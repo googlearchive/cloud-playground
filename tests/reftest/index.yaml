@@ -1,0 +1,7 @@
+indexes:
+
+- kind: Item
+  properties:
+  - name: x
+  - name: y
+    direction: desc

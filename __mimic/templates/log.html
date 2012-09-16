@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+  <head>
+    <script type="text/javascript" src='/_ah/channel/jsapi'></script>
+    <title>Mimic Log</title>
+  </head>
+  <body>
+    <script type='text/javascript'>
+      addLogEntry = function(entry) {
+        var table = document.getElementById("output");
+        var row = table.insertRow(table.rows.length);
+        row.insertCell(0).innerHTML = new Date(entry.created * 1000);
+        row.insertCell(1).innerHTML = entry.levelname;
+        row.insertCell(2).innerHTML = entry.message;
+      }
+
+      onMessage = function(m) {
+        addLogEntry(JSON.parse(m.data));
+      }
+
+      openChannel = function() {
+        var token = "%(token)s";
+        var channel = new goog.appengine.Channel(token);
+        var socket = channel.open();
+        socket.onmessage = onMessage;
+      }
+
+      initialize = function() {
+        openChannel();
+      }
+
+      setTimeout(initialize, 100);
+    </script>
+    <table id="output" border="0" summary="log messages">
+      <tr><th>Timestamp</th><th>Severity</th><th>Message</th></tr>
+    </table>
+  </body>
+</html>
