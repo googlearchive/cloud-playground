@@ -51,7 +51,7 @@ class DatastoreTree(common.Tree):
     self.root = ndb.Key(_AhMimicFile, '/', namespace=namespace)
 
   def __repr__(self):
-    return '<{0} root={1}>'.format(__name__, self.root)
+    return '<{0} root={1}>'.format(self.__class__.__name__, self.root)
 
   @staticmethod
   def _NormalizeDirectoryPath(path):
@@ -125,6 +125,10 @@ class DatastoreTree(common.Tree):
     keys = _AhMimicFile.query(ancestor=self.root).iter(keys_only=True)
     for key in keys:
       entry_path = key.id()
+      # 'path is None' means get all files recursively
+      if path is None:
+        paths.add(entry_path)
+        continue
       if not entry_path.startswith(path):
         continue
       tail = entry_path[len(path):]

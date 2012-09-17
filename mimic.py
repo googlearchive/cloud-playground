@@ -22,6 +22,9 @@ going to be tested outside of App Engine.
 
 import cStringIO
 from email import feedparser
+import logging
+import os
+import shared
 import sys
 import traceback
 
@@ -45,6 +48,11 @@ class Mimic(object):
     saved_out = sys.stdout
     sys.stdout = output
     try:
+      logging.warn('\n' * 3)
+      if (not shared.DoesCurrentProjectExist()
+          and os.environ['PATH_INFO'] == '/'):
+        yield self._RedirectResponse('/bliss')
+        return
       mimic.RunMimic()
     except target_env.TargetAppError, err:
       yield self._ExceptionResponse(err.FormattedException())
@@ -60,6 +68,13 @@ class Mimic(object):
       sys.stdout = saved_out
     response = output.getvalue()
     yield self._NormalResponse(response)
+
+  def _RedirectResponse(self, location):
+    status = '302 Found'
+    response_headers = [('Location', location)]
+    self.start_response(status, response_headers)
+    # empty body
+    return ''
 
   def _ExceptionResponse(self, formatted_exception):
     status = '500 Server Error'

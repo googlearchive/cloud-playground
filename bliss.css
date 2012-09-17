@@ -1,0 +1,336 @@
+HTML, BODY {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+BODY {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+A, .link {
+  cursor: pointer;
+  color: #00e;
+  text-decoration: none;
+}
+
+HR.divider {
+  clear: both;
+  border: none;
+  padding: 2px;
+}
+
+BUTTON {
+  color: white;
+  background-color: #22F;
+  border: 1px solid #11E;
+  border-radius: 4px;
+  display: inline-block;
+  padding: 8px;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+  BUTTON:hover {
+    cursor: pointer;
+  }
+
+  BUTTON.login {
+    background-color: #44e;
+    border: 1px solid #33d;
+  }
+
+  BUTTON.logout {
+    background-color: #ccc;
+    border: 1px solid #bbb;
+  }
+
+#file-context-menu {
+  display: none;
+  position: absolute;
+  width: 10em;
+  margin-left: -2em;
+  margin-top: -.5em;
+  z-index: 1000;
+  padding: .5em;
+  background-color: #e9e9e9;
+}
+
+  #file-context-menu DIV:hover {
+    cursor: pointer;
+    background-color: #c5d7ef;
+  }
+
+TABLE {
+  border: 1px solid #c5d7ef;
+  border-collapse: collapse;
+  empty-cells: show;
+  margin: 1em .5em .5em 1em;
+}
+
+  TR {
+    border: 1px solid #c5d7ef;
+  }
+
+  TR.even {
+    background-color: #e9e9e9;
+  }
+
+  TH {
+    background-color: #c5d7ef;
+  }
+
+  TH, TD {
+    padding: 0px;
+    margin: 0px;
+    text-align: left;
+    padding: .35em 1em .25em .35em;
+  }
+
+.experimental {
+  color: #f00;
+  top: -0.9em;
+  position: relative;
+}
+
+.butter {
+  color: #444;
+  background-color: #fe8;
+  box-shadow: 0 .23em .4em rgba(0, 0, 0, .3);
+  font-weight: bold;
+  margin: 0 auto;
+  padding: .25em 15px .2em 15px;
+  text-align: center;
+}
+
+.topbar {
+  position: absolute;
+  right: 0em;
+  top: 0em;
+}
+
+  .topbar DIV {
+    display: inline-block;
+  }
+
+  .topbar SPAN {
+    margin: 0.4em;
+  }
+
+#status {
+  color: #ccc;
+  margin: 0em 2em;
+  min-height: 2em;
+}
+
+.logo {
+  font-size: 2em;
+  font-weight: bold;
+  color: #000;
+  text-decoration: none;
+}
+
+  .logo .app-back {
+    color: #ddd;
+    font-size: 0.9em;
+    vertical-align: top;
+  }
+
+  .logo:HOVER .app-back {
+    color: #555;
+  }
+
+h1 {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin: 1.7em 0em .4em;
+}
+
+.projectlist .project {
+  list-style-type: none;
+}
+
+#projectname {
+  color: #aaa;
+}
+
+#source-filename {
+  font-weight: bold;
+  color: #777;
+  padding-left: 30px;
+  display: inline-block;
+}
+
+#nav {
+  width: 15%;
+  height: 100%;
+  float: left;
+}
+
+  #nav #filelist {
+    border-top: 1px solid #aaa;
+  }
+
+    #nav #filelist .fileentry {
+      margin: .2em 0em 0em;
+      cursor: pointer;
+    }
+
+    #nav #filelist .fileentry.selected {
+      background-color: #ddf;
+    }
+
+      #nav #filelist .fileentry.selected .filename {
+        font-weight: bold;
+      }
+
+  #nav #projectname , #source-filename {
+    /* run.png is 42px x 32px */
+    height: 34px;
+  }
+
+  #nav .runlink {
+    float: right;
+  }
+
+  #nav .dropdown {
+    text-align: right;
+    float: right;
+  }
+
+    #nav .dropdown A {
+      color: #555;
+    }
+
+    #nav .dropdown A:hover {
+      color: #00c;
+      background-color: #cce;
+    }
+
+.newthing {
+  color: #bbb;
+  padding-top: .5em;
+}
+
+  .newthing .name {
+    font-weight: bold;
+  }
+
+  .one .newthing .name {
+    color: #484;
+  }
+  .one .newthing BUTTON {
+    background-color: #484;
+    border: 1px solid #373;
+  }
+
+  .two .newthing .name {
+    color: #448;
+  }
+  .two .newthing BUTTON {
+    background-color: #448;
+    border: 1px solid #337;
+  }
+
+  .three .newthing .name {
+    color: #844;
+  }
+  .three .newthing BUTTON {
+    background-color: #844;
+    border: 1px solid #733;
+  }
+
+#container {
+  position: relative;
+  height: auto;
+  min-height: 100%;
+}
+
+  #header {
+    border-bottom: 1px solid #ccc;
+    /* developers-logo.png is 200px x 48px */
+    background: 7px 7px no-repeat url(/bliss/developers-logo.png);
+    padding-left: 215px;
+    line-height: 67px;
+    height: 67px;
+  }
+
+  #main {
+    /* bottom padding should be at least footer height */
+    padding: 0em 1em 4em;
+  }
+
+  #footer {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    border-top: 1px solid #ccc;
+    padding: 1em 0em 0.5em;
+  }
+
+    #footer .diag {
+      color: #ccc;
+      display: inline-block;
+    }
+
+    #footer #adminlinks {
+      color: #999;
+      display: inline-block;
+      float: right;
+    }
+
+      #footer SPAN {
+        margin: 0.4em;
+      }
+
+#source-code {
+  background-color: #f8fafc;
+  width: 85%;
+  float: right;
+  white-space: pre;
+}
+
+  #source-container #source-code , #source-container #source-image {
+    display: none;
+  }
+
+  #source-container.code #source-code , #source-container.image #source-image {
+    display: block;
+  }
+
+  #source-container IMG {
+    background: url(/bliss/checker.png) repeat;
+    display: block;
+  }
+
+.CodeMirror {
+  border: 1px solid #ccc;
+}
+
+  .CodeMirror-scroll {
+    height: 30em;
+  }
+
+#output-container {
+  display: none;
+  padding: .5em 0em 0em;
+}
+
+  #output-container #output-url {
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    /* popout.png is 42px x 32px */
+    background: no-repeat url(popout.png);
+    line-height: 32px;
+    height: 32px;
+    padding-left: 47px;
+  }
+
+  #output-container #output-iframe {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    height: 17em;
+  }
+

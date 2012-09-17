@@ -1,0 +1,28 @@
+<div id="container"> {# closed in footer.html #}
+
+<div id="header">
+  <a class="logo" href="/bliss"><span class='app-back'>&#x2039;</span>Cloud Playground</a>
+  <sup class="experimental">experimental</sup>
+  <span id="status"></span>
+
+  <div class="topbar">
+    <div class="email">
+      <span>{{email}}</span>
+      {% if is_logged_in %}
+        <button class="logout" onclick="window.location='/bliss/logout'">logout</button>
+      {% else %}
+        <button class="login" onclick="window.location='/bliss/login'">login</button>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="butter">
+  Note: This is a shared public playground.
+  Anyone can read, modify or delete your projects, files and data at any time.
+  Your private source code and data are <em>not</em> safe here.
+</div>
+
+<hr class="divider">
+
+<div id="main"> {# closed in footer.html #}

@@ -42,8 +42,11 @@ from __mimic import target_env
 from __mimic import target_info
 import yaml
 
+# import parts of the google.appengine.api.appinfo package (extracted from the
+# local SDK by sdkapi.sh), since the appinfo package is currently unavailable in
+# the App Engine production environment
+from sdkapi import appinfo
 from google.appengine.api import app_identity
-from google.appengine.api import appinfo
 from google.appengine.api import users
 from google.appengine.ext.webapp.util import run_wsgi_app
 
@@ -265,10 +268,7 @@ def GetProjectName():
   # 'project-name-dot-your-app-id.appspot.com' or
   # 'project-name.your-app-id.appspot.com'
 
-  if 'SERVER_NAME' not in os.environ:
-    return ''
   server_name = os.environ['SERVER_NAME']
-
   # use a consistent delimiter
   server_name = server_name.replace('-dot-', '.')
 

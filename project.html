@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+
+{% block onload %}initWorkspace(){% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="/codemirror/lib/codemirror.css">
+
+  <script src="/codemirror/lib/codemirror.js"></script>
+
+  <script src="/codemirror/mode/clike/clike.js"></script>
+  <script src="/codemirror/mode/css/css.js"></script>
+  <script src="/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+  <script src="/codemirror/mode/htmlembedded/htmlembedded.js"></script>
+  <script src="/codemirror/mode/javascript/javascript.js"></script>
+  <script src="/codemirror/mode/mysql/mysql.js"></script>
+  <script src="/codemirror/mode/php/php.js"></script>
+  <script src="/codemirror/mode/python/python.js"></script>
+  <script src="/codemirror/mode/xml/xml.js"></script>
+  <script src="/codemirror/mode/yaml/yaml.js"></script>
+
+  <script src="/codemirror/lib/util/formatting.js"></script>
+
+<script>
+function file_context_menu(id) {
+  console.log(id);
+}
+</script>
+{% endblock %}
+
+{% block main %}
+  <div id="nav">
+    <div id="projectname">
+      {{project_description}}
+      <div class="runlink" onclick="return run('{{project_run_url}}', '{{project_name}}')" title="run {{project_name}}"><img src='/bliss/run.png'></div>
+    </div>
+    <div id="filelist">
+    </div>
+  </div>
+
+  <div id="source-container">
+    <div id="source-filename"></div>
+    <div id="source-code"></div>
+    <img id="source-image">
+  </div>
+
+  <hr class="divider"/>
+
+  <div id="output-container">
+    <div id="output-url" onclick="popout(); run('{{project_run_url}}', '{{project_name}}')"></div>
+    <iframe id="output-iframe">
+    </iframe>
+  </div>
+
+  {# hidden bits #}
+  <div id='file-context-menu'>
+    <div onclick="prompt_file_rename()">Rename</div>
+    <div onclick="prompt_file_delete()">Delete</div>
+  </div>
+{% endblock %}

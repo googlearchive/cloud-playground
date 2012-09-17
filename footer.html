@@ -1,0 +1,21 @@
+</div> {# closing tag for <div id="main"> #}
+
+<div id="footer">
+  <div class="diag">
+    <span>namespace: {{namespace}}</span>
+    <span>session: {{session}}</span>
+  </div>
+  <div id="adminlinks">
+    <span>git(<a href="{{git_bliss_url}}" target="bliss_datastore">bliss</a>)</span>
+
+    {% if nuke_admin_url %}
+      <span>danger(<a href="{{nuke_admin_url}}" onclick="lightbox('Bye, bye, data.', 'Please wait...');">big-red-button</a>)</span>
+    {% endif %}
+
+    {% if datastore_admin_url and memcache_admin_url %}
+    <span>admin(<a href="{{datastore_admin_url}}" target="bliss_datastore">datastore</a>, <a href="{{memcache_admin_url}}" target="bliss_memcache">memcache</a>)</span>
+    {% endif %}
+
+  </div>
+</div>
+</div> {# closing tag for <div id="container"> #}

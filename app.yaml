@@ -1,9 +1,13 @@
-application: your-app-id
-version: 1
+application: try-appengine
+version: bliss
 runtime: python27
 api_version: 1
 # Mimic target environment is not yet threadsafe
 threadsafe: false
+
+includes:
+- codemirror.yaml
+- bliss.yaml
 
 # https://developers.google.com/appengine/docs/python/config/appconfig#Builtin_Handlers
 builtins:
@@ -39,8 +43,8 @@ handlers:
   #   Request failed because URL requires user login. For requests invoked
   #   within App Engine (offline requests like Task Queue, or webhooks like XMPP
   #   and Incoming Mail), the URL must require admin login (or no login)
-  login: admin
-  secure: always
+  #login: admin
+  #secure: always
 
 # Currently supported libraries are documented by
 # https://developers.google.com/appengine/docs/python/tools/libraries27
@@ -71,7 +75,7 @@ libraries:
 
 skip_files:
 # default list
-- ^(.*/)?app\.ya?ml
+- ^app\.ya?ml
 - ^(.*/)?index\.ya?ml
 - ^(.*/)?#.*#
 - ^(.*/)?.*~
@@ -79,17 +83,6 @@ skip_files:
 - ^(.*/)?.*/RCS/.*
 - ^(.*/)?\..*
 - ^(.*/)?.*\.so
-
-
-
-
-
-
-
-
-
-
-# things that don't need to be uploaded
 - ^(.*/)?tests.*
 - ^(.*/)?run_tests\.py
 - ^(.*/)?README\.txt

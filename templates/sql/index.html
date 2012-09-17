@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>CloudSQL Tutorial</title>
+</head>
+<body>
+<h2>Guestbook</h2>
+<form action="sign" method="POST">
+  Name: <input name="guest_name"><br>
+  <textarea name="content" rows="3" cols="60"></textarea><br>
+  <input type="submit" value="Sign Guestbook">
+</form>
+<hr>
+{% for row in rows %}
+  <p>{{ row[0]|e }} wrote:
+    <blockquote>
+      {{ row[1]|e }}
+    </blockquote>
+    at {{ row[2]|e }}
+  </p>
+  <hr>
+{% endfor %}

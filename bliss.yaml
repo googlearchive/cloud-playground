@@ -1,0 +1,12 @@
+handlers:
+- url: /bliss/([^/]*.(png|gif))
+  static_files: images/\1
+  upload: images/.*.(png|gif)
+
+- url: /bliss/([^/]*.(js|css))
+  static_files: \1
+  # don't cast a wide net
+  upload: (bliss.js|bliss.css)
+
+- url: /bliss|/bliss/.*
+  script: bliss.app
