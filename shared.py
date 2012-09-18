@@ -54,6 +54,7 @@ _TEXT_MIME_TYPES = {
   'jsp': 'application/x-jsp',
   'json': 'application/json',
   'php': 'application/x-httpd-php',
+  'sh': 'text/x-sh',
   'sql': 'text/x-mysql',
   'xml': 'application/xml',
   'yaml': 'text/x-yaml',
