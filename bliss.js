@@ -136,8 +136,7 @@ function insertAfter(newNode, existingNode) {
   }
 }
 
-function file_context_menu(id) {
-  var evt = window.event;
+function file_context_menu(evt, id) {
   evt.stopPropagation();
   var menuDiv = document.getElementById('file-context-menu');
   menuDiv.style.display = 'block';
@@ -207,7 +206,7 @@ function addfile(id, filename) {
   node.id = id;
   node.setAttribute('class', 'fileentry unselected');
   var url = 'http://' + _whoami.hostname + filename;
-  node.innerHTML = '<span class="filename">' + filename + '</span><span class="dropdown"><a onclick="file_context_menu(\'' + id + '\')">&hellip;</a></span>';
+  node.innerHTML = '<span class="filename">' + filename + '</span><span class="dropdown"><a onclick="file_context_menu(arguments[0] || window.event, \'' + id + '\')">&hellip;</a></span>';
   filelist.insertBefore(node, filelist.lastChild);
 }
 
@@ -376,7 +375,7 @@ function initFileContextMenuClearHandler() {
 // setup left nav click handler
 function initLeftNavClickHandler() {
   nav.addEventListener('click', function(evt) {
-    var id = getFileIdFromElem(evt.srcElement);
+    var id = getFileIdFromElem(evt.srcElement || evt.target);
     if (id) {
       selectFile(id);
     }
