@@ -83,6 +83,17 @@ skip_files:
 - ^(.*/)?.*/RCS/.*
 - ^(.*/)?\..*
 - ^(.*/)?.*\.so
+
+
+
+
+
+
+
+
+
+
+# things that don't need to be uploaded
 - ^(.*/)?tests.*
 - ^(.*/)?run_tests\.py
 - ^(.*/)?README\.txt
