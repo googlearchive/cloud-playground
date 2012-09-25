@@ -109,7 +109,7 @@ class BlissHandler(SessionHandler):
     self.response.out.write('%s' % (cgi.escape(exception.message, quote=True)))
 
 
-  def db_tree(self, project_name):
+  def get_tree(self, project_name):
     assert project_name
     prj = model.GetProject(project_name)
     if not prj:
@@ -187,7 +187,7 @@ class GetFile(BlissHandler):
   def get(self, project_name, filename):
     assert project_name
     assert filename
-    contents = self.db_tree(project_name).GetFileContents(filename)
+    contents = self.get_tree(project_name).GetFileContents(filename)
     if contents is None:
       self.response.set_status(404)
       self.response.headers['Content-Type'] = 'text/plain'
@@ -203,7 +203,7 @@ class PutFile(BlissHandler):
   def put(self, project_name, filename):
     assert project_name
     assert filename
-    self.db_tree(project_name).SetFile(path=filename,
+    self.get_tree(project_name).SetFile(path=filename,
                  contents=self.request.body)
 
     self.response.headers['Content-Type'] = 'text/plain'
@@ -219,7 +219,7 @@ class MoveFile(BlissHandler):
       raise Exception('Project {0} does not exist'.format(project_name))
     newpath = self.request.get('newpath')
     assert newpath
-    self.db_tree(project_name).MoveFile(oldpath, newpath)
+    self.get_tree(project_name).MoveFile(oldpath, newpath)
 
 
 class DeleteFile(BlissHandler):
@@ -229,7 +229,7 @@ class DeleteFile(BlissHandler):
     assert path
     if not model.GetProject(project_name):
       raise Exception('Project {0} does not exist'.format(project_name))
-    self.db_tree(project_name).DeleteFile(path)
+    self.get_tree(project_name).DeleteFile(path)
 
 
 class Project(BlissHandler):
@@ -263,7 +263,7 @@ class WhoAmI(BlissHandler):
       "project_name": project.project_name,
       "project_description": project.project_description,
       'hostname': version_hostname,
-      'files': self.db_tree(project_name).ListDirectory(None),
+      'files': self.get_tree(project_name).ListDirectory(None),
     }
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
@@ -356,11 +356,11 @@ class CreateProject(BlissHandler):
                         project_name=project_name,
                         project_description=project_description)
     if codesite.IsCodesiteURL(template_url):
-      codesite.PopulateProjectFromCodesite(tree=self.db_tree(project_name),
+      codesite.PopulateProjectFromCodesite(tree=self.get_tree(project_name),
                                            project_name=project_name,
                                            template_url=template_url)
     else:
-      model.PopulateProjectWithTemplate(tree=self.db_tree(project_name),
+      model.PopulateProjectWithTemplate(tree=self.get_tree(project_name),
                                         project_name=project_name,
                                         template_url=template_url)
 
@@ -371,7 +371,7 @@ class DeleteProject(BlissHandler):
     assert project_name
     if not model.GetProject(project_name):
       raise Exception('Project {0} does not exist'.format(project_name))
-    model.DeleteProject(self.user, tree=self.db_tree(project_name),
+    model.DeleteProject(self.user, tree=self.get_tree(project_name),
                         project_name=project_name)
 
 
