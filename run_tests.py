@@ -58,6 +58,11 @@ def main():
   else:
     file_pattern = '*_test.py'
 
+  # setup a minimal / partial CGI environment
+  os.environ['SERVER_NAME'] = 'localhost'
+  os.environ['SERVER_SOFTWARE'] = 'Development/unittests'
+  os.environ['PATH_INFO'] = '/moonbase'
+
   argv = ['', 'discover',
           '-v',  # verbose
           '-s', DIR_PATH,  # search path
