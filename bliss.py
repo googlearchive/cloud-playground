@@ -314,7 +314,9 @@ class RunProject(BlissHandler):
       return
     # interstitual
     self.response.write("""
-      <html><body>dev_appserver hack:
+      <html><body>Bliss needs to set a special (dev_appserver only) cookie in
+        order to simulate the multiple hostnames provided by App Engine's
+        production environment:
         <blockquote>Set cookie <code>{0}={1}</code> and <a href="{2}">proceed</a>.</blockquote>
       </body></html>
       """.format(shared.BLISS_PROJECT_NAME_COOKIE, project_name,
