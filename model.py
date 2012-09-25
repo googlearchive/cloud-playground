@@ -5,8 +5,6 @@ import random
 import shared
 import os
 
-from __mimic import datastore_tree
-
 from google.appengine.api import memcache
 from google.appengine.api import users
 

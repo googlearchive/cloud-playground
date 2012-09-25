@@ -7,8 +7,6 @@ import shared
 import sys
 import traceback
 
-from __mimic import datastore_tree
-
 from google.appengine.api import memcache
 from google.appengine.api import urlfetch
 

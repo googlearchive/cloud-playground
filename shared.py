@@ -9,8 +9,6 @@ from google.appengine.api import users
 from google.appengine.api import namespace_manager
 
 
-from __mimic import datastore_tree
-
 _PROJECT_NAME_FROM_PATH_INFO_RE = re.compile('/bliss/p/(.+?)/')
 _PROJECT_NAME_FROM_HOSTNAME_RE = re.compile('(.+?)-dot-(.+?)\.')
 
