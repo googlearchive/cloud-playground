@@ -231,7 +231,7 @@ class MimicTest(unittest.TestCase):
     saved_out = sys.stdout
     try:
       sys.stdout = output
-      mimic.RunMimic(datastore_tree_func=self._CreateTree,
+      mimic.RunMimic(create_tree_func=self._CreateTree,
                      users_mod=self._users_mod)
     finally:
       sys.stdout = saved_out

@@ -279,13 +279,13 @@ def GetProjectName():
   return server_name.split('.')[0]
 
 
-def RunMimic(datastore_tree_func=datastore_tree.DatastoreTree,
+def RunMimic(create_tree_func=datastore_tree.DatastoreTree,
              users_mod=users):
   """Entry point for mimic.
 
   Args:
-    datastore_tree_func: A callable that creates an DatastoreTree (default
-        is the DatastoreTree class itself).
+    create_tree_func: A callable that creates a common.Tree (default
+        is datastore_tree.DatastoreTree).
     users_mod: A users module to use for authentication (default is the
         AppEngine users module).
   """
@@ -302,7 +302,7 @@ def RunMimic(datastore_tree_func=datastore_tree.DatastoreTree,
 
   if requires_tree:
     project_name = GetProjectName()
-    tree = datastore_tree_func(project_name)
+    tree = create_tree_func(project_name)
   else:
     tree = None
 

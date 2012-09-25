@@ -73,6 +73,10 @@ class Tree(object):
   provide implementations of SetFile() and Clear().
   """
 
+  def __init__(self, project_name=None):
+    """Constructor which accepts a project name argument."""
+    pass
+
   def IsMutable(self):
     """Returns True if the tree can be modifed, False otherwise."""
     return False
