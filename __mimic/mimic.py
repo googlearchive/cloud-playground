@@ -279,8 +279,7 @@ def GetProjectName():
   return server_name.split('.')[0]
 
 
-def RunMimic(create_tree_func=datastore_tree.DatastoreTree,
-             users_mod=users):
+def RunMimic(create_tree_func, users_mod=users):
   """Entry point for mimic.
 
   Args:

@@ -28,6 +28,7 @@ import shared
 import sys
 import traceback
 
+from __mimic import datastore_tree
 from __mimic import mimic
 from __mimic import target_env
 
@@ -53,7 +54,7 @@ class Mimic(object):
           and os.environ['PATH_INFO'] == '/'):
         yield self._RedirectResponse('/bliss')
         return
-      mimic.RunMimic()
+      mimic.RunMimic(create_tree_func=datastore_tree.DatastoreTree)
     except target_env.TargetAppError, err:
       yield self._ExceptionResponse(err.FormattedException())
       return
