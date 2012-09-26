@@ -1,3 +1,4 @@
+# keep in sync with urlfetch_tree_SOURCE_CODE_APP_ID in appengine_config.py
 application: try-appengine
 version: bliss
 runtime: python27
