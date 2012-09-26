@@ -216,7 +216,7 @@ function prompt_file_delete() {
   if (!answer || answer.toLowerCase()[0] != 'y') {
     return;
   }
-  var uri = 'deletefile/' + encodeURI(filename);
+  var uri = 'deletepath/' + encodeURI(filename);
   post(uri, function(xhr) {
     document.body.scrollTop = 0;
     window.location.reload();

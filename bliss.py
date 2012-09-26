@@ -420,7 +420,7 @@ app = webapp2.WSGIApplication([
     ('/bliss/p/(.*)/getfile/(.*)', GetFile),
     ('/bliss/p/(.*)/putfile/(.*)', PutFile),
     ('/bliss/p/(.*)/movefile/(.*)', MoveFile),
-    ('/bliss/p/(.*)/deletefile/(.*)', DeletePath),
+    ('/bliss/p/(.*)/deletepath/(.*)', DeletePath),
     ('/bliss/p/(.*)/listfiles/(.*)', ListFiles),
 
     # project actions

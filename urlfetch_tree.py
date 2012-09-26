@@ -125,7 +125,7 @@ class UrlFetchTree(common.Tree):
     return True
 
   def DeletePath(self, path):
-    url = ('http://{0}.appspot.com/bliss/p/{1}/deletefile/{2}'
+    url = ('http://{0}.appspot.com/bliss/p/{1}/deletepath/{2}'
            .format(_config.SOURCE_CODE_APP_ID,
                    self.project_name,
                    path))
