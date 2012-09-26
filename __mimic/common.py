@@ -214,6 +214,12 @@ def RequiresOriginalMemcache(func):
   being prefixed with the project's name for namespacing memcache for the
   duration of the decorated function. This is primarily for allowing mimic to
   cache the target app's files without polluting the target app's namespace.
+
+  Args:
+    func: The function which is to be decorated.
+
+  Returns:
+    A function object.
   """
 
   def Wrapper(*args, **kwargs):
@@ -224,6 +230,7 @@ def RequiresOriginalMemcache(func):
     finally:
       _requires_original_memcache_call_depth -= 1
       assert _requires_original_memcache_call_depth >= 0
+
   return Wrapper
 
 

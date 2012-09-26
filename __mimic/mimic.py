@@ -39,25 +39,27 @@ from __mimic import control
 from __mimic import shell
 from __mimic import target_env
 from __mimic import target_info
-import yaml
 
 # import parts of the google.appengine.api.appinfo package (extracted from the
 # local SDK by sdkapi.sh), since the appinfo package is currently unavailable in
 # the App Engine production environment
 from sdkapi import appinfo
+
+import yaml
+
 from google.appengine.api import app_identity
 from google.appengine.api import namespace_manager
 from google.appengine.api import users
 from google.appengine.ext.webapp.util import run_wsgi_app
 
 # os.environ key representing 'X-AppEngine-QueueName' HTTP header,
-# which should only be present for 'offline' task queue requests,
-# see https://developers.google.com/appengine/docs/python/taskqueue/overview-push#Task_Execution
+# which should only be present for 'offline' task queue requests, see
+# https://developers.google.com/appengine/docs/python/taskqueue/overview-push#Task_Execution
 _HTTP_X_APPENGINE_QUEUENAME = 'HTTP_X_APPENGINE_QUEUENAME'
 
 # os.environ key representing 'X-AppEngine-Cron' HTTP header,
-# which should only be present for 'offline' cron requests,
-# see https://developers.google.com/appengine/docs/python/config/cron#Securing_URLs_for_Cron
+# which should only be present for 'offline' cron requests, see
+# https://developers.google.com/appengine/docs/python/config/cron#Securing_URLs_for_Cron
 _HTTP_X_APPENGINE_CRON = 'HTTP_X_APPENGINE_CRON'
 
 # os.environ key representing 'X-AppEngine-Current-Namespace' HTTP header,
@@ -247,26 +249,28 @@ def RunTargetApp(tree, path_info, project_name, users_mod):
 def GetProjectNameFromServerName():
   """Returns the project name from the SERVER_NAME env var.
 
-     For appspot.com domains, a project name is extracted from the left most
-     portion of the subdomain. If no subdomain is specified, or if the project
-     name cannot be determined, '' is returned. Finally, when the server name
-     is 'localhost', '' is also returned.
+  For appspot.com domains, a project name is extracted from the left most
+  portion of the subdomain. If no subdomain is specified, or if the project
+  name cannot be determined, '' is returned. Finally, when the server name
+  is 'localhost', '' is also returned.
 
-     For custom domains, it's not possible to determine with certainty the
-     subdomain vs. the default version hostname. In this case we end up using
-     the left most component of the server name.
+  For custom domains, it's not possible to determine with certainty the
+  subdomain vs. the default version hostname. In this case we end up using
+  the left most component of the server name.
 
-     Example mapping of server name to project name:
+  Example mapping of server name to project name:
 
-     Server Name                              Project Name
-     -----------                              ------------
-     proj1.your-app-id.appspot.com        ->  'proj1'
-     proj1-dot-your-app-id.appspot.com    ->  'proj1'
-     your-app-id.appspot.com              ->  ''
-     www.mydomain.com                     ->  'www'
-     proj2.www.mydomain.com               ->  'proj2'
-     localhost                            ->  ''
+  Server Name                              Project Name
+  -----------                              ------------
+  proj1.your-app-id.appspot.com        ->  'proj1'
+  proj1-dot-your-app-id.appspot.com    ->  'proj1'
+  your-app-id.appspot.com              ->  ''
+  www.mydomain.com                     ->  'www'
+  proj2.www.mydomain.com               ->  'proj2'
+  localhost                            ->  ''
 
+  Returns:
+    The project name or empty string ''.
   """
   # The project name is sent as a "subdomain" of the app, e.g.
   # 'project-name-dot-your-app-id.appspot.com' or
@@ -304,6 +308,9 @@ def GetProjectName():
 
   A number of sources for project name are tried in order. See implementation
   details.
+
+  Returns:
+    The project name.
   """
   # for task queues, use persisted namespace as the project name
   project_name = os.environ.get(_HTTP_X_APPENGINE_CURRENT_NAMESPACE)

@@ -103,7 +103,6 @@ class DatastoreTree(common.Tree):
     ndb.delete_multi(keys)
 
   def SetFile(self, path, contents):
-    """Set the file contents."""
     entity = _AhMimicFile(id=path, parent=self.root, contents=contents)
     entity.put()
     return entity
