@@ -220,14 +220,13 @@ class MoveFile(BlissHandler):
     self.get_tree(project_name).MoveFile(oldpath, newpath)
 
 
-class DeleteFile(BlissHandler):
+class DeletePath(BlissHandler):
 
   def post(self, project_name, path):
     assert project_name
-    assert path
     if not model.GetProject(project_name):
       raise Exception('Project {0} does not exist'.format(project_name))
-    self.get_tree(project_name).DeleteFile(path)
+    self.get_tree(project_name).DeletePath(path)
 
 
 class ListFiles(BlissHandler):
@@ -421,7 +420,7 @@ app = webapp2.WSGIApplication([
     ('/bliss/p/(.*)/getfile/(.*)', GetFile),
     ('/bliss/p/(.*)/putfile/(.*)', PutFile),
     ('/bliss/p/(.*)/movefile/(.*)', MoveFile),
-    ('/bliss/p/(.*)/deletefile/(.*)', DeleteFile),
+    ('/bliss/p/(.*)/deletefile/(.*)', DeletePath),
     ('/bliss/p/(.*)/listfiles/(.*)', ListFiles),
 
     # project actions

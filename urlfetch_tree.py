@@ -124,7 +124,7 @@ class UrlFetchTree(common.Tree):
                .format(resp.status_code, url))
     return True
 
-  def DeleteFile(self, path):
+  def DeletePath(self, path):
     url = ('http://{0}.appspot.com/bliss/p/{1}/deletefile/{2}'
            .format(_config.SOURCE_CODE_APP_ID,
                    self.project_name,
@@ -142,7 +142,7 @@ class UrlFetchTree(common.Tree):
     return True
 
   def Clear(self):
-    raise NotImplementedError
+    self.DeletePath('')
 
   def SetFile(self, path, contents):
     resp = self._PutFile(path, contents)

@@ -91,11 +91,13 @@ class DatastoreTree(common.Tree):
     entity.key.delete()
     return True
 
-  def DeleteFile(self, path):
-    entity = _AhMimicFile.get_by_id(path, parent=self.root)
-    if entity is None:
+  def DeletePath(self, path):
+    normpath = self._NormalizeDirectoryPath(path)
+    keys = _AhMimicFile.query(ancestor=self.root).fetch(keys_only=True)
+    keys = [k for k in keys if k.id() == path or k.id().startswith(normpath)]
+    if not keys:
       return False
-    entity.key.delete()
+    ndb.delete_multi(keys)
     return True
 
   def Clear(self):

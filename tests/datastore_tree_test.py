@@ -65,11 +65,35 @@ class DatastoreTreeTest(unittest.TestCase):
   def testDeleteFile(self):
     self.assertTrue(self._tree.HasFile('/foo'))
     self.assertEquals('123', self._tree.GetFileContents('/foo'))
-    self._tree.DeleteFile('/foo')
+    self._tree.DeletePath('/foo')
     self.assertFalse(self._tree.HasFile('/foo'))
     self.assertIsNone(self._tree.GetFileContents('/foo'))
     # make sure '/bar' still exists
     self.assertEquals('456', self._tree.GetFileContents('/bar'))
+
+  def testDeleteDirectory(self):
+    self.assertTrue(self._tree.HasDirectory('/'))
+    self.assertFalse(self._tree.HasDirectory('/boo'))
+    self.assertTrue(self._tree.HasFile('/foo'))
+    self.assertEquals('123', self._tree.GetFileContents('/foo'))
+    # create directory /boo with two files
+    self._tree.SetFile('/boo/bat', '456')
+    self._tree.SetFile('/boo/bot', '789')
+    self.assertTrue(self._tree.HasDirectory('/boo'))
+    self.assertTrue(self._tree.HasFile('/boo/bat'))
+    self.assertEquals('456', self._tree.GetFileContents('/boo/bat'))
+    self.assertTrue(self._tree.HasFile('/boo/bot'))
+    self.assertEquals('789', self._tree.GetFileContents('/boo/bot'))
+    # delete directory
+    self._tree.DeletePath('/boo')
+    self.assertTrue(self._tree.HasDirectory('/'))
+    self.assertFalse(self._tree.HasDirectory('/boo'))
+    self.assertTrue(self._tree.HasFile('/foo'))
+    self.assertEquals('123', self._tree.GetFileContents('/foo'))
+    self.assertFalse(self._tree.HasFile('/boo/bat'))
+    self.assertIsNone(self._tree.GetFileContents('/boo/bat'))
+    self.assertFalse(self._tree.HasFile('/boo/bot'))
+    self.assertIsNone(self._tree.GetFileContents('/boo/bot'))
 
   def testHasDirectory(self):
     self.assertTrue(self._tree.HasDirectory('/'))

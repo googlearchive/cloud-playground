@@ -139,14 +139,14 @@ class Tree(object):
     """
     raise NotImplementedError
 
-  def DeleteFile(self, path):
-    """Delete a file.
+  def DeletePath(self, path):
+    """Delete a file, or directory and its contents.
 
     Args:
-      path: The full path for the file.
+      path: The full path for the file or directory.
 
     Returns:
-      True if the file existed and was deleted, False otherwise.
+      True if any paths were deleted, False otherwise.
     """
     raise NotImplementedError
 
