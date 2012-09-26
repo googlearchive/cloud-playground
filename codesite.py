@@ -7,6 +7,8 @@ import shared
 import sys
 import traceback
 
+from __mimic import common
+
 from google.appengine.api import memcache
 from google.appengine.api import urlfetch
 
@@ -52,7 +54,7 @@ def _GetTemplates(template_source):
   if 'app.yaml' in candidates:
     candidates.insert(0, '')
 
-  if shared.IsDevAppserver():
+  if common.IsDevMode():
     # fetch fewer templates during development
     candidates = candidates[:3]
 

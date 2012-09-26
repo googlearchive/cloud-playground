@@ -119,7 +119,7 @@ class BlissHandler(SessionHandler):
 
 
   def redirect_to_default_hostname(self):
-    if shared.IsDevAppserver():
+    if common.IsDevMode():
       return False
     default_version_hostname = app_identity.get_default_version_hostname()
     if self.request.host != default_version_hostname:
@@ -305,7 +305,7 @@ class Logout(BlissHandler):
 class RunProject(BlissHandler):
 
   def get(self, project_name):
-    if not shared.IsDevAppserver():
+    if not common.IsDevMode():
       # production
       self.redirect('https://{0}{1}{2}/'.format(urllib.quote_plus(project_name),
                     _DASH_DOT_DASH,

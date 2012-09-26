@@ -30,10 +30,6 @@ def w(msg, *args, **kwargs):
   logging.warning('##### {0}'.format(repr(msg)))
 
 
-def IsDevAppserver():
-  return os.environ['SERVER_SOFTWARE'].startswith('Development/')
-
-
 # TODO: use the MIME Type list at http://codemirror.net/
 _TEXT_MIME_TYPES = {
   'css': 'text/css',

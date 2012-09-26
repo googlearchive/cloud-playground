@@ -60,7 +60,7 @@ class UrlFetchTree(common.Tree):
                    self.project_name,
                    path))
     headers = {}
-    if shared.IsDevAppserver():
+    if common.IsDevMode():
       cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,
                                 self.project_name)
       headers['Cookie'] = cookie
@@ -74,7 +74,7 @@ class UrlFetchTree(common.Tree):
                    self.project_name,
                    path))
     headers = {}
-    if shared.IsDevAppserver():
+    if common.IsDevMode():
       cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,
                                 self.project_name)
       headers['Cookie'] = cookie
@@ -113,7 +113,7 @@ class UrlFetchTree(common.Tree):
                    path,
                    newpath))
     headers = {}
-    if shared.IsDevAppserver():
+    if common.IsDevMode():
       cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,
                                 self.project_name)
       headers['Cookie'] = cookie
@@ -130,7 +130,7 @@ class UrlFetchTree(common.Tree):
                    self.project_name,
                    path))
     headers = {}
-    if shared.IsDevAppserver():
+    if common.IsDevMode():
       cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,
                                 self.project_name)
       headers['Cookie'] = cookie
@@ -157,7 +157,7 @@ class UrlFetchTree(common.Tree):
            .format(_config.SOURCE_CODE_APP_ID,
                    self.project_name))
     headers = {}
-    if shared.IsDevAppserver():
+    if common.IsDevMode():
       cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,
                                 self.project_name)
       headers['Cookie'] = cookie
