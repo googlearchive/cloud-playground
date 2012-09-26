@@ -115,7 +115,7 @@ class BlissHandler(SessionHandler):
       raise Exception('Project {0} does not exist'.format(project_name))
     # TODO: instantiate tree elsewhere
     assert namespace_manager.get_namespace() == project_name
-    return datastore_tree.DatastoreTree()
+    return common.config.CREATE_TREE_FUNC(project_name)
 
 
   def redirect_to_default_hostname(self):
