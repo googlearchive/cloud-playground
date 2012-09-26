@@ -230,6 +230,17 @@ class DeleteFile(BlissHandler):
     self.get_tree(project_name).DeleteFile(path)
 
 
+class ListFiles(BlissHandler):
+
+  def get(self, project_name, path):
+    project = model.GetProject(project_name)
+    if not project:
+      return self.not_found()
+    r = self.get_tree(project_name).ListDirectory(None)
+    self.response.headers['Content-Type'] = _JSON_MIME_TYPE
+    self.response.write(tojson(r))
+
+
 class Project(BlissHandler):
 
   def get(self, project_name):
@@ -261,7 +272,6 @@ class WhoAmI(BlissHandler):
       "project_name": project.project_name,
       "project_description": project.project_description,
       'hostname': version_hostname,
-      'files': self.get_tree(project_name).ListDirectory(None),
     }
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
@@ -412,6 +422,7 @@ app = webapp2.WSGIApplication([
     ('/bliss/p/(.*)/putfile/(.*)', PutFile),
     ('/bliss/p/(.*)/movefile/(.*)', MoveFile),
     ('/bliss/p/(.*)/deletefile/(.*)', DeleteFile),
+    ('/bliss/p/(.*)/listfiles/(.*)', ListFiles),
 
     # project actions
     ('/bliss/p/(.*)/create', CreateProject),

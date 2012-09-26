@@ -343,13 +343,15 @@ function populateFilenames(filenames) {
 function initWorkspace() {
   json('whoami', function(xhr, r) {
     _whoami = r;
-    populateFilenames(r.files);
-    if (r.files.length) {
-      // select a file
-      selectFile('file-0');
-    }
     initLeftNavClickHandler();
     initFileContextMenuClearHandler();
+    json('listfiles/', function(xhr, files) {
+      populateFilenames(files);
+      if (files.length) {
+        // select a file
+        selectFile('file-0');
+      }
+    });
   });
 }
 
