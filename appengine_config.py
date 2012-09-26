@@ -1,6 +1,7 @@
 import re
 import urlfetch_tree
 
+from __mimic import common
 from __mimic import mimic
 from __mimic import datastore_tree
 
@@ -8,7 +9,8 @@ from google.appengine.api import app_identity
 
 urlfetch_tree_SOURCE_CODE_APP_ID = 'try-appengine'
 
-if app_identity.get_application_id() == urlfetch_tree_SOURCE_CODE_APP_ID:
+if (app_identity.get_application_id() == urlfetch_tree_SOURCE_CODE_APP_ID
+    or common.IsDevMode()):
   mimic_CREATE_TREE_FUNC = datastore_tree.DatastoreTree
 else:
   mimic_CREATE_TREE_FUNC = urlfetch_tree.UrlFetchTree
