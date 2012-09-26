@@ -325,7 +325,9 @@ def GetProjectName():
   # in the dev_appserver determine project name via a cookie
   if common.IsDevMode():
     project_name = GetProjectNameFromCookie()
-  return project_name
+  if project_name:
+    return project_name
+  return ''
 
 
 def GetNamespace():
