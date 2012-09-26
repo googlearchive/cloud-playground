@@ -105,7 +105,6 @@ class DatastoreTree(common.Tree):
   def SetFile(self, path, contents):
     entity = _AhMimicFile(id=path, parent=self.root, contents=contents)
     entity.put()
-    return entity
 
   def HasDirectory(self, path):
     path = self._NormalizeDirectoryPath(path)
