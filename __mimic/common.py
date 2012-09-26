@@ -19,7 +19,9 @@
 
 
 import os
+import re
 
+from google.appengine.api import lib_config
 from google.appengine.ext import ndb
 
 
@@ -44,6 +46,16 @@ MEMCACHE_FILE_KEY_PREFIX = 'file:'
 PERSIST_INDEX_NAME = 'index'
 
 _requires_original_memcache_call_depth = 0
+
+
+config = lib_config.register('mimic', {
+    # must be defined in appengine_config.py
+    'CREATE_TREE_FUNC': None,
+    # regex for extracting project name from PATH_INFO
+    'PROJECT_NAME_FROM_PATH_INFO_RE': re.compile('/_mimic/p/(.+?)/'),
+    # dev_appserver cookie, used to identify the project_name
+    'PROJECT_NAME_COOKIE': '_mimic_project',
+    })
 
 
 class Error(Exception):

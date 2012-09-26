@@ -20,7 +20,7 @@ The Mimic application must serve two distinct types of requests:
 
 * Control requests are used to interact with Mimc and are handled internally.
 * Target requests represent the user's application and processed according
-  to the files retrieved from the datastore.
+  to the files retrieved from the provided tree.
 
 The target application may include Python code which will expect to run
 in a pristine environment, so measures are taken not to invoke any sort of
@@ -36,7 +36,6 @@ import sys
 
 from __mimic import common
 from __mimic import control
-from __mimic import datastore_tree
 from __mimic import shell
 from __mimic import target_env
 from __mimic import target_info
@@ -47,6 +46,7 @@ import yaml
 # the App Engine production environment
 from sdkapi import appinfo
 from google.appengine.api import app_identity
+from google.appengine.api import namespace_manager
 from google.appengine.api import users
 from google.appengine.ext.webapp.util import run_wsgi_app
 
@@ -59,6 +59,10 @@ _HTTP_X_APPENGINE_QUEUENAME = 'HTTP_X_APPENGINE_QUEUENAME'
 # which should only be present for 'offline' cron requests,
 # see https://developers.google.com/appengine/docs/python/config/cron#Securing_URLs_for_Cron
 _HTTP_X_APPENGINE_CRON = 'HTTP_X_APPENGINE_CRON'
+
+# os.environ key representing 'X-AppEngine-Current-Namespace' HTTP header,
+# which identifies the effective namespace when a task was created
+_HTTP_X_APPENGINE_CURRENT_NAMESPACE = 'HTTP_X_APPENGINE_CURRENT_NAMESPACE'
 
 # TODO: see if "app.yaml" can be made into a link to the actual
 # app.yaml file in the user's workspace.
@@ -240,7 +244,7 @@ def RunTargetApp(tree, path_info, project_name, users_mod):
     raise NotImplementedError('Unrecognized page {0!r}'.format(page))
 
 
-def GetProjectName():
+def GetProjectNameFromServerName():
   """Returns the project name from the SERVER_NAME env var.
 
      For appspot.com domains, a project name is extracted from the left most
@@ -279,12 +283,59 @@ def GetProjectName():
   return server_name.split('.')[0]
 
 
+def GetProjectNameFromCookie():
+  """Returns the project name from the project name cookie."""
+  if 'HTTP_COOKIE' not in os.environ:
+    return None
+  cookies = dict([c.split('=') for c in os.environ['HTTP_COOKIE'].split('; ')])
+  return cookies.get(common.config.PROJECT_NAME_COOKIE)
+
+
+def GetProjectNameFromPathInfo(path_info):
+  """Returns the project name from the request path."""
+  m = common.config.PROJECT_NAME_FROM_PATH_INFO_RE.match(path_info)
+  if not m:
+    return None
+  return m.group(1)
+
+
+def GetProjectName():
+  """Returns the project name from the HTTP request.
+
+  A number of sources for project name are tried in order. See implementation
+  details.
+  """
+  # for task queues, use persisted namespace as the project name
+  project_name = os.environ.get(_HTTP_X_APPENGINE_CURRENT_NAMESPACE)
+  if project_name:
+    return project_name
+  project_name = GetProjectNameFromPathInfo(os.environ['PATH_INFO'])
+  if project_name:
+    return project_name
+  project_name = GetProjectNameFromServerName()
+  if project_name:
+    return project_name
+  # in the dev_appserver determine project name via a cookie
+  if common.IsDevMode():
+    project_name = GetProjectNameFromCookie()
+  return project_name
+
+
+def GetNamespace():
+  project_name = GetProjectName()
+  if not project_name:
+    return None
+  # TODO: check project_name at creation time
+  # throws BadValueError
+  namespace_manager.validate_namespace(project_name)
+  return project_name
+
+
 def RunMimic(create_tree_func, users_mod=users):
   """Entry point for mimic.
 
   Args:
-    create_tree_func: A callable that creates a common.Tree (default
-        is datastore_tree.DatastoreTree).
+    create_tree_func: A callable that creates a common.Tree.
     users_mod: A users module to use for authentication (default is the
         AppEngine users module).
   """

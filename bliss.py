@@ -6,6 +6,7 @@ from google.appengine.ext import ndb
 
 from __mimic import common
 from __mimic import datastore_tree
+from __mimic import mimic
 
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
@@ -36,8 +37,6 @@ _JSON_ENCODER.sort_keys = True
 _DEV_APPSERVER = os.environ['SERVER_SOFTWARE'].startswith('Development/')
 
 _JINJA2_ENV = Environment(autoescape=True, loader=FileSystemLoader(''))
-
-_PROJECT_NAME_FROM_PATH_INFO_RE = re.compile('/bliss/p/(.*?)/.*')
 
 _DASH_DOT_DASH = '-dot-'
 
@@ -130,17 +129,16 @@ class BlissHandler(SessionHandler):
 
 
   def get_project_from_path_info(self):
-    m = _PROJECT_NAME_FROM_PATH_INFO_RE.match(self.request.path_info)
-    if not m:
+    project_name = mimic.GetProjectNameFromPathInfo(self.request.path_info)
+    if not project_name:
       return None
-    project_name = m.group(1)
     return model.GetProject(project_name)
 
 
   def render(self, template, *args, **kwargs):
     template = _JINJA2_ENV.get_template(template)
 
-    namespace = shared.GetNamespace() or shared._BLISS_NAMESPACE
+    namespace = mimic.GetNamespace() or shared._BLISS_NAMESPACE
     app_id = app_identity.get_application_id()
 
     if _DEV_APPSERVER:
@@ -303,23 +301,27 @@ class RunProject(BlissHandler):
       self.redirect('https://{0}{1}{2}/'.format(urllib.quote_plus(project_name),
                     _DASH_DOT_DASH,
                     app_identity.get_default_version_hostname()))
-    if shared.GetProjectNameFromCookie() == project_name:
+    if mimic.GetProjectNameFromCookie() == project_name:
       # cookie already set; proceed to app
       self.redirect('/')
       return
     if self.request.get('set_cookie'):
       # set cookie and redirect
-      self.response.set_cookie(shared.BLISS_PROJECT_NAME_COOKIE, project_name)
+      self.response.set_cookie(common.config.PROJECT_NAME_COOKIE, project_name)
       self.redirect('/')
       return
     # interstitual
     self.response.write("""
-      <html><body>Bliss needs to set a special (dev_appserver only) cookie in
+      <html><body>
+        Bliss needs to set a special (dev_appserver only) cookie in
         order to simulate the multiple hostnames provided by App Engine's
         production environment:
-        <blockquote>Set cookie <code>{0}={1}</code> and <a href="{2}">proceed</a>.</blockquote>
+        <blockquote>
+          Set cookie <code>{0}={1}</code> and
+          <a href="{2}">proceed</a>.
+        </blockquote>
       </body></html>
-      """.format(shared.BLISS_PROJECT_NAME_COOKIE, project_name,
+      """.format(common.config.PROJECT_NAME_COOKIE, project_name,
                  self.request.path_info + '?set_cookie=1'))
 
 
@@ -405,14 +407,11 @@ config['webapp2_extras.sessions'] = {
 }
 
 app = webapp2.WSGIApplication([
-    # file actions
+    # tree actions
     ('/bliss/p/(.*)/getfile/(.*)', GetFile),
     ('/bliss/p/(.*)/putfile/(.*)', PutFile),
     ('/bliss/p/(.*)/movefile/(.*)', MoveFile),
     ('/bliss/p/(.*)/deletefile/(.*)', DeleteFile),
-
-    # bliss actions
-    ('/bliss/c', EasyCreateProject),
 
     # project actions
     ('/bliss/p/(.*)/create', CreateProject),
@@ -420,6 +419,9 @@ app = webapp2.WSGIApplication([
     ('/bliss/p/(.*)/rename', RenameProject),
     ('/bliss/p/(.*)/run', RunProject),
     ('/bliss/p/(.*)/whoami', WhoAmI),
+
+    # bliss actions
+    ('/bliss/c', EasyCreateProject),
 
     # /bliss/p/project_name/
     ('/bliss/p/(.*)/', Project),
