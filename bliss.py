@@ -26,6 +26,7 @@ import urllib
 import webapp2
 
 import codesite
+import settings
 import shared
 
 _JSON_MIME_TYPE = 'application/json'
@@ -121,9 +122,11 @@ class BlissHandler(SessionHandler):
   def redirect_to_default_hostname(self):
     if common.IsDevMode():
       return False
-    default_version_hostname = app_identity.get_default_version_hostname()
+    app_id = app_identity.get_application_id()
+    default_version_hostname = settings.GetBlissDefaultVersionHostname(app_id)
     if self.request.host != default_version_hostname:
-      self.redirect('https://{0}{1}'.format(default_version_hostname, self.request.path_qs))
+      self.redirect('https://{0}{1}'.format(default_version_hostname,
+                                            self.request.path_qs))
       return True
     return False
 
