@@ -2,6 +2,7 @@ import bliss
 import json
 import logging
 import random
+import settings
 import shared
 import os
 
@@ -75,7 +76,8 @@ class _AhTemplate(ndb.Model):
 
 
 def GetUser(user_id):
-  return _AhBlissUser.get_or_insert(user_id, namespace=shared._BLISS_NAMESPACE)
+  return _AhBlissUser.get_or_insert(user_id,
+                                    namespace=settings._BLISS_NAMESPACE)
 
 
 def GetProjects(user):
@@ -91,7 +93,7 @@ def GetProject(project_name):
 
 
 def GetGlobalRootEntity():
-  return _AhGlobal.get_or_insert('config', namespace=shared._BLISS_NAMESPACE)
+  return _AhGlobal.get_or_insert('config', namespace=settings._BLISS_NAMESPACE)
 
 
 def GetTemplateSources():

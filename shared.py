@@ -11,9 +11,6 @@ from google.appengine.api import users
 from google.appengine.api import namespace_manager
 
 
-# namespace for bliss specific data
-_BLISS_NAMESPACE = '_bliss'
-
 # Extensions to exclude when creating template projects
 _SKIP_EXTENSIONS = ('swp','pyc','svn')
 

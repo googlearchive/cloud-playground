@@ -3,6 +3,9 @@ _APP_ID_MAP = {
   'shared-playground': 'try-appengine',
 }
 
+# namespace for bliss specific data
+_BLISS_NAMESPACE = '_bliss'
+
 def GetBlissAppIdFor(app_id):
   """Lookup the Bliss app id for the provided app id.
 

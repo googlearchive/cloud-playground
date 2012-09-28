@@ -144,7 +144,7 @@ class BlissHandler(SessionHandler):
   def render(self, template, *args, **kwargs):
     template = _JINJA2_ENV.get_template(template)
 
-    namespace = mimic.GetNamespace() or shared._BLISS_NAMESPACE
+    namespace = mimic.GetNamespace() or settings._BLISS_NAMESPACE
     app_id = app_identity.get_application_id()
 
     if _DEV_APPSERVER:
