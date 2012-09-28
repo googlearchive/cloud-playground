@@ -116,7 +116,9 @@ class BlissHandler(SessionHandler):
     if not prj:
       raise Exception('Project {0} does not exist'.format(project_name))
     # TODO: instantiate tree elsewhere
-    assert namespace_manager.get_namespace() == project_name
+    assert (namespace_manager.get_namespace() == project_name,
+     'namespace_manager.get_namespace()={0!r}, project_name={1!r}'
+     .format(namespace_manager.get_namespace(), project_name))
     return common.config.CREATE_TREE_FUNC(project_name)
 
 
