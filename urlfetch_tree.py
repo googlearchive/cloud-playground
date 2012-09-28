@@ -21,7 +21,6 @@ import httplib
 import json
 
 from __mimic import common
-from __mimic import mimic
 
 import shared
 

@@ -1,17 +1,17 @@
-import bliss
+"""Module containing the datastore mode and associated functions."""
+
 import json
 import logging
+import os
 import random
+
+import bliss
+import codesite
 import settings
 import shared
-import os
 
 from google.appengine.api import memcache
-from google.appengine.api import users
-
 from google.appengine.ext import ndb
-
-import codesite
 
 
 _PLAYGROUND_JSON = '__playground.json'
@@ -20,11 +20,14 @@ _PLAYGROUND_JSON = '__playground.json'
 _MEMCACHE_TIME = 3600
 
 # tuples containing templates (uri, description)
-_TEMPLATE_SOURCES = {
-  ('templates/', 'Playground Templates'),
-  ('https://google-app-engine-samples.googlecode.com/svn/trunk/', 'Python App Engine Samples'),
-  ('https://google-app-engine-samples.googlecode.com/svn/trunk/python27/', 'Python 2.7 App Engine Samples'),
-}
+_TEMPLATE_SOURCES = [
+    ('templates/',
+     'Playground Templates'),
+    ('https://google-app-engine-samples.googlecode.com/svn/trunk/',
+     'Python App Engine Samples'),
+    ('https://google-app-engine-samples.googlecode.com/svn/trunk/python27/',
+     'Python 2.7 App Engine Samples'),
+]
 
 
 class _AhGlobal(ndb.Model):
@@ -77,14 +80,15 @@ class _AhTemplate(ndb.Model):
 
 def GetUser(user_id):
   return _AhBlissUser.get_or_insert(user_id,
-                                    namespace=settings._BLISS_NAMESPACE)
+                                    namespace=settings.BLISS_NAMESPACE)
 
 
 def GetProjects(user):
   projects = ndb.get_multi(user.projects)
   # assert users.projects does not reference proejcts which do not exist
-  assert None not in projects, ('Missing project(s): %s' %
-    [key for (key, prj) in zip(user.projects, projects) if prj is None])
+  assert None not in projects, (
+      'Missing project(s): %s' %
+      [key for (key, prj) in zip(user.projects, projects) if prj is None])
   return projects
 
 
@@ -93,10 +97,11 @@ def GetProject(project_name):
 
 
 def GetGlobalRootEntity():
-  return _AhGlobal.get_or_insert('config', namespace=settings._BLISS_NAMESPACE)
+  return _AhGlobal.get_or_insert('config', namespace=settings.BLISS_NAMESPACE)
 
 
 def GetTemplateSources():
+  """Get template sources."""
   _MEMCACHE_KEY = _AhTemplateSource.__class__.__name__
   sources = memcache.get(_MEMCACHE_KEY)
   if sources:
@@ -112,19 +117,26 @@ def GetTemplateSources():
 def _GetTemplateSources():
   sources = []
   for uri, description in _TEMPLATE_SOURCES:
-    source =_AhTemplateSource(id=uri, parent=GetGlobalRootEntity().key,
-                              description=description)
+    source = _AhTemplateSource(id=uri, parent=GetGlobalRootEntity().key,
+                               description=description)
     sources.append(source)
   ndb.put_multi(sources)
   return sources
 
 
 def GetTemplates(template_source):
-  _MEMCACHE_KEY = '{0}-{1}'.format(_AhTemplate.__class__.__name__, template_source)
+  """Get templates from a given template source."""
+  _MEMCACHE_KEY = '{0}-{1}'.format(_AhTemplate.__class__.__name__,
+                                   template_source)
   templates = memcache.get(_MEMCACHE_KEY)
+  templates = None
+
+
+
   if templates:
     return templates
-  templates = _AhTemplate.query(ancestor=template_source.key).order(_AhTemplate.key).fetch()
+  templates = (_AhTemplate.query(ancestor=template_source.key)
+               .order(_AhTemplate.key).fetch())
   if not templates:
     templates = _GetTemplates(template_source)
   templates.sort(key=lambda template: template.name.lower())
@@ -149,13 +161,13 @@ def _GetFileSystemTemplates(template_source):
     try:
       f = open(os.path.join(template_dir, dirname, _PLAYGROUND_JSON))
       data = json.loads(f.read())
-      name=data.get('template_name')
-      description=data.get('template_description')
+      name = data.get('template_name')
+      description = data.get('template_description')
     except:
       name = dirname
       description = dirname
     t = _AhTemplate(parent=template_source.key,
-                    id=os.path.join(template_dir, dirname), # url
+                    id=os.path.join(template_dir, dirname),  # url
                     name=name,
                     description=description)
     templates.append(t)
@@ -163,7 +175,8 @@ def _GetFileSystemTemplates(template_source):
 
 
 def DeleteTemplates():
-  source_keys = _AhTemplateSource.query(ancestor=GetGlobalRootEntity().key).fetch(keys_only=True)
+  query = _AhTemplateSource.query(ancestor=GetGlobalRootEntity().key)
+  source_keys = query.fetch(keys_only=True)
   keys = []
   for k in source_keys:
     keys.append(k)
@@ -175,6 +188,7 @@ def DeleteTemplates():
 
 def NewProjectName():
   return 'foo{0}'.format(random.randint(100, 999))
+
 
 @ndb.transactional(xg=True)
 def CreateProject(user, project_name, project_description):
@@ -188,14 +202,15 @@ def CreateProject(user, project_name, project_description):
   user.put()
 
 
-def PopulateProjectWithTemplate(tree, template_url, project_name):
+def PopulateProjectWithTemplate(tree, template_url):
+  """Populate a project from a template."""
   tree.Clear()
 
   def add_files(dirname):
     for path in os.listdir(os.path.join(template_url, dirname)):
       if path == _PLAYGROUND_JSON:
         continue
-      if shared.GetExtension(path) in settings._SKIP_EXTENSIONS:
+      if shared.GetExtension(path) in settings.SKIP_EXTENSIONS:
         continue
       relpath = os.path.join(dirname, path)
       fullpath = os.path.join(template_url, dirname, path)
@@ -203,13 +218,14 @@ def PopulateProjectWithTemplate(tree, template_url, project_name):
         add_files(relpath)
       else:
         with open(fullpath, 'rb') as f:
-          logging.info('- %s' % relpath)
+          logging.info('- %s', relpath)
           tree.SetFile(relpath, f.read())
 
   add_files('')
 
 
 def DeleteProject(user, tree, project_name):
+  """Delete an existing project."""
   assert tree
   assert project_name
   # 1. delete files

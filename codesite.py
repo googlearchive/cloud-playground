@@ -1,25 +1,29 @@
+"""Module for accessing code.google.com projects."""
+
 import httplib
 import logging
-import model
 import os
 import re
-import shared
 import sys
 import traceback
 
 from __mimic import common
+import model
+import settings
+import shared
 
-from google.appengine.api import memcache
 from google.appengine.api import urlfetch
 
 
 _CODESITE_RE = re.compile('^https?://[^/]+.googlecode.com/.+$')
 
-_CODESITE_DIR_FOOTER = """<em><a href="http://code.google.com/">Google Code</a> powered by """
+_CODESITE_DIR_FOOTER = ('<em><a href="http://code.google.com/">'
+                        'Google Code</a> powered by ')
 _CODESITE_DIR_PATH_RE = re.compile('<li><a href="([^"/]+/?)">[^<]+</a></li>')
 
 
 def fetch(url, async=False):
+  """Make an HTTP request using URL Fetch."""
   rpc = urlfetch.create_rpc()
   urlfetch.make_fetch_call(rpc, url,
                            follow_redirects=True,
@@ -43,6 +47,7 @@ def _GetChildPaths(page):
   paths = _CODESITE_DIR_PATH_RE.findall(page)
   paths = [d for d in paths if not d.startswith('.')]
   return paths
+
 
 def _GetTemplates(template_source):
   baseurl = template_source.key.id()
@@ -85,13 +90,13 @@ def _GetTemplates(template_source):
       shared.w('Skipping %s' % project_url)
       for line in [line for line in formatted_exception if line]:
         shared.w(line)
-      pass
   model.ndb.put_multi(samples)
   return samples
 
 
 # TODO: fetch remote files once in a task, not on every project creation
-def PopulateProjectFromCodesite(tree, template_url, project_name):
+def PopulateProjectFromCodesite(tree, template_url):
+  """Populate project from codesite template."""
   tree.Clear()
 
   baseurl = template_url
@@ -102,13 +107,12 @@ def PopulateProjectFromCodesite(tree, template_url, project_name):
     paths = _GetChildPaths(page)
     shared.w('{0} -> {1}', url, paths)
     if not paths:
-      logging.info('- %s' % dirname)
+      logging.info('- %s', dirname)
       tree.SetFile(dirname, page)
     for path in paths:
-      if shared.GetExtension(path) in settings._SKIP_EXTENSIONS:
+      if shared.GetExtension(path) in settings.SKIP_EXTENSIONS:
         continue
       relpath = os.path.join(dirname, path)
-      fullpath = os.path.join(baseurl, dirname, path)
       add_files(relpath)
 
   add_files('')

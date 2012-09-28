@@ -1,13 +1,12 @@
-import logging
-import os
-import re
+"""Module for shared Bliss functions."""
 
+import logging
 import mimetypes
-import model
 
 from __mimic import mimic
 
-from google.appengine.api import users
+import model
+
 from google.appengine.api import namespace_manager
 
 
@@ -25,18 +24,18 @@ def w(msg, *args, **kwargs):
 
 # TODO: use the MIME Type list at http://codemirror.net/
 _TEXT_MIME_TYPES = {
-  'css': 'text/css',
-  # *.dart uses *.js MIME Type for now
-  'dart': 'text/javascript',
-  'html': 'text/html',
-  'js': 'text/javascript',
-  'jsp': 'application/x-jsp',
-  'json': 'application/json',
-  'php': 'application/x-httpd-php',
-  'sh': 'text/x-sh',
-  'sql': 'text/x-mysql',
-  'xml': 'application/xml',
-  'yaml': 'text/x-yaml',
+    'css': 'text/css',
+    # *.dart uses *.js MIME Type for now
+    'dart': 'text/javascript',
+    'html': 'text/html',
+    'js': 'text/javascript',
+    'jsp': 'application/x-jsp',
+    'json': 'application/json',
+    'php': 'application/x-httpd-php',
+    'sh': 'text/x-sh',
+    'sql': 'text/x-mysql',
+    'xml': 'application/xml',
+    'yaml': 'text/x-yaml',
 }
 
 
@@ -67,6 +66,7 @@ def GuessMimeType(filename):
 
 
 def DoesCurrentProjectExist():
+  """Checks whether the curent project exists."""
   project_name = mimic.GetProjectName()
   if not project_name:
     return None
@@ -74,6 +74,6 @@ def DoesCurrentProjectExist():
   if not prj:
     return None
   assert (namespace_manager.get_namespace() == project_name,
-   'namespace_manager.get_namespace()={0!r}, project_name={1!r}'
-   .format(namespace_manager.get_namespace(), project_name))
+          'namespace_manager.get_namespace()={0!r}, project_name={1!r}'
+          .format(namespace_manager.get_namespace(), project_name))
   return True

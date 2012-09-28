@@ -13,11 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-"""This script runs all the unittests.
-
-See README.txt for usage.
-"""
+"""This script runs all the unittests. See README.txt for usage."""
 
 import os
 import sys
@@ -25,7 +21,7 @@ import sys
 import unittest
 
 try:
-  import dev_appserver
+  import dev_appserver  # pylint: disable-msg=C6204
 except ImportError:
 
   error_msg = ('The path to the App Engine Python SDK must be in the '
@@ -33,7 +29,7 @@ except ImportError:
 
   # The app engine SDK isn't in sys.path. If we're on Windows, we can try to
   # guess where it is.
-  import platform
+  import platform  # pylint: disable-msg=C6204
   if platform.system() == 'Windows':
     sys.path.append('C:\\Program Files\\Google\\google_appengine')
     try:

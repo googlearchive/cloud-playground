@@ -1,34 +1,33 @@
-from google.appengine.api import app_identity
-from google.appengine.api import namespace_manager
-from google.appengine.api import urlfetch
-from google.appengine.api import users
-from google.appengine.ext import ndb
-
-from __mimic import common
-from __mimic import datastore_tree
-from __mimic import mimic
-
-from jinja2 import Environment
-from jinja2 import FileSystemLoader
-from jinja2 import Template
-
-from webapp2_extras import security
-from webapp2_extras import sessions
+"""Module containing the Bliss WSGI handlers."""
 
 import cgi
 import json
 import logging
-import model
 import os
-import pprint as pp
 import re
-import secret
 import urllib
+
+from jinja2 import Environment
+from jinja2 import FileSystemLoader
+
 import webapp2
+from webapp2_extras import security
+from webapp2_extras import sessions
+
+from __mimic import common
+from __mimic import mimic
 
 import codesite
+import model
+import secret
 import settings
 import shared
+
+from google.appengine.api import app_identity
+from google.appengine.api import namespace_manager
+from google.appengine.api import users
+from google.appengine.ext import ndb
+
 
 _JSON_MIME_TYPE = 'application/json'
 
@@ -47,6 +46,7 @@ _VALID_PROJECT_RE = re.compile('^[a-z0-9-]{0,50}$')
 
 _USER_KEY = u'user_key'
 
+
 def tojson(r):
   return _JSON_ENCODER.encode(r)
 
@@ -54,21 +54,24 @@ def tojson(r):
 class BlissException(Exception):
 
   def __init__(self, message):
-    self.message = message
+    super(BlissException, self).__init__(message)
 
 
 # From http://webapp-improved.appspot.com/guide/extras.html
 class SessionHandler(webapp2.RequestHandler):
+  """Convenience request handler for dealing with sessions."""
 
   def get_user_key(self):
+    """Retrieves the user key."""
     user = users.get_current_user()
     if user:
       user_key = user.email()
     else:
       user_key = self.session.get(_USER_KEY)
     if not user_key:
-      suffix = security.generate_random_string(length=10,
-                                               pool=security.LOWERCASE_ALPHANUMERIC)
+      suffix = security.generate_random_string(
+          length=10,
+          pool=security.LOWERCASE_ALPHANUMERIC)
       user_key = 'user_{0}'.format(suffix)
       self.session[_USER_KEY] = user_key
     return user_key
@@ -93,6 +96,7 @@ class SessionHandler(webapp2.RequestHandler):
 
 
 class BlissHandler(SessionHandler):
+  """Convenice request handler with Bliss specific functionality."""
 
   def handle_exception(self, exception, debug_mode):
     """Called if this handler throws an exception during execution.
@@ -102,13 +106,13 @@ class BlissHandler(SessionHandler):
       debug_mode: True if the web application is running in debug mode
     """
     if not isinstance(exception, BlissException):
-      return super(BlissHandler, self).handle_exception(exception, debug_mode)
+      super(BlissHandler, self).handle_exception(exception, debug_mode)
+      return
     self.error(500)
     logging.exception(exception)
     self.response.clear()
     self.response.headers['Content-Type'] = 'text/plain'
     self.response.out.write('%s' % (cgi.escape(exception.message, quote=True)))
-
 
   def get_tree(self, project_name):
     assert project_name
@@ -117,10 +121,9 @@ class BlissHandler(SessionHandler):
       raise Exception('Project {0} does not exist'.format(project_name))
     # TODO: instantiate tree elsewhere
     assert (namespace_manager.get_namespace() == project_name,
-     'namespace_manager.get_namespace()={0!r}, project_name={1!r}'
-     .format(namespace_manager.get_namespace(), project_name))
+            'namespace_manager.get_namespace()={0!r}, project_name={1!r}'
+            .format(namespace_manager.get_namespace(), project_name))
     return common.config.CREATE_TREE_FUNC(project_name)
-
 
   def redirect_to_default_hostname(self):
     if common.IsDevMode():
@@ -133,18 +136,17 @@ class BlissHandler(SessionHandler):
       return True
     return False
 
-
   def get_project_from_path_info(self):
     project_name = mimic.GetProjectNameFromPathInfo(self.request.path_info)
     if not project_name:
       return None
     return model.GetProject(project_name)
 
-
   def render(self, template, *args, **kwargs):
+    """Renders the provided template."""
     template = _JINJA2_ENV.get_template(template)
 
-    namespace = mimic.GetNamespace() or settings._BLISS_NAMESPACE
+    namespace = mimic.GetNamespace() or settings.BLISS_NAMESPACE
     app_id = app_identity.get_application_id()
 
     if _DEV_APPSERVER:
@@ -152,8 +154,10 @@ class BlissHandler(SessionHandler):
       memcache_admin_url = '/_ah/admin/memcache?namespace=%s' % namespace
       nuke_admin_url = '/bliss/nuke'
     elif users.is_current_user_admin():
-      datastore_admin_url = 'https://appengine.google.com/datastore/explorer?&app_id=%s&namespace=%s' % (app_id, namespace)
-      memcache_admin_url = 'https://appengine.google.com/memcache?&app_id=%s&namespace=%s' % (app_id, namespace)
+      datastore_admin_url = ('https://appengine.google.com/datastore/explorer'
+                             '?&app_id=%s&namespace=%s' % (app_id, namespace))
+      memcache_admin_url = ('https://appengine.google.com/memcache'
+                            '?&app_id=%s&namespace=%s' % (app_id, namespace))
       nuke_admin_url = '/bliss/nuke'
     else:
       datastore_admin_url = None
@@ -164,7 +168,8 @@ class BlissHandler(SessionHandler):
     if project:
       kwargs['project_name'] = project.project_name
       kwargs['project_description'] = project.project_description
-      kwargs['project_run_url'] = '/bliss/p/{0}/run'.format(project.project_name)
+      kwargs['project_run_url'] = ('/bliss/p/{0}/run'
+                                   .format(project.project_name))
 
     if users.get_current_user():
       kwargs['is_logged_in'] = True
@@ -173,14 +178,15 @@ class BlissHandler(SessionHandler):
 
     kwargs['session'] = self.session.items()
 
-    self.response.write(template.render(*args,
-      namespace=namespace,
-      email=self.user.key.id(),
-      git_bliss_url='http://code.google.com/p/cloud-playground/',
-      datastore_admin_url=datastore_admin_url,
-      memcache_admin_url=memcache_admin_url,
-      nuke_admin_url=nuke_admin_url,
-      **kwargs))
+    self.response.write(template.render(
+        *args,
+        namespace=namespace,
+        email=self.user.key.id(),
+        git_bliss_url='http://code.google.com/p/cloud-playground/',
+        datastore_admin_url=datastore_admin_url,
+        memcache_admin_url=memcache_admin_url,
+        nuke_admin_url=nuke_admin_url,
+        **kwargs))
 
   def not_found(self):
     self.render('404.html', path_info=self.request.path_info)
@@ -189,6 +195,7 @@ class BlissHandler(SessionHandler):
 class GetFile(BlissHandler):
 
   def get(self, project_name, filename):
+    """Handles HTTP GET requests."""
     assert project_name
     assert filename
     contents = self.get_tree(project_name).GetFileContents(filename)
@@ -205,10 +212,11 @@ class GetFile(BlissHandler):
 class PutFile(BlissHandler):
 
   def put(self, project_name, filename):
+    """Handles HTTP PUT requests."""
     assert project_name
     assert filename
     self.get_tree(project_name).SetFile(path=filename,
-                 contents=self.request.body)
+                                        contents=self.request.body)
 
     self.response.headers['Content-Type'] = 'text/plain'
     self.response.write('OK')
@@ -217,6 +225,7 @@ class PutFile(BlissHandler):
 class MoveFile(BlissHandler):
 
   def post(self, project_name, oldpath):
+    """Handles HTTP POST requests."""
     assert project_name
     assert oldpath
     if not model.GetProject(project_name):
@@ -229,6 +238,7 @@ class MoveFile(BlissHandler):
 class DeletePath(BlissHandler):
 
   def post(self, project_name, path):
+    """Handles HTTP POST requests."""
     assert project_name
     if not model.GetProject(project_name):
       raise Exception('Project {0} does not exist'.format(project_name))
@@ -238,10 +248,11 @@ class DeletePath(BlissHandler):
 class ListFiles(BlissHandler):
 
   def get(self, project_name, path):
+    """Handles HTTP GET requests."""
     project = model.GetProject(project_name)
     if not project:
       return self.not_found()
-    r = self.get_tree(project_name).ListDirectory(None)
+    r = self.get_tree(project_name).ListDirectory(path)
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
 
@@ -249,6 +260,7 @@ class ListFiles(BlissHandler):
 class Project(BlissHandler):
 
   def get(self, project_name):
+    """Handles HTTP GET requests."""
     assert project_name
     if self.redirect_to_default_hostname():
       return
@@ -261,6 +273,7 @@ class Project(BlissHandler):
 class WhoAmI(BlissHandler):
 
   def get(self, project_name):
+    """Handles HTTP GET requests."""
     assert project_name
     project = model.GetProject(project_name)
     if not project:
@@ -274,9 +287,9 @@ class WhoAmI(BlissHandler):
                                             default_hostname)
 
     r = {
-      "project_name": project.project_name,
-      "project_description": project.project_description,
-      'hostname': version_hostname,
+        'project_name': project.project_name,
+        'project_description': project.project_description,
+        'hostname': version_hostname,
     }
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
@@ -285,6 +298,7 @@ class WhoAmI(BlissHandler):
 class Bliss(BlissHandler):
 
   def get(self):
+    """Handles HTTP GET requests."""
     if self.redirect_to_default_hostname():
       return
     projects = model.GetProjects(self.user)
@@ -298,24 +312,28 @@ class Bliss(BlissHandler):
 
 class Login(BlissHandler):
 
-   def get(self):
-     self.redirect(users.create_login_url('/bliss'))
+  def get(self):
+    """Handles HTTP GET requests."""
+    self.redirect(users.create_login_url('/bliss'))
 
 
 class Logout(BlissHandler):
 
-   def get(self):
-     self.redirect(users.create_logout_url('/bliss'))
+  def get(self):
+    """Handles HTTP GET requests."""
+    self.redirect(users.create_logout_url('/bliss'))
 
 
 class RunProject(BlissHandler):
 
   def get(self, project_name):
+    """Handles HTTP GET requests."""
     if not common.IsDevMode():
       # production
-      self.redirect('https://{0}{1}{2}/'.format(urllib.quote_plus(project_name),
-                    _DASH_DOT_DASH,
-                    app_identity.get_default_version_hostname()))
+      self.redirect('https://{0}{1}{2}/'
+                    .format(urllib.quote_plus(project_name),
+                            _DASH_DOT_DASH,
+                            app_identity.get_default_version_hostname()))
     if mimic.GetProjectNameFromCookie() == project_name:
       # cookie already set; proceed to app
       self.redirect('/')
@@ -341,16 +359,19 @@ class RunProject(BlissHandler):
 
 
 class EasyCreateProject(BlissHandler):
+  """Request handler for creating projects via am HTML link to Bliss."""
 
   def get(self):
     # allow project creation via:
     # https://appid.appspot.com/bliss/c?template_url=...
     project_name = model.NewProjectName()
     template_url = self.request.get('template_url')
-    self.redirect('/bliss/p/{0}/create?template_url={1}'.format(project_name, template_url))
+    self.redirect('/bliss/p/{0}/create?template_url={1}'.format(project_name,
+                                                                template_url))
 
 
 class CreateProject(BlissHandler):
+  """Request handler for creating projects."""
 
   def get(self, project_name):
     # allow EasyCreateProject GET to redirect here
@@ -358,6 +379,7 @@ class CreateProject(BlissHandler):
     self.redirect('/bliss/p/{0}'.format(project_name))
 
   def post(self, project_name):
+    """Handles HTTP POST requests."""
     assert project_name
     if (_DASH_DOT_DASH in project_name
         or not _VALID_PROJECT_RE.match(project_name)):
@@ -365,22 +387,21 @@ class CreateProject(BlissHandler):
                            '{1!r}'.format(_VALID_PROJECT_RE.pattern,
                                           _DASH_DOT_DASH))
     template_url = self.request.get('template_url')
-    project_description = self.request.get('project_description') or project_name
+    project_description = (self.request.get('project_description')
+                           or project_name)
     self.make_template_project(template_url, project_name, project_description)
 
-
   @ndb.transactional(xg=True)
-  def make_template_project(self, template_url, project_name, project_description):
+  def make_template_project(self, template_url, project_name,
+                            project_description):
     model.CreateProject(self.user,
                         project_name=project_name,
                         project_description=project_description)
     if codesite.IsCodesiteURL(template_url):
       codesite.PopulateProjectFromCodesite(tree=self.get_tree(project_name),
-                                           project_name=project_name,
                                            template_url=template_url)
     else:
       model.PopulateProjectWithTemplate(tree=self.get_tree(project_name),
-                                        project_name=project_name,
                                         template_url=template_url)
 
 
@@ -397,7 +418,7 @@ class DeleteProject(BlissHandler):
 class RenameProject(BlissHandler):
 
   def post(self, project_name):
-    raise Exception('not implemented')
+    raise Exception('not implemented. unable to rename %s' % project_name)
 
 
 class AddSlash(webapp2.RequestHandler):
@@ -451,4 +472,4 @@ app = webapp2.WSGIApplication([
     ('/bliss/', Bliss),
     ('/bliss/login', Login),
     ('/bliss/logout', Logout),
-  ], debug=True, config=config)
+], debug=True, config=config)

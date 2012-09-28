@@ -24,13 +24,15 @@ import cStringIO
 from email import feedparser
 import logging
 import os
-import shared
 import sys
 import traceback
 
 from __mimic import common
 from __mimic import mimic
 from __mimic import target_env
+
+import shared
+
 
 _SEPARATOR = '-' * 50 + '\n'
 
