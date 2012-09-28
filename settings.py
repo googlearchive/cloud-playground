@@ -6,6 +6,10 @@ _APP_ID_MAP = {
 # namespace for bliss specific data
 _BLISS_NAMESPACE = '_bliss'
 
+# Extensions to exclude when creating template projects
+_SKIP_EXTENSIONS = ('swp','pyc','svn')
+
+
 def GetBlissAppIdFor(app_id):
   """Lookup the Bliss app id for the provided app id.
 

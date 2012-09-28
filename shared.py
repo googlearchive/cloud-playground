@@ -11,10 +11,6 @@ from google.appengine.api import users
 from google.appengine.api import namespace_manager
 
 
-# Extensions to exclude when creating template projects
-_SKIP_EXTENSIONS = ('swp','pyc','svn')
-
-
 def e(msg, *args, **kwargs):
   if isinstance(msg, basestring):
     msg = msg.format(*args, **kwargs)

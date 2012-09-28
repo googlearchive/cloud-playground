@@ -195,7 +195,7 @@ def PopulateProjectWithTemplate(tree, template_url, project_name):
     for path in os.listdir(os.path.join(template_url, dirname)):
       if path == _PLAYGROUND_JSON:
         continue
-      if shared.GetExtension(path) in shared._SKIP_EXTENSIONS:
+      if shared.GetExtension(path) in settings._SKIP_EXTENSIONS:
         continue
       relpath = os.path.join(dirname, path)
       fullpath = os.path.join(template_url, dirname, path)

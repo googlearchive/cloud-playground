@@ -105,7 +105,7 @@ def PopulateProjectFromCodesite(tree, template_url, project_name):
       logging.info('- %s' % dirname)
       tree.SetFile(dirname, page)
     for path in paths:
-      if shared.GetExtension(path) in shared._SKIP_EXTENSIONS:
+      if shared.GetExtension(path) in settings._SKIP_EXTENSIONS:
         continue
       relpath = os.path.join(dirname, path)
       fullpath = os.path.join(baseurl, dirname, path)
