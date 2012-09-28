@@ -22,6 +22,7 @@ import model
 import os
 import pprint as pp
 import re
+import secret
 import urllib
 import webapp2
 
@@ -415,7 +416,7 @@ class Nuke(BlissHandler):
 
 config = {}
 config['webapp2_extras.sessions'] = {
-    'secret_key': 'fix-me-please'
+    'secret_key': secret.GetSecret('webapp2_extras.sessions', entropy=128),
 }
 
 app = webapp2.WSGIApplication([
