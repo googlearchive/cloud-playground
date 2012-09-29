@@ -44,7 +44,7 @@ _DASH_DOT_DASH = '-dot-'
 # must fit in front of '-dot-appid.appspot.com' and not contain '-dot-'
 _VALID_PROJECT_RE = re.compile('^[a-z0-9-]{0,50}$')
 
-_USER_KEY = u'user_key'
+_ANON_USER_KEY = u'anon_user_key'
 
 
 def tojson(r):
@@ -62,21 +62,11 @@ class SessionHandler(webapp2.RequestHandler):
   """Convenience request handler for dealing with sessions."""
 
   def get_user_key(self):
-    """Retrieves the user key from the session or generate a new one."""
+    """Returns the email from logged in user or the session user key."""
     user = users.get_current_user()
     if user:
-      user_key = user.email()
-    else:
-      user_key = self.session.get(_USER_KEY)
-    if not user_key:
-      suffix = security.generate_random_string(
-          length=10,
-          pool=security.LOWERCASE_ALPHANUMERIC)
-      user_key = 'user_{0}'.format(suffix)
-      self.session[_USER_KEY] = user_key
-      self.session['csrf'] = security.generate_random_string(entropy=128)
-      self.response.set_cookie('csrf', self.session['csrf'])
-    return user_key
+      return user.email()
+    return self.session.get(_ANON_USER_KEY)
 
   def PerformCsrfRequestValidation(self):
     if self.request.method == 'GET':
@@ -106,7 +96,16 @@ class SessionHandler(webapp2.RequestHandler):
   @webapp2.cached_property
   def session(self):
     # Returns a session using the default cookie key.
-    return self.session_store.get_session()
+    session = self.session_store.get_session()
+    if not session:
+      # initialize the session
+      session['csrf'] = security.generate_random_string(entropy=128)
+      self.response.set_cookie('csrf', session['csrf'])
+      suffix = security.generate_random_string(
+          length=10,
+          pool=security.LOWERCASE_ALPHANUMERIC)
+      session[_ANON_USER_KEY] = 'user_{0}'.format(suffix)
+    return session
 
 
 class BlissHandler(SessionHandler):
