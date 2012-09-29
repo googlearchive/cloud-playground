@@ -74,13 +74,27 @@ class SessionHandler(webapp2.RequestHandler):
           pool=security.LOWERCASE_ALPHANUMERIC)
       user_key = 'user_{0}'.format(suffix)
       self.session[_USER_KEY] = user_key
+      self.session['csrf'] = security.generate_random_string(entropy=128)
+      self.response.set_cookie('csrf', self.session['csrf'])
     return user_key
+
+  def PerformCsrfRequestValidation(self):
+    if self.request.method == 'GET':
+      return
+    session_csrf = self.session['csrf']
+    client_csrf = self.request.headers['X-Bliss-CSRF']
+    if not client_csrf:
+      raise Exception('Missing client csrf token')
+    if client_csrf != session_csrf:
+      raise Exception('Client csrf token {0!r} does not match '
+                      'session csrf token {1!r}'
+                      .format(client_csrf, session_csrf))
 
   def dispatch(self):
     # Get a session store for this request.
     self.session_store = sessions.get_store(request=self.request)
-
     self.user = model.GetUser(self.get_user_key())
+    self.PerformCsrfRequestValidation()
 
     try:
       # Dispatch the request.
@@ -175,8 +189,6 @@ class BlissHandler(SessionHandler):
       kwargs['is_logged_in'] = True
     if users.is_current_user_admin():
       kwargs['is_admin'] = True
-
-    kwargs['session'] = self.session.items()
 
     self.response.write(template.render(
         *args,

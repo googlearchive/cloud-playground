@@ -65,9 +65,27 @@ function safer(html) {
   return html.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+function get_cookie(key) {
+  cookies = document.cookie.split('; ')
+  for (i=0; i<cookies.length; i++) {
+    kv = cookies[i].split('=');
+    if (kv[0] == key) {
+      return kv[1];
+    }
+  }
+  return null;
+}
+
 function _xhr(method, url, callback, data) {
   var xhr = new XMLHttpRequest();
   xhr.open(method, url, true);
+  if (method != 'GET') {
+    var csrf = get_cookie('csrf');
+    xhr.setRequestHeader('X-Bliss-CSRF', csrf);
+  }
+  if (method == 'POST') {
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  }
   xhr.onreadystatechange = function() {
     if (xhr.readyState != 4) {
       return;
@@ -236,12 +254,12 @@ function prompt_file_rename() {
   if (!new_filename || new_filename == filename) {
     return;
   }
-  var uri = 'movefile/' + encodeURI(filename) +
-            '?newpath=' + encodeURI(new_filename);
+  var uri = 'movefile/' + encodeURI(filename);
+  var data = 'newpath=' + encodeURI(new_filename);
   post(uri, function(xhr) {
     document.body.scrollTop = 0;
     window.location.reload();
-  });
+  }, data);
 }
 
 function prompt_for_new_project(template_url) {
