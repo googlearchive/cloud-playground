@@ -140,7 +140,6 @@ function file_context_menu(evt, id) {
   evt.stopPropagation();
   var menuDiv = document.getElementById('file-context-menu');
   menuDiv.style.display = 'block';
-  console.log(menuDiv.style);
   menuDiv.style.left = evt.pageX + 'px';
   menuDiv.style.top = evt.pageY + 'px';
   var elem = document.getElementById(id);
@@ -225,7 +224,9 @@ function prompt_file_delete() {
 
 function prompt_file_rename() {
   var filename = _files[_current_filename_id];
-  var new_filename = prompt('New filename?\n(You may specify a full path such as: foo/bar.txt)', filename);
+  var new_filename = prompt(
+      'New filename?\n(You may specify a full path such as: foo/bar.txt)',
+      filename);
   if (!new_filename) {
     return;
   }
@@ -250,19 +251,20 @@ function prompt_for_new_project(template_url) {
   }
   // var project_description = prompt('Project description', project_name) || project_name;
   var project_description = project_name;
-  var uri = '/bliss/p/' + encodeURI(project_name) + '/create' +
-            '?template_url=' + encodeURI(template_url) +
+  var uri = '/bliss/p/' + encodeURI(project_name) + '/create';
+  var data = 'template_url=' + encodeURI(template_url) +
             '&project_description=' + encodeURI(project_description);
   box = lightbox(escape(project_description), 'Creating project. Please wait.');
   post(uri, function(xhr) {
     box();
     document.body.scrollTop = 0;
     window.location.reload();
-  });
+  }, data);
 }
 
 function prompt_to_delete_project(project_name) {
-  var answer = prompt("Are you sure you want to delete project " + project_name + "?\nType 'yes' to confirm.", "no");
+  var answer = prompt("Are you sure you want to delete project " +
+                      project_name + "?\nType 'yes' to confirm.", "no");
   if (!answer || answer.toLowerCase()[0] != 'y') {
     return;
   }
