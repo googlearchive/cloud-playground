@@ -62,7 +62,7 @@ class SessionHandler(webapp2.RequestHandler):
   """Convenience request handler for dealing with sessions."""
 
   def get_user_key(self):
-    """Retrieves the user key."""
+    """Retrieves the user key from the session or generate a new one."""
     user = users.get_current_user()
     if user:
       user_key = user.email()
