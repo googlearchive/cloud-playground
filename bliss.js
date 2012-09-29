@@ -87,21 +87,21 @@ function _xhr(method, url, callback, data) {
 
 // GET
 function get(url, callback, data) {
-  xhr('get', url, function(xhr) {
+  xhr('GET', url, function(xhr) {
     callback(xhr);
   }, data);
 }
 
 // POST
 function post(url, callback, data) {
-  xhr('post', url, function(xhr) {
+  xhr('POST', url, function(xhr) {
     callback(xhr);
   }, data);
 }
 
 // PUT
 function put(url, callback, data) {
-  xhr('put', url, function(xhr) {
+  xhr('PUT', url, function(xhr) {
     callback(xhr);
   }, data);
 }
