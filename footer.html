@@ -7,8 +7,8 @@
   <div id="adminlinks">
     <span>git(<a href="{{git_bliss_url}}" target="bliss_datastore">bliss</a>)</span>
 
-    {% if nuke_admin_url %}
-      <span>danger(<a href="{{nuke_admin_url}}" onclick="lightbox('Bye, bye, data.', 'Please wait...');">big-red-button</a>)</span>
+    {% if is_admin %}
+      <span>danger(<a onclick="big_red_button();">big-red-button</a>)</span>
     {% endif %}
 
     {% if datastore_admin_url and memcache_admin_url %}

@@ -315,6 +315,15 @@ function prompt_for_new_file() {
   });
 }
 
+function big_red_button() {
+  lightbox('Bye, bye, data.', 'Please wait...');
+  var uri = 'nuke';
+  post(uri, function(xhr) {
+    document.body.scrollTop = 0;
+    window.location.reload();
+  });
+}
+
 function popout() {
   _popout = true;
   _output_window = undefined;

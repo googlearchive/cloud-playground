@@ -166,17 +166,14 @@ class BlissHandler(SessionHandler):
     if _DEV_APPSERVER:
       datastore_admin_url = '/_ah/admin/datastore?namespace=%s' % namespace
       memcache_admin_url = '/_ah/admin/memcache?namespace=%s' % namespace
-      nuke_admin_url = '/bliss/nuke'
     elif users.is_current_user_admin():
       datastore_admin_url = ('https://appengine.google.com/datastore/explorer'
                              '?&app_id=%s&namespace=%s' % (app_id, namespace))
       memcache_admin_url = ('https://appengine.google.com/memcache'
                             '?&app_id=%s&namespace=%s' % (app_id, namespace))
-      nuke_admin_url = '/bliss/nuke'
     else:
       datastore_admin_url = None
       memcache_admin_url = None
-      nuke_admin_url = None
 
     project = self.get_project_from_path_info()
     if project:
@@ -197,7 +194,6 @@ class BlissHandler(SessionHandler):
         git_bliss_url='http://code.google.com/p/cloud-playground/',
         datastore_admin_url=datastore_admin_url,
         memcache_admin_url=memcache_admin_url,
-        nuke_admin_url=nuke_admin_url,
         **kwargs))
 
   def not_found(self):
@@ -446,8 +442,7 @@ class AddSlash(webapp2.RequestHandler):
 
 class Nuke(BlissHandler):
 
-  # TODO: be RESTful, use POST
-  def get(self):
+  def post(self):
     if not users.is_current_user_admin():
       shared.e('You must be an admin for this app')
     model.DeleteTemplates()
