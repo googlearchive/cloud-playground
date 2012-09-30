@@ -5,8 +5,9 @@ import re
 from __mimic import common
 from __mimic import datastore_tree
 from __mimic import mimic
+
+import caching_urlfetch_tree
 import settings
-import urlfetch_tree
 
 from google.appengine.api import app_identity
 
@@ -19,7 +20,7 @@ urlfetch_tree_SOURCE_CODE_APP_ID = settings.BLISS_APP_ID
 if common.IsDevMode() or urlfetch_tree_SOURCE_CODE_APP_ID == app_id:
   mimic_CREATE_TREE_FUNC = datastore_tree.DatastoreTree
 else:
-  mimic_CREATE_TREE_FUNC = urlfetch_tree.UrlFetchTree
+  mimic_CREATE_TREE_FUNC = caching_urlfetch_tree.CachingUrlFetchTree
 
 mimic_PROJECT_NAME_COOKIE = '_bliss_project'
 
