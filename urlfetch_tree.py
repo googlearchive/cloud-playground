@@ -40,7 +40,7 @@ class UrlFetchTree(common.Tree):
     self.project_name = project_name
 
   def __repr__(self):
-    return ('<{0} project_name={1}>'
+    return ('<{0} project_name={1!r}>'
             .format(self.__class__.__name__, self.project_name))
 
   @staticmethod
