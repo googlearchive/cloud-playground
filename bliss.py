@@ -138,15 +138,6 @@ class BlissHandler(SessionHandler):
             .format(namespace_manager.get_namespace(), project_name))
     return common.config.CREATE_TREE_FUNC(project_name)
 
-  def redirect_to_default_hostname(self):
-    if common.IsDevMode():
-      return False
-    if self.request.host != settings.BLISS_HOSTNAME:
-      self.redirect('https://{0}{1}'.format(settings.BLISS_HOSTNAME,
-                                            self.request.path_qs))
-      return True
-    return False
-
   def get_project_from_path_info(self):
     project_name = mimic.GetProjectNameFromPathInfo(self.request.path_info)
     if not project_name:
@@ -267,8 +258,6 @@ class Project(BlissHandler):
   def get(self, project_name):
     """Handles HTTP GET requests."""
     assert project_name
-    if self.redirect_to_default_hostname():
-      return
     project = model.GetProject(project_name)
     if not project:
       return self.not_found()
@@ -304,8 +293,6 @@ class Bliss(BlissHandler):
 
   def get(self):
     """Handles HTTP GET requests."""
-    if self.redirect_to_default_hostname():
-      return
     projects = model.GetProjects(self.user)
     p = [(p.project_name, p.project_description) for p in projects]
     template_sources = model.GetTemplateSources()
