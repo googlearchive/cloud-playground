@@ -3,4 +3,4 @@
 class BlissError(Exception):
 
   def __init__(self, message):
-    super(BlissException, self).__init__(message)
+    super(BlissError, self).__init__(message)
