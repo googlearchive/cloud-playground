@@ -1,4 +1,4 @@
-"""Module for shared Bliss functions."""
+"""Module for shared bliss functions."""
 
 import logging
 import mimetypes

@@ -1,4 +1,4 @@
-"""Module containing global Bliss constants and functions."""
+"""Module containing global bliss constants and functions."""
 
 # namespace for bliss specific data
 BLISS_NAMESPACE = '_bliss'
@@ -6,39 +6,66 @@ BLISS_NAMESPACE = '_bliss'
 # Extensions to exclude when creating template projects
 SKIP_EXTENSIONS = ('swp', 'pyc', 'svn')
 
-# map app ids where user code is executed to app id where bliss runs
-_APP_ID_MAP = {
-    'shared-playground': 'fredsa-bliss',
+# list of bliss tuples (<bliss app id>, <playground app id>)
+_BLISS_TO_PLAYGROUND_DICT = {
+    'try-appengine': 'shared-playground',
 }
+_PLAYGROUND_TO_BLISS_DICT = dict(
+    (v, k) for k, v in _BLISS_TO_PLAYGROUND_DICT.iteritems())
 
 
 def GetBlissAppIdFor(app_id):
-  """Lookup the Bliss app id for the provided app id.
+  """Lookup the bliss app id for the provided app id.
 
   Args:
-    app_id: The app id to to use as the lookup key.
+    app_id: The app id to to use as the lookup key or default.
 
   Returns:
-    The Bliss app id if known, else the provided the app id.
+    The bliss app id if known, else the provided the app id.
   """
-  return _APP_ID_MAP.get(app_id, app_id)
+  return _PLAYGROUND_TO_BLISS_DICT.get(app_id, app_id)
+
+
+def GetPlaygroundAppIdFor(app_id):
+  """Lookup the playground app id for the provided app id.
+
+  Args:
+    app_id: The app id to to use as the lookup key or default.
+
+  Returns:
+    The playground app id if known, else the provided the app id.
+  """
+  return _BLISS_TO_PLAYGROUND_DICT.get(app_id, app_id)
 
 
 def GetBlissDefaultVersionHostname(app_id):
-  """Return default version hostname for the associated bliss app id.
+  """Return default bliss version hostname for the associated app id.
 
   Args:
-    app_id: The bliss app id.
+    app_id: The app id to to use as the lookup key or default.
 
   Returns:
-    The default version hostname for the bliss app id associated with this app,
-    else the default version hostname for the provided app id.
+    The default version hostname for the bliss app id.
   """
   bliss_app_id = GetBlissAppIdFor(app_id)
   return '{0}.appspot.com'.format(bliss_app_id)
 
 
+def GetPlaygroundDefaultVersionHostname(app_id):
+  """Return default playground version hostname for the associated app id.
+
+  Args:
+    app_id: The app id to to use as the lookup key or default.
+
+  Returns:
+    The default version hostname for the playground app id.
+  """
+  playground_app_id = GetPlaygroundAppIdFor(app_id)
+  return '{0}.appspot.com'.format(playground_app_id)
+
+
 def PrintAppIdsInMap():
   """Prints a new line delimited list of known app ids."""
-  app_ids = set(_APP_ID_MAP.keys() + _APP_ID_MAP.values())
+  app_ids = set(_BLISS_TO_PLAYGROUND_DICT.keys() +
+      _BLISS_TO_PLAYGROUND_DICT.values())
   print '\n'.join(app_ids)

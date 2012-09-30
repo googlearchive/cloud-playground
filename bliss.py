@@ -1,4 +1,4 @@
-"""Module containing the Bliss WSGI handlers."""
+"""Module containing the bliss WSGI handlers."""
 
 import cgi
 import json
@@ -109,7 +109,7 @@ class SessionHandler(webapp2.RequestHandler):
 
 
 class BlissHandler(SessionHandler):
-  """Convenice request handler with Bliss specific functionality."""
+  """Convenice request handler with bliss specific functionality."""
 
   def handle_exception(self, exception, debug_mode):
     """Called if this handler throws an exception during execution.
@@ -371,7 +371,7 @@ class RunProject(BlissHandler):
 
 
 class EasyCreateProject(BlissHandler):
-  """Request handler for creating projects via am HTML link to Bliss."""
+  """Request handler for creating projects via an HTML link."""
 
   def get(self):
     # allow project creation via:
