@@ -75,6 +75,13 @@ class SessionHandler(webapp2.RequestHandler):
                       .format(client_csrf, session_csrf))
 
   def dispatch(self):
+    if not shared.ThisIsBlissApp():
+      url = 'https://{0}/bliss'.format(settings.BLISS_HOSTNAME)
+      self.error(501)  # not implemented
+      self.response.write('Bliss user interface not implemented here.<br>'
+                          'See <a href="{0}">{0}</a> instead.'
+                          .format(url))
+      return
     # Get a session store for this request.
     self.session_store = sessions.get_store(request=self.request)
     self.user = model.GetUser(self.get_user_key())
