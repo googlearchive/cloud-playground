@@ -40,8 +40,9 @@ class Item(db.Model):
   z = db.IntegerProperty()
 
 # Having a root entity key allows us to use ancestor queries for strong
-# consistency in the High Replication Datastore
-_ROOT_ITEM_KEY = Item(key_name='root_entity')
+# consistency in the High Replication Datastore. We initialize this global
+# variable in setUp after calling test_util.InitAppHostingApi().
+_ROOT_ITEM_KEY = None
 
 
 class CompositeQueryTest(unittest.TestCase):
@@ -135,6 +136,9 @@ def setUp():
   _MODULE_SETUP = True
 
   test_util.InitAppHostingApi()
+
+  global _ROOT_ITEM_KEY
+  _ROOT_ITEM_KEY = Item(key_name='root_entity')
 
   # add some data
   for x in range(5):
