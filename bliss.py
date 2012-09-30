@@ -337,10 +337,14 @@ class RunProject(BlissHandler):
     """Handles HTTP GET requests."""
     if not common.IsDevMode():
       # production
+      app_id = app_identity.get_application_id()
+      playground_app_id = settings.GetPlaygroundAppIdFor(app_id)
+      default_version_hostname = settings.GetPlaygroundDefaultVersionHostname(
+          playground_app_id)
       self.redirect('https://{0}{1}{2}/'
                     .format(urllib.quote_plus(project_name),
                             _DASH_DOT_DASH,
-                            app_identity.get_default_version_hostname()))
+                            default_version_hostname))
     if mimic.GetProjectNameFromCookie() == project_name:
       # cookie already set; proceed to app
       self.redirect('/')
