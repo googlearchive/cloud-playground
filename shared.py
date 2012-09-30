@@ -3,10 +3,13 @@
 import logging
 import mimetypes
 
+from __mimic import common
 from __mimic import mimic
 
 import model
+import settings
 
+from google.appengine.api import app_identity
 from google.appengine.api import namespace_manager
 
 
@@ -63,6 +66,13 @@ def GuessMimeType(filename):
   if mime_type:
     return mime_type
   return 'text/plain'
+
+
+def ThisIsBlissApp():
+  """Returns whether this is the bliss app id."""
+  if common.IsDevMode():
+    return True
+  return app_identity.get_application_id() == settings.BLISS_APP_ID
 
 
 def DoesCurrentProjectExist():

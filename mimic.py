@@ -52,8 +52,9 @@ class Mimic(object):
     sys.stdout = output
     try:
       logging.warn('\n' * 3)
-      if (not shared.DoesCurrentProjectExist()
-          and os.environ['PATH_INFO'] == '/'):
+      if (shared.ThisIsBlissApp()
+          and os.environ['PATH_INFO'] == '/'
+          and not shared.DoesCurrentProjectExist()):
         yield self._RedirectResponse('/bliss')
         return
       mimic.RunMimic(create_tree_func=common.config.CREATE_TREE_FUNC)
