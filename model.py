@@ -5,8 +5,8 @@ import logging
 import os
 import random
 
-import bliss
 import codesite
+import error
 import settings
 import shared
 
@@ -194,7 +194,7 @@ def NewProjectName():
 def CreateProject(user, project_name, project_description):
   prj = _AhBlissProject.get_by_id(project_name)
   if prj:
-    raise bliss.BlissException('Project name %s already exists' % project_name)
+    raise error.BlissError('Project name %s already exists' % project_name)
   prj = _AhBlissProject(id=project_name,
                         project_description=project_description)
   prj.put()

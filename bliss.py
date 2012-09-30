@@ -51,12 +51,6 @@ def tojson(r):
   return _JSON_ENCODER.encode(r)
 
 
-class BlissException(Exception):
-
-  def __init__(self, message):
-    super(BlissException, self).__init__(message)
-
-
 # From http://webapp-improved.appspot.com/guide/extras.html
 class SessionHandler(webapp2.RequestHandler):
   """Convenience request handler for dealing with sessions."""
@@ -118,7 +112,7 @@ class BlissHandler(SessionHandler):
       exception: the exception that was thrown
       debug_mode: True if the web application is running in debug mode
     """
-    if not isinstance(exception, BlissException):
+    if not isinstance(exception, error.BlissError):
       super(BlissHandler, self).handle_exception(exception, debug_mode)
       return
     self.error(500)
@@ -380,9 +374,9 @@ class CreateProject(BlissHandler):
     assert project_name
     if (_DASH_DOT_DASH in project_name
         or not _VALID_PROJECT_RE.match(project_name)):
-      raise BlissException('Project name must match {0} and must not contain '
-                           '{1!r}'.format(_VALID_PROJECT_RE.pattern,
-                                          _DASH_DOT_DASH))
+      raise error.BlissError('Project name must match {0} and must not contain '
+                             '{1!r}'.format(_VALID_PROJECT_RE.pattern,
+                                            _DASH_DOT_DASH))
     template_url = self.request.get('template_url')
     project_description = (self.request.get('project_description')
                            or project_name)
