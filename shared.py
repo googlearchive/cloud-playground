@@ -83,7 +83,7 @@ def DoesCurrentProjectExist():
   prj = model.GetProject(project_name)
   if not prj:
     return None
-  assert (namespace_manager.get_namespace() == project_name,
-          'namespace_manager.get_namespace()={0!r}, project_name={1!r}'
-          .format(namespace_manager.get_namespace(), project_name))
+  assert namespace_manager.get_namespace() == project_name, (
+      'namespace_manager.get_namespace()={0!r}, project_name={1!r}'
+      .format(namespace_manager.get_namespace(), project_name))
   return True
