@@ -12,7 +12,7 @@ function deploy() {
   appcfg.py --oauth2 $* update .
 }
 
-if [ $( echo "- A" | egrep -- '-A'\|'--application=' >/dev/null; echo $? ) == 0 ]
+if [ $( echo "$*" | egrep -- '-A'\|'--application=' >/dev/null; echo $? ) == 0 ]
 then
   deploy $*
 else
