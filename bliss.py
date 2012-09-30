@@ -18,6 +18,7 @@ from __mimic import common
 from __mimic import mimic
 
 import codesite
+import error
 import model
 import secret
 import settings
