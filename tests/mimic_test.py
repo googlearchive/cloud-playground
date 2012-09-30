@@ -458,7 +458,7 @@ class MimicTest(unittest.TestCase):
   def checkHostParseFailure(self, server_name):
     os.environ['SERVER_NAME'] = server_name
     project_name = mimic.GetProjectName()
-    self.assertEquals('', project_name)
+    self.assertEquals(None, project_name)
 
   def testGetProjectNameAppspot(self):
     os.environ['SERVER_NAME'] = 'project-name.your-app-id.appspot.com'
@@ -486,7 +486,7 @@ class MimicTest(unittest.TestCase):
     os.environ['HTTP_HOST'] = 'localhost:8080'
     os.environ['SERVER_NAME'] = 'localhost'
     project_name = mimic.GetProjectName()
-    self.assertEquals('', project_name)
+    self.assertEquals(None, project_name)
 
   def testGetProjectNameCustomDomainDashDotDash(self):
     os.environ['SERVER_NAME'] = 'proj2-dot-www.mydomain.com'

@@ -310,7 +310,7 @@ def GetProjectName():
   details.
 
   Returns:
-    The project name.
+    The project name or None.
   """
   # for task queues, use persisted namespace as the project name
   project_name = os.environ.get(_HTTP_X_APPENGINE_CURRENT_NAMESPACE)
@@ -327,7 +327,7 @@ def GetProjectName():
     project_name = GetProjectNameFromCookie()
   if project_name:
     return project_name
-  return ''
+  return None
 
 
 def GetNamespace():
