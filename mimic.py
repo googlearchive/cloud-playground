@@ -51,7 +51,8 @@ class Mimic(object):
     saved_out = sys.stdout
     sys.stdout = output
     try:
-      logging.warn('\n' * 3)
+      if common.IsDevMode():
+        logging.warn('\n' * 3)
       if (shared.ThisIsBlissApp()
           and os.environ['PATH_INFO'] == '/'
           and not shared.DoesCurrentProjectExist()):
