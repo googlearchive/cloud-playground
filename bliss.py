@@ -74,13 +74,6 @@ class SessionHandler(webapp2.RequestHandler):
                       .format(client_csrf, session_csrf))
 
   def dispatch(self):
-    if not shared.ThisIsBlissApp():
-      url = 'https://{0}/bliss'.format(settings.BLISS_HOSTNAME)
-      self.error(501)  # not implemented
-      self.response.write('Bliss user interface not implemented here.<br>'
-                          'See <a href="{0}">{0}</a> instead.'
-                          .format(url))
-      return
     # Get a session store for this request.
     self.session_store = sessions.get_store(request=self.request)
     # Ensure valid session is present (including GET requests)
@@ -133,6 +126,18 @@ class BlissHandler(SessionHandler):
         'namespace_manager.get_namespace()={0!r}, project_name={1!r}'
         .format(namespace_manager.get_namespace(), project_name))
     return common.config.CREATE_TREE_FUNC(project_name)
+
+  def dispatch(self):
+    if not shared.ThisIsBlissApp():
+      url = 'https://{0}/bliss'.format(settings.BLISS_HOSTNAME)
+      self.error(501)  # not implemented
+      self.response.write('Bliss user interface not implemented here.<br>'
+                          'See <a href="{0}">{0}</a> instead.'
+                          .format(url))
+      return
+
+    # Dispatch the request.
+    SessionHandler.dispatch(self)
 
   def handle_exception(self, exception, debug_mode):
     """Called if this handler throws an exception during execution.
