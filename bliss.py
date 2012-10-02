@@ -73,14 +73,18 @@ class SessionHandler(webapp2.RequestHandler):
                       'session csrf token {1!r}'
                       .format(client_csrf, session_csrf))
 
+  def PerformValidation(self):
+    """To be overriden by subclasses."""
+    if self.request.method != 'GET':
+      self._PerformCsrfRequestValidation()
+
   def dispatch(self):
     # Get a session store for this request.
     self.session_store = sessions.get_store(request=self.request)
     # Ensure valid session is present (including GET requests)
     self.session
     self.user = model.GetUser(self.get_user_key())
-    if self.request.method != 'GET':
-      self._PerformCsrfRequestValidation()
+    self.PerformValidation()
 
     try:
       # Dispatch the request.
@@ -130,7 +134,8 @@ class BlissHandler(SessionHandler):
         .format(namespace_manager.get_namespace(), self.project_name))
     return common.config.CREATE_TREE_FUNC(self.project_name)
 
-  def dispatch(self):
+  def PerformValidation(self):
+    super(BlissHandler, self).PerformValidation()
     if not shared.ThisIsBlissApp():
       url = 'https://{0}/bliss'.format(settings.BLISS_HOSTNAME)
       self.error(501)  # not implemented
@@ -138,9 +143,6 @@ class BlissHandler(SessionHandler):
                           'See <a href="{0}">{0}</a> instead.'
                           .format(url))
       return
-
-    # Dispatch the request.
-    SessionHandler.dispatch(self)
 
   def handle_exception(self, exception, debug_mode):
     """Called if this handler throws an exception during execution.
