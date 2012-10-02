@@ -89,6 +89,7 @@ class SessionHandler(webapp2.RequestHandler):
     except error.BlissError, e:
       # Manually dispatch to handle_exception
       self.handle_exception(e, self.app.debug)
+      return
 
     try:
       # Exceptions during dispatch automatically handled by handle_exception
