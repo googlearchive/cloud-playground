@@ -134,6 +134,27 @@ class BlissHandler(SessionHandler):
         .format(namespace_manager.get_namespace(), self.project_name))
     return common.config.CREATE_TREE_FUNC(self.project_name)
 
+  # TODO remove me once all projects have a writers
+  def _MaybeFixProject(self):
+    if self.project.writers:
+      return
+    project_names = [key.id() for key in self.user.projects]
+    if self.project_name in project_names:
+      self.project.writers = [self.user.key.id()]
+      self.project.put()
+
+  def _PerformWriteAccessCheck(self):
+    shared.w(self.user)
+    user_key = self.user.key.id()
+    if not user_key:
+      shared.e('FIX ME: no user')
+    self._MaybeFixProject()
+    if not self.project.writers:
+      shared.e('FIX ME: project has no writers')
+    if user_key not in self.project.writers:
+      shared.e('User {0!r} is not authorized to edit project {1!r}'
+               .format(user_key, self.project_name))
+
   def PerformValidation(self):
     super(BlissHandler, self).PerformValidation()
     if not shared.ThisIsBlissApp():
@@ -143,6 +164,8 @@ class BlissHandler(SessionHandler):
                           'See <a href="{0}">{0}</a> instead.'
                           .format(url))
       return
+    if self.request.method != 'GET':
+      self._PerformWriteAccessCheck()
 
   def handle_exception(self, exception, debug_mode):
     """Called if this handler throws an exception during execution.

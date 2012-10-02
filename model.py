@@ -46,6 +46,7 @@ class _AhBlissUser(ndb.Model):
 class _AhBlissProject(ndb.Model):
   """A Model to store bliss projects."""
   project_description = ndb.StringProperty(indexed=False)
+  writers = ndb.StringProperty(repeated=True)
 
   @property
   def project_name(self):
@@ -196,7 +197,8 @@ def CreateProject(user, project_name, project_description):
   if prj:
     raise error.BlissError('Project name %s already exists' % project_name)
   prj = _AhBlissProject(id=project_name,
-                        project_description=project_description)
+                        project_description=project_description,
+                        writers=[user.key.id()])
   prj.put()
   user.projects.append(prj.key)
   user.put()
