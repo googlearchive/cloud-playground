@@ -212,15 +212,11 @@ function selectFile(id) {
         source_code.removeChild(source_code.childNodes[0]);
       }
       _editor = createEditor(mime_type);
+      _editor.getScrollerElement().id = 'scroller-element';
       source_container.setAttribute('class', 'code');
       _editor.setValue(xhr.responseText);
       _editor.setOption('onChange', editorOnChange);
       _editor.focus();
-
-      resizer(document.getElementById('divider1'),
-              _editor.getScrollerElement());
-      resizer(document.getElementById('divider2'),
-              document.getElementById('output-iframe'));
     }
   });
 }
@@ -470,8 +466,13 @@ function createEditor(mime_type) {
 }
 
 // TODO: replace this handcrafted splitter
-function resizer(divider, elem) {
-  var downx, downy, isdown, initialheight;
+function resizer(divider_id, content_id) {
+  divider = document.getElementById(divider_id);
+  if (!divider) {
+    return;
+  }
+
+  var downx, downy, isdown, initialheight, elem;
   var dragDiv = document.getElementById('drag-div');
 
   var movefunc = function(evt) {
@@ -487,6 +488,7 @@ function resizer(divider, elem) {
     isdown = true;
     downx = evt.x;
     downy = evt.y;
+    elem = document.getElementById(content_id);
     initialheight = elem.offsetHeight;
     dragDiv.style.display = 'block';
     dragDiv.addEventListener('mousemove', movefunc);
@@ -502,3 +504,6 @@ function resizer(divider, elem) {
 
   divider.addEventListener('mousedown', downfunc);
 }
+
+resizer('divider1', 'scroller-element');
+resizer('divider2', 'output-iframe');
