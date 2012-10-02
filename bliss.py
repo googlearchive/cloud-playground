@@ -88,7 +88,7 @@ class SessionHandler(webapp2.RequestHandler):
 
     try:
       # Dispatch the request.
-      webapp2.RequestHandler.dispatch(self)
+      super(SessionHandler, self).dispatch()
     finally:
       # Save all sessions.
       self.session_store.save_sessions(self.response)
