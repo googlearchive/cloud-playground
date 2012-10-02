@@ -224,6 +224,10 @@ h1 {
   padding-top: .5em;
 }
 
+  .newthing:hover {
+    color: #00e;
+  }
+
   .newthing .name {
     font-weight: bold;
   }
