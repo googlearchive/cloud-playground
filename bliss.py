@@ -264,6 +264,9 @@ class MoveFile(BlissHandler):
       raise Exception('Project {0} does not exist'.format(project_name))
     newpath = self.request.get('newpath')
     assert newpath
+    if self.tree.HasFile(newpath):
+      raise error.BlissError('Filename {0!r} already exists'
+                             .format(str(newpath)))
     self.tree.MoveFile(oldpath, newpath)
 
 
