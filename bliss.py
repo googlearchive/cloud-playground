@@ -63,9 +63,7 @@ class SessionHandler(webapp2.RequestHandler):
       return user.email()
     return self.session.get(_ANON_USER_KEY)
 
-  def PerformCsrfRequestValidation(self):
-    if self.request.method == 'GET':
-      return
+  def _PerformCsrfRequestValidation(self):
     session_csrf = self.session['csrf']
     client_csrf = self.request.headers['X-Bliss-CSRF']
     if not client_csrf:
@@ -88,7 +86,8 @@ class SessionHandler(webapp2.RequestHandler):
     # Ensure valid session is present (including GET requests)
     self.session
     self.user = model.GetUser(self.get_user_key())
-    self.PerformCsrfRequestValidation()
+    if self.request.method != 'GET':
+      self._PerformCsrfRequestValidation()
 
     try:
       # Dispatch the request.
