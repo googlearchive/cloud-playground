@@ -168,6 +168,32 @@ function file_context_menu(evt, id) {
   insertAfter(menuDiv, elem);
 }
 
+function fetch_current_file_content() {
+  var filename = _files[_current_filename_id];
+  source_filename.innerHTML = filename;
+  var uri = '/bliss/p/' + encodeURI(_whoami.project_name) + '/getfile/' + encodeURI(filename);
+  get(uri, function(xhr) {
+    // e.g. 'text/html; charset=UTF-8'
+    var mime_type = xhr.getResponseHeader('Content-Type');
+    // strip '; charset=...'
+    mime_type = mime_type.replace(/ ?;.*/, '');
+    if (/^image\//.test(mime_type)) {
+      source_image.setAttribute('src', uri);
+      source_container.setAttribute('class', 'image');
+    } else {
+      while(source_code.hasChildNodes()) {
+        source_code.removeChild(source_code.childNodes[0]);
+      }
+      _editor = createEditor(mime_type);
+      _editor.getScrollerElement().id = 'scroller-element';
+      source_container.setAttribute('class', 'code');
+      _editor.setValue(xhr.responseText);
+      _editor.setOption('onChange', editorOnChange);
+      _editor.focus();
+    }
+  });
+}
+
 // activate a new file in the left nav
 function selectFile(id) {
   if (_current_filename_id) {
@@ -194,31 +220,7 @@ function selectFile(id) {
 
   // remember current file
   _current_filename_id = id;
-
-  // fetch file content
-  var filename = _files[id];
-  source_filename.innerHTML = filename;
-  var uri = '/bliss/p/' + encodeURI(_whoami.project_name) + '/getfile/' + encodeURI(filename);
-  get(uri, function(xhr) {
-    // e.g. 'text/html; charset=UTF-8'
-    var mime_type = xhr.getResponseHeader('Content-Type');
-    // strip '; charset=...'
-    mime_type = mime_type.replace(/ ?;.*/, '');
-    if (/^image\//.test(mime_type)) {
-      source_image.setAttribute('src', uri);
-      source_container.setAttribute('class', 'image');
-    } else {
-      while(source_code.hasChildNodes()) {
-        source_code.removeChild(source_code.childNodes[0]);
-      }
-      _editor = createEditor(mime_type);
-      _editor.getScrollerElement().id = 'scroller-element';
-      source_container.setAttribute('class', 'code');
-      _editor.setValue(xhr.responseText);
-      _editor.setOption('onChange', editorOnChange);
-      _editor.focus();
-    }
-  });
+  fetch_current_file_content();
 }
 
 function addfile(id, filename) {
@@ -435,6 +437,9 @@ function save() {
   // TODO: catch exception and mark dirty
   var uri = '/bliss/p/' + encodeURI(_whoami.project_name) + '/putfile/' + encodeURI(filename);
   put(uri, function(xhr) {
+    if (xhr.status != 200) {
+      fetch_current_file_content();
+    }
     set_status(); // Saved
   }, _editor.getValue());
 }
