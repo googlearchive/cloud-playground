@@ -115,6 +115,26 @@ class SessionHandler(webapp2.RequestHandler):
 class BlissHandler(SessionHandler):
   """Convenice request handler with bliss specific functionality."""
 
+  def not_found(self):
+    self.render('404.html', path_info=self.request.path_info)
+
+  def get_project_from_path_info(self):
+    project_name = mimic.GetProjectNameFromPathInfo(self.request.path_info)
+    if not project_name:
+      return None
+    return model.GetProject(project_name)
+
+  def get_tree(self, project_name):
+    assert project_name
+    prj = model.GetProject(project_name)
+    if not prj:
+      raise Exception('Project {0} does not exist'.format(project_name))
+    # TODO: instantiate tree elsewhere
+    assert namespace_manager.get_namespace() == project_name, (
+        'namespace_manager.get_namespace()={0!r}, project_name={1!r}'
+        .format(namespace_manager.get_namespace(), project_name))
+    return common.config.CREATE_TREE_FUNC(project_name)
+
   def handle_exception(self, exception, debug_mode):
     """Called if this handler throws an exception during execution.
 
@@ -130,23 +150,6 @@ class BlissHandler(SessionHandler):
     self.response.clear()
     self.response.headers['Content-Type'] = 'text/plain'
     self.response.out.write('%s' % (cgi.escape(exception.message, quote=True)))
-
-  def get_tree(self, project_name):
-    assert project_name
-    prj = model.GetProject(project_name)
-    if not prj:
-      raise Exception('Project {0} does not exist'.format(project_name))
-    # TODO: instantiate tree elsewhere
-    assert namespace_manager.get_namespace() == project_name, (
-        'namespace_manager.get_namespace()={0!r}, project_name={1!r}'
-        .format(namespace_manager.get_namespace(), project_name))
-    return common.config.CREATE_TREE_FUNC(project_name)
-
-  def get_project_from_path_info(self):
-    project_name = mimic.GetProjectNameFromPathInfo(self.request.path_info)
-    if not project_name:
-      return None
-    return model.GetProject(project_name)
 
   def render(self, template, *args, **kwargs):
     """Renders the provided template."""
@@ -187,9 +190,6 @@ class BlissHandler(SessionHandler):
         datastore_admin_url=datastore_admin_url,
         memcache_admin_url=memcache_admin_url,
         **kwargs))
-
-  def not_found(self):
-    self.render('404.html', path_info=self.request.path_info)
 
 
 class GetFile(BlissHandler):
