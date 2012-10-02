@@ -83,11 +83,15 @@ class SessionHandler(webapp2.RequestHandler):
     self.session_store = sessions.get_store(request=self.request)
     # Ensure valid session is present (including GET requests)
     _ = self.session
-    self.user = model.GetUser(self.get_user_key())
-    self.PerformValidation()
+    try:
+      self.user = model.GetUser(self.get_user_key())
+      self.PerformValidation()
+    except error.BlissError, e:
+      # Manually dispatch to handle_exception
+      self.handle_exception(e, self.app.debug)
 
     try:
-      # Dispatch the request.
+      # Exceptions during dispatch automatically handled by handle_exception
       super(SessionHandler, self).dispatch()
     finally:
       # Save all sessions.
