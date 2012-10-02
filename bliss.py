@@ -148,6 +148,9 @@ class BlissHandler(SessionHandler):
     user_key = self.user.key.id()
     if not user_key:
       shared.e('FIX ME: no user')
+    if not self.project:
+      # TODO: better approach which allows the creation of new projects
+      return
     self._MaybeFixProject()
     if not self.project.writers:
       shared.e('FIX ME: project has no writers')
