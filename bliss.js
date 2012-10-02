@@ -218,6 +218,8 @@ function selectFile(id) {
 
       resizer(document.getElementById('divider1'),
               _editor.getScrollerElement());
+      resizer(document.getElementById('divider2'),
+              document.getElementById('output-iframe'));
     }
   });
 }
