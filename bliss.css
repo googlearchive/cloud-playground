@@ -20,6 +20,14 @@ HR.divider {
   padding: 2px;
 }
 
+  HR.divider.movable {
+    cursor: move;
+    border-top: 4px solid #fff;
+    border-bottom: 4px solid #fff;
+    background-color: #eee;
+    padding: 2px;
+  }
+
 BUTTON {
   color: white;
   background-color: #22F;

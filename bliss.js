@@ -459,3 +459,36 @@ function createEditor(mime_type) {
     undoDepth: 440, // default = 40
   });
 }
+
+// TODO: replace this handcrafted splitter
+var divider1 = document.getElementById('divider1');
+if (divider1) {
+  var downx, downy, isdown, initialheight;
+
+  var movefunc = function(evt) {
+    if (!isdown) {
+      return;
+    }
+    var scroller = _editor.getScrollerElement();
+    var newheight = initialheight + (evt.y - downy);
+    scroller.style.height = newheight + 'px';
+  };
+
+  var downfunc = function(evt) {
+    evt.preventDefault();
+    isdown = true;
+    downx = evt.x;
+    downy = evt.y;
+    initialheight = _editor.getScrollerElement().offsetHeight;
+    document.body.addEventListener('mousemove', movefunc);
+    document.body.addEventListener('mouseup', upfunc);
+  };
+
+  var upfunc = function(evt) {
+    isdown = false;
+    document.body.removeEventListener(movefunc);
+    document.body.removeEventListener(upfunc);
+  };
+
+  divider1.addEventListener('mousedown', downfunc);
+}
