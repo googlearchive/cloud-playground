@@ -111,22 +111,24 @@ class BlissHandler(SessionHandler):
     self.render('404.html', path_info=self.request.path_info)
 
   @webapp2.cached_property
-  def project(self):
-    project_name = mimic.GetProjectNameFromPathInfo(self.request.path_info)
-    if not project_name:
-      return None
-    return model.GetProject(project_name)
+  def project_name(self):
+    return mimic.GetProjectNameFromPathInfo(self.request.path_info)
 
-  def get_tree(self, project_name):
-    assert project_name
-    prj = model.GetProject(project_name)
-    if not prj:
-      raise Exception('Project {0} does not exist'.format(project_name))
+  @webapp2.cached_property
+  def project(self):
+    if not self.project_name:
+      return None
+    return model.GetProject(self.project_name)
+
+  @webapp2.cached_property
+  def tree(self):
+    if not self.project:
+      raise Exception('Project {0} does not exist'.format(self.project_name))
     # TODO: instantiate tree elsewhere
-    assert namespace_manager.get_namespace() == project_name, (
+    assert namespace_manager.get_namespace() == self.project_name, (
         'namespace_manager.get_namespace()={0!r}, project_name={1!r}'
-        .format(namespace_manager.get_namespace(), project_name))
-    return common.config.CREATE_TREE_FUNC(project_name)
+        .format(namespace_manager.get_namespace(), self.project_name))
+    return common.config.CREATE_TREE_FUNC(self.project_name)
 
   def dispatch(self):
     if not shared.ThisIsBlissApp():
@@ -202,7 +204,7 @@ class GetFile(BlissHandler):
     """Handles HTTP GET requests."""
     assert project_name
     assert filename
-    contents = self.get_tree(project_name).GetFileContents(filename)
+    contents = self.tree.GetFileContents(filename)
     if contents is None:
       self.response.set_status(404)
       self.response.headers['Content-Type'] = 'text/plain'
@@ -219,7 +221,7 @@ class PutFile(BlissHandler):
     """Handles HTTP PUT requests."""
     assert project_name
     assert filename
-    self.get_tree(project_name).SetFile(path=filename,
+    self.tree.SetFile(path=filename,
                                         contents=self.request.body)
 
     self.response.headers['Content-Type'] = 'text/plain'
@@ -236,7 +238,7 @@ class MoveFile(BlissHandler):
       raise Exception('Project {0} does not exist'.format(project_name))
     newpath = self.request.get('newpath')
     assert newpath
-    self.get_tree(project_name).MoveFile(oldpath, newpath)
+    self.tree.MoveFile(oldpath, newpath)
 
 
 class DeletePath(BlissHandler):
@@ -246,7 +248,7 @@ class DeletePath(BlissHandler):
     assert project_name
     if not model.GetProject(project_name):
       raise Exception('Project {0} does not exist'.format(project_name))
-    self.get_tree(project_name).DeletePath(path)
+    self.tree.DeletePath(path)
 
 
 class ListFiles(BlissHandler):
@@ -256,7 +258,7 @@ class ListFiles(BlissHandler):
     project = model.GetProject(project_name)
     if not project:
       return self.not_found()
-    r = self.get_tree(project_name).ListDirectory(path)
+    r = self.tree.ListDirectory(path)
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
 
@@ -403,10 +405,10 @@ class CreateProject(BlissHandler):
                         project_name=project_name,
                         project_description=project_description)
     if codesite.IsCodesiteURL(template_url):
-      codesite.PopulateProjectFromCodesite(tree=self.get_tree(project_name),
+      codesite.PopulateProjectFromCodesite(tree=self.tree,
                                            template_url=template_url)
     else:
-      model.PopulateProjectWithTemplate(tree=self.get_tree(project_name),
+      model.PopulateProjectWithTemplate(tree=self.tree,
                                         template_url=template_url)
 
 
@@ -416,7 +418,7 @@ class DeleteProject(BlissHandler):
     assert project_name
     if not model.GetProject(project_name):
       raise Exception('Project {0} does not exist'.format(project_name))
-    model.DeleteProject(self.user, tree=self.get_tree(project_name),
+    model.DeleteProject(self.user, tree=self.tree,
                         project_name=project_name)
 
 
