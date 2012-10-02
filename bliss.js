@@ -215,6 +215,9 @@ function selectFile(id) {
       _editor.setValue(xhr.responseText);
       _editor.setOption('onChange', editorOnChange);
       _editor.focus();
+
+      resizer(document.getElementById('divider1'),
+              _editor.getScrollerElement());
     }
   });
 }
@@ -464,17 +467,15 @@ function createEditor(mime_type) {
 }
 
 // TODO: replace this handcrafted splitter
-var divider1 = document.getElementById('divider1');
-if (divider1) {
+function resizer(divider, elem) {
   var downx, downy, isdown, initialheight;
 
   var movefunc = function(evt) {
     if (!isdown) {
       return;
     }
-    var scroller = _editor.getScrollerElement();
     var newheight = initialheight + (evt.y - downy);
-    scroller.style.height = newheight + 'px';
+    elem.style.height = newheight + 'px';
   };
 
   var downfunc = function(evt) {
@@ -482,7 +483,7 @@ if (divider1) {
     isdown = true;
     downx = evt.x;
     downy = evt.y;
-    initialheight = _editor.getScrollerElement().offsetHeight;
+    initialheight = elem.offsetHeight;
     document.body.addEventListener('mousemove', movefunc);
     document.body.addEventListener('mouseup', upfunc);
   };
@@ -493,5 +494,5 @@ if (divider1) {
     document.body.removeEventListener(upfunc);
   };
 
-  divider1.addEventListener('mousedown', downfunc);
+  divider.addEventListener('mousedown', downfunc);
 }
