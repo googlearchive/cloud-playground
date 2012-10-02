@@ -110,7 +110,8 @@ class BlissHandler(SessionHandler):
   def not_found(self):
     self.render('404.html', path_info=self.request.path_info)
 
-  def get_project_from_path_info(self):
+  @webapp2.cached_property
+  def project(self):
     project_name = mimic.GetProjectNameFromPathInfo(self.request.path_info)
     if not project_name:
       return None
@@ -174,12 +175,11 @@ class BlissHandler(SessionHandler):
       datastore_admin_url = None
       memcache_admin_url = None
 
-    project = self.get_project_from_path_info()
-    if project:
-      kwargs['project_name'] = project.project_name
-      kwargs['project_description'] = project.project_description
+    if self.project:
+      kwargs['project_name'] = self.project.project_name
+      kwargs['project_description'] = self.project.project_description
       kwargs['project_run_url'] = ('/bliss/p/{0}/run'
-                                   .format(project.project_name))
+                                   .format(self.project.project_name))
 
     if users.get_current_user():
       kwargs['is_logged_in'] = True
