@@ -43,11 +43,12 @@ function lightbox(summary, details) {
     '<div style="position:absolute;z-index:' + _glassMessageZIndex +
     ';left:0px;top:0px;right:0px;bottom:0px;filter:alpha(opacity=60);opacity:0.6;background-color:#000;"></div>'
   ;
-  document.body.appendChild(outer);
+  var container = document.getElementById('container') || document.body;
+  container.appendChild(outer);
   document.body.scrollTop = 0;
 
   return function() {
-    document.body.removeChild(outer);
+    container.removeChild(outer);
   }
 }
 
