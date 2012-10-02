@@ -401,9 +401,9 @@ class CreateProject(BlissHandler):
   @ndb.transactional(xg=True)
   def make_template_project(self, template_url, project_name,
                             project_description):
-    model.CreateProject(self.user,
-                        project_name=project_name,
-                        project_description=project_description)
+    self.project = model.CreateProject(self.user,
+                                       project_name=project_name,
+                                       project_description=project_description)
     if codesite.IsCodesiteURL(template_url):
       codesite.PopulateProjectFromCodesite(tree=self.tree,
                                            template_url=template_url)

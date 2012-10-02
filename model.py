@@ -200,6 +200,7 @@ def CreateProject(user, project_name, project_description):
   prj.put()
   user.projects.append(prj.key)
   user.put()
+  return prj
 
 
 def PopulateProjectWithTemplate(tree, template_url):
