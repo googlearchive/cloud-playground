@@ -134,15 +134,6 @@ class BlissHandler(SessionHandler):
         .format(namespace_manager.get_namespace(), self.project_name))
     return common.config.CREATE_TREE_FUNC(self.project_name)
 
-  # TODO remove me once all projects have a writers
-  def _MaybeFixProject(self):
-    if self.project.writers:
-      return
-    project_names = [key.id() for key in self.user.projects]
-    if self.project_name in project_names:
-      self.project.writers = [self.user.key.id()]
-      self.project.put()
-
   def _PerformWriteAccessCheck(self):
     shared.w(self.user)
     user_key = self.user.key.id()
@@ -151,9 +142,6 @@ class BlissHandler(SessionHandler):
     if not self.project:
       # TODO: better approach which allows the creation of new projects
       return
-    self._MaybeFixProject()
-    if not self.project.writers:
-      shared.e('FIX ME: project has no writers')
     if user_key not in self.project.writers:
       shared.e('User {0!r} is not authorized to edit project {1!r}'
                .format(user_key, self.project_name))
