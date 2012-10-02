@@ -188,6 +188,10 @@ h1 {
       background-color: #ddf;
     }
 
+    #nav #filelist .fileentry:hover {
+      background-color: #ccf;
+    }
+
       #nav #filelist .fileentry.selected .filename {
         font-weight: bold;
       }
