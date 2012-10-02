@@ -471,6 +471,7 @@ function createEditor(mime_type) {
 // TODO: replace this handcrafted splitter
 function resizer(divider, elem) {
   var downx, downy, isdown, initialheight;
+  var dragDiv = document.getElementById('drag-div');
 
   var movefunc = function(evt) {
     if (!isdown) {
@@ -486,14 +487,16 @@ function resizer(divider, elem) {
     downx = evt.x;
     downy = evt.y;
     initialheight = elem.offsetHeight;
-    document.body.addEventListener('mousemove', movefunc);
-    document.body.addEventListener('mouseup', upfunc);
+    dragDiv.style.display = 'block';
+    dragDiv.addEventListener('mousemove', movefunc);
+    dragDiv.addEventListener('mouseup', upfunc);
   };
 
   var upfunc = function(evt) {
     isdown = false;
-    document.body.removeEventListener(movefunc);
-    document.body.removeEventListener(upfunc);
+    dragDiv.style.display = 'none';
+    dragDiv.removeEventListener(movefunc);
+    dragDiv.removeEventListener(upfunc);
   };
 
   divider.addEventListener('mousedown', downfunc);

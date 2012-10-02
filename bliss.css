@@ -342,3 +342,12 @@ h1 {
     height: 17em;
   }
 
+#drag-div {
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  position: absolute;
+  z-index: 2147483647;
+  display: none;
+}
