@@ -49,7 +49,15 @@ def _GetChildPaths(page):
   return paths
 
 
-def _GetTemplates(template_source):
+def GetTemplates(template_source):
+  """Retrieve a project template.
+
+  Args:
+    template_source: The template source entity.
+
+  Returns:
+    List of template entities.
+  """
   baseurl = template_source.key.id()
   page = fetch(baseurl).content
   candidates = _GetChildPaths(page)

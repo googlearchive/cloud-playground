@@ -53,7 +53,15 @@ class UrlFetchTree(common.Tree):
   def IsMutable(self):
     return True
 
-  def _GetFile(self, path):
+  def RemoteGetFile(self, path):
+    """Retrieve the file via URL Fetch.
+
+    Args:
+      path: The file path.
+
+    Returns:
+      The URL Fetch response.
+    """
     url = ('http://{0}.appspot.com/bliss/p/{1}/getfile/{2}'
            .format(_config.SOURCE_CODE_APP_ID,
                    self.project_name,
@@ -67,7 +75,16 @@ class UrlFetchTree(common.Tree):
                           follow_redirects=False, deadline=3)
     return resp
 
-  def _PutFile(self, path, content):
+  def RemotePutFile(self, path, content):
+    """Put the file via URL Fetch.
+
+    Args:
+      path: The file path.
+      content: The file contents.
+
+    Returns:
+      The URL Fetch response.
+    """
     url = ('http://{0}.appspot.com/bliss/p/{1}/putfile/{2}'
            .format(_config.SOURCE_CODE_APP_ID,
                    self.project_name,
@@ -85,7 +102,7 @@ class UrlFetchTree(common.Tree):
     return resp
 
   def GetFileContents(self, path):
-    resp = self._GetFile(path)
+    resp = self.RemoteGetFile(path)
     if resp.status_code != httplib.OK:
       return None
     return resp.content
@@ -100,12 +117,21 @@ class UrlFetchTree(common.Tree):
     # root always exists, even if there are no files in the datastore
     if path == '':  # pylint: disable-msg=C6403
       return True
-    resp = self._GetFile(path)
+    resp = self.RemoteGetFile(path)
     if resp.status_code == httplib.OK:
       return True
     return False
 
   def MoveFile(self, path, newpath):
+    """Rename a file.
+
+    Args:
+      path: The file path to rename.
+      newpath: The new path.
+
+    Returns:
+      True if the move succeeded.
+    """
     url = ('http://{0}.appspot.com/bliss/p/{1}/movefile/{2}?newpath={3}'
            .format(_config.SOURCE_CODE_APP_ID,
                    self.project_name,
@@ -124,6 +150,14 @@ class UrlFetchTree(common.Tree):
     return True
 
   def DeletePath(self, path):
+    """Delete a file or directory.
+
+    Args:
+      path: The path to delete.
+
+    Returns:
+      True if the delete succeeded.
+    """
     url = ('http://{0}.appspot.com/bliss/p/{1}/deletepath/{2}'
            .format(_config.SOURCE_CODE_APP_ID,
                    self.project_name,
@@ -144,13 +178,21 @@ class UrlFetchTree(common.Tree):
     self.DeletePath('')
 
   def SetFile(self, path, contents):
-    resp = self._PutFile(path, contents)
+    resp = self.RemotePutFile(path, contents)
     assert resp.status_code == httplib.OK
 
   def HasDirectory(self, path):
     raise NotImplementedError
 
   def ListDirectory(self, path):
+    """List the current directory or tree contents.
+
+    Args:
+      path: The directory path to list or '' to access the entire tree.
+
+    Returns:
+      A list of files in the specified directory or tree.
+    """
     path = self._NormalizeDirectoryPath(path)
     url = ('http://{0}.appspot.com/bliss/p/{1}/listfiles/'
            .format(_config.SOURCE_CODE_APP_ID,

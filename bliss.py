@@ -82,7 +82,7 @@ class SessionHandler(webapp2.RequestHandler):
     # Get a session store for this request.
     self.session_store = sessions.get_store(request=self.request)
     # Ensure valid session is present (including GET requests)
-    self.session
+    _ = self.session
     self.user = model.GetUser(self.get_user_key())
     self.PerformValidation()
 
@@ -95,6 +95,7 @@ class SessionHandler(webapp2.RequestHandler):
 
   @webapp2.cached_property
   def session(self):
+    """Lazily create and return a valid session."""
     # Returns a session using the default cookie key.
     session = self.session_store.get_session()
     if not session:
@@ -158,12 +159,11 @@ class BlissHandler(SessionHandler):
     if self.request.method != 'GET':
       self._PerformWriteAccessCheck()
 
-  def handle_bliss_error(self, exception, debug_mode):
+  def handle_bliss_error(self, exception):
     """Called if this handled throws a BlissError.
 
     Args:
       exception: the exception that was thrown
-      debug_mode: True if the web application is running in debug mode
     """
     self.error(500)
     logging.exception(exception)
@@ -180,7 +180,7 @@ class BlissHandler(SessionHandler):
       debug_mode: True if the web application is running in debug mode
     """
     if isinstance(exception, error.BlissError):
-      self.handle_bliss_error(exception, debug_mode)
+      self.handle_bliss_error(exception)
     else:
       super(BlissHandler, self).handle_exception(exception, debug_mode)
 
@@ -247,8 +247,7 @@ class PutFile(BlissHandler):
     """Handles HTTP PUT requests."""
     assert project_name
     assert filename
-    self.tree.SetFile(path=filename,
-                                        contents=self.request.body)
+    self.tree.SetFile(path=filename, contents=self.request.body)
 
     self.response.headers['Content-Type'] = 'text/plain'
     self.response.write('OK')

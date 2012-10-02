@@ -15,16 +15,16 @@ class CachingUrlFetchTree(urlfetch_tree.UrlFetchTree):
     # uniquely identifies the current HTTP request
     self.request_log_id = os.environ['REQUEST_LOG_ID']
 
-  def _GetFile(self, path):
+  def RemoteGetFile(self, path):
     # cached should not be used across multiple requests
     assert self.request_log_id == os.environ['REQUEST_LOG_ID']
-    file = self.file_cache.get(path)
-    if not file:
-      file = super(CachingUrlFetchTree, self)._GetFile(path)
-      self.file_cache[path] = file
-    return file
+    f = self.file_cache.get(path)
+    if not f:
+      f = super(CachingUrlFetchTree, self).RemoteGetFile(path)
+      self.file_cache[path] = f
+    return f
 
-  def _PutFile(self, path, content):
-    resp = super(CachingUrlFetchTree, self)._PutFile(path, content)
+  def RemotePutFile(self, path, content):
+    resp = super(CachingUrlFetchTree, self).RemotePutFile(path, content)
     self.file_cache.pop(path, None)
     return resp

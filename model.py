@@ -150,7 +150,7 @@ def _GetTemplates(template_source):
   if url == 'templates/':
     return _GetFileSystemTemplates(template_source)
   elif codesite.IsCodesiteURL(url):
-    return codesite._GetTemplates(template_source)
+    return codesite.GetTemplates(template_source)
   else:
     shared.e('Unknown URL template %s' % url)
 
@@ -160,11 +160,11 @@ def _GetFileSystemTemplates(template_source):
   template_dir = template_source.key.id()
   for dirname in os.listdir(template_dir):
     try:
-      f = open(os.path.join(template_dir, dirname, _PLAYGROUND_JSON))
+      f = open(os.path.join(template_dir, dirname, _PLAYGROUND_JSON + 'x'))
       data = json.loads(f.read())
       name = data.get('template_name')
       description = data.get('template_description')
-    except:
+    except IOError:
       name = dirname
       description = dirname
     t = _AhTemplate(parent=template_source.key,
@@ -193,6 +193,19 @@ def NewProjectName():
 
 @ndb.transactional(xg=True)
 def CreateProject(user, project_name, project_description):
+  """Create a new user project.
+
+  Args:
+    user: The user for which the project is to be created.
+    project_name: The project name.
+    project_description: The project description.
+
+  Returns:
+    The new project entity.
+
+  Raises:
+    BlissError: If the project name already exists.
+  """
   prj = _AhBlissProject.get_by_id(project_name)
   if prj:
     raise error.BlissError('Project name %s already exists' % project_name)

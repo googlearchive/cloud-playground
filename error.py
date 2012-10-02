@@ -1,5 +1,6 @@
 """Exceptions raised in bliss app."""
 
+
 class BlissError(Exception):
 
   def __init__(self, message):
