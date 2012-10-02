@@ -158,6 +158,20 @@ class BlissHandler(SessionHandler):
     if self.request.method != 'GET':
       self._PerformWriteAccessCheck()
 
+  def handle_bliss_error(self, exception, debug_mode):
+    """Called if this handled throws a BlissError.
+
+    Args:
+      exception: the exception that was thrown
+      debug_mode: True if the web application is running in debug mode
+    """
+    self.error(500)
+    logging.exception(exception)
+    self.response.clear()
+    self.response.headers['Content-Type'] = 'text/plain'
+    self.response.headers['X-Bliss-Error'] = 'True'
+    self.response.out.write('%s' % (cgi.escape(exception.message, quote=True)))
+
   def handle_exception(self, exception, debug_mode):
     """Called if this handler throws an exception during execution.
 
@@ -165,14 +179,10 @@ class BlissHandler(SessionHandler):
       exception: the exception that was thrown
       debug_mode: True if the web application is running in debug mode
     """
-    if not isinstance(exception, error.BlissError):
+    if isinstance(exception, error.BlissError):
+      self.handle_bliss_error(exception, debug_mode)
+    else:
       super(BlissHandler, self).handle_exception(exception, debug_mode)
-      return
-    self.error(500)
-    logging.exception(exception)
-    self.response.clear()
-    self.response.headers['Content-Type'] = 'text/plain'
-    self.response.out.write('%s' % (cgi.escape(exception.message, quote=True)))
 
   def render(self, template, *args, **kwargs):
     """Renders the provided template."""

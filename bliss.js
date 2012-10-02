@@ -90,7 +90,10 @@ function _xhr(method, url, callback, data) {
     if (xhr.readyState != 4) {
       return;
     }
-    if (xhr.status != 200) {
+    if (xhr.getResponseHeader('X-Bliss-Error')) {
+      callback(xhr);
+      alert('Error: ' + xhr.responseText);
+    } else if (xhr.status != 200) {
       set_status('\nHTTP Status: ' + xhr.status + '\nURL: ' + url);
       // '.' does not match newlines, so use '[\s\S]' instead
       content = xhr.responseText.replace(/[\s\S]*<body>([\s\S]*)<\/body>[\s\S]*/, '$1');
