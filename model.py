@@ -130,10 +130,6 @@ def GetTemplates(template_source):
   _MEMCACHE_KEY = '{0}-{1}'.format(_AhTemplate.__class__.__name__,
                                    template_source)
   templates = memcache.get(_MEMCACHE_KEY)
-  templates = None
-
-
-
   if templates:
     return templates
   templates = (_AhTemplate.query(ancestor=template_source.key)
