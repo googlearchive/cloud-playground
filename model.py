@@ -160,7 +160,7 @@ def _GetFileSystemTemplates(template_source):
   template_dir = template_source.key.id()
   for dirname in os.listdir(template_dir):
     try:
-      f = open(os.path.join(template_dir, dirname, _PLAYGROUND_JSON + 'x'))
+      f = open(os.path.join(template_dir, dirname, _PLAYGROUND_JSON))
       data = json.loads(f.read())
       name = data.get('template_name')
       description = data.get('template_description')
