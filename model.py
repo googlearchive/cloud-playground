@@ -169,6 +169,7 @@ def _GetFileSystemTemplates(template_source):
                     name=name,
                     description=description)
     templates.append(t)
+    ndb.put_multi(templates)
   return templates
 
 
