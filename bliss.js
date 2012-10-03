@@ -375,22 +375,6 @@ function populateFilenames(filenames) {
   }
 }
 
-// initalize workspace
-function initWorkspace() {
-  json('whoami', function(xhr, r) {
-    _whoami = r;
-    initLeftNavClickHandler();
-    initFileContextMenuClearHandler();
-    json('listfiles/', function(xhr, files) {
-      populateFilenames(files);
-      if (files.length) {
-        // select a file
-        selectFile('file-0');
-      }
-    });
-  });
-}
-
 // given an element in the left nav, determine the file id
 function getFileIdFromElem(elem) {
   while (elem != null && elem.nodeName != 'BODY') {

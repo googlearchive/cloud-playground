@@ -1,16 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="blissful">
   <head>
     <title>bliss</title>
     {% block head %}{% endblock %}
     <link rel="stylesheet" href="/bliss/bliss.css">
   </head>
-  <body onload="{% block onload %}{% endblock %}">
+  <body>
     {% include 'header.html' %}
 
     {% block main %}{% endblock %}
 
     {% include 'footer.html' %}
     <script src="/bliss/bliss.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular.min.js"></script>
+    <script src="/bliss/blissful.js"></script>
   </body>
 </html>

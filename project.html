@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 
 
-{% block onload %}initWorkspace(){% endblock %}
-
 {% block head %}
   <link rel="stylesheet" href="/codemirror/lib/codemirror.css">
 
@@ -30,6 +28,7 @@ function file_context_menu(id) {
 {% endblock %}
 
 {% block main %}
+<div ng-controller="ProjectController">
   <div id="nav">
     <div id="projectname">
       {{project_description}}
@@ -60,4 +59,5 @@ function file_context_menu(id) {
     <div onclick="prompt_file_rename()">Rename</div>
     <div onclick="prompt_file_delete()">Delete</div>
   </div>
+</div>
 {% endblock %}
