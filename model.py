@@ -103,15 +103,16 @@ def GetGlobalRootEntity():
 
 def GetTemplateSources():
   """Get template sources."""
-  _MEMCACHE_KEY = _AhTemplateSource.__class__.__name__
-  sources = memcache.get(_MEMCACHE_KEY)
+  _MEMCACHE_KEY = _AhTemplateSource.__name__
+  sources = memcache.get(_MEMCACHE_KEY, namespace=settings.BLISS_NAMESPACE)
   if sources:
     return sources
   sources = _AhTemplateSource.query(ancestor=GetGlobalRootEntity().key).fetch()
   if not sources:
     sources = _GetTemplateSources()
   sources.sort(key=lambda source: source.description)
-  memcache.set(_MEMCACHE_KEY, sources, time=_MEMCACHE_TIME)
+  memcache.set(_MEMCACHE_KEY, sources, namespace=settings.BLISS_NAMESPACE,
+               time=_MEMCACHE_TIME)
   return sources
 
 
@@ -127,9 +128,8 @@ def _GetTemplateSources():
 
 def GetTemplates(template_source):
   """Get templates from a given template source."""
-  _MEMCACHE_KEY = '{0}-{1}'.format(_AhTemplate.__class__.__name__,
-                                   template_source)
-  templates = memcache.get(_MEMCACHE_KEY)
+  _MEMCACHE_KEY = '{0}-{1}'.format(_AhTemplate.__name__, template_source)
+  templates = memcache.get(_MEMCACHE_KEY, namespace=settings.BLISS_NAMESPACE)
   if templates:
     return templates
   templates = (_AhTemplate.query(ancestor=template_source.key)
@@ -137,7 +137,8 @@ def GetTemplates(template_source):
   if not templates:
     templates = _GetTemplates(template_source)
   templates.sort(key=lambda template: template.name.lower())
-  memcache.set(_MEMCACHE_KEY, templates, time=_MEMCACHE_TIME)
+  memcache.set(_MEMCACHE_KEY, templates, namespace=settings.BLISS_NAMESPACE,
+               time=_MEMCACHE_TIME)
   return templates
 
 
