@@ -142,7 +142,6 @@ class BlissHandler(SessionHandler):
     return common.config.CREATE_TREE_FUNC(self.project_name)
 
   def _PerformWriteAccessCheck(self):
-    shared.w(self.user)
     user_key = self.user.key.id()
     if not user_key:
       shared.e('FIX ME: no user')
