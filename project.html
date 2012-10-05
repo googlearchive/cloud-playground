@@ -28,13 +28,23 @@ function file_context_menu(id) {
 {% endblock %}
 
 {% block main %}
-<div ng-controller="ProjectController">
+<div ng-cloak ng-controller="ProjectController">
   <div id="nav">
     <div id="projectname">
       {{project_description}}
       <div class="runlink" onclick="return run('{{project_run_url}}', '{{project_name}}')" title="run {{project_name}}"><img src='/bliss/run.png'></div>
     </div>
     <div id="filelist">
+      {% raw %}
+        <div id="file-{{$index}}" class="fileentry"
+             ng-click="select($index)"
+             ng-class="{selected: $index == currentIndex}"
+             ng-repeat="file in files">
+          <span class="filename">{{file.name}}</span>
+          <span class="dropdown"><a ng-click="file_context_menu($event, $index)">…</a></span>
+        </div>
+        <div class="newthing link" ng-click="prompt_for_new_file()">+ new file</div>
+      {% endraw %}
     </div>
   </div>
 
@@ -56,8 +66,8 @@ function file_context_menu(id) {
 
   {# hidden bits #}
   <div id='file-context-menu'>
-    <div onclick="prompt_file_rename()">Rename</div>
-    <div onclick="prompt_file_delete()">Delete</div>
+    <div ng-click="prompt_file_rename()">Rename</div>
+    <div ng-click="prompt_file_delete()">Delete</div>
   </div>
 </div>
 {% endblock %}

@@ -45,6 +45,12 @@ _DASH_DOT_DASH = '-dot-'
 # must fit in front of '-dot-appid.appspot.com' and not contain '-dot-'
 _VALID_PROJECT_RE = re.compile('^[a-z0-9-]{0,50}$')
 
+# AngularJS XSRF Cookie, see http://docs.angularjs.org/api/ng.$http
+_XSRF_TOKEN_COOKIE = 'XSRF-TOKEN'
+
+# AngularJS XSRF HTTP Header, see http://docs.angularjs.org/api/ng.$http
+_XSRF_TOKEN_HEADER = 'X-XSRF-TOKEN'
+
 _ANON_USER_KEY = u'anon_user_key'
 
 
@@ -64,14 +70,14 @@ class SessionHandler(webapp2.RequestHandler):
     return self.session.get(_ANON_USER_KEY)
 
   def _PerformCsrfRequestValidation(self):
-    session_csrf = self.session['csrf']
-    client_csrf = self.request.headers['X-Bliss-CSRF']
-    if not client_csrf:
-      raise Exception('Missing client csrf token')
-    if client_csrf != session_csrf:
-      raise Exception('Client csrf token {0!r} does not match '
-                      'session csrf token {1!r}'
-                      .format(client_csrf, session_csrf))
+    session_xsrf = self.session['xsrf']
+    client_xsrf = self.request.headers[_XSRF_TOKEN_HEADER]
+    if not client_xsrf:
+      raise Exception('Missing client XSRF token')
+    if client_xsrf != session_xsrf:
+      raise Exception('Client XSRF token {0!r} does not match '
+                      'session XSRF token {1!r}'
+                      .format(client_xsrf, session_xsrf))
 
   def PerformValidation(self):
     """To be overriden by subclasses."""
@@ -106,8 +112,8 @@ class SessionHandler(webapp2.RequestHandler):
     session = self.session_store.get_session()
     if not session:
       # initialize the session
-      session['csrf'] = security.generate_random_string(entropy=128)
-      self.response.set_cookie('csrf', session['csrf'])
+      session['xsrf'] = security.generate_random_string(entropy=128)
+      self.response.set_cookie(_XSRF_TOKEN_COOKIE, session['xsrf'])
       suffix = security.generate_random_string(
           length=10,
           pool=security.LOWERCASE_ALPHANUMERIC)
@@ -266,7 +272,8 @@ class MoveFile(BlissHandler):
     assert oldpath
     if not model.GetProject(project_name):
       raise Exception('Project {0} does not exist'.format(project_name))
-    newpath = self.request.get('newpath')
+    data = json.loads(self.request.body)
+    newpath = data.get('newpath')
     assert newpath
     if self.tree.HasFile(newpath):
       raise error.BlissError('Filename {0!r} already exists'
@@ -292,6 +299,7 @@ class ListFiles(BlissHandler):
     if not project:
       return self.not_found()
     r = self.tree.ListDirectory(path)
+    r = [{'name': name} for name in r]
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
 
@@ -305,31 +313,6 @@ class Project(BlissHandler):
     if not project:
       return self.not_found()
     self.render('project.html')
-
-
-class WhoAmI(BlissHandler):
-
-  def get(self, project_name):
-    """Handles HTTP GET requests."""
-    assert project_name
-    project = model.GetProject(project_name)
-    if not project:
-      return self.not_found()
-    major_version = os.environ['CURRENT_VERSION_ID'].split('.')[0]
-    if _DEV_APPSERVER:
-      version_hostname = self.request.headers['HOST']
-    else:
-      default_hostname = app_identity.get_default_version_hostname()
-      version_hostname = '{0}{1}{2}'.format(major_version, _DASH_DOT_DASH,
-                                            default_hostname)
-
-    r = {
-        'project_name': project.project_name,
-        'project_description': project.project_description,
-        'hostname': version_hostname,
-    }
-    self.response.headers['Content-Type'] = _JSON_MIME_TYPE
-    self.response.write(tojson(r))
 
 
 class Bliss(BlissHandler):
@@ -487,14 +470,13 @@ app = webapp2.WSGIApplication([
     ('/bliss/p/(.*)/putfile/(.*)', PutFile),
     ('/bliss/p/(.*)/movefile/(.*)', MoveFile),
     ('/bliss/p/(.*)/deletepath/(.*)', DeletePath),
-    ('/bliss/p/(.*)/listfiles/(.*)', ListFiles),
+    ('/bliss/p/(.*)/listfiles/?(.*)', ListFiles),
 
     # project actions
     ('/bliss/p/(.*)/create', CreateProject),
     ('/bliss/p/(.*)/delete', DeleteProject),
     ('/bliss/p/(.*)/rename', RenameProject),
     ('/bliss/p/(.*)/run', RunProject),
-    ('/bliss/p/(.*)/whoami', WhoAmI),
 
     # bliss actions
     ('/bliss/c', EasyCreateProject),
