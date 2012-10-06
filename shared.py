@@ -86,7 +86,7 @@ def GuessMimeType(filename):
 
 
 def ThisIsBlissApp():
-  """Returns whether this is the bliss app id."""
+  """Determines whether this is the bliss app id."""
   if common.IsDevMode():
     return True
   return app_identity.get_application_id() == settings.BLISS_APP_ID
