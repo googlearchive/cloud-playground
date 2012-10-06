@@ -1,0 +1,3 @@
+handlers:
+- url: /_bliss_tasks/.*
+  script: tasks.app

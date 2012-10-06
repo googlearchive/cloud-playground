@@ -9,6 +9,7 @@ threadsafe: false
 includes:
 - codemirror.yaml
 - bliss.yaml
+- tasks.yaml
 
 # https://developers.google.com/appengine/docs/python/config/appconfig#Builtin_Handlers
 builtins:

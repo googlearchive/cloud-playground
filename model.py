@@ -11,6 +11,7 @@ import settings
 import shared
 
 from google.appengine.api import memcache
+from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 
 
@@ -101,6 +102,10 @@ def GetGlobalRootEntity():
   return _AhGlobal.get_or_insert('config', namespace=settings.BLISS_NAMESPACE)
 
 
+def GetTemplateSource(url):
+  return _AhTemplateSource.get_by_id(url, parent=GetGlobalRootEntity().key)
+
+
 def GetTemplateSources():
   """Get template sources."""
   _MEMCACHE_KEY = _AhTemplateSource.__name__
@@ -116,11 +121,19 @@ def GetTemplateSources():
   return sources
 
 
+@ndb.transactional(xg=True)
 def _GetTemplateSources():
   sources = []
   for uri, description in _TEMPLATE_SOURCES:
-    source = _AhTemplateSource(id=uri, parent=GetGlobalRootEntity().key,
-                               description=description)
+    key = ndb.Key(_AhTemplateSource, uri, parent=GetGlobalRootEntity().key)
+    source = key.get()
+    # avoid race condition when multiple requests call into this method
+    if source:
+      continue
+    source = _AhTemplateSource(key=key, description=description)
+    shared.w('adding task to populate template source {0!r}'.format(uri))
+    taskqueue.add(url='/_bliss_tasks/template_source/populate',
+                  params={'key': source.key.id()})
     sources.append(source)
   ndb.put_multi(sources)
   return sources
@@ -135,8 +148,6 @@ def GetTemplates(template_source):
     return templates
   templates = (_AhTemplate.query(ancestor=template_source.key)
                .order(_AhTemplate.key).fetch())
-  if not templates:
-    templates = _GetTemplates(template_source)
   templates.sort(key=lambda template: template.name.lower())
   memcache.set(_MEMCACHE_KEY, templates, namespace=settings.BLISS_NAMESPACE,
                time=_MEMCACHE_TIME)
