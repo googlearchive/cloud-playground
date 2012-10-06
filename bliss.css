@@ -224,7 +224,7 @@ h1 {
   padding-top: .5em;
 }
 
-  .newthing:hover {
+  .newthing.link:hover {
     color: #00e;
   }
 
