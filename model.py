@@ -128,7 +128,8 @@ def _GetTemplateSources():
 
 def GetTemplates(template_source):
   """Get templates from a given template source."""
-  _MEMCACHE_KEY = '{0}-{1}'.format(_AhTemplate.__name__, template_source)
+  _MEMCACHE_KEY = '{0}-{1}'.format(_AhTemplate.__name__,
+                                   template_source.key.id())
   templates = memcache.get(_MEMCACHE_KEY, namespace=settings.BLISS_NAMESPACE)
   if templates:
     return templates
