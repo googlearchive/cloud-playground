@@ -250,6 +250,7 @@ class GetFile(BlissHandler):
       return
 
     self.response.headers['Content-Type'] = shared.GuessMimeType(filename)
+    self.response.headers['X-Content-Type-Options'] = 'nosniff'
     self.response.write(contents)
 
 
