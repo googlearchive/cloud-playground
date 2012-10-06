@@ -1,5 +1,6 @@
 """Module for shared bliss functions."""
 
+import httplib
 import logging
 import mimetypes
 
@@ -11,6 +12,7 @@ import settings
 
 from google.appengine.api import app_identity
 from google.appengine.api import namespace_manager
+from google.appengine.api import urlfetch
 
 
 def e(msg, *args, **kwargs):
@@ -40,6 +42,21 @@ _TEXT_MIME_TYPES = {
     'xml': 'application/xml',
     'yaml': 'text/x-yaml',
 }
+
+
+def Fetch(url, follow_redirects=False, async=False):
+  """Make an HTTP request using URL Fetch."""
+  rpc = urlfetch.create_rpc()
+  urlfetch.make_fetch_call(rpc, url,
+                           follow_redirects=follow_redirects,
+                           validate_certificate=True)
+  if async:
+    return rpc
+  response = rpc.get_result()
+  if response.status_code != httplib.OK:
+    e('Status code {0} fetching {1} {2}', response.status_code, url,
+      response.content)
+  return response
 
 
 def IsTextMimeType(mime_type):

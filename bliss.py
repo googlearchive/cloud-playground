@@ -1,6 +1,7 @@
 """Module containing the bliss WSGI handlers."""
 
 import cgi
+import httplib
 import json
 import logging
 import os

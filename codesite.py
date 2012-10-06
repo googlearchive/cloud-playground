@@ -1,6 +1,5 @@
 """Module for accessing code.google.com projects."""
 
-import httplib
 import logging
 import os
 import re
@@ -12,29 +11,12 @@ import model
 import settings
 import shared
 
-from google.appengine.api import urlfetch
-
 
 _CODESITE_RE = re.compile('^https?://[^/]+.googlecode.com/.+$')
 
 _CODESITE_DIR_FOOTER = ('<em><a href="http://code.google.com/">'
                         'Google Code</a> powered by ')
 _CODESITE_DIR_PATH_RE = re.compile('<li><a href="([^"/]+/?)">[^<]+</a></li>')
-
-
-def fetch(url, async=False):
-  """Make an HTTP request using URL Fetch."""
-  rpc = urlfetch.create_rpc()
-  urlfetch.make_fetch_call(rpc, url,
-                           follow_redirects=True,
-                           validate_certificate=True)
-  if async:
-    return rpc
-  response = rpc.get_result()
-  if response.status_code != httplib.OK:
-    shared.e('Status code {0} fetching {1}]\n{2}', response.status_code, url,
-             response.content)
-  return response
 
 
 def IsCodesiteURL(url):
@@ -59,7 +41,7 @@ def GetTemplates(template_source):
     List of template entities.
   """
   baseurl = template_source.key.id()
-  page = fetch(baseurl).content
+  page = shared.Fetch(baseurl, follow_redirects=True).content
   candidates = _GetChildPaths(page)
   rpcs = []
 
@@ -76,7 +58,7 @@ def GetTemplates(template_source):
       continue
     project_url = '{0}{1}'.format(baseurl, c)
     app_yaml_url = '{0}app.yaml'.format(project_url)
-    rpc = fetch(app_yaml_url, async=True)
+    rpc = shared.Fetch(app_yaml_url, follow_redirects=True, async=True)
     rpcs.append((c, project_url, app_yaml_url, rpc))
 
   samples = []
@@ -111,7 +93,7 @@ def PopulateProjectFromCodesite(tree, template_url):
 
   def add_files(dirname):
     url = os.path.join(baseurl, dirname)
-    page = fetch(url).content
+    page = shared.Fetch(url, follow_redirects=True).content
     paths = _GetChildPaths(page)
     shared.w('{0} -> {1}', url, paths)
     if not paths:
