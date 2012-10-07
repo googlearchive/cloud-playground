@@ -300,6 +300,9 @@ class ListFiles(BlissHandler):
     project = model.GetProject(project_name)
     if not project:
       return self.not_found()
+    # 'path is None' means get all files recursively
+    if not path:
+      path = None
     r = self.tree.ListDirectory(path)
     r = [{'name': name} for name in r]
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
