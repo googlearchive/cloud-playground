@@ -257,6 +257,14 @@ class GetFile(BlissHandler):
     """Handles HTTP GET requests."""
     assert project_name
     assert filename
+    # User content must be served from a separate user content host
+    if (not common.IsDevMode()
+        and os.environ['HOST_NAME'] != settings.BLISS_USER_CONTENT_HOST):
+      self.response.set_status(401)
+      self.response.headers['Content-Type'] = 'text/plain'
+      self.response.write('Files must be fetched from {0}'
+                          .format(settings.BLISS_USER_CONTENT_HOST))
+      return
     contents = self.tree.GetFileContents(filename)
     if contents is None:
       self.response.set_status(404)
