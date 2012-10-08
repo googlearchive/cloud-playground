@@ -15,9 +15,9 @@ PLAYGROUND_APP_ID = 'shared-playground'
 # All app ids used by this project
 _APP_IDS = (BLISS_APP_ID, PLAYGROUND_APP_ID)
 
-BLISS_HOSTNAME = '{0}.appspot.com'.format(BLISS_APP_ID)
+BLISS_HOST = '{0}.appspot.com'.format(BLISS_APP_ID)
 
-PLAYGROUND_HOSTNAME = '{0}.appspot.com'.format(PLAYGROUND_APP_ID)
+PLAYGROUND_HOST = '{0}.appspot.com'.format(PLAYGROUND_APP_ID)
 
 
 def PrintAppIdsInMap():

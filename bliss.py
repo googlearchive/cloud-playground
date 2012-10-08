@@ -162,7 +162,7 @@ class BlissHandler(SessionHandler):
   def PerformValidation(self):
     super(BlissHandler, self).PerformValidation()
     if not shared.ThisIsBlissApp():
-      url = 'https://{0}/bliss'.format(settings.BLISS_HOSTNAME)
+      url = 'https://{0}/bliss'.format(settings.BLISS_HOST)
       self.error(501)  # not implemented
       self.response.write('Bliss user interface not implemented here.<br>'
                           'See <a href="{0}">{0}</a> instead.'
@@ -356,7 +356,7 @@ class RunProject(BlissHandler):
       self.redirect('https://{0}{1}{2}/'
                     .format(urllib.quote_plus(project_name),
                             _DASH_DOT_DASH,
-                            settings.PLAYGROUND_HOSTNAME))
+                            settings.PLAYGROUND_HOST))
     if mimic.GetProjectNameFromCookie() == project_name:
       # cookie already set; proceed to app
       self.redirect('/')
