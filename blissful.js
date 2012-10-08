@@ -122,6 +122,7 @@ function ProjectController($scope, $http, $resource, $filter) {
   };
 
   $scope.currentFilename = function() {
+    if (!$scope.files) return '';
     return $scope.files[$scope.currentIndex].name;
   };
 
