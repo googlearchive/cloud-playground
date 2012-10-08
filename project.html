@@ -49,7 +49,7 @@ function file_context_menu(id) {
   </div>
 
   <div id="source-container">
-    <div id="source-filename"></div>
+    <div id="source-filename">{% raw %}{{currentFilename()}}{% endraw %}</div>
     <div id="source-code"></div>
     <img id="source-image">
   </div>
