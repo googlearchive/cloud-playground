@@ -178,8 +178,7 @@ h1 {
   #nav #filelist {
     border-top: 1px solid #aaa;
     width: 100%;
-    /* match height of .CodeMirror-scroll */
-    height: 400px;
+    height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
   }
@@ -313,10 +312,15 @@ h1 {
         margin: 0.4em;
       }
 
-#source-code {
-  background-color: #f8fafc;
-  white-space: pre;
+#source-container {
+  height: 400px;
 }
+
+  #source-container #source-code {
+    background-color: #f8fafc;
+    white-space: pre;
+    height: 100%;
+  }
 
   #source-container #source-code , #source-container #source-image {
     display: none;
@@ -333,11 +337,11 @@ h1 {
 
 .CodeMirror {
   border: 1px solid #ccc;
+  height: 100%;
 }
 
   .CodeMirror-scroll {
-    /* match height of #nav #filelist */
-    height: 400px;
+    height: 100%;
   }
 
 #output-container {
