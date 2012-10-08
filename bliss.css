@@ -187,6 +187,8 @@ h1 {
     #nav #filelist .fileentry {
       margin: .2em 0em 0em;
       cursor: pointer;
+      overflow: hidden;
+      display: inline-block;
     }
 
     #nav #filelist .fileentry.selected {
@@ -196,6 +198,12 @@ h1 {
     #nav #filelist .fileentry:hover {
       background-color: #ccf;
     }
+
+      #nav #filelist .fileentry .filename {
+        display: inline-block;
+        width: 155px;
+        overflow: hidden;
+      }
 
       #nav #filelist .fileentry.selected .filename {
         font-weight: bold;
@@ -212,7 +220,8 @@ h1 {
 
   #nav .dropdown {
     text-align: right;
-    float: right;
+    width: 20px;
+    display: inline-block;
   }
 
     #nav .dropdown A {
