@@ -243,4 +243,5 @@ function resizer(divider_id, content_id) {
 }
 
 resizer('divider1', 'scroller-element');
+resizer('divider1', 'filelist');
 resizer('divider2', 'output-iframe');

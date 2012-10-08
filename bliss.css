@@ -170,13 +170,18 @@ h1 {
 }
 
 #nav {
-  width: 15%;
+  width: 200px;
   height: 100%;
   float: left;
 }
 
   #nav #filelist {
     border-top: 1px solid #aaa;
+    width: 100%;
+    /* match height of .CodeMirror-scroll */
+    height: 400px;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
     #nav #filelist .fileentry {
@@ -301,8 +306,6 @@ h1 {
 
 #source-code {
   background-color: #f8fafc;
-  width: 85%;
-  float: right;
   white-space: pre;
 }
 
@@ -324,7 +327,8 @@ h1 {
 }
 
   .CodeMirror-scroll {
-    height: 30em;
+    /* match height of #nav #filelist */
+    height: 400px;
   }
 
 #output-container {
