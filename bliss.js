@@ -216,15 +216,15 @@ function resizer(divider_id, content_id) {
     if (!isdown) {
       return;
     }
-    var newheight = initialheight + (evt.y - downy);
+    var newheight = initialheight + (evt.pageY - downy);
     elem.style.height = newheight + 'px';
   };
 
   var downfunc = function(evt) {
     evt.preventDefault();
     isdown = true;
-    downx = evt.x;
-    downy = evt.y;
+    downx = evt.pageX;
+    downy = evt.pageY;
     elem = document.getElementById(content_id);
     initialheight = elem.offsetHeight;
     dragDiv.style.display = 'block';
@@ -235,8 +235,8 @@ function resizer(divider_id, content_id) {
   var upfunc = function(evt) {
     isdown = false;
     dragDiv.style.display = 'none';
-    dragDiv.removeEventListener(movefunc);
-    dragDiv.removeEventListener(upfunc);
+    dragDiv.removeEventListener('mousemove', movefunc);
+    dragDiv.removeEventListener('mouseup', upfunc);
   };
 
   divider.addEventListener('mousedown', downfunc);
