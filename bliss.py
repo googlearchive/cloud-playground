@@ -253,6 +253,18 @@ class GetConfig(BlissHandler):
 
 class GetFile(BlissHandler):
 
+  def options(self, project_name, filename):
+    """Handles HTTP OPTIONS requests."""
+    assert project_name
+    assert filename
+    if self.request.host == settings.BLISS_HOST:
+      # OK, CORS access allowed
+      return
+    self.response.set_status(401)
+    self.response.headers['Content-Type'] = 'text/plain'
+    self.response.write('CORS supported only from {0}'
+                        .format(settings.BLISS_HOST))
+
   def get(self, project_name, filename):
     """Handles HTTP GET requests."""
     assert project_name
