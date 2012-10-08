@@ -167,8 +167,11 @@ function ProjectController($scope, $http, $resource, $filter) {
   $scope.select = function(i) {
     $scope.currentIndex = i;
 
+    url = '//' + $scope.config.BLISS_USER_CONTENT_HOST +
+          document.location.pathname + 'getfile/' +
+          encodeURI($scope.currentFilename());
     $http({method: 'GET',
-           url: 'getfile/' + encodeURI($scope.currentFilename())})
+           url: url})
     .success(function(data, status, headers, config) {
       // e.g. 'text/html; charset=UTF-8'
       var mime_type = headers('Content-Type');
@@ -198,6 +201,15 @@ function ProjectController($scope, $http, $resource, $filter) {
     });
   };
 
-  listfiles();
+  var getconfig = function() {
+    $http({method: 'GET',
+           url: '/bliss/getconfig'})
+    .success(function(data, status, headers, config) {
+       $scope.config = data;
+       listfiles();
+    });
+  };
+
+  getconfig();
 
 }

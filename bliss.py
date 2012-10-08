@@ -236,6 +236,21 @@ class BlissHandler(SessionHandler):
         **kwargs))
 
 
+class GetConfig(BlissHandler):
+
+  def get(self):
+    """Handles HTTP GET requests."""
+    if common.IsDevMode():
+      bliss_user_content_host = os.environ['HTTP_HOST']
+    else:
+      bliss_user_content_host = settings.BLISS_USER_CONTENT_HOST
+    r = {
+        'BLISS_USER_CONTENT_HOST': bliss_user_content_host,
+    };
+    self.response.headers['Content-Type'] = _JSON_MIME_TYPE
+    self.response.write(tojson(r))
+
+
 class GetFile(BlissHandler):
 
   def get(self, project_name, filename):
@@ -470,6 +485,9 @@ config['webapp2_extras.sessions'] = {
 }
 
 app = webapp2.WSGIApplication([
+    # config actions
+    ('/bliss/getconfig', GetConfig),
+
     # tree actions
     ('/bliss/p/(.*)/getfile/(.*)', GetFile),
     ('/bliss/p/(.*)/putfile/(.*)', PutFile),
