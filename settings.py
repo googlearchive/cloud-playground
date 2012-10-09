@@ -1,5 +1,11 @@
 """Module containing global bliss constants and functions."""
 
+import os
+
+
+# whether or not we're running in the dev_appserver
+_DEV_MODE = os.environ['SERVER_SOFTWARE'].startswith('Development/')
+
 # namespace for bliss specific data
 BLISS_NAMESPACE = '_bliss'
 
@@ -9,20 +15,23 @@ SKIP_EXTENSIONS = ('swp', 'pyc', 'svn')
 # The application where the bliss IDE runs
 BLISS_APP_ID = 'try-appengine'
 
-# An application id alias for the bliss IDE which can safely serve user content
-BLISS_ALIAS_APP_ID = 'try-appengine-user-content'
-
 # The application where user code runs
 PLAYGROUND_APP_ID = 'shared-playground'
+
+USER_CONTENT_PREFIX = 'user-content'
 
 # All app ids used by this project
 _APP_IDS = (BLISS_APP_ID, PLAYGROUND_APP_ID)
 
-BLISS_HOST = '{0}.appspot.com'.format(BLISS_APP_ID)
-
-BLISS_USER_CONTENT_HOST = '{0}.appspot.com'.format(BLISS_ALIAS_APP_ID)
-
-PLAYGROUND_HOST = '{0}.appspot.com'.format(PLAYGROUND_APP_ID)
+if _DEV_MODE:
+  BLISS_HOST = 'localhost:8080'
+  BLISS_USER_CONTENT_HOST = 'localhost:9100'
+  PLAYGROUND_HOST = 'localhost:9101'
+else:
+  BLISS_HOST = '{0}.appspot.com'.format(BLISS_APP_ID)
+  BLISS_USER_CONTENT_HOST = '{0}.{1}.appspot.com'.format(USER_CONTENT_PREFIX,
+                                                         BLISS_APP_ID)
+  PLAYGROUND_HOST = '{0}.appspot.com'.format(PLAYGROUND_APP_ID)
 
 
 def PrintAppIdsInMap():

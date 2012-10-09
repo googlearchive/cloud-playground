@@ -16,7 +16,7 @@ if [ $( echo "$*" | egrep -- '-A'\|'--application=' >/dev/null; echo $? ) == 0 ]
 then
   deploy $*
 else
-  appids=$(python -c 'import settings; settings.PrintAppIdsInMap()')
+  appids=$(SERVER_SOFTWARE=$0 python -c 'import settings; settings.PrintAppIdsInMap()')
   for appid in $appids
   do
     deploy -A $appid $*

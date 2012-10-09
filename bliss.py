@@ -41,6 +41,8 @@ _DEV_APPSERVER = os.environ['SERVER_SOFTWARE'].startswith('Development/')
 
 _JINJA2_ENV = Environment(autoescape=True, loader=FileSystemLoader(''))
 
+_INVALID_PROJECT_NAMES = (settings.USER_CONTENT_PREFIX)
+
 _DASH_DOT_DASH = '-dot-'
 
 # HTTP methods which do not affect state
@@ -244,12 +246,8 @@ class GetConfig(BlissHandler):
   def get(self, project_name):
     """Handles HTTP GET requests."""
     assert project_name
-    if common.IsDevMode():
-      bliss_user_content_host = os.environ['HTTP_HOST']
-    else:
-      bliss_user_content_host = settings.BLISS_USER_CONTENT_HOST
     r = {
-        'BLISS_USER_CONTENT_HOST': bliss_user_content_host,
+        'BLISS_USER_CONTENT_HOST': settings.BLISS_USER_CONTENT_HOST,
     };
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
@@ -257,30 +255,47 @@ class GetConfig(BlissHandler):
 
 class GetFile(BlissHandler):
 
+  def _CheckCors(self, project_name):
+    origin = self.request.headers.get('Origin')
+    # If not a CORS request, do nothing
+    if not origin:
+      return
+    bliss_origin = '{0}://{1}'.format(self.request.scheme,
+                                      settings.BLISS_HOST)
+
+    if origin != bliss_origin:
+      raise Exception('CORS supported only from origin {0}'
+                      .format(bliss_origin))
+      self.response.set_status(401)
+      self.response.headers['Content-Type'] = 'text/plain'
+      self.response.write('CORS supported only from origin {0}'
+                          .format(bliss_origin))
+      return
+    if self.request.host != settings.BLISS_USER_CONTENT_HOST:
+      self.response.set_status(401)
+      self.response.headers['Content-Type'] = 'text/plain'
+      self.response.write('Files may only be fetched from {0}'
+                          .format(settings.BLISS_USER_CONTENT_HOST))
+      return
+    # OK, CORS access allowed
+    self.response.headers['Access-Control-Allow-Origin'] = bliss_origin
+    self.response.headers['Access-Control-Allow-Methods'] = 'GET'
+    self.response.headers['Access-Control-Max-Age'] = '600'
+    self.response.headers['Access-Control-Allow-Headers'] = 'Origin, X-XSRF-Token, X-Requested-With, Accept'
+    self.response.headers['Access-Control-Allow-Credentials'] = 'true'
+
   def options(self, project_name, filename):
     """Handles HTTP OPTIONS requests."""
     assert project_name
     assert filename
-    if self.request.host == settings.BLISS_HOST:
-      # OK, CORS access allowed
-      return
-    self.response.set_status(401)
-    self.response.headers['Content-Type'] = 'text/plain'
-    self.response.write('CORS supported only from {0}'
-                        .format(settings.BLISS_HOST))
+    self._CheckCors(project_name)
 
   def get(self, project_name, filename):
     """Handles HTTP GET requests."""
     assert project_name
     assert filename
-    # User content must be served from a separate user content host
-    if (not common.IsDevMode()
-        and os.environ['HOST_NAME'] != settings.BLISS_USER_CONTENT_HOST):
-      self.response.set_status(401)
-      self.response.headers['Content-Type'] = 'text/plain'
-      self.response.write('Files must be fetched from {0}'
-                          .format(settings.BLISS_USER_CONTENT_HOST))
-      return
+    self._CheckCors(project_name)
+
     contents = self.tree.GetFileContents(filename)
     if contents is None:
       self.response.set_status(404)
@@ -453,6 +468,8 @@ class CreateProject(BlissHandler):
       raise error.BlissError('Project name must match {0} and must not contain '
                              '{1!r}'.format(_VALID_PROJECT_RE.pattern,
                                             _DASH_DOT_DASH))
+    if project_name in _INVALID_PROJECT_NAMES:
+      raise error.BlissError('Project name {0!r} is not available')
     template_url = self.request.get('template_url')
     project_description = (self.request.get('project_description')
                            or project_name)

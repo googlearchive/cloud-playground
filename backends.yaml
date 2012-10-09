@@ -1,0 +1,13 @@
+backends:
+
+# used only for dev_appserver CORS testing
+- name: devappserver-cors-test
+  class: B1
+  instances: 1
+  options: dynamic
+
+# used only for dev_appserver playground testing
+- name: devappserver-playground-test
+  class: B1
+  instances: 1
+  options: dynamic
