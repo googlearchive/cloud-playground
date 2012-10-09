@@ -26,7 +26,7 @@ _APP_IDS = (BLISS_APP_ID, PLAYGROUND_APP_ID)
 if _DEV_MODE:
   BLISS_HOST = 'localhost:8080'
   BLISS_USER_CONTENT_HOST = 'localhost:9100'
-  PLAYGROUND_HOST = 'localhost:9101'
+  PLAYGROUND_HOST = 'localhost:9200'
 else:
   BLISS_HOST = '{0}.appspot.com'.format(BLISS_APP_ID)
   BLISS_USER_CONTENT_HOST = '{0}.{1}.appspot.com'.format(USER_CONTENT_PREFIX,

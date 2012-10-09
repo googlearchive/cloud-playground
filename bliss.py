@@ -403,41 +403,22 @@ class Logout(BlissHandler):
 
 class RunProject(BlissHandler):
 
+  def _GetPlaygroundHostname(self, project_name):
+    """Determine the playground hostname for the project."""
+    if common.IsDevMode():
+      return settings.PLAYGROUND_HOST
+    return '{0}{1}{2}'.format(urllib.quote_plus(project_name),
+                              _DASH_DOT_DASH,
+                              settings.PLAYGROUND_HOST)
+
   def get(self, project_name):
     """Handles HTTP GET requests."""
-    if not common.IsDevMode():
-      # production
-      self.redirect('https://{0}{1}{2}/'
-                    .format(urllib.quote_plus(project_name),
-                            _DASH_DOT_DASH,
-                            settings.PLAYGROUND_HOST))
-    if mimic.GetProjectNameFromCookie() == project_name:
-      # cookie already set; proceed to app
-      self.redirect('/')
-      return
-    if self.request.get('set_cookie'):
-      # set cookie and redirect
+    assert project_name
+    if common.IsDevMode():
       self.response.set_cookie(common.config.PROJECT_NAME_COOKIE, project_name)
-      self.redirect('/')
-      return
-    # interstitual
-    self.response.write("""
-      <html>
-        <head>
-          <meta http-equiv="refresh" content="0;URL='{2}'">
-        </head>
-        <body>
-          Bliss needs to set a special (dev_appserver only) cookie in
-          order to simulate the multiple hostnames provided by App Engine's
-          production environment:
-          <blockquote>
-            Set cookie <code>{0}={1}</code> and
-           <a href="{2}">proceed</a>.
-          </blockquote>
-        </body>
-      </html>
-      """.format(common.config.PROJECT_NAME_COOKIE, project_name,
-                 self.request.path_info + '?set_cookie=1'))
+    url = '{0}://{1}/'.format(self.request.scheme,
+                              self._GetPlaygroundHostname(project_name))
+    self.redirect(url)
 
 
 class EasyCreateProject(BlissHandler):

@@ -31,6 +31,7 @@ from __mimic import common
 from __mimic import mimic
 from __mimic import target_env
 
+import settings
 import shared
 
 
@@ -53,9 +54,8 @@ class Mimic(object):
     try:
       if common.IsDevMode():
         logging.warn('\n' * 3)
-      if (shared.ThisIsBlissApp()
-          and os.environ['PATH_INFO'] == '/'
-          and not shared.DoesCurrentProjectExist()):
+      if (os.environ['HTTP_HOST'] == settings.BLISS_HOST
+          and os.environ['PATH_INFO'] == '/'):
         yield self._RedirectResponse('/bliss')
         return
       mimic.RunMimic(create_tree_func=common.config.CREATE_TREE_FUNC)
