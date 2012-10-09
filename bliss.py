@@ -469,7 +469,8 @@ class CreateProject(BlissHandler):
                              '{1!r}'.format(_VALID_PROJECT_RE.pattern,
                                             _DASH_DOT_DASH))
     if project_name in _INVALID_PROJECT_NAMES:
-      raise error.BlissError('Project name {0!r} is not available')
+      raise error.BlissError('Project name {0!r} is not available'
+                             .format(project_name))
     template_url = self.request.get('template_url')
     project_description = (self.request.get('project_description')
                            or project_name)
