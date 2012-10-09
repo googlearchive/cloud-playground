@@ -43,6 +43,9 @@ _JINJA2_ENV = Environment(autoescape=True, loader=FileSystemLoader(''))
 
 _DASH_DOT_DASH = '-dot-'
 
+# HTTP methods which do not affect state
+_HTTP_READ_METHODS = ('GET', 'OPTIONS')
+
 # must fit in front of '-dot-appid.appspot.com' and not contain '-dot-'
 _VALID_PROJECT_RE = re.compile('^[a-z0-9-]{0,50}$')
 
@@ -82,7 +85,7 @@ class SessionHandler(webapp2.RequestHandler):
 
   def PerformValidation(self):
     """To be overriden by subclasses."""
-    if self.request.method != 'GET':
+    if self.request.method not in _HTTP_READ_METHODS:
       self._PerformCsrfRequestValidation()
 
   def dispatch(self):
@@ -168,7 +171,7 @@ class BlissHandler(SessionHandler):
                           'See <a href="{0}">{0}</a> instead.'
                           .format(url))
       return
-    if self.request.method != 'GET':
+    if self.request.method not in _HTTP_READ_METHODS:
       self._PerformWriteAccessCheck()
 
   def handle_bliss_error(self, exception):
