@@ -4,6 +4,9 @@
     <title>bliss</title>
     {% block head %}{% endblock %}
     <link rel="stylesheet" href="/bliss/bliss.css">
+    {# load angular in head section to ensure ngCloak CSS is loaded #}
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular-resource.min.js"></script>
   </head>
   <body>
     {% include 'header.html' %}
@@ -12,8 +15,6 @@
 
     {% include 'footer.html' %}
     <script src="/bliss/bliss.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular-resource.min.js"></script>
     <script src="/bliss/blissful.js"></script>
   </body>
 </html>
