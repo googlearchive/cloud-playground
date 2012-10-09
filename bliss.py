@@ -241,8 +241,9 @@ class BlissHandler(SessionHandler):
 
 class GetConfig(BlissHandler):
 
-  def get(self):
+  def get(self, project_name):
     """Handles HTTP GET requests."""
+    assert project_name
     if common.IsDevMode():
       bliss_user_content_host = os.environ['HTTP_HOST']
     else:
@@ -509,7 +510,7 @@ config['webapp2_extras.sessions'] = {
 
 app = webapp2.WSGIApplication([
     # config actions
-    ('/bliss/getconfig', GetConfig),
+    ('/bliss/p/(.*)/getconfig', GetConfig),
 
     # tree actions
     ('/bliss/p/(.*)/getfile/(.*)', GetFile),

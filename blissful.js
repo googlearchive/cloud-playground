@@ -203,7 +203,7 @@ function ProjectController($scope, $http, $resource, $filter) {
 
   var getconfig = function() {
     $http({method: 'GET',
-           url: '/bliss/getconfig'})
+           url: 'getconfig'})
     .success(function(data, status, headers, config) {
        $scope.config = data;
        listfiles();
