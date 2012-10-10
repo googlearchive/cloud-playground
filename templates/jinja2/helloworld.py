@@ -16,7 +16,7 @@ class Greeting(db.Model):
   """Models an individual Guestbook entry with an author, content, and date."""
   author = db.StringProperty()
   content = db.StringProperty(multiline=True, indexed=False)
-  date = db.DateTimeProperty(auto_now_add=True, indexed=False)
+  date = db.DateTimeProperty(auto_now_add=True)
 
 
 def guestbook_key(guestbook_name=None):
