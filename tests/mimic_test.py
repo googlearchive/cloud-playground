@@ -215,7 +215,7 @@ class MimicTest(unittest.TestCase):
     return tree
 
   def _CallMimic(self, path,
-                 http_host='project-name.your-app-id.appspot.com',
+                 http_host='project-id.your-app-id.appspot.com',
                  os_environ=None):
     # TODO: at some point we might need to expand the set of environ
     # variables set, support POST, etc.  For now this is enough to test what
@@ -461,17 +461,17 @@ class MimicTest(unittest.TestCase):
     self.assertEquals(None, project_id)
 
   def testGetProjectIdAppspot(self):
-    os.environ['SERVER_NAME'] = 'project-name.your-app-id.appspot.com'
+    os.environ['SERVER_NAME'] = 'project-id.your-app-id.appspot.com'
     project_id = mimic.GetProjectId()
-    self.assertEquals('project-name', project_id)
+    self.assertEquals('project-id', project_id)
 
     # Must have project name subdomain
     self.checkHostParseFailure('your-app-id.appspot.com')
 
   def testGetProjectIdAppspotDashDotDash(self):
-    os.environ['SERVER_NAME'] = 'project-name-dot-your-app-id.appspot.com'
+    os.environ['SERVER_NAME'] = 'project-id-dot-your-app-id.appspot.com'
     project_id = mimic.GetProjectId()
-    self.assertEquals('project-name', project_id)
+    self.assertEquals('project-id', project_id)
 
   def testGetProjectIdCustomDomain(self):
     os.environ['SERVER_NAME'] = 'www.mydomain.com'
@@ -503,7 +503,7 @@ class MimicTest(unittest.TestCase):
   def testTreeWithoutProjectId(self):
     self._AddFile('app.yaml', _GENERIC_APP_YAML)
     self._AddFile('main.py', _SIMPLE_CGI_SCRIPT)
-    # tree should still work even though we've not specified a project name
+    # tree should still work even though we've not specified a project id
     self._CallMimic('/main.py', http_host='your-app-id.appspot.com')
     self.assertEquals(httplib.OK, self._status)
     self.assertEquals('hello\n', self._body)
