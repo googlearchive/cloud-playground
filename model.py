@@ -36,23 +36,23 @@ class _AhGlobal(ndb.Model):
 
   A single root entity allows us to use ancestor queries for consistency.
   """
-  created = ndb.DateTimeProperty(auto_now_add=True)
-  udpated = ndb.DateTimeProperty(auto_now=True)
+  created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
+  udpated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
 
 class _AhBlissUser(ndb.Model):
   """A Model to store bliss users."""
   projects = ndb.KeyProperty(repeated=True, indexed=False)
-  created = ndb.DateTimeProperty(auto_now_add=True)
-  udpated = ndb.DateTimeProperty(auto_now=True)
+  created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
+  udpated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
 
 class _AhBlissProject(ndb.Model):
   """A Model to store bliss projects."""
   project_description = ndb.StringProperty(indexed=False)
   writers = ndb.StringProperty(repeated=True)
-  created = ndb.DateTimeProperty(auto_now_add=True)
-  udpated = ndb.DateTimeProperty(auto_now=True)
+  created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
+  udpated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
   @property
   def project_name(self):
@@ -65,8 +65,8 @@ class _AhTemplateSource(ndb.Model):
   The base url is used as the entity key id.
   """
   description = ndb.StringProperty(indexed=False)
-  created = ndb.DateTimeProperty(auto_now_add=True)
-  udpated = ndb.DateTimeProperty(auto_now=True)
+  created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
+  udpated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
   @property
   def base_url(self):
@@ -81,8 +81,8 @@ class _AhTemplate(ndb.Model):
   """
   name = ndb.StringProperty(indexed=False)
   description = ndb.StringProperty(indexed=False)
-  created = ndb.DateTimeProperty(auto_now_add=True)
-  udpated = ndb.DateTimeProperty(auto_now=True)
+  created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
+  udpated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
   @property
   def template_url(self):

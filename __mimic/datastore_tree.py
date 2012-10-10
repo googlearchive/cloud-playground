@@ -33,7 +33,7 @@ class _AhMimicFile(ndb.Model):
   The file's path should be used as the key for the entity.
   """
   contents = ndb.BlobProperty(required=True)
-  udpated = ndb.DateTimeProperty(auto_now=True)
+  udpated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
 
 class DatastoreTree(common.Tree):
