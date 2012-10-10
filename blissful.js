@@ -166,6 +166,8 @@ function ProjectController($scope, $http, $resource, $filter) {
     return false;
   };
 
+  var noTransform = function(data) { return data; };
+
   $scope.select = function(i) {
     $scope.currentIndex = i;
 
@@ -173,7 +175,8 @@ function ProjectController($scope, $http, $resource, $filter) {
           document.location.pathname + 'getfile/' +
           encodeURI($scope.currentFilename());
     $http({method: 'GET',
-           url: url})
+           url: url,
+           transformResponse: noTransform})
     .success(function(data, status, headers, config) {
       // e.g. 'text/html; charset=UTF-8'
       var mime_type = headers('Content-Type');
