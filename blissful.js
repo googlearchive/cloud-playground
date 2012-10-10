@@ -8,11 +8,13 @@ angular.module('blissful', ['ngResource'])
   return function(promise) {
     return promise.then(function(response) {
       return response;
-    }, function(response) {
-      if (response.headers('X-Bliss-Error')) {
-        alert('Error:\n' + response.data);
+    }, function(reason) {
+      if (reason instanceof Error) {
+        alert(reason);
+      } else if (reason.headers('X-Bliss-Error')) {
+        alert('Error:\n' + reason.data);
       }
-      return $q.reject(response);
+      return $q.reject(reason);
     });
   };
 });
