@@ -136,9 +136,10 @@ function prompt_for_new_project(template_url) {
   }
   // var project_description = prompt('Project description', project_name) || project_name;
   var project_description = project_name;
-  var uri = '/bliss/p/' + encodeURI(project_name) + '/create';
+  var uri = '/bliss/createproject';
   var data = 'template_url=' + encodeURI(template_url) +
-            '&project_description=' + encodeURI(project_description);
+             '&project_name=' + encodeURI(project_name) +
+             '&project_description=' + encodeURI(project_description);
   box = lightbox(escape(project_description), 'Creating project. Please wait.');
   post(uri, function(xhr) {
     box();

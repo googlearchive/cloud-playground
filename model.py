@@ -49,7 +49,9 @@ class _AhBlissUser(ndb.Model):
 
 class _AhBlissProject(ndb.Model):
   """A Model to store bliss projects."""
+  project_name = ndb.StringProperty(indexed=False)
   project_description = ndb.StringProperty(indexed=False)
+  template_url = ndb.StringProperty(indexed=False)
   writers = ndb.StringProperty(repeated=True)
   created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
   udpated = ndb.DateTimeProperty(auto_now=True, indexed=False)
@@ -104,7 +106,8 @@ def GetProjects(user):
 
 
 def GetProject(project_name):
-  return _AhBlissProject.get_by_id(project_name)
+  return _AhBlissProject.get_by_id(project_name,
+                                   namespace=project_name)
 
 
 def GetGlobalRootEntity():
@@ -211,11 +214,12 @@ def NewProjectName():
 
 
 @ndb.transactional(xg=True)
-def CreateProject(user, project_name, project_description):
+def CreateProject(user, template_url, project_name, project_description):
   """Create a new user project.
 
   Args:
     user: The user for which the project is to be created.
+    template_url: The template URL to populate the project files or None.
     project_name: The project name.
     project_description: The project description.
 
@@ -225,20 +229,40 @@ def CreateProject(user, project_name, project_description):
   Raises:
     BlissError: If the project name already exists.
   """
-  prj = _AhBlissProject.get_by_id(project_name)
+  prj = GetProject(project_name)
   if prj:
     raise error.BlissError('Project name %s already exists' % project_name)
   prj = _AhBlissProject(id=project_name,
                         project_description=project_description,
-                        writers=[user.key.id()])
+                        writers=[user.key.id()],
+                        template_url=template_url,
+                        namespace=project_name)
   prj.put()
   user.projects.append(prj.key)
   user.put()
   return prj
 
 
-def PopulateProjectWithTemplate(tree, template_url):
-  """Populate a project from a template."""
+def PopulateProject(project, tree, template_url):
+  """Populate project from a template.
+
+  Args:
+    tree: A tree object to use to retrieve files.
+    template_url: The template URL to populate the project files.
+  """
+  if codesite.IsCodesiteURL(template_url):
+    codesite.PopulateProjectFromCodesite(tree, template_url)
+  else:
+    _PopulateProjectWithTemplate(tree, template_url)
+
+
+def _PopulateProjectWithTemplate(tree, template_url):
+  """Populate a project from a template.
+
+  Args:
+    tree: A tree object to use to retrieve files.
+    template_url: The template URL to populate the project files or None.
+  """
   tree.Clear()
 
   def add_files(dirname):

@@ -41,8 +41,6 @@ _DEV_APPSERVER = os.environ['SERVER_SOFTWARE'].startswith('Development/')
 
 _JINJA2_ENV = Environment(autoescape=True, loader=FileSystemLoader(''))
 
-_INVALID_PROJECT_NAMES = (settings.USER_CONTENT_PREFIX)
-
 _DASH_DOT_DASH = '-dot-'
 
 # HTTP methods which do not affect state
@@ -421,54 +419,41 @@ class RunProject(BlissHandler):
     self.redirect(url)
 
 
-class EasyCreateProject(BlissHandler):
+class CreateProject(BlissHandler):
   """Request handler for creating projects via an HTML link."""
+
+  @ndb.transactional(xg=True)
+  def _MakeTemplateProject(self, template_url, project_name,
+                           project_description):
+    project = model.CreateProject(self.user,
+                                  template_url=template_url,
+                                  project_name=project_name,
+                                  project_description=project_description)
+    # set self.project_name and default namespace which cannot be set from url
+    self.project_name = project.project_name
+    namespace_manager.set_namespace(project_name)
+    # set self.project so we can access self.tree
+    self.project = project
+    model.PopulateProject(project, self.tree, template_url)
+    return project
 
   def get(self):
     # allow project creation via:
     # https://appid.appspot.com/bliss/c?template_url=...
-    project_name = model.NewProjectName()
-    template_url = self.request.get('template_url')
-    self.redirect('/bliss/p/{0}/create?template_url={1}'.format(project_name,
-                                                                template_url))
+    self.post()
 
-
-class CreateProject(BlissHandler):
-  """Request handler for creating projects."""
-
-  def get(self, project_name):
-    # allow EasyCreateProject GET to redirect here
-    self.post(project_name)
-    self.redirect('/bliss/p/{0}'.format(project_name))
-
-  def post(self, project_name):
-    """Handles HTTP POST requests."""
-    assert project_name
-    if (_DASH_DOT_DASH in project_name
-        or not _VALID_PROJECT_RE.match(project_name)):
-      raise error.BlissError('Project name must match {0} and must not contain '
-                             '{1!r}'.format(_VALID_PROJECT_RE.pattern,
-                                            _DASH_DOT_DASH))
-    if project_name in _INVALID_PROJECT_NAMES:
-      raise error.BlissError('Project name {0!r} is not available'
-                             .format(project_name))
-    template_url = self.request.get('template_url')
+  def post(self):
+    project_name = self.request.get('project_name')
     project_description = (self.request.get('project_description')
                            or project_name)
-    self.make_template_project(template_url, project_name, project_description)
-
-  @ndb.transactional(xg=True)
-  def make_template_project(self, template_url, project_name,
-                            project_description):
-    self.project = model.CreateProject(self.user,
-                                       project_name=project_name,
-                                       project_description=project_description)
-    if codesite.IsCodesiteURL(template_url):
-      codesite.PopulateProjectFromCodesite(tree=self.tree,
-                                           template_url=template_url)
-    else:
-      model.PopulateProjectWithTemplate(tree=self.tree,
-                                        template_url=template_url)
+    template_url = self.request.get('template_url')
+    if not project_name:
+      raise error.BlissError('project_name required')
+    if not template_url:
+      raise error.BlissError('template_url required')
+    project = self._MakeTemplateProject(template_url, project_name,
+                                        project_description)
+    self.redirect('/bliss/p/{0}/'.format(project.project_name))
 
 
 class DeleteProject(BlissHandler):
@@ -519,13 +504,12 @@ app = webapp2.WSGIApplication([
     ('/bliss/p/(.*)/listfiles/?(.*)', ListFiles),
 
     # project actions
-    ('/bliss/p/(.*)/create', CreateProject),
     ('/bliss/p/(.*)/delete', DeleteProject),
     ('/bliss/p/(.*)/rename', RenameProject),
     ('/bliss/p/(.*)/run', RunProject),
 
     # bliss actions
-    ('/bliss/c', EasyCreateProject),
+    ('/bliss/createproject', CreateProject),
 
     # /bliss/p/project_name/
     ('/bliss/p/(.*)/', Project),
