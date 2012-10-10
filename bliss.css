@@ -338,6 +338,7 @@ h1 {
 .CodeMirror {
   border: 1px solid #ccc;
   height: 100%;
+  line-height: 1.2em;
 }
 
   .CodeMirror-scroll {
