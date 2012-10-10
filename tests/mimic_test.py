@@ -208,8 +208,8 @@ class MimicTest(unittest.TestCase):
   def tearDown(self):
     pass
 
-  def _CreateTree(self, project_name):
-    tree = datastore_tree.DatastoreTree(project_name)
+  def _CreateTree(self, project_id):
+    tree = datastore_tree.DatastoreTree(project_id)
     for path, contents in self._files.items():
       tree.SetFile(path, contents)
     return tree
@@ -457,50 +457,50 @@ class MimicTest(unittest.TestCase):
 
   def checkHostParseFailure(self, server_name):
     os.environ['SERVER_NAME'] = server_name
-    project_name = mimic.GetProjectName()
-    self.assertEquals(None, project_name)
+    project_id = mimic.GetProjectId()
+    self.assertEquals(None, project_id)
 
-  def testGetProjectNameAppspot(self):
+  def testGetProjectIdAppspot(self):
     os.environ['SERVER_NAME'] = 'project-name.your-app-id.appspot.com'
-    project_name = mimic.GetProjectName()
-    self.assertEquals('project-name', project_name)
+    project_id = mimic.GetProjectId()
+    self.assertEquals('project-name', project_id)
 
     # Must have project name subdomain
     self.checkHostParseFailure('your-app-id.appspot.com')
 
-  def testGetProjectNameAppspotDashDotDash(self):
+  def testGetProjectIdAppspotDashDotDash(self):
     os.environ['SERVER_NAME'] = 'project-name-dot-your-app-id.appspot.com'
-    project_name = mimic.GetProjectName()
-    self.assertEquals('project-name', project_name)
+    project_id = mimic.GetProjectId()
+    self.assertEquals('project-name', project_id)
 
-  def testGetProjectNameCustomDomain(self):
+  def testGetProjectIdCustomDomain(self):
     os.environ['SERVER_NAME'] = 'www.mydomain.com'
-    project_name = mimic.GetProjectName()
-    self.assertEquals('www', project_name)
+    project_id = mimic.GetProjectId()
+    self.assertEquals('www', project_id)
 
     os.environ['SERVER_NAME'] = 'proj1.www.mydomain.com'
-    project_name = mimic.GetProjectName()
-    self.assertEquals('proj1', project_name)
+    project_id = mimic.GetProjectId()
+    self.assertEquals('proj1', project_id)
 
-  def testGetProjectNameLocalhost(self):
+  def testGetProjectIdLocalhost(self):
     os.environ['HTTP_HOST'] = 'localhost:8080'
     os.environ['SERVER_NAME'] = 'localhost'
-    project_name = mimic.GetProjectName()
-    self.assertEquals(None, project_name)
+    project_id = mimic.GetProjectId()
+    self.assertEquals(None, project_id)
 
-  def testGetProjectNameCustomDomainDashDotDash(self):
+  def testGetProjectIdCustomDomainDashDotDash(self):
     os.environ['SERVER_NAME'] = 'proj2-dot-www.mydomain.com'
-    project_name = mimic.GetProjectName()
-    self.assertEquals('proj2', project_name)
+    project_id = mimic.GetProjectId()
+    self.assertEquals('proj2', project_id)
 
-  def testVersionIdWithoutProjectName(self):
+  def testVersionIdWithoutProjectId(self):
     self._CallMimic('/_ah/mimic/version_id',
                     http_host='your-app-id.appspot.com')
     self.assertEquals(httplib.OK, self._status)
     # should be a response containing a mimic identifier and some version info
     self.assertTrue(str(common.VERSION_ID) in self._body)
 
-  def testTreeWithoutProjectName(self):
+  def testTreeWithoutProjectId(self):
     self._AddFile('app.yaml', _GENERIC_APP_YAML)
     self._AddFile('main.py', _SIMPLE_CGI_SCRIPT)
     # tree should still work even though we've not specified a project name

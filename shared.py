@@ -94,13 +94,13 @@ def ThisIsBlissApp():
 
 def DoesCurrentProjectExist():
   """Checks whether the curent project exists."""
-  project_name = mimic.GetProjectName()
-  if not project_name:
+  project_id = mimic.GetProjectId()
+  if not project_id:
     return None
-  prj = model.GetProject(project_name)
+  prj = model.GetProject(project_id)
   if not prj:
     return None
-  assert namespace_manager.get_namespace() == project_name, (
-      'namespace_manager.get_namespace()={0!r}, project_name={1!r}'
-      .format(namespace_manager.get_namespace(), project_name))
+  assert namespace_manager.get_namespace() == project_id, (
+      'namespace_manager.get_namespace()={0!r}, project_id={1!r}'
+      .format(namespace_manager.get_namespace(), project_id))
   return True

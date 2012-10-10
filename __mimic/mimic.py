@@ -128,17 +128,17 @@ def ServeStaticPage(tree, page):
                     data=file_data, expiration_s=expiration_s)
 
 
-def ServeScriptPage(tree, config, page, project_name):
+def ServeScriptPage(tree, config, page, project_id):
   """Respond by invoking a python cgi script.
 
   Args:
     tree: A tree object to use to retrieve files.
     config: The app's config loaded from the app's app.yaml.
     page: A ScriptPage object describing the file to be served.
-    project_name: The name of the project for namespace prefixing
+    project_id: The project id for namespace prefixing.
   """
   logging.info('Serving script page %s', page.script_path)
-  env = target_env.TargetEnvironment(tree, config, project_name)
+  env = target_env.TargetEnvironment(tree, config, project_id)
   try:
     env.RunScript(page.script_path, control.LoggingHandler())
   except target_env.ScriptNotFoundError:
@@ -184,13 +184,13 @@ def _GetUrl(force_https=False):
   return url
 
 
-def RunTargetApp(tree, path_info, project_name, users_mod):
+def RunTargetApp(tree, path_info, project_id, users_mod):
   """Top level handling of target application requests.
 
   Args:
     tree: A tree object to use to retrieve files.
     path_info: The path to be served.
-    project_name: The name of the project for namespace prefixing.
+    project_id: The name of the project for namespace prefixing.
     users_mod: A users module to use for authentication.
   """
   app_yaml = tree.GetFileContents('app.yaml')
@@ -241,26 +241,26 @@ def RunTargetApp(tree, path_info, project_name, users_mod):
   if isinstance(page, target_info.StaticPage):
     ServeStaticPage(tree, page)
   elif isinstance(page, target_info.ScriptPage):
-    ServeScriptPage(tree, config, page, project_name)
+    ServeScriptPage(tree, config, page, project_id)
   else:
     raise NotImplementedError('Unrecognized page {0!r}'.format(page))
 
 
-def GetProjectNameFromServerName():
-  """Returns the project name from the SERVER_NAME env var.
+def GetProjectIdFromServerName():
+  """Returns the project id from the SERVER_NAME env var.
 
-  For appspot.com domains, a project name is extracted from the left most
+  For appspot.com domains, a project id is extracted from the left most
   portion of the subdomain. If no subdomain is specified, or if the project
-  name cannot be determined, '' is returned. Finally, when the server name
+  id cannot be determined, '' is returned. Finally, when the server name
   is 'localhost', '' is also returned.
 
   For custom domains, it's not possible to determine with certainty the
   subdomain vs. the default version hostname. In this case we end up using
   the left most component of the server name.
 
-  Example mapping of server name to project name:
+  Example mapping of server name to project id:
 
-  Server Name                              Project Name
+  Server Name                              Project Id
   -----------                              ------------
   proj1.your-app-id.appspot.com        ->  'proj1'
   proj1-dot-your-app-id.appspot.com    ->  'proj1'
@@ -270,11 +270,11 @@ def GetProjectNameFromServerName():
   localhost                            ->  ''
 
   Returns:
-    The project name or empty string ''.
+    The project id or empty string ''.
   """
-  # The project name is sent as a "subdomain" of the app, e.g.
-  # 'project-name-dot-your-app-id.appspot.com' or
-  # 'project-name.your-app-id.appspot.com'
+  # The project id is sent as a "subdomain" of the app, e.g.
+  # 'project-id-dot-your-app-id.appspot.com' or
+  # 'project-id.your-app-id.appspot.com'
 
   server_name = os.environ['SERVER_NAME']
   # use a consistent delimiter
@@ -287,58 +287,58 @@ def GetProjectNameFromServerName():
   return server_name.split('.')[0]
 
 
-def GetProjectNameFromCookie():
-  """Returns the project name from the project name cookie."""
+def GetProjectIdFromCookie():
+  """Returns the project id from the project id cookie."""
   if 'HTTP_COOKIE' not in os.environ:
     return None
   cookies = dict([c.split('=', 1) for c in
                   os.environ['HTTP_COOKIE'].split('; ')])
-  return cookies.get(common.config.PROJECT_NAME_COOKIE)
+  return cookies.get(common.config.PROJECT_ID_COOKIE)
 
 
-def GetProjectNameFromPathInfo(path_info):
-  """Returns the project name from the request path."""
-  m = common.config.PROJECT_NAME_FROM_PATH_INFO_RE.match(path_info)
+def GetProjectIdFromPathInfo(path_info):
+  """Returns the project id from the request path."""
+  m = common.config.PROJECT_ID_FROM_PATH_INFO_RE.match(path_info)
   if not m:
     return None
   return m.group(1)
 
 
-def GetProjectName():
-  """Returns the project name from the HTTP request.
+def GetProjectId():
+  """Returns the project id from the HTTP request.
 
-  A number of sources for project name are tried in order. See implementation
+  A number of sources for project id are tried in order. See implementation
   details.
 
   Returns:
-    The project name or None.
+    The project id or None.
   """
-  # for task queues, use persisted namespace as the project name
-  project_name = os.environ.get(_HTTP_X_APPENGINE_CURRENT_NAMESPACE)
-  if project_name:
-    return project_name
-  project_name = GetProjectNameFromPathInfo(os.environ['PATH_INFO'])
-  if project_name:
-    return project_name
-  project_name = GetProjectNameFromServerName()
-  if project_name:
-    return project_name
-  # in the dev_appserver determine project name via a cookie
+  # for task queues, use persisted namespace as the project id
+  project_id = os.environ.get(_HTTP_X_APPENGINE_CURRENT_NAMESPACE)
+  if project_id:
+    return project_id
+  project_id = GetProjectIdFromPathInfo(os.environ['PATH_INFO'])
+  if project_id:
+    return project_id
+  project_id = GetProjectIdFromServerName()
+  if project_id:
+    return project_id
+  # in the dev_appserver determine project id via a cookie
   if common.IsDevMode():
-    project_name = GetProjectNameFromCookie()
-  if project_name:
-    return project_name
+    project_id = GetProjectIdFromCookie()
+  if project_id:
+    return project_id
   return None
 
 
 def GetNamespace():
-  project_name = GetProjectName()
-  if not project_name:
+  project_id = GetProjectId()
+  if not project_id:
     return None
-  # TODO: check project_name at creation time
+  # TODO: check project_id at creation time
   # throws BadValueError
-  namespace_manager.validate_namespace(project_name)
-  return project_name
+  namespace_manager.validate_namespace(project_id)
+  return project_id
 
 
 def RunMimic(create_tree_func, users_mod=users):
@@ -361,14 +361,14 @@ def RunMimic(create_tree_func, users_mod=users):
     requires_tree = True
 
   if requires_tree:
-    project_name = GetProjectName()
-    tree = create_tree_func(project_name)
+    project_id = GetProjectId()
+    tree = create_tree_func(project_id)
   else:
     tree = None
 
   if is_control_request:
     run_wsgi_app(control.MakeControlApp(tree))
   elif path_info.startswith(common.SHELL_PREFIX):
-    run_wsgi_app(shell.MakeShellApp(tree, project_name))
+    run_wsgi_app(shell.MakeShellApp(tree, project_id))
   else:
-    RunTargetApp(tree, path_info, project_name, users_mod)
+    RunTargetApp(tree, path_info, project_id, users_mod)

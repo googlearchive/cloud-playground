@@ -39,9 +39,9 @@ class _AhMimicFile(ndb.Model):
 class DatastoreTree(common.Tree):
   """An implementation of Tree backed by Datastore."""
 
-  def __init__(self, project_name=None):
-    if project_name:
-      namespace = project_name
+  def __init__(self, project_id=None):
+    if project_id:
+      namespace = str(project_id)
     else:
       namespace = None
     # Having a root entity key allows us to use ancestor queries for strong

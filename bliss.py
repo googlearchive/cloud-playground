@@ -132,24 +132,24 @@ class BlissHandler(SessionHandler):
     self.render('404.html', path_info=self.request.path_info)
 
   @webapp2.cached_property
-  def project_name(self):
-    return mimic.GetProjectNameFromPathInfo(self.request.path_info)
+  def project_id(self):
+    return mimic.GetProjectIdFromPathInfo(self.request.path_info)
 
   @webapp2.cached_property
   def project(self):
-    if not self.project_name:
+    if not self.project_id:
       return None
-    return model.GetProject(self.project_name)
+    return model.GetProject(self.project_id)
 
   @webapp2.cached_property
   def tree(self):
     if not self.project:
-      raise Exception('Project {0} does not exist'.format(self.project_name))
+      raise Exception('Project {0} does not exist'.format(self.project_id))
     # TODO: instantiate tree elsewhere
-    assert namespace_manager.get_namespace() == self.project_name, (
-        'namespace_manager.get_namespace()={0!r}, project_name={1!r}'
-        .format(namespace_manager.get_namespace(), self.project_name))
-    return common.config.CREATE_TREE_FUNC(self.project_name)
+    assert namespace_manager.get_namespace() == str(self.project_id), (
+        'namespace_manager.get_namespace()={0!r}, project_id={1!r}'
+        .format(namespace_manager.get_namespace(), str(self.project_id)))
+    return common.config.CREATE_TREE_FUNC(self.project_id)
 
   def _PerformWriteAccessCheck(self):
     user_key = self.user.key.id()
@@ -160,7 +160,7 @@ class BlissHandler(SessionHandler):
       return
     if user_key not in self.project.writers:
       raise error.BlissError('User {0!r} is not authorized to edit project '
-                             '{1!r}'.format(user_key, self.project_name))
+                             '{1!r}'.format(user_key, self.project_id))
 
   def PerformValidation(self):
     super(BlissHandler, self).PerformValidation()
@@ -219,10 +219,11 @@ class BlissHandler(SessionHandler):
       memcache_admin_url = None
 
     if self.project:
+      kwargs['project_id'] = self.project.key.id()
       kwargs['project_name'] = self.project.project_name
       kwargs['project_description'] = self.project.project_description
       kwargs['project_run_url'] = ('/bliss/p/{0}/run'
-                                   .format(self.project.project_name))
+                                   .format(self.project.key.id()))
 
     if users.get_current_user():
       kwargs['is_logged_in'] = True
@@ -241,9 +242,9 @@ class BlissHandler(SessionHandler):
 
 class GetConfig(BlissHandler):
 
-  def get(self, project_name):
+  def get(self, project_id):
     """Handles HTTP GET requests."""
-    assert project_name
+    assert project_id
     r = {
         'BLISS_USER_CONTENT_HOST': settings.BLISS_USER_CONTENT_HOST,
     };
@@ -253,7 +254,7 @@ class GetConfig(BlissHandler):
 
 class GetFile(BlissHandler):
 
-  def _CheckCors(self, project_name):
+  def _CheckCors(self):
     origin = self.request.headers.get('Origin')
     # If not a CORS request, do nothing
     if not origin:
@@ -282,17 +283,17 @@ class GetFile(BlissHandler):
     self.response.headers['Access-Control-Allow-Headers'] = 'Origin, X-XSRF-Token, X-Requested-With, Accept'
     self.response.headers['Access-Control-Allow-Credentials'] = 'true'
 
-  def options(self, project_name, filename):
+  def options(self, project_id, filename):
     """Handles HTTP OPTIONS requests."""
-    assert project_name
+    assert project_id
     assert filename
-    self._CheckCors(project_name)
+    self._CheckCors()
 
-  def get(self, project_name, filename):
+  def get(self, project_id, filename):
     """Handles HTTP GET requests."""
-    assert project_name
+    assert project_id
     assert filename
-    self._CheckCors(project_name)
+    self._CheckCors()
 
     contents = self.tree.GetFileContents(filename)
     if contents is None:
@@ -308,9 +309,9 @@ class GetFile(BlissHandler):
 
 class PutFile(BlissHandler):
 
-  def put(self, project_name, filename):
+  def put(self, project_id, filename):
     """Handles HTTP PUT requests."""
-    assert project_name
+    assert project_id
     assert filename
     self.tree.SetFile(path=filename, contents=self.request.body)
 
@@ -320,12 +321,12 @@ class PutFile(BlissHandler):
 
 class MoveFile(BlissHandler):
 
-  def post(self, project_name, oldpath):
+  def post(self, project_id, oldpath):
     """Handles HTTP POST requests."""
-    assert project_name
+    assert project_id
     assert oldpath
-    if not model.GetProject(project_name):
-      raise Exception('Project {0} does not exist'.format(project_name))
+    if not model.GetProject(project_id):
+      raise Exception('Project {0} does not exist'.format(project_id))
     data = json.loads(self.request.body)
     newpath = data.get('newpath')
     assert newpath
@@ -337,19 +338,20 @@ class MoveFile(BlissHandler):
 
 class DeletePath(BlissHandler):
 
-  def post(self, project_name, path):
+  def post(self, project_id, path):
     """Handles HTTP POST requests."""
-    assert project_name
-    if not model.GetProject(project_name):
-      raise Exception('Project {0} does not exist'.format(project_name))
+    assert project_id
+    if not model.GetProject(project_id):
+      raise Exception('Project {0} does not exist'.format(project_id))
     self.tree.DeletePath(path)
 
 
 class ListFiles(BlissHandler):
 
-  def get(self, project_name, path):
+  def get(self, project_id, path):
     """Handles HTTP GET requests."""
-    project = model.GetProject(project_name)
+    assert project_id
+    project = model.GetProject(project_id)
     if not project:
       return self.not_found()
     # 'path is None' means get all files recursively
@@ -363,10 +365,10 @@ class ListFiles(BlissHandler):
 
 class Project(BlissHandler):
 
-  def get(self, project_name):
+  def get(self, project_id):
     """Handles HTTP GET requests."""
-    assert project_name
-    project = model.GetProject(project_name)
+    assert project_id
+    project = model.GetProject(project_id)
     if not project:
       return self.not_found()
     self.render('project.html')
@@ -377,7 +379,8 @@ class Bliss(BlissHandler):
   def get(self):
     """Handles HTTP GET requests."""
     projects = model.GetProjects(self.user)
-    p = [(p.project_name, p.project_description) for p in projects]
+    p = [(p.key.id(), p.project_name, p.project_description)
+          for p in projects]
     template_sources = model.GetTemplateSources()
     tuples = [(s, model.GetTemplates(s)) for s in template_sources]
     self.render('main.html',
@@ -401,21 +404,21 @@ class Logout(BlissHandler):
 
 class RunProject(BlissHandler):
 
-  def _GetPlaygroundHostname(self, project_name):
+  def _GetPlaygroundHostname(self, project_id):
     """Determine the playground hostname for the project."""
     if common.IsDevMode():
       return settings.PLAYGROUND_HOST
-    return '{0}{1}{2}'.format(urllib.quote_plus(project_name),
+    return '{0}{1}{2}'.format(urllib.quote_plus(project_id),
                               _DASH_DOT_DASH,
                               settings.PLAYGROUND_HOST)
 
-  def get(self, project_name):
+  def get(self, project_id):
     """Handles HTTP GET requests."""
-    assert project_name
+    assert project_id
     if common.IsDevMode():
-      self.response.set_cookie(common.config.PROJECT_NAME_COOKIE, project_name)
+      self.response.set_cookie(common.config.PROJECT_ID_COOKIE, project_id)
     url = '{0}://{1}/'.format(self.request.scheme,
-                              self._GetPlaygroundHostname(project_name))
+                              self._GetPlaygroundHostname(project_id))
     self.redirect(url)
 
 
@@ -429,9 +432,9 @@ class CreateProject(BlissHandler):
                                   template_url=template_url,
                                   project_name=project_name,
                                   project_description=project_description)
-    # set self.project_name and default namespace which cannot be set from url
-    self.project_name = project.project_name
-    namespace_manager.set_namespace(project_name)
+    # set self.project_id and default namespace which cannot be set from url
+    self.project_id = project.key.id()
+    namespace_manager.set_namespace(str(self.project_id))
     # set self.project so we can access self.tree
     self.project = project
     model.PopulateProject(project, self.tree, template_url)
@@ -447,29 +450,26 @@ class CreateProject(BlissHandler):
     project_description = (self.request.get('project_description')
                            or project_name)
     template_url = self.request.get('template_url')
-    if not project_name:
-      raise error.BlissError('project_name required')
     if not template_url:
       raise error.BlissError('template_url required')
     project = self._MakeTemplateProject(template_url, project_name,
                                         project_description)
-    self.redirect('/bliss/p/{0}/'.format(project.project_name))
+    self.redirect('/bliss/p/{0}/'.format(project.key.id()))
 
 
 class DeleteProject(BlissHandler):
 
-  def post(self, project_name):
-    assert project_name
-    if not model.GetProject(project_name):
-      raise Exception('Project {0} does not exist'.format(project_name))
-    model.DeleteProject(self.user, tree=self.tree,
-                        project_name=project_name)
+  def post(self, project_id):
+    assert project_id
+    if not model.GetProject(project_id):
+      raise Exception('Project {0} does not exist'.format(project_id))
+    model.DeleteProject(self.user, tree=self.tree, project_id=project_id)
 
 
 class RenameProject(BlissHandler):
 
-  def post(self, project_name):
-    raise Exception('not implemented. unable to rename %s' % project_name)
+  def post(self, project_id):
+    raise Exception('not implemented. unable to rename %s' % project_id)
 
 
 class AddSlash(webapp2.RequestHandler):
@@ -511,7 +511,7 @@ app = webapp2.WSGIApplication([
     # bliss actions
     ('/bliss/createproject', CreateProject),
 
-    # /bliss/p/project_name/
+    # /bliss/p/project_id/
     ('/bliss/p/(.*)/', Project),
     ('/bliss/p/[^/]+$', AddSlash),
 

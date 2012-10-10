@@ -8,11 +8,26 @@ BODY {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-A, .link {
+A {
+  color: inherit;
+}
+
+A, .link, .newthing {
   cursor: pointer;
-  color: #00e;
   text-decoration: none;
 }
+
+  .newthing:hover, .link {
+    color: #0000ee;
+  }
+
+  .newthing:active, .link:active {
+    color: #ee0000;
+  }
+
+  .newthing:visited, .link A:visited {
+    color: #800080;
+  }
 
 HR.divider {
   clear: both;
@@ -95,6 +110,10 @@ TABLE {
     padding: .35em 1em .25em .35em;
   }
 
+    TD.projectid {
+      color: #aaa;
+    }
+
 .experimental {
   color: #f00;
   top: -0.9em;
@@ -158,19 +177,27 @@ h1 {
   list-style-type: none;
 }
 
-#projectname {
+#navheader {
   color: #aaa;
 }
+
+  #navheader #projectname {
+    /* run.png is 42px x 32px */
+    margin-right: 48px;
+    overflow: hidden;
+    white-space: nowrap;
+  }
 
 #source-filename {
   font-weight: bold;
   color: #777;
   padding-left: 30px;
   display: inline-block;
+  white-space: nowrap;
 }
 
 #nav {
-  width: 200px;
+  width: 180px;
   height: 100%;
   float: left;
 }
@@ -202,13 +229,14 @@ h1 {
         display: inline-block;
         width: 155px;
         overflow: hidden;
+        white-space: nowrap;
       }
 
       #nav #filelist .fileentry.selected .filename {
         font-weight: bold;
       }
 
-  #nav #projectname , #source-filename {
+  #nav #navheader , #source-filename {
     /* run.png is 42px x 32px */
     height: 34px;
   }
@@ -237,34 +265,34 @@ h1 {
   padding-top: .5em;
 }
 
-  .newthing.link:hover {
-    color: #00e;
-  }
+.newproject {
+  color: #aaa;
+}
 
-  .newthing .name {
+  .newproject .name {
     font-weight: bold;
   }
 
-  .one .newthing .name {
+  .one .newproject .name {
     color: #484;
   }
-  .one .newthing BUTTON {
+  .one .newproject BUTTON {
     background-color: #484;
     border: 1px solid #373;
   }
 
-  .two .newthing .name {
+  .two .newproject .name {
     color: #448;
   }
-  .two .newthing BUTTON {
+  .two .newproject BUTTON {
     background-color: #448;
     border: 1px solid #337;
   }
 
-  .three .newthing .name {
+  .three .newproject .name {
     color: #844;
   }
-  .three .newthing BUTTON {
+  .three .newproject BUTTON {
     background-color: #844;
     border: 1px solid #733;
   }

@@ -32,9 +32,9 @@ function file_context_menu(id) {
 
   <div id="source-container">
     <div id="nav">
-      <div id="projectname">
-        {{project_description}}
+      <div id="navheader">
         <div class="runlink" onclick="return run('{{project_run_url}}', '{{project_name}}')" title="run {{project_name}}"><img src='/bliss/run.png'></div>
+        <div id="projectname" title="{{project_name}}">{{project_name}}</div>
       </div>
       <div id="filelist">
         {% raw %}
@@ -45,7 +45,7 @@ function file_context_menu(id) {
             <div class="filename">{{file.name}}</div>
             <div class="dropdown"><a ng-click="file_context_menu($event, $index)">…</a></div>
           </div>
-          <div class="newthing link" ng-click="prompt_for_new_file()">+ new file</div>
+          <div class="newthing" ng-click="prompt_for_new_file()">+ new file</div>
         {% endraw %}
       </div>
     </div>

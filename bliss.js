@@ -129,18 +129,13 @@ function insertAfter(newNode, existingNode) {
   }
 }
 
-function prompt_for_new_project(template_url) {
-  var project_name = prompt("Please select a unique project name.\nUse only lowercase letters (a-z), digits (0-9) and dashes (-).", "");
-  if (!project_name) {
-    return;
-  }
-  // var project_description = prompt('Project description', project_name) || project_name;
-  var project_description = project_name;
+function prompt_for_new_project(template_url, project_name,
+                                project_description) {
   var uri = '/bliss/createproject';
   var data = 'template_url=' + encodeURI(template_url) +
              '&project_name=' + encodeURI(project_name) +
              '&project_description=' + encodeURI(project_description);
-  box = lightbox(escape(project_description), 'Creating project. Please wait.');
+  box = lightbox('Creating project', 'Please wait.');
   post(uri, function(xhr) {
     box();
     document.body.scrollTop = 0;
@@ -148,13 +143,13 @@ function prompt_for_new_project(template_url) {
   }, data);
 }
 
-function prompt_to_delete_project(project_name) {
+function prompt_to_delete_project(project_id, project_name) {
   var answer = prompt("Are you sure you want to delete project " +
                       project_name + "?\nType 'yes' to confirm.", "no");
   if (!answer || answer.toLowerCase()[0] != 'y') {
     return;
   }
-  var uri = '/bliss/p/' + encodeURI(project_name) + '/delete';
+  var uri = '/bliss/p/' + encodeURI(project_id) + '/delete';
   post(uri, function(xhr) {
     document.body.scrollTop = 0;
     window.location.reload();
@@ -175,14 +170,14 @@ function popout() {
   _output_window = undefined;
 }
 
-function run(url, project_name) {
+function run(url, project_id) {
   var container = document.getElementById('output-container');
   if (_output_window && _output_window.closed) {
     _popout = false;
   }
   if (_popout) {
     container.style.display = 'none';
-    _output_window = window.open(url, project_name);
+    _output_window = window.open(url, project_id);
   } else {
     container.style.display = 'block';
     var container = document.getElementById('output-container');

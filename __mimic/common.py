@@ -52,9 +52,9 @@ config = lib_config.register('mimic', {
     # must be defined in appengine_config.py
     'CREATE_TREE_FUNC': None,
     # regex for extracting project name from PATH_INFO
-    'PROJECT_NAME_FROM_PATH_INFO_RE': re.compile('/_mimic/p/(.+?)/'),
-    # dev_appserver cookie, used to identify the project_name
-    'PROJECT_NAME_COOKIE': '_mimic_project',
+    'PROJECT_ID_FROM_PATH_INFO_RE': re.compile('/_mimic/p/(.+?)/'),
+    # dev_appserver cookie, used to identify the project_id
+    'PROJECT_ID_COOKIE': '_mimic_project',
     })
 
 
@@ -85,7 +85,7 @@ class Tree(object):
   provide implementations of SetFile() and Clear().
   """
 
-  def __init__(self, project_name=None):
+  def __init__(self, project_id=None):
     """Constructor which accepts a project name argument."""
     pass
 

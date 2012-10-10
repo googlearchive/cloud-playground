@@ -15,7 +15,7 @@
 
     <thead>
       <tr class="project">
-        <th class="projectname">Project</a></th>
+        <th class="projectid">Project</a></th>
         <th class="projectdescription">Description</th>
         <th class=""></th>
       </tr>
@@ -23,11 +23,11 @@
 
     <tbody>
       {% if projects %}
-        {% for name, description in projects %}
+        {% for id, name, description in projects %}
           <tr class="project {{ loop.cycle('odd', 'even') }}">
-            <td class="projectname"><a href="/bliss/p/{{name}}/">{{name}}</a></td>
-            <td class="projectdescription">{{description}}</td>
-            <td class="link" onclick="prompt_to_delete_project('{{name}}')">delete</td>
+            <td class="projectname link"><a href="/bliss/p/{{id}}/">{{name}}</a></td>
+            <td class="projectdescription"><a href="/bliss/p/{{id}}/">{{description}}</a></td>
+            <td class="link" onclick="prompt_to_delete_project('{{id}}','{{name}}')">delete</td>
           </tr>
         {% endfor %}
       {% else %}
@@ -52,8 +52,8 @@
     <h1>{{source.description}}</h1>
     <div class="{{ loop.cycle('one', 'two', 'three') }}">
       {% for t in templates %}
-        <div class="newthing" style="margin: .5em;">
-          <button style="float: left;" onclick="prompt_for_new_project('{{t.key.id()}}')">New Project</button>
+        <div class="newproject" style="margin: .5em;">
+          <button style="float: left;" onclick="prompt_for_new_project('{{t.key.id()}}', '{{t.name}}', '{{t.description}}')">New Project</button>
           <div stlye="clear: both;">
              <div class="name">{{t.name}}</div>
              <div class="description">{{t.description}}</div>

@@ -68,10 +68,11 @@ def GetTemplates(template_source):
       shared.w('{0} {1}'.format(result.status_code, app_yaml_url))
       if result.status_code != 200:
         continue
-      s = model._AhTemplate(parent=template_source.key,
-                            id=project_url,
-                            name=c or project_url,
-                            description=project_url)
+      description = 'Sample code from {0}'.format(project_url)
+      s = model.Template(parent=template_source.key,
+                         id=project_url,
+                         name=c or project_url,
+                         description=description)
       samples.append(s)
     except:
       exc_info = sys.exc_info()
