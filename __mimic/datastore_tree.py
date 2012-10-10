@@ -36,6 +36,7 @@ class _AhMimicFile(ndb.Model):
   _use_memcache = False
 
   contents = ndb.BlobProperty(required=True)
+  udpated = ndb.DateTimeProperty(auto_now=True)
 
 
 class DatastoreTree(common.Tree):
