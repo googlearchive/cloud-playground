@@ -32,9 +32,6 @@ class _AhMimicFile(ndb.Model):
 
   The file's path should be used as the key for the entity.
   """
-  # allow admin console changes to become immediately visible
-  _use_memcache = False
-
   contents = ndb.BlobProperty(required=True)
   udpated = ndb.DateTimeProperty(auto_now=True)
 
