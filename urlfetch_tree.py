@@ -64,12 +64,12 @@ class UrlFetchTree(common.Tree):
     """
     url = ('http://{0}.appspot.com/bliss/p/{1}/getfile/{2}'
            .format(_config.SOURCE_CODE_APP_ID,
-                   self.project_name,
+                   self.namespace,
                    path))
     headers = {}
     if common.IsDevMode():
       cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,
-                                self.project_name)
+                                self.namespace)
       headers['Cookie'] = cookie
     resp = urlfetch.fetch(url, headers=headers, method='GET',
                           follow_redirects=False, deadline=3)
@@ -87,12 +87,12 @@ class UrlFetchTree(common.Tree):
     """
     url = ('http://{0}.appspot.com/bliss/p/{1}/putfile/{2}'
            .format(_config.SOURCE_CODE_APP_ID,
-                   self.project_name,
+                   self.namespace,
                    path))
     headers = {}
     if common.IsDevMode():
       cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,
-                                self.project_name)
+                                self.namespace)
       headers['Cookie'] = cookie
     resp = urlfetch.fetch(url, headers=headers, method='PUT', payload=content,
                           follow_redirects=False, deadline=3)
@@ -134,13 +134,13 @@ class UrlFetchTree(common.Tree):
     """
     url = ('http://{0}.appspot.com/bliss/p/{1}/movefile/{2}?newpath={3}'
            .format(_config.SOURCE_CODE_APP_ID,
-                   self.project_name,
+                   self.namespace,
                    path,
                    newpath))
     headers = {}
     if common.IsDevMode():
       cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,
-                                self.project_name)
+                                self.namespace)
       headers['Cookie'] = cookie
     resp = urlfetch.fetch(url, headers=headers, method='POST',
                           follow_redirects=False, deadline=3)
@@ -160,12 +160,12 @@ class UrlFetchTree(common.Tree):
     """
     url = ('http://{0}.appspot.com/bliss/p/{1}/deletepath/{2}'
            .format(_config.SOURCE_CODE_APP_ID,
-                   self.project_name,
+                   self.namespace,
                    path))
     headers = {}
     if common.IsDevMode():
       cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,
-                                self.project_name)
+                                self.namespace)
       headers['Cookie'] = cookie
     resp = urlfetch.fetch(url, headers=headers, method='POST',
                           follow_redirects=False, deadline=3)
@@ -196,11 +196,11 @@ class UrlFetchTree(common.Tree):
     path = self._NormalizeDirectoryPath(path)
     url = ('http://{0}.appspot.com/bliss/p/{1}/listfiles/'
            .format(_config.SOURCE_CODE_APP_ID,
-                   self.project_name))
+                   self.namespace))
     headers = {}
     if common.IsDevMode():
       cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,
-                                self.project_name)
+                                self.namespace)
       headers['Cookie'] = cookie
     resp = urlfetch.fetch(url, headers=headers, method='GET',
                           follow_redirects=False, deadline=3)
