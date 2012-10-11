@@ -9,8 +9,8 @@ import urlfetch_tree
 class CachingUrlFetchTree(urlfetch_tree.UrlFetchTree):
   """An caching implementation of URL Fetch Tree."""
 
-  def __init__(self, project_name=None):
-    super(CachingUrlFetchTree, self).__init__(project_name)
+  def __init__(self, namespace=''):
+    super(CachingUrlFetchTree, self).__init__(namespace)
     self.file_cache = {}
     # uniquely identifies the current HTTP request
     self.request_log_id = os.environ['REQUEST_LOG_ID']

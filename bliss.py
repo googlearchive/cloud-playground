@@ -145,11 +145,12 @@ class BlissHandler(SessionHandler):
   def tree(self):
     if not self.project:
       raise Exception('Project {0} does not exist'.format(self.project_id))
+    namespace = str(self.project_id)
     # TODO: instantiate tree elsewhere
-    assert namespace_manager.get_namespace() == str(self.project_id), (
-        'namespace_manager.get_namespace()={0!r}, project_id={1!r}'
-        .format(namespace_manager.get_namespace(), str(self.project_id)))
-    return common.config.CREATE_TREE_FUNC(self.project_id)
+    assert namespace_manager.get_namespace() == namespace, (
+        'namespace_manager.get_namespace()={0!r} != namespace={1!r}'
+        .format(namespace_manager.get_namespace(), namespace))
+    return common.config.CREATE_TREE_FUNC(namespace)
 
   def _PerformWriteAccessCheck(self):
     user_key = self.user.key.id()

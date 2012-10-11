@@ -36,12 +36,12 @@ _config = lib_config.register('urlfetch_tree', {
 class UrlFetchTree(common.Tree):
   """An implementation of Tree backed by URL Fetch."""
 
-  def __init__(self, project_name=None):
-    self.project_name = project_name
+  def __init__(self, namespace=''):
+    self.namespace = namespace
 
   def __repr__(self):
-    return ('<{0} project_name={1!r}>'
-            .format(self.__class__.__name__, self.project_name))
+    return ('<{0} namespace={1!r}>'
+            .format(self.__class__.__name__, self.namespace))
 
   @staticmethod
   def _NormalizeDirectoryPath(path):
