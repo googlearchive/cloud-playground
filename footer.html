@@ -5,14 +5,14 @@
     <span>namespace: {{namespace}}</span>
   </div>
   <div id="adminlinks">
-    <span>git(<a href="{{git_bliss_url}}" target="_blank">bliss</a>)</span>
+    <span>git(<a class="link" href="{{git_bliss_url}}" target="_blank">bliss</a>)</span>
 
     {% if is_admin %}
-      <span>danger(<a onclick="big_red_button();">big-red-button</a>)</span>
+      <span>danger(<a class="link" onclick="big_red_button();">big-red-button</a>)</span>
     {% endif %}
 
     {% if datastore_admin_url and memcache_admin_url %}
-    <span>admin(<a href="{{datastore_admin_url}}" target="_blank">datastore</a>, <a href="{{memcache_admin_url}}" target="_blank">memcache</a>)</span>
+    <span>admin(<a class="link" href="{{datastore_admin_url}}" target="_blank">datastore</a>, <a class="link" href="{{memcache_admin_url}}" target="_blank">memcache</a>)</span>
     {% endif %}
 
   </div>
