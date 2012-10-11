@@ -35,9 +35,6 @@ CONTROL_PREFIX = '/_ah/mimic'
 # URL path prefix for accessing a Python shell
 SHELL_PREFIX = '/_ah/shell'
 
-# namespace for App Engine APIs (i.e. memcache)
-NAMESPACE = '_ah_mimic'
-
 # memcache key space
 MEMCACHE_MANIFEST_PREFIX = 'manifest:'
 MEMCACHE_FILE_KEY_PREFIX = 'file:'
