@@ -208,8 +208,8 @@ class MimicTest(unittest.TestCase):
   def tearDown(self):
     pass
 
-  def _CreateTree(self, project_id):
-    tree = datastore_tree.DatastoreTree(project_id)
+  def _CreateTree(self, namespace):
+    tree = datastore_tree.DatastoreTree(namespace)
     for path, contents in self._files.items():
       tree.SetFile(path, contents)
     return tree
@@ -595,17 +595,17 @@ for p in people:
     self._CallMimic('/get.py', http_host='proj1.your-app-id.appspot.com')
     # the target_env patches should remove the namespace. the actual entity
     # has a namespace of 'proj1-', same for JaneDoe below
-    self.assertEquals('name: JohnDoe, namespace: ""\n', self._body)
+    self.assertEquals('name: JohnDoe, namespace: "proj1"\n', self._body)
 
     # proj2 should see its person, JaneDoe
     self._CallMimic('/get.py', http_host='proj2.your-app-id.appspot.com')
-    self.assertEquals('name: JaneDoe, namespace: ""\n', self._body)
+    self.assertEquals('name: JaneDoe, namespace: "proj2"\n', self._body)
 
   def testDBNamespacingSameProjectDifferentBranch(self):
     """Tests that different branches of the same project see the same data."""
     self.SetupDBNamespacing()
     self._CallMimic('/get.py', http_host='proj1.your-app-id.appspot.com')
-    self.assertEquals('name: JohnDoe, namespace: ""\n', self._body)
+    self.assertEquals('name: JohnDoe, namespace: "proj1"\n', self._body)
 
   def testDBNamespacingDifferentProjectNoData(self):
     """Tests that different projects don't see other projects' data."""

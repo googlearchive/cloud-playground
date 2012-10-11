@@ -92,12 +92,12 @@ class TargetEnvironmentTest(unittest.TestCase):
     global _test_portal  # pylint: disable-msg=W0603
     _test_portal = TestPortal()
     test_util.InitAppHostingApi()
-    project_name = 'ProjectName'
-    self._tree = datastore_tree.DatastoreTree(project_name)
+    namespace = 'project-name'
+    self._tree = datastore_tree.DatastoreTree(namespace)
     self._env = target_env.TargetEnvironment(
         self._tree,
         _TEST_CONFIG,
-        project_name,
+        namespace,
         test_portal=_test_portal)
     # force loading of namespace_manager before target environment is
     # setup, so that we avoid recursion in tests trying to access the tree
@@ -759,20 +759,6 @@ logging.debug(%s)
       self.assertTrue(os.access(dst, os.F_OK))
     finally:
       shutil.rmtree(tmp)
-
-  def testPrefixNamespace(self):
-    self.assertEqual(self._env.PrefixNamespace(None), 'ProjectName')
-    self.assertEqual(self._env.PrefixNamespace('Namespace'),
-                     'ProjectNameNamespace')
-
-    # test that the inverse function indeed removes the prefix
-    self.assertEqual(self._env.UnprefixNamespace(self._env.PrefixNamespace(
-        'Namespace')), 'Namespace')
-
-    # Namespace prefix is "ProjectName", length 11, leaving 89
-    self.assertRaises(namespace_manager.BadValueError,
-                      self._env.PrefixNamespace, 'N' * 90)
-    self._env.PrefixNamespace('N' * 89)  # 88 shouldn't fail
 
   def testBlobstoreGetBlobKey(self):
     # Create the file

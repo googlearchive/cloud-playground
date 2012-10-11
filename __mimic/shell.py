@@ -40,8 +40,8 @@ class FileHandler(webapp.RequestHandler):
     """Initializes this request handler with the given Request and Response."""
     webapp.RequestHandler.initialize(self, request, response)
     tree = self.app.config.get('tree')
-    project_name = self.app.config.get('project_name')
-    self.env = target_env.TargetEnvironment(tree, None, project_name)
+    namespace = self.app.config.get('namespace')
+    self.env = target_env.TargetEnvironment(tree, None, namespace)
 
   def get(self):  # pylint: disable-msg=C6409
     """Executes a file non-interactively printing the result to response.out."""
@@ -73,7 +73,7 @@ class FileHandler(webapp.RequestHandler):
       sys.stderr = old_stderr
 
 
-def MakeShellApp(tree, project_name):
+def MakeShellApp(tree, namespace):
   """Create and return a WSGI application for controlling Mimic."""
   # standard handlers
   handlers = [
@@ -81,5 +81,5 @@ def MakeShellApp(tree, project_name):
       ]
   # prepend CONTROL_PREFIX to all handler paths
   handlers = [(common.SHELL_PREFIX + p, h) for (p, h) in handlers]
-  config = {'tree': tree, 'project_name': project_name}
+  config = {'tree': tree, 'namespace': namespace}
   return webapp.WSGIApplication(handlers, debug=True, config=config)

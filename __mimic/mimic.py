@@ -128,17 +128,17 @@ def ServeStaticPage(tree, page):
                     data=file_data, expiration_s=expiration_s)
 
 
-def ServeScriptPage(tree, config, page, project_id):
+def ServeScriptPage(tree, config, page, namespace):
   """Respond by invoking a python cgi script.
 
   Args:
     tree: A tree object to use to retrieve files.
     config: The app's config loaded from the app's app.yaml.
     page: A ScriptPage object describing the file to be served.
-    project_id: The project id for namespace prefixing.
+    namespace: The datastore and memcache namespace used for metadata.
   """
   logging.info('Serving script page %s', page.script_path)
-  env = target_env.TargetEnvironment(tree, config, project_id)
+  env = target_env.TargetEnvironment(tree, config, namespace)
   try:
     env.RunScript(page.script_path, control.LoggingHandler())
   except target_env.ScriptNotFoundError:
@@ -184,13 +184,13 @@ def _GetUrl(force_https=False):
   return url
 
 
-def RunTargetApp(tree, path_info, project_id, users_mod):
+def RunTargetApp(tree, path_info, namespace, users_mod):
   """Top level handling of target application requests.
 
   Args:
     tree: A tree object to use to retrieve files.
     path_info: The path to be served.
-    project_id: The name of the project for namespace prefixing.
+    namespace: The datastore and memcache namespace used for metadata.
     users_mod: A users module to use for authentication.
   """
   app_yaml = tree.GetFileContents('app.yaml')
@@ -241,7 +241,7 @@ def RunTargetApp(tree, path_info, project_id, users_mod):
   if isinstance(page, target_info.StaticPage):
     ServeStaticPage(tree, page)
   elif isinstance(page, target_info.ScriptPage):
-    ServeScriptPage(tree, config, page, project_id)
+    ServeScriptPage(tree, config, page, namespace)
   else:
     raise NotImplementedError('Unrecognized page {0!r}'.format(page))
 
@@ -332,13 +332,10 @@ def GetProjectId():
 
 
 def GetNamespace():
-  project_id = GetProjectId()
-  if not project_id:
-    return None
-  # TODO: check project_id at creation time
+  namespace = GetProjectId() or ''
   # throws BadValueError
-  namespace_manager.validate_namespace(project_id)
-  return project_id
+  namespace_manager.validate_namespace(namespace)
+  return namespace
 
 
 def RunMimic(create_tree_func, users_mod=users):
@@ -349,6 +346,9 @@ def RunMimic(create_tree_func, users_mod=users):
     users_mod: A users module to use for authentication (default is the
         AppEngine users module).
   """
+  # ensures that namespace_manager_default_namespace_for_request is used
+  namespace_manager.set_namespace(None)
+
   # use PATH_INFO to determine if this is a control or target request
   path_info = os.environ['PATH_INFO']
 
@@ -361,14 +361,14 @@ def RunMimic(create_tree_func, users_mod=users):
     requires_tree = True
 
   if requires_tree:
-    project_id = GetProjectId()
-    tree = create_tree_func(project_id)
+    namespace = GetNamespace()
+    tree = create_tree_func(namespace)
   else:
     tree = None
 
   if is_control_request:
     run_wsgi_app(control.MakeControlApp(tree))
   elif path_info.startswith(common.SHELL_PREFIX):
-    run_wsgi_app(shell.MakeShellApp(tree, project_id))
+    run_wsgi_app(shell.MakeShellApp(tree, namespace))
   else:
-    RunTargetApp(tree, path_info, project_id, users_mod)
+    RunTargetApp(tree, path_info, namespace, users_mod)

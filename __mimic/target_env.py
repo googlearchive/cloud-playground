@@ -314,52 +314,39 @@ class TargetEnvironment(object):
   # The currently active TargetEnvironment (there can be at most one)
   _instance = None
 
-  @staticmethod
-  def IsBuiltinKind(kind):
-    """Determines whether the provided kind is a builtin kind.
-
-    Builtin kinds, denoted by a leading double underscore ('__'), such as
-    __BlobFileIndex__ or __BlobInfo__, are always stored in the default empty
-    namespace.
-
-    Args:
-      kind: the datastore kind which is to be tested.
-
-    Returns:
-      True if the provided kind starts with '__'.
-    """
-    return kind.startswith('__')
-
   @classmethod
   def Instance(cls):
     """Returns the active TargetEnvironment, or None."""
     return cls._instance
 
-  def __init__(self, tree, config, project_name, test_portal=None):
+  def __init__(self, tree, config, namespace, test_portal=None):
     """Initialize and associate with a given tree.
 
     Args:
       tree: A mimic.common.Tree object.
       config: The app's config loaded from the app's app.yaml.
-      project_name: the namsepace safe name of the project used to prefix the
-          datastore and memcache namespace.
+      namespace: The datastore and memcache namespace used for metadata.
       test_portal: An object that can be used to exchange data with target code
           during tests.  If this value is not None, then any loaded modules will
           be initialized with a _test_portal attribute that points to the
           supplied object.
     """
+    # throws BadValueError
+    namespace_manager.validate_namespace(namespace)
     self._tree = tree
-    self._namespace_prefix = project_name
+    self._namespace = namespace
     self._active = False
     self._saved_sys_modules = None
     self._test_portal = test_portal
     self._saved_open = open
     self._main_method = ''
     self._wsgi_app_name = None
-    self._munge_namespace = True
     self._patches = []
     self._static_file_patterns = self._CreateStaticFilePatterns(config)
     self._skip_files_pattern = self._CreateSkipFilesPattern(config)
+
+    # TODO: separate out the patches into separate classes to reduce
+    # dependency creep and clean up this class.
 
     # patches for builtins
     for name, value in [('open', self._CustomOpen),
@@ -386,27 +373,8 @@ class TargetEnvironment(object):
                        ]:
       self.AddPatch(patch.AttributePatch(os.path, name, value))
 
-    # patches for namespacing the datastore for branches/projects
-    # Note that after these are patched in, we can't use mimic's
-    # common.GetPersistent or common.SetPersistent because these will
-    # have the target app's branch/project namespace. Memcache has an escape
-    # hatch.
-    self.AddPatch(patch.AttributePatch(datastore.Entity, '__init__',
-                                       self._DatastoreEntityInit))
-    self.AddPatch(patch.AttributePatch(datastore_types, 'ResolveNamespace',
-                                       self._ResolveNamespace))
-    self.AddPatch(patch.AttributePatch(datastore_types.Key, 'namespace',
-                                       self._KeyNamespace))
-    self.AddPatch(patch.AttributePatch(memcache, '_add_name_space',
-                                       self._MemcacheAddNameSpace))
-
-    # Patch static method
-    self.AddPatch(patch.AttributePatch(datastore_types.Key, 'from_path',
-                                       self._KeyFromPath))
-
+    # patch for datastore
     self.AddPatch(composite_query.CompositeQueryPatch())
-    # TODO: separate out the patches into separate classes to reduce
-    # dependency creep and clean up this class.
 
   def AddPatch(self, a_patch):
     """Add a patch that will be installed and removed automatically."""
@@ -536,7 +504,6 @@ class TargetEnvironment(object):
     sys.path_hooks.append(self._PathHook)
     for p in self._patches:
       p.Install()
-    namespace_manager.set_namespace(None)  # trigger our namespace prefix
     self._active = True
     TargetEnvironment._instance = self
 
@@ -763,94 +730,6 @@ class TargetEnvironment(object):
     if self._IsSkippedFile(filename):
       raise IOError(errno.ENOENT, _ACCESSING_SKIPPED_FILE_ERROR_MSG % filename)
     return MimicFile(filename, mode, bufsize)
-
-  def PrefixNamespace(self, namespace):
-    """Prefixes the given namespace with the namespace safe project name."""
-    if not self._munge_namespace:
-      return namespace
-    namespace = (namespace or '')
-    # Raise BadValueError if not instance of basestring or otherwise invalid
-    namespace_manager.validate_namespace(namespace)
-    prefix = self._namespace_prefix
-    if namespace.startswith(prefix):
-      # TODO:
-      # This is a temporary patch over db.Query calling ResolveNamespace on
-      # the same namespace, resulting in multiple prefixes, eg Proj1-Proj1-Proj1
-      return namespace
-    # 100 is from namespace_manager._NAMESPACE_MAX_LENGTH
-    max_length = 100 - len(prefix)
-    if len(namespace) > max_length:
-      values = (prefix, len(prefix), max_length, namespace, len(namespace),
-                len(namespace) - max_length)
-      raise namespace_manager.BadValueError("""When running on the staging
-server, datastore and memcache namespaces
-are prefixed with the project name to separate the data of different
-projects and workspaces. The maximum length of a namespace is 100
-characters. The namespace prefix for this application is "%s" (length
-%d). This leaves %d characters for application namespaces. The given
-application namespace "%s" has length %d (%d over).""" % values)
-    return prefix + namespace
-
-  def UnprefixNamespace(self, namespace):
-    """Removes a prefix from a namespace."""
-    if not self._munge_namespace:
-      return namespace
-    assert namespace.startswith(self._namespace_prefix), (
-        'Namespace "%s" does not start with this application\'s namespace '
-        'prefix ("%s")' % (namespace, self._namespace_prefix))
-    len_prefix = len(self._namespace_prefix)
-    return namespace[len_prefix:]
-
-  @patch.NeedsOriginal
-  def _MemcacheAddNameSpace(self, original, message, namespace=None):
-    skip_prefix = common.ShouldUseOriginalMemcache()
-    if skip_prefix:
-      original(message, namespace)
-    else:
-      original(message, self.PrefixNamespace(namespace))
-
-  @patch.NeedsOriginal
-  def _ResolveNamespace(self, original, namespace):
-    return self.PrefixNamespace(original(namespace))
-
-  @patch.NeedsOriginal
-  def _KeyNamespace(self, original, key):
-    # _KeyNamespace is a method bound to TargetEnvironment, patching an
-    # unbound method in the datastores_types.Key class. When the patch glue
-    # gets called, it's calling
-    # _KeyNamespace(target_environment_instance, original_method, key_instance)
-    if self.IsBuiltinKind(key.kind()):
-      return original(key)
-    else:
-      return self.UnprefixNamespace(original(key))
-
-  @patch.NeedsOriginal
-  def _DatastoreEntityInit(self, original, *args, **kwds):
-    """Patch for datastore.Entity__init__."""
-    # Builtin kinds are expected to live in the empty namespace
-    if self.IsBuiltinKind(args[1]):
-      try:
-        # No munging in ResolveNamespace which is called by Entity.__init__
-        self._munge_namespace = False
-        return original(*args, **kwds)
-      finally:
-        self._munge_namespace = True
-    else:
-      return original(*args, **kwds)
-
-  @patch.NeedsOriginal
-  def _KeyFromPath(self, original, *args, **kwds):
-    """Patch for Key.from_path static method."""
-    # Builtin kinds are expected to live in the empty namespace
-    if self.IsBuiltinKind(args[0]):
-      try:
-        # No munging in ResolveNamespace which is called by Key.from_path
-        self._munge_namespace = False
-        return original(*args, **kwds)
-      finally:
-        self._munge_namespace = True
-    else:
-      return original(*args, **kwds)
 
   @patch.NeedsOriginal
   def _Access(self, original, path, mode):
