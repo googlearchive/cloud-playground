@@ -46,6 +46,8 @@ _requires_original_memcache_call_depth = 0
 
 
 config = lib_config.register('mimic', {
+    # namespace for mimic specific data
+    'NAMESPACE': '_mimic',
     # must be defined in appengine_config.py
     'CREATE_TREE_FUNC': None,
     # regex for extracting project name from PATH_INFO

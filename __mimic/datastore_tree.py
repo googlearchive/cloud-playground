@@ -46,7 +46,9 @@ class DatastoreTree(common.Tree):
       namespace = None
     # Having a root entity key allows us to use ancestor queries for strong
     # consistency in the High Replication Datastore
-    self.root = ndb.Key(_AhMimicFile, '/', namespace=namespace)
+    assert namespace is not None
+    self.root = ndb.Key(_AhMimicFile, '/',
+                        namespace=namespace or common.config.NAMESPACE)
 
   def __repr__(self):
     return '<{0} root={1}>'.format(self.__class__.__name__, self.root)

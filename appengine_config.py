@@ -22,6 +22,8 @@ if common.IsDevMode() or urlfetch_tree_SOURCE_CODE_APP_ID == app_id:
 else:
   mimic_CREATE_TREE_FUNC = caching_urlfetch_tree.CachingUrlFetchTree
 
+mimic_NAMESPACE = '_bliss'
+
 mimic_PROJECT_ID_COOKIE = '_bliss_project'
 
 mimic_PROJECT_ID_FROM_PATH_INFO_RE = re.compile('/bliss/p/(.+?)/')
