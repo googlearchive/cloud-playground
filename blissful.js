@@ -41,10 +41,11 @@ function ProjectController($scope, $http, $resource, $filter) {
   }
 
   function markDirty() {
+    _dirty = true;
+
     if (_save_timeout) {
       return;
     }
-    _dirty = true;
     _save_timeout = setTimeout(function() {
       _save_timeout = null;
       save();
