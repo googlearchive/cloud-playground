@@ -59,9 +59,8 @@ function ProjectController($scope, $http, $resource, $filter) {
     _dirty = false;
 
     set_status('Saving...');
-
     $scope.putfile($scope.currentFilename(), _editor.getValue(), function () {
-      set_status('SAVED!');
+      set_status(''); // saved
       if (callback) {
         callback.call();
       }
