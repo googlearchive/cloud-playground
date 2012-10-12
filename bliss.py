@@ -75,7 +75,7 @@ class SessionHandler(webapp2.RequestHandler):
 
   def _PerformCsrfRequestValidation(self):
     session_xsrf = self.session['xsrf']
-    client_xsrf = self.request.headers[_XSRF_TOKEN_HEADER]
+    client_xsrf = self.request.headers.get(_XSRF_TOKEN_HEADER)
     if not client_xsrf:
       raise error.BlissError('Missing client XSRF token')
     if client_xsrf != session_xsrf:
