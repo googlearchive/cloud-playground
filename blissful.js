@@ -26,9 +26,32 @@ function ProjectController($scope, $http, $resource, $filter) {
   var _dirty = false;
   var _save_timeout;
 
+  $scope.run = function(url, project_id) {
+    $scope.save(function() {
+      var container = document.getElementById('output-container');
+      if (_output_window && _output_window.closed) {
+        _popout = false;
+      }
+      if (_popout) {
+        container.style.display = 'none';
+        _output_window = window.open(url, project_id);
+      } else {
+        container.style.display = 'block';
+        var container = document.getElementById('output-container');
+        var where = document.getElementById('output-url');
+        var iframe = document.getElementById('output-iframe');
+        iframe.src = url;
+        where.innerHTML = iframe.src;
+      }
+    });
+  }
+
   // called from setTimeout after editor is marked dirty
-  function save() {
+  $scope.save = function(callback) {
     if (!_dirty) {
+      if (callback) {
+        callback.call();
+      }
       return;
     }
 
@@ -37,7 +60,12 @@ function ProjectController($scope, $http, $resource, $filter) {
 
     set_status('Saving...');
 
-    $scope.putfile($scope.currentFilename(), _editor.getValue());
+    $scope.putfile($scope.currentFilename(), _editor.getValue(), function () {
+      set_status('SAVED!');
+      if (callback) {
+        callback.call();
+      }
+    });
   }
 
   function markDirty() {
@@ -48,7 +76,7 @@ function ProjectController($scope, $http, $resource, $filter) {
     }
     _save_timeout = setTimeout(function() {
       _save_timeout = null;
-      save();
+      $scope.save();
     }, 1000);
   }
 
@@ -148,12 +176,14 @@ function ProjectController($scope, $http, $resource, $filter) {
     });
   };
 
-  $scope.putfile = function(filename, data) {
+  $scope.putfile = function(filename, data, callback) {
     $http({method: 'PUT',
            url: 'putfile/' + encodeURI(filename),
            data: data})
     .success(function(data, status, headers, config) {
-      set_status(); // Saved
+      if (callback) {
+        callback.call();
+      }
     });
   };
 

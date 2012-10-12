@@ -170,24 +170,6 @@ function popout() {
   _output_window = undefined;
 }
 
-function run(url, project_id) {
-  var container = document.getElementById('output-container');
-  if (_output_window && _output_window.closed) {
-    _popout = false;
-  }
-  if (_popout) {
-    container.style.display = 'none';
-    _output_window = window.open(url, project_id);
-  } else {
-    container.style.display = 'block';
-    var container = document.getElementById('output-container');
-    var where = document.getElementById('output-url');
-    var iframe = document.getElementById('output-iframe');
-    iframe.src = url;
-    where.innerHTML = iframe.src;
-  }
-}
-
 function createEditor(mime_type) {
   return CodeMirror(source_code, {
     value: 'Initializing...',
