@@ -2,11 +2,14 @@ handlers:
 - url: /bliss/([^/]*.(png|gif))
   static_files: images/\1
   upload: images/.*.(png|gif)
+  secure: always
 
 - url: /bliss/([^/]*.(js|css))
   static_files: \1
   # don't cast a wide net
   upload: (blissful.js|bliss.js|bliss.css)
+  secure: always
 
 - url: /bliss|/bliss/.*
   script: bliss.app
+  secure: always
