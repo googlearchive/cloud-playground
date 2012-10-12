@@ -167,8 +167,7 @@ class BlissHandler(SessionHandler):
       # TODO: better approach which allows the creation of new projects
       return
     if user_key not in self.project.writers:
-      raise error.BlissError('User {0!r} is not authorized to edit project '
-                             '{1!r}'.format(user_key, self.project_id))
+      raise error.BlissError('You are not authorized to edit this project')
 
   def PerformValidation(self):
     super(BlissHandler, self).PerformValidation()
