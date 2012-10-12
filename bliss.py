@@ -77,7 +77,8 @@ class SessionHandler(webapp2.RequestHandler):
     session_xsrf = self.session['xsrf']
     client_xsrf = self.request.headers.get(_XSRF_TOKEN_HEADER)
     if not client_xsrf:
-      raise error.BlissError('Missing client XSRF token')
+      raise error.BlissError('Missing client XSRF token. '
+                             'Clear your cookies and refresh the page.')
     if client_xsrf != session_xsrf:
       internal_msg = ('Client XSRF token {0!r} does not match '
                       'session XSRF token {1!r}'
@@ -86,8 +87,8 @@ class SessionHandler(webapp2.RequestHandler):
       if common.IsDevMode():
         logging.error('Client XSRF token={0!r}, session XSRF token={1!r}'
                       .format(client_xsrf, session_xsrf))
-      raise error.BlissError('Client XSRF token does not match '
-                             'session XSRF token')
+      raise error.BlissError('Client XSRF token does not match session XSRF '
+                             'token. Clear your cookies and refresh the page.')
 
   def PerformValidation(self):
     """To be overriden by subclasses."""
