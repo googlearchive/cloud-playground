@@ -199,6 +199,12 @@ function ProjectController($scope, $http, $resource, $filter) {
   var noTransform = function(data) { return data; };
 
   $scope.select = function(i) {
+    $scope.save(function() {
+      _select(i)
+    });
+  };
+
+  var _select = function(i) {
     $scope.currentIndex = i;
 
     url = '//' + $scope.config.BLISS_USER_CONTENT_HOST +
