@@ -52,8 +52,8 @@ config = lib_config.register('mimic', {
     'CREATE_TREE_FUNC': None,
     # regex for extracting project name from PATH_INFO
     'PROJECT_ID_FROM_PATH_INFO_RE': re.compile('/_mimic/p/(.+?)/'),
-    # dev_appserver cookie, used to identify the project_id
-    'PROJECT_ID_COOKIE': '_mimic_project',
+    # dev_appserver query parameter used to identify the project_id
+    'PROJECT_ID_QUERY_PARAM': '_mimic_project',
     })
 
 

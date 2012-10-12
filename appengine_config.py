@@ -24,7 +24,7 @@ else:
 
 mimic_NAMESPACE = '_bliss'
 
-mimic_PROJECT_ID_COOKIE = '_bliss_project'
+mimic_PROJECT_ID_QUERY_PARAM = '_bliss_project'
 
 mimic_PROJECT_ID_FROM_PATH_INFO_RE = re.compile('/bliss/p/(.+?)/')
 

@@ -200,6 +200,18 @@ class BlissHandler(SessionHandler):
     else:
       super(BlissHandler, self).handle_exception(exception, debug_mode)
 
+  def _GetPlaygroundRunUrl(self, project_id):
+    """Determine the playground run url."""
+    assert project_id
+    if common.IsDevMode():
+      return '//{0}/?{1}={2}'.format(settings.PLAYGROUND_HOST,
+                                     common.config.PROJECT_ID_QUERY_PARAM,
+                                     urllib.quote_plus(str(project_id)))
+    else:
+      return '//{0}{1}{2}/'.format(urllib.quote_plus(str(project_id)),
+                                   _DASH_DOT_DASH, settings.PLAYGROUND_HOST)
+
+
   def render(self, template, *args, **kwargs):
     """Renders the provided template."""
     template = _JINJA2_ENV.get_template(template)
@@ -220,11 +232,11 @@ class BlissHandler(SessionHandler):
       memcache_admin_url = None
 
     if self.project:
-      kwargs['project_id'] = self.project.key.id()
+      project_id = self.project.key.id()
+      kwargs['project_id'] = project_id
       kwargs['project_name'] = self.project.project_name
       kwargs['project_description'] = self.project.project_description
-      kwargs['project_run_url'] = ('/bliss/p/{0}/run'
-                                   .format(self.project.key.id()))
+      kwargs['project_run_url'] = self._GetPlaygroundRunUrl(project_id)
 
     if users.get_current_user():
       kwargs['is_logged_in'] = True
@@ -403,26 +415,6 @@ class Logout(BlissHandler):
     self.redirect(users.create_logout_url('/bliss'))
 
 
-class RunProject(BlissHandler):
-
-  def _GetPlaygroundHostname(self, project_id):
-    """Determine the playground hostname for the project."""
-    if common.IsDevMode():
-      return settings.PLAYGROUND_HOST
-    return '{0}{1}{2}'.format(urllib.quote_plus(project_id),
-                              _DASH_DOT_DASH,
-                              settings.PLAYGROUND_HOST)
-
-  def get(self, project_id):
-    """Handles HTTP GET requests."""
-    assert project_id
-    if common.IsDevMode():
-      self.response.set_cookie(common.config.PROJECT_ID_COOKIE, project_id)
-    url = '{0}://{1}/'.format(self.request.scheme,
-                              self._GetPlaygroundHostname(project_id))
-    self.redirect(url)
-
-
 class CreateProject(BlissHandler):
   """Request handler for creating projects via an HTML link."""
 
@@ -507,7 +499,6 @@ app = webapp2.WSGIApplication([
     # project actions
     ('/bliss/p/(.*)/delete', DeleteProject),
     ('/bliss/p/(.*)/rename', RenameProject),
-    ('/bliss/p/(.*)/run', RunProject),
 
     # bliss actions
     ('/bliss/createproject', CreateProject),

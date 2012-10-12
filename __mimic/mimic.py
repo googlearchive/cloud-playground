@@ -32,6 +32,7 @@ import logging
 import mimetypes
 import os
 import sys
+import urlparse
 
 
 from __mimic import common
@@ -287,13 +288,13 @@ def GetProjectIdFromServerName():
   return server_name.split('.')[0]
 
 
-def GetProjectIdFromCookie():
-  """Returns the project id from the project id cookie."""
-  if 'HTTP_COOKIE' not in os.environ:
+def GetProjectIdFromQueryParam():
+  """Returns the project id from the project id query param."""
+  qs = os.environ.get('QUERY_STRING')
+  if not qs:
     return None
-  cookies = dict([c.split('=', 1) for c in
-                  os.environ['HTTP_COOKIE'].split('; ')])
-  return cookies.get(common.config.PROJECT_ID_COOKIE)
+  params = dict(urlparse.parse_qsl(qs, strict_parsing=True))
+  return params.get(common.config.PROJECT_ID_QUERY_PARAM)
 
 
 def GetProjectIdFromPathInfo(path_info):
@@ -325,7 +326,7 @@ def GetProjectId():
     return project_id
   # in the dev_appserver determine project id via a cookie
   if common.IsDevMode():
-    project_id = GetProjectIdFromCookie()
+    project_id = GetProjectIdFromQueryParam()
   if project_id:
     return project_id
   return None
