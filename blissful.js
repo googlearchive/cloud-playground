@@ -8,13 +8,16 @@ angular.module('blissful', ['ngResource'])
   return function(promise) {
     return promise.then(function(response) {
       return response;
-    }, function(reason) {
-      if (reason instanceof Error) {
-        alert(reason);
-      } else if (reason.headers('X-Bliss-Error')) {
-        alert('Error:\n' + reason.data);
+    }, function(err) {
+      if (err instanceof Error) {
+        alert(err);
+      } else if (err.headers('X-Bliss-Error')) {
+        alert('Error:\n' + err.data);
+      } else {
+        alert(err.status + ' <- ' + err.method + ' ' + err.url + '\n' +
+              err.data);
+        return $q.reject(err);
       }
-      return $q.reject(reason);
     });
   };
 });
