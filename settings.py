@@ -29,8 +29,8 @@ if _DEV_MODE:
   PLAYGROUND_HOST = 'localhost:9200'
 else:
   BLISS_HOST = '{0}.appspot.com'.format(BLISS_APP_ID)
-  BLISS_USER_CONTENT_HOST = '{0}.{1}.appspot.com'.format(USER_CONTENT_PREFIX,
-                                                         BLISS_APP_ID)
+  BLISS_USER_CONTENT_HOST = ('{0}-dot-{1}.appspot.com'
+                             .format(USER_CONTENT_PREFIX, BLISS_APP_ID))
   PLAYGROUND_HOST = '{0}.appspot.com'.format(PLAYGROUND_APP_ID)
 
 
