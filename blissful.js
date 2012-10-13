@@ -29,8 +29,16 @@ function ProjectController($scope, $http, $resource, $filter) {
 
   var Files = $resource('listfiles');
 
+  var _editor;
   var _dirty = false;
   var _save_timeout;
+  var _output_window;
+  var _popout = false;
+
+  $scope.popout = function() {
+    _popout = true;
+    _output_window = undefined;
+  }
 
   $scope.run = function(url, project_id) {
     $scope.save(function() {
@@ -43,7 +51,6 @@ function ProjectController($scope, $http, $resource, $filter) {
         _output_window = window.open(url, project_id);
       } else {
         container.style.display = 'block';
-        var container = document.getElementById('output-container');
         var where = document.getElementById('output-url');
         var iframe = document.getElementById('output-iframe');
         iframe.src = url;

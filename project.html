@@ -60,7 +60,7 @@ function file_context_menu(id) {
   <hr id="divider1" class="divider movable"/>
 
   <div id="output-container">
-    <div id="output-url" onclick="popout(); run('{{project_run_url}}', '{{project_name}}')"></div>
+    <div id="output-url" ng-click="popout(); run('{{project_run_url}}', '{{project_id}}')"></div>
     <iframe id="output-iframe">
     </iframe>
     <hr id="divider2" class="divider movable"/>

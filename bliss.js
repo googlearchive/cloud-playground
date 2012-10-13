@@ -3,11 +3,6 @@ window.onerror = function(msg, url, line) {
   alert("JavaScript error on line " + line + " of " + url + "\n\n" + msg);
 }
 
-// Globals
-var _editor;
-var _output_window;
-var _popout = false;
-
 // AngularJS XSRF Cookie, see http://docs.angularjs.org/api/ng.$http
 var _XSRF_TOKEN_COOKIE = 'XSRF-TOKEN'
 
@@ -115,11 +110,6 @@ function post(url, callback, data) {
   }, data);
 }
 
-// CodeMirror helper
-function getSelectedRange() {
-  return { from: _editor.getCursor(true), to: _editor.getCursor(false) };
-}
-
 function insertAfter(newNode, existingNode) {
   var parentNode = existingNode.parentNode;
   if (existingNode.nextSibling) {
@@ -163,11 +153,6 @@ function big_red_button() {
     document.body.scrollTop = 0;
     window.location.reload();
   });
-}
-
-function popout() {
-  _popout = true;
-  _output_window = undefined;
 }
 
 function createEditor(mime_type) {
