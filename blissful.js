@@ -186,6 +186,8 @@ function ProjectController($scope, $http, $resource, $filter) {
       if (callback) {
         callback.call();
       }
+    }).error(function(resp) {
+      $scope.select($scope.currentIndex);
     });
   };
 
