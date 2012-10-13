@@ -16,8 +16,8 @@ angular.module('blissful', ['ngResource'])
       } else {
         alert(err.status + ' <- ' + err.method + ' ' + err.url + '\n' +
               err.data);
-        return $q.reject(err);
       }
+      return $q.reject(err);
     });
   };
 });
