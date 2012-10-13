@@ -489,6 +489,7 @@ class Nuke(BlissHandler):
 config = {}
 config['webapp2_extras.sessions'] = {
     'secret_key': secret.GetSecret('webapp2_extras.sessions', entropy=128),
+    'cookie_args': {'secure': not common.IsDevMode()},
 }
 
 app = webapp2.WSGIApplication([
