@@ -46,21 +46,6 @@ window.onerror = function(msg, url, line) {
   box = lightbox("JavaScript error on line " + line + " of " + url, msg);
 }
 
-function safer(html) {
-  return html.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-function get_cookie(key) {
-  cookies = document.cookie.split('; ')
-  for (i=0; i<cookies.length; i++) {
-    kv = cookies[i].split('=');
-    if (kv[0] == key) {
-      return kv[1];
-    }
-  }
-  return null;
-}
-
 // TODO: replace this handcrafted splitter
 function resizer(divider_id, content_id) {
   divider = document.getElementById(divider_id);
