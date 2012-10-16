@@ -32,7 +32,6 @@ from __mimic import mimic
 from __mimic import target_env
 
 import settings
-import shared
 
 
 _SEPARATOR = '-' * 50 + '\n'

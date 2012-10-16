@@ -23,7 +23,7 @@ def GetSecret(key_name, entropy):
     candidate_secret_key = security.generate_random_string(
         entropy=entropy, pool=security.LOWERCASE_ALPHANUMERIC)
     entity = BlissSecret.get_or_insert(key_name,
-                                    secret_key=candidate_secret_key,
-                                    namespace=settings.BLISS_NAMESPACE)
+                                       secret_key=candidate_secret_key,
+                                       namespace=settings.BLISS_NAMESPACE)
   # return the one true secret key from the datastore
   return str(entity.secret_key)

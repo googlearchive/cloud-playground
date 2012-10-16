@@ -1,7 +1,6 @@
 """Module containing the bliss WSGI handlers."""
 
 import cgi
-import httplib
 import json
 import logging
 import os
@@ -18,7 +17,6 @@ from webapp2_extras import sessions
 from __mimic import common
 from __mimic import mimic
 
-import codesite
 import error
 import model
 import secret
@@ -93,9 +91,6 @@ class SessionHandler(webapp2.RequestHandler):
       raise error.BlissError('Missing client XSRF token. '
                              'Clear your cookies and refresh the page.')
     if client_xsrf != session_xsrf:
-      internal_msg = ('Client XSRF token {0!r} does not match '
-                      'session XSRF token {1!r}'
-                      .format(client_xsrf, session_xsrf))
       # do not log tokens in production
       if common.IsDevMode():
         logging.error('Client XSRF token={0!r}, session XSRF token={1!r}'
@@ -226,7 +221,6 @@ class BlissHandler(SessionHandler):
       return '//{0}{1}{2}/'.format(urllib.quote_plus(str(project_id)),
                                    _DASH_DOT_DASH, settings.PLAYGROUND_HOST)
 
-
   def render(self, template, *args, **kwargs):
     """Renders the provided template."""
     template = _JINJA2_ENV.get_template(template)
@@ -275,12 +269,13 @@ class GetConfig(BlissHandler):
     assert project_id
     r = {
         'BLISS_USER_CONTENT_HOST': settings.BLISS_USER_CONTENT_HOST,
-    };
+    }
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
 
 
 class GetFile(BlissHandler):
+  """Get file handler."""
 
   def _CheckCors(self):
     origin = self.request.headers.get('Origin')
@@ -291,8 +286,6 @@ class GetFile(BlissHandler):
                                       settings.BLISS_HOST)
 
     if origin != bliss_origin:
-      raise Exception('CORS supported only from origin {0}'
-                      .format(bliss_origin))
       self.response.set_status(401)
       self.response.headers['Content-Type'] = 'text/plain'
       self.response.write('CORS supported only from origin {0}'
@@ -308,7 +301,8 @@ class GetFile(BlissHandler):
     self.response.headers['Access-Control-Allow-Origin'] = bliss_origin
     self.response.headers['Access-Control-Allow-Methods'] = 'GET'
     self.response.headers['Access-Control-Max-Age'] = '600'
-    self.response.headers['Access-Control-Allow-Headers'] = 'Origin, X-XSRF-Token, X-Requested-With, Accept'
+    allowed_headers = 'Origin, X-XSRF-Token, X-Requested-With, Accept'
+    self.response.headers['Access-Control-Allow-Headers'] = allowed_headers
     self.response.headers['Access-Control-Allow-Credentials'] = 'true'
 
   def options(self, project_id, filename):
@@ -408,7 +402,7 @@ class Bliss(BlissHandler):
     """Handles HTTP GET requests."""
     projects = model.GetProjects(self.user)
     p = [(p.key.id(), p.project_name, p.project_description)
-          for p in projects]
+         for p in projects]
     template_sources = model.GetTemplateSources()
     tuples = [(s, model.GetTemplates(s)) for s in template_sources]
     self.render('main.html',
@@ -445,7 +439,7 @@ class CreateProject(BlissHandler):
     namespace_manager.set_namespace(str(self.project_id))
     # set self.project so we can access self.tree
     self.project = project
-    model.PopulateProject(project, self.tree, template_url)
+    model.PopulateProject(self.tree, template_url)
     return project
 
   def get(self):

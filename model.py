@@ -6,7 +6,6 @@ import os
 import random
 
 import codesite
-import error
 import settings
 import shared
 
@@ -257,7 +256,7 @@ def CreateProject(user, template_url, project_name, project_description):
   return prj
 
 
-def PopulateProject(project, tree, template_url):
+def PopulateProject(tree, template_url):
   """Populate project from a template.
 
   Args:
