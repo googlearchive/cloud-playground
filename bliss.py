@@ -41,6 +41,9 @@ _JINJA2_ENV = Environment(autoescape=True, loader=FileSystemLoader(''))
 
 _DASH_DOT_DASH = '-dot-'
 
+# RFC1113 formatted 'Expires' to prevent HTTP/1.0 caching
+_LONG_AGO = 'Mon, 01 Jan 1990 00:00:00 GMT'
+
 # HTTP methods which do not affect state
 _HTTP_READ_METHODS = ('GET', 'OPTIONS')
 
@@ -120,6 +123,7 @@ class SessionHandler(webapp2.RequestHandler):
     try:
       # Exceptions during dispatch automatically handled by handle_exception
       super(SessionHandler, self).dispatch()
+      self.response.headers['Expires'] = _LONG_AGO
     finally:
       # Save all sessions.
       self.session_store.save_sessions(self.response)
