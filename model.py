@@ -86,7 +86,7 @@ class Template(ndb.Model):
     return self.key.id()
 
 
-def GetUser(user_id):
+def GetOrCreateUser(user_id):
   return BlissUser.get_or_insert(user_id,
                                  namespace=settings.BLISS_NAMESPACE)
 
@@ -121,11 +121,8 @@ def _UpdateProjectUserKeys(dest_user, source_user):
 
 
 def AdoptProjects(dest_user_key, source_user_key):
-  keys = [
-      ndb.Key(BlissUser, source_user_key, namespace=settings.BLISS_NAMESPACE),
-      ndb.Key(BlissUser, dest_user_key, namespace=settings.BLISS_NAMESPACE),
-  ]
-  source_user, dest_user = ndb.get_multi(keys)
+  dest_user = GetOrCreateUser(dest_user_key)
+  source_user = GetOrCreateUser(source_user_key)
   _UpdateProjectUserKeys(dest_user, source_user)
   dest_user.projects.extend(source_user.projects)
   dest_user.put()

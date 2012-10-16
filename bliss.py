@@ -113,7 +113,7 @@ class SessionHandler(webapp2.RequestHandler):
     # Ensure valid session is present (including GET requests)
     _ = self.session
     try:
-      self.user = model.GetUser(self.get_user_key())
+      self.user = model.GetOrCreateUser(self.get_user_key())
       self.PerformValidation()
     except error.BlissError, e:
       # Manually dispatch to handle_exception
