@@ -107,6 +107,32 @@ def GetProject(project_id):
   return project
 
 
+def _UpdateProjectUserKeys(dest_user, source_user):
+  projects = GetProjects(source_user)
+  dest_user_key = dest_user.key.id()
+  source_user_key = source_user.key.id()
+  for p in projects:
+    if not source_user_key in p.writers:
+      continue
+    p.writers.remove(source_user_key)
+    if dest_user_key in p.writers:
+      continue
+    p.writers.append(dest_user_key)
+  ndb.put_multi(projects)
+
+
+def AdoptProjects(dest_user_key, source_user_key):
+  keys = [
+      ndb.Key(BlissUser, source_user_key, namespace=settings.BLISS_NAMESPACE),
+      ndb.Key(BlissUser, dest_user_key, namespace=settings.BLISS_NAMESPACE),
+  ]
+  source_user, dest_user = ndb.get_multi(keys)
+  _UpdateProjectUserKeys(dest_user, source_user)
+  dest_user.projects.extend(source_user.projects)
+  dest_user.put()
+  source_user.key.delete()
+
+
 def GetGlobalRootEntity():
   return Global.get_or_insert('config', namespace=settings.BLISS_NAMESPACE)
 

@@ -66,12 +66,25 @@ def tojson(r):
 class SessionHandler(webapp2.RequestHandler):
   """Convenience request handler for dealing with sessions."""
 
+  def _AdoptAnonymousProjects(self, dest_user_key, source_user_key):
+    model.AdoptProjects(dest_user_key, source_user_key)
+
   def get_user_key(self):
     """Returns the email from logged in user or the session user key."""
     user = users.get_current_user()
+    anon_user_key = self.session.get(_ANON_USER_KEY)
+    if user and anon_user_key:
+      self._AdoptAnonymousProjects(user.email(), anon_user_key)
+      self.session.pop(_ANON_USER_KEY)
     if user:
       return user.email()
-    return self.session.get(_ANON_USER_KEY)
+    if not anon_user_key:
+      suffix = security.generate_random_string(
+          length=10,
+          pool=security.LOWERCASE_ALPHANUMERIC)
+      anon_user_key = 'user_{0}'.format(suffix)
+      self.session[_ANON_USER_KEY] = anon_user_key
+    return anon_user_key
 
   def _PerformCsrfRequestValidation(self):
     session_xsrf = self.session['xsrf']
@@ -125,10 +138,6 @@ class SessionHandler(webapp2.RequestHandler):
       # initialize the session
       session['xsrf'] = security.generate_random_string(entropy=128)
       self.response.set_cookie(_XSRF_TOKEN_COOKIE, session['xsrf'])
-      suffix = security.generate_random_string(
-          length=10,
-          pool=security.LOWERCASE_ALPHANUMERIC)
-      session[_ANON_USER_KEY] = 'user_{0}'.format(suffix)
     return session
 
 
