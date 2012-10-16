@@ -3,12 +3,6 @@ window.onerror = function(msg, url, line) {
   alert("JavaScript error on line " + line + " of " + url + "\n\n" + msg);
 }
 
-// AngularJS XSRF Cookie, see http://docs.angularjs.org/api/ng.$http
-var _XSRF_TOKEN_COOKIE = 'XSRF-TOKEN'
-
-// AngularJS XSRF HTTP Header, see http://docs.angularjs.org/api/ng.$http
-var _XSRF_TOKEN_HEADER = 'X-XSRF-TOKEN'
-
 // Keep track of z-index to allow layering of multiple glass messages
 var _glassMessageZIndex = 2147483647 - 100;
 
@@ -52,12 +46,6 @@ window.onerror = function(msg, url, line) {
   box = lightbox("JavaScript error on line " + line + " of " + url, msg);
 }
 
-// XHR
-function xhr(method, url, callback, data) {
-  set_status('<img src="/bliss/spinner.png"/> <b>' + method + '</b> ' + url);
-  setTimeout(function() { _xhr(method, url, callback, data); }, 0);
-}
-
 function safer(html) {
   return html.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
@@ -71,43 +59,6 @@ function get_cookie(key) {
     }
   }
   return null;
-}
-
-function _xhr(method, url, callback, data) {
-  var xhr = new XMLHttpRequest();
-  xhr.open(method, url, true);
-  if (method != 'GET') {
-    var xsrf = get_cookie(_XSRF_TOKEN_COOKIE);
-    xhr.setRequestHeader(_XSRF_TOKEN_HEADER, xsrf);
-  }
-  if (method == 'POST') {
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-  }
-  xhr.onreadystatechange = function() {
-    if (xhr.readyState != 4) {
-      return;
-    }
-    if (xhr.getResponseHeader('X-Bliss-Error')) {
-      callback(xhr);
-      alert('Error: ' + xhr.responseText);
-    } else if (xhr.status != 200) {
-      set_status('\nHTTP Status: ' + xhr.status + '\nURL: ' + url);
-      // '.' does not match newlines, so use '[\s\S]' instead
-      content = xhr.responseText.replace(/[\s\S]*<body>([\s\S]*)<\/body>[\s\S]*/, '$1');
-      box = lightbox('HTTP Status: ' + xhr.status + '\nURL: ' + url, content);
-    } else {
-      set_status(); // XHR success
-      callback(xhr);
-    }
-  }
-  xhr.send(data);
-}
-
-// POST
-function post(url, callback, data) {
-  xhr('POST', url, function(xhr) {
-    callback(xhr);
-  }, data);
 }
 
 function insertAfter(newNode, existingNode) {
