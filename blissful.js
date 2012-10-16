@@ -171,6 +171,15 @@ function ProjectController($scope, $http, $resource, $filter) {
     document.getElementById('file-context-menu').style.display = 'None';
   }, false);
 
+  function insertAfter(newNode, existingNode) {
+    var parentNode = existingNode.parentNode;
+    if (existingNode.nextSibling) {
+      return parentNode.insertBefore(newNode, existingNode.nextSibling);
+    } else {
+      return parentNode.appendChild(newNode);
+    }
+  }
+
   $scope.file_context_menu = function(evt, i) {
     evt.stopPropagation();
     $scope.select(i);
@@ -261,6 +270,16 @@ function ProjectController($scope, $http, $resource, $filter) {
       _select(i)
     });
   };
+
+  function createEditor(mime_type) {
+    return CodeMirror(source_code, {
+      value: 'Initializing...',
+      mode: mime_type,
+      lineNumbers: true,
+      matchBrackets: true,
+      undoDepth: 440, // default = 40
+    });
+  }
 
   var _select = function(i) {
     $scope.currentIndex = i;

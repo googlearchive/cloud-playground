@@ -61,25 +61,6 @@ function get_cookie(key) {
   return null;
 }
 
-function insertAfter(newNode, existingNode) {
-  var parentNode = existingNode.parentNode;
-  if (existingNode.nextSibling) {
-    return parentNode.insertBefore(newNode, existingNode.nextSibling);
-  } else {
-    return parentNode.appendChild(newNode);
-  }
-}
-
-function createEditor(mime_type) {
-  return CodeMirror(source_code, {
-    value: 'Initializing...',
-    mode: mime_type,
-    lineNumbers: true,
-    matchBrackets: true,
-    undoDepth: 440, // default = 40
-  });
-}
-
 // TODO: replace this handcrafted splitter
 function resizer(divider_id, content_id) {
   divider = document.getElementById(divider_id);
