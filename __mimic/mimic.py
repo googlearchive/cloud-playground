@@ -31,7 +31,9 @@ import httplib
 import logging
 import mimetypes
 import os
+import rfc822
 import sys
+import time
 import urlparse
 
 
@@ -90,7 +92,7 @@ def RespondWithStatus(status_code, expiration_s=0, content_type='text/plain',
   print 'Content-Type: %s' % content_type
   print 'Status: %d' % status_code
   if expiration_s:
-    # TODO: Add equivalent HTTP/1.0 'Expires' header
+    print 'Expires: %s' % rfc822.formatdate(time.time() + expiration_s)
     print 'Cache-Control: public, max-age=%s' % expiration_s
   if headers:
     for k, v in headers:
