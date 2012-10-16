@@ -6,6 +6,8 @@ import re
 import sys
 import traceback
 
+from google.appengine.api import urlfetch_errors
+
 from __mimic import common
 import model
 import settings
@@ -74,7 +76,7 @@ def GetTemplates(template_source):
                          name=c or project_url,
                          description=description)
       samples.append(s)
-    except:
+    except urlfetch_errors.Error:
       exc_info = sys.exc_info()
       formatted_exception = traceback.format_exception(exc_info[0], exc_info[1],
                                                        exc_info[2])
