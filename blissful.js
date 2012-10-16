@@ -30,12 +30,10 @@ function MainController($scope, $http) {
   $scope.prompt_for_new_project = function(template_url, project_name,
                                            project_description) {
     box = lightbox('Creating project', 'Please wait.');
-    $http({method: 'POST',
-           url: 'createproject',
-           data: {
-               template_url: template_url,
-               project_name: project_name,
-               project_description: project_description}})
+    $http.post('createproject', {
+        template_url: template_url,
+        project_name: project_name,
+        project_description: project_description})
     .success(function(data, status, headers, config) {
       box();
       document.body.scrollTop = 0;
@@ -190,8 +188,7 @@ function ProjectController($scope, $http, $resource, $filter) {
   };
 
   $scope.deletepath = function(filename) {
-    $http({method: 'POST',
-           url: 'deletepath/' + encodeURI(filename)})
+    $http.post('deletepath/' + encodeURI(filename))
     .success(function(data, status, headers, config) {
       $scope.files.splice($scope.currentIndex, 1);
       $scope.select(0);
@@ -199,9 +196,7 @@ function ProjectController($scope, $http, $resource, $filter) {
   };
 
   $scope.movefile = function(path, newpath) {
-    $http({method: 'POST',
-         url: 'movefile/' + encodeURI(path),
-         data: {newpath: newpath}})
+    $http.post('movefile/' + encodeURI(path),{newpath: newpath})
     .success(function(data, status, headers, config) {
       $scope.files[$scope.currentIndex].name = newpath;
       $scope.orderFilesAndSelectByPath(newpath);
@@ -209,9 +204,10 @@ function ProjectController($scope, $http, $resource, $filter) {
   };
 
   $scope.putfile = function(filename, data, callback) {
-    $http({method: 'PUT',
-           url: 'putfile/' + encodeURI(filename),
-           data: data})
+    
+    $http.put('putfile/' + encodeURI(filename), data, {
+           headers: {'Content-Type': 'text/plain; charset=utf-8'}
+    })
     .success(function(data, status, headers, config) {
       if (callback) {
         callback.call();
@@ -245,9 +241,7 @@ function ProjectController($scope, $http, $resource, $filter) {
     url = '//' + $scope.config.BLISS_USER_CONTENT_HOST +
           document.location.pathname + 'getfile/' +
           encodeURI($scope.currentFilename());
-    $http({method: 'GET',
-           url: url,
-           transformResponse: noTransform})
+    $http.get(url, {transformResponse: noTransform})
     .success(function(data, status, headers, config) {
       // e.g. 'text/html; charset=UTF-8'
       var mime_type = headers('Content-Type');
@@ -278,8 +272,7 @@ function ProjectController($scope, $http, $resource, $filter) {
   };
 
   var getconfig = function() {
-    $http({method: 'GET',
-           url: 'getconfig'})
+    $http.get('getconfig')
     .success(function(data, status, headers, config) {
        $scope.config = data;
        listfiles();
