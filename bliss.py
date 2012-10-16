@@ -265,6 +265,13 @@ class BlissHandler(SessionHandler):
         memcache_admin_url=memcache_admin_url,
         **kwargs))
 
+  def dispatch(self):
+    """WSGI request dispatch with automatic JSON parsing."""
+    content_type = self.request.headers.get('Content-Type')
+    if content_type and content_type.split(';')[0] == 'application/json':
+      self.request.data = json.loads(self.request.body)
+    super(BlissHandler, self).dispatch()
+
 
 class GetConfig(BlissHandler):
 
@@ -452,10 +459,12 @@ class CreateProject(BlissHandler):
     self.post()
 
   def post(self):
-    project_name = self.request.get('project_name')
-    project_description = (self.request.get('project_description')
+    project_name = self.request.data['project_name']
+    if not project_name:
+      raise error.BlissError('project_name required')
+    project_description = (self.request.data['project_description']
                            or project_name)
-    template_url = self.request.get('template_url')
+    template_url = self.request.data['template_url']
     if not template_url:
       raise error.BlissError('template_url required')
     project = self._MakeTemplateProject(template_url, project_name,

@@ -25,6 +25,26 @@ angular.module('blissful', ['ngResource'])
   };
 });
 
+function MainController($scope, $http) {
+
+  $scope.prompt_for_new_project = function(template_url, project_name,
+                                           project_description) {
+    box = lightbox('Creating project', 'Please wait.');
+    $http({method: 'POST',
+           url: 'createproject',
+           data: {
+               template_url: template_url,
+               project_name: project_name,
+               project_description: project_description}})
+    .success(function(data, status, headers, config) {
+      box();
+      document.body.scrollTop = 0;
+      window.location.reload();
+    });
+  };
+
+}
+
 function ProjectController($scope, $http, $resource, $filter) {
 
   var Files = $resource('listfiles');

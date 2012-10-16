@@ -9,6 +9,8 @@
 {% endblock %}
 
 {% block main %}
+<div ng-cloak ng-controller="MainController">
+
   <h1 class="projectlistheader">My Projects</h1>
 
   <table class="projectlist">
@@ -53,7 +55,7 @@
     <div class="{{ loop.cycle('one', 'two', 'three') }}">
       {% for t in templates %}
         <div class="newproject" style="margin: .5em;">
-          <button style="float: left;" onclick="prompt_for_new_project('{{t.key.id()}}', '{{t.name}}', '{{t.description}}')">New Project</button>
+          <button style="float: left;" ng-click="prompt_for_new_project('{{t.key.id()}}', '{{t.name}}', '{{t.description}}')">New Project</button>
           <div stlye="clear: both;">
              <div class="name">{{t.name}}</div>
              <div class="description">{{t.description}}</div>
@@ -63,4 +65,5 @@
     </div>
   {% endfor %}
 
+</div>
 {% endblock %}

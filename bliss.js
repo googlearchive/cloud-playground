@@ -119,20 +119,6 @@ function insertAfter(newNode, existingNode) {
   }
 }
 
-function prompt_for_new_project(template_url, project_name,
-                                project_description) {
-  var uri = '/bliss/createproject';
-  var data = 'template_url=' + encodeURI(template_url) +
-             '&project_name=' + encodeURI(project_name) +
-             '&project_description=' + encodeURI(project_description);
-  box = lightbox('Creating project', 'Please wait.');
-  post(uri, function(xhr) {
-    box();
-    document.body.scrollTop = 0;
-    window.location.reload();
-  }, data);
-}
-
 function prompt_to_delete_project(project_id, project_name) {
   var answer = prompt("Are you sure you want to delete project " +
                       project_name + "?\nType 'yes' to confirm.", "no");
