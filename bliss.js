@@ -119,19 +119,6 @@ function insertAfter(newNode, existingNode) {
   }
 }
 
-function prompt_to_delete_project(project_id, project_name) {
-  var answer = prompt("Are you sure you want to delete project " +
-                      project_name + "?\nType 'yes' to confirm.", "no");
-  if (!answer || answer.toLowerCase()[0] != 'y') {
-    return;
-  }
-  var uri = '/bliss/p/' + encodeURI(project_id) + '/delete';
-  post(uri, function(xhr) {
-    document.body.scrollTop = 0;
-    window.location.reload();
-  });
-}
-
 function big_red_button() {
   lightbox('Bye, bye, data.', 'Please wait...');
   var uri = 'nuke';

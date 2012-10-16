@@ -41,6 +41,19 @@ function MainController($scope, $http) {
     });
   };
 
+  $scope.prompt_to_delete_project = function(project_id, project_name) {
+    var answer = prompt("Are you sure you want to delete project " +
+                        project_name + "?\nType 'yes' to confirm.", "no");
+    if (!answer || answer.toLowerCase()[0] != 'y') {
+      return;
+    }
+    $http.post('/bliss/p/' + encodeURI(project_id) + '/delete')
+    .success(function(data, status, headers, config) {
+      document.body.scrollTop = 0;
+      window.location.reload();
+    });
+  };
+
 }
 
 function ProjectController($scope, $http, $resource, $filter) {

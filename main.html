@@ -29,7 +29,7 @@
           <tr class="project {{ loop.cycle('odd', 'even') }}">
             <td class="projectname link"><a href="/bliss/p/{{id}}/">{{name}}</a></td>
             <td class="projectdescription"><a href="/bliss/p/{{id}}/">{{description}}</a></td>
-            <td class="link" onclick="prompt_to_delete_project('{{id}}','{{name}}')">delete</td>
+            <td class="link" ng-click="prompt_to_delete_project('{{id}}','{{name}}')">delete</td>
           </tr>
         {% endfor %}
       {% else %}
