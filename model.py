@@ -189,17 +189,12 @@ def GetTemplates(template_source):
   return templates
 
 
-def _GetTemplates(template_source):
-  url = template_source.key.id()
-  if url == 'templates/':
-    return _GetFileSystemTemplates(template_source)
-  elif codesite.IsCodesiteURL(url):
-    return codesite.GetTemplates(template_source)
-  else:
-    shared.e('Unknown URL template %s' % url)
+def PopulateFileSystemTemplates(template_source):
+  """Populate file system templates.
 
-
-def _GetFileSystemTemplates(template_source):
+  Args:
+    template_source: The template source entity.
+  """
   templates = []
   template_dir = template_source.key.id()
   for dirname in os.listdir(template_dir):
@@ -217,7 +212,6 @@ def _GetFileSystemTemplates(template_source):
                  description=description)
     templates.append(t)
     ndb.put_multi(templates)
-  return templates
 
 
 def DeleteTemplates():

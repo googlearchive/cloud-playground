@@ -6,12 +6,12 @@ import re
 import sys
 import traceback
 
-from google.appengine.api import urlfetch_errors
-
 from __mimic import common
 import model
 import settings
 import shared
+
+from google.appengine.api import urlfetch_errors
 
 
 _CODESITE_RE = re.compile('^https?://[^/]+.googlecode.com/.+$')
@@ -33,8 +33,8 @@ def _GetChildPaths(page):
   return paths
 
 
-def GetTemplates(template_source):
-  """Retrieve a project template.
+def PopulateTemplates(template_source):
+  """Populate codesite templates.
 
   Args:
     template_source: The template source entity.
@@ -84,7 +84,6 @@ def GetTemplates(template_source):
       for line in [line for line in formatted_exception if line]:
         shared.w(line)
   model.ndb.put_multi(samples)
-  return samples
 
 
 # TODO: fetch remote files once in a task, not on every project creation
