@@ -25,6 +25,20 @@ angular.module('blissful', ['ngResource'])
   };
 });
 
+function AdminController($scope, $http) {
+
+  $scope.big_red_button = function() {
+    box = lightbox('Bye, bye, data.', 'Please wait...');
+    $http.post('nuke')
+    .success(function(data, status, headers, config) {
+      box();
+      document.body.scrollTop = 0;
+      window.location.reload();
+    });
+  };
+
+}
+
 function MainController($scope, $http) {
 
   $scope.prompt_for_new_project = function(template_url, project_name,

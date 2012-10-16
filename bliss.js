@@ -119,15 +119,6 @@ function insertAfter(newNode, existingNode) {
   }
 }
 
-function big_red_button() {
-  lightbox('Bye, bye, data.', 'Please wait...');
-  var uri = 'nuke';
-  post(uri, function(xhr) {
-    document.body.scrollTop = 0;
-    window.location.reload();
-  });
-}
-
 function createEditor(mime_type) {
   return CodeMirror(source_code, {
     value: 'Initializing...',

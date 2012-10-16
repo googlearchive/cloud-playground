@@ -1,6 +1,6 @@
 </div> {# closing tag for <div id="main"> #}
 
-<div id="footer">
+<div id="footer" ng-cloak ng-controller="AdminController">
   <div class="diag">
     <span>namespace: {{namespace}}</span>
   </div>
@@ -8,7 +8,7 @@
     <span>git(<a class="link" href="{{git_bliss_url}}" target="_blank">bliss</a>)</span>
 
     {% if is_admin %}
-      <span>danger(<a class="link" onclick="big_red_button();">big-red-button</a>)</span>
+      <span>danger(<a class="link" ng-click="big_red_button()">big-red-button</a>)</span>
     {% endif %}
 
     {% if datastore_admin_url and memcache_admin_url %}
