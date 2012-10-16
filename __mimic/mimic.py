@@ -85,6 +85,9 @@ _NOT_FOUND_PAGE = """
 </html>
 """
 
+# most recently seen project_id (dev_appserver only)
+_most_recent_project_id = None
+
 
 def RespondWithStatus(status_code, expiration_s=0, content_type='text/plain',
                       data=None, headers=None):
@@ -328,7 +331,9 @@ def GetProjectId():
     return project_id
   # in the dev_appserver determine project id via a cookie
   if common.IsDevMode():
-    project_id = GetProjectIdFromQueryParam()
+    global _most_recent_project_id
+    project_id = GetProjectIdFromQueryParam() or _most_recent_project_id
+    _most_recent_project_id = project_id
   if project_id:
     return project_id
   return None
