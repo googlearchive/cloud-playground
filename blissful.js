@@ -266,8 +266,6 @@ function ProjectController($scope, $http, $resource, $filter) {
     return false;
   };
 
-  var noTransform = function(data) { return data; };
-
   $scope.select = function(i) {
     $scope.save(function() {
       _select(i)
@@ -284,16 +282,24 @@ function ProjectController($scope, $http, $resource, $filter) {
     });
   }
 
+  var noJsonTransform = function(data) { return data; };
+
   var _select = function(i) {
     $scope.currentIndex = i;
 
     url = '//' + $scope.config.BLISS_USER_CONTENT_HOST +
           document.location.pathname + 'getfile/' +
           encodeURI($scope.currentFilename());
-    $http.get(url, {transformResponse: noTransform})
+    $http.get(url, {transformResponse: noJsonTransform})
     .success(function(data, status, headers, config) {
       // e.g. 'text/html; charset=UTF-8'
       var mime_type = headers('Content-Type');
+      // Workaround missing HTTP response headers for CORS requests
+      // See https://github.com/angular/angular.js/issues/1468
+      // See https://bugzilla.mozilla.org/show_bug.cgi?id=608735
+      if (!mime_type) {
+        mime_type = 'application/octet-stream';
+      }
       // strip '; charset=...'
       mime_type = mime_type.replace(/ ?;.*/, '');
       if (/^image\//.test(mime_type)) {
