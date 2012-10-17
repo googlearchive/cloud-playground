@@ -14,8 +14,8 @@ angular.module('blissful', ['ngResource'])
       } else if (err.headers('X-Bliss-Error')) {
         alert('Error:\n' + err.data);
       } else {
-        alert(err.status + ' <- ' + err.method + ' ' + err.url + '\n' +
-              err.data);
+        alert(err.status + ' <- ' + err.config.method + ' ' + err.config.url +
+              '\n' + err.data);
         // TODO: address problems such as OPTIONS pre-flight request failures
         alert('FIXME: see console.log for details');
         console.log('err', err);
