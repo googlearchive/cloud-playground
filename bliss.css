@@ -144,7 +144,7 @@ TABLE {
     margin: 0.4em;
   }
 
-#status {
+.filestatus {
   color: #ccc;
   margin: 0em 2em;
   min-height: 2em;

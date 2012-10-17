@@ -116,9 +116,11 @@ function ProjectController($scope, $http, $resource, $filter) {
     // TODO: fix me
     _dirty = false;
 
-    set_status('Saving...');
+    $scope.filestatus = 'Saving...';
+    $scope.$apply();
+
     $scope.putfile($scope.currentFilename(), _editor.getValue(), function () {
-      set_status(''); // saved
+      $scope.filestatus = ''; // saved
       if (callback) {
         callback.call();
       }

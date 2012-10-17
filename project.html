@@ -50,7 +50,10 @@ function file_context_menu(id) {
       </div>
     </div>
 
-    <div id="source-filename">{% raw %}{{currentFilename()}}{% endraw %}</div>
+    <div id="source-filename">
+      {% raw %}{{currentFilename()}}{% endraw %}
+      <span class="filestatus" ng-bind="filestatus">x</span>
+    </div>
     <div id="source-code"></div>
     <img id="source-image">
   </div>

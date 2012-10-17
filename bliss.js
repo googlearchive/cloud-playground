@@ -12,10 +12,6 @@ var source_code = document.getElementById('source-code');
 var source_image = document.getElementById('source-image');
 
 
-function set_status(status) {
-  document.getElementById('status').innerHTML = status || '&nbsp;';
-}
-
 function lightbox(summary, details) {
   outer = document.createElement('div');
   _glassMessageZIndex += 2;
