@@ -134,8 +134,9 @@ function ProjectController($scope, $http, $resource, $filter) {
       return;
     }
     _save_timeout = setTimeout(function() {
-      _save_timeout = null;
-      $scope.save();
+      $scope.save(function() {
+        _save_timeout = null;
+      });
     }, 1000);
   }
 
