@@ -85,8 +85,8 @@ _NOT_FOUND_PAGE = """
 </html>
 """
 
-# most recently seen project_id (dev_appserver only)
-_most_recent_project_id = None
+# most recently seen query string project_id (dev_appserver only)
+_most_recent_query_string_project_id = ''
 
 
 def RespondWithStatus(status_code, expiration_s=0, content_type='text/plain',
@@ -297,16 +297,16 @@ def GetProjectIdFromQueryParam():
   """Returns the project id from the project id query param."""
   qs = os.environ.get('QUERY_STRING')
   if not qs:
-    return None
+    return ''
   params = dict(urlparse.parse_qsl(qs, strict_parsing=True))
-  return params.get(common.config.PROJECT_ID_QUERY_PARAM)
+  return params.get(common.config.PROJECT_ID_QUERY_PARAM, '')
 
 
 def GetProjectIdFromPathInfo(path_info):
   """Returns the project id from the request path."""
   m = common.config.PROJECT_ID_FROM_PATH_INFO_RE.match(path_info)
   if not m:
-    return None
+    return ''
   return m.group(1)
 
 
@@ -331,12 +331,11 @@ def GetProjectId():
     return project_id
   # in the dev_appserver determine project id via a cookie
   if common.IsDevMode():
-    global _most_recent_project_id
-    project_id = GetProjectIdFromQueryParam() or _most_recent_project_id
-    _most_recent_project_id = project_id
-  if project_id:
-    return project_id
-  return None
+    global _most_recent_query_string_project_id
+    project_id = (GetProjectIdFromQueryParam()
+                  or _most_recent_query_string_project_id)
+    _most_recent_query_string_project_id = project_id
+  return project_id
 
 
 def GetNamespace():
