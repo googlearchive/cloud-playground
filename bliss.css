@@ -68,10 +68,9 @@ BUTTON {
     border: 1px solid #bbb;
   }
 
-#file-context-menu {
+.context-menu {
   display: none;
   position: absolute;
-  width: 10em;
   margin-left: -2em;
   margin-top: -.5em;
   z-index: 1000;
@@ -79,7 +78,7 @@ BUTTON {
   background-color: #e9e9e9;
 }
 
-  #file-context-menu DIV:hover {
+  .context-menu DIV:hover {
     cursor: pointer;
     background-color: #c5d7ef;
   }
@@ -181,17 +180,9 @@ h1 {
   color: #aaa;
 }
 
-  #navheader #projectname {
-    /* run.png is 42px x 32px */
-    margin-right: 48px;
-    overflow: hidden;
-    white-space: nowrap;
-  }
-
 #source-filename {
   font-weight: bold;
   color: #777;
-  padding-left: 30px;
   display: inline-block;
   white-space: nowrap;
 }
@@ -225,7 +216,7 @@ h1 {
       background-color: #ccf;
     }
 
-      #nav #filelist .fileentry .filename {
+      #nav #filelist .fileentry .filename , #nav #navheader #projectname {
         display: inline-block;
         width: 155px;
         overflow: hidden;
@@ -239,10 +230,6 @@ h1 {
   #nav #navheader , #source-filename {
     /* run.png is 42px x 32px */
     height: 34px;
-  }
-
-  #nav .runlink {
-    float: right;
   }
 
   #nav .dropdown {
@@ -259,6 +246,10 @@ h1 {
       color: #00c;
       background-color: #cce;
     }
+
+.runlink {
+  display: inline-block;
+}
 
 .newthing {
   color: #bbb;

@@ -169,9 +169,14 @@ function ProjectController($scope, $http, $resource, $filter) {
     $scope.movefile($scope.currentFilename(), new_filename);
   }
 
+  function hide_context_menus() {
+    document.getElementById('file-context-menu').style.display = 'None';
+    document.getElementById('project-context-menu').style.display = 'None';
+  }
+
   // setup file context menu clear handler
   window.addEventListener('click', function(evt) {
-    document.getElementById('file-context-menu').style.display = 'None';
+    hide_context_menus();
   }, false);
 
   function insertAfter(newNode, existingNode) {
@@ -183,8 +188,20 @@ function ProjectController($scope, $http, $resource, $filter) {
     }
   }
 
+  $scope.project_context_menu = function(evt) {
+    evt.stopPropagation();
+    hide_context_menus();
+    var menuDiv = document.getElementById('project-context-menu');
+    menuDiv.style.display = 'block';
+    menuDiv.style.left = evt.pageX + 'px';
+    menuDiv.style.top = evt.pageY + 'px';
+    var elem = evt.srcElement.parentNode();
+    insertAfter(menuDiv, elem);
+  };
+
   $scope.file_context_menu = function(evt, i) {
     evt.stopPropagation();
+    hide_context_menus();
     $scope.select(i);
     var menuDiv = document.getElementById('file-context-menu');
     menuDiv.style.display = 'block';

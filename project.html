@@ -33,8 +33,8 @@ function file_context_menu(id) {
   <div id="source-container">
     <div id="nav">
       <div id="navheader">
-        <div class="runlink" ng-click="run('{{project_run_url}}', '{{project_id}}')" title="run {{project_name}}"><img src='/bliss/run.png'></div>
         <div id="projectname" title="{{project_name}}">{{project_name}}</div>
+        <div class="dropdown"><a ng-click="project_context_menu($event)">…</a></div>
       </div>
       <div id="filelist">
         {% raw %}
@@ -51,8 +51,9 @@ function file_context_menu(id) {
     </div>
 
     <div id="source-filename">
+      <div class="runlink" ng-click="run('{{project_run_url}}', '{{project_id}}')" title="run {{project_name}}"><img src='/bliss/run.png'></div>
       {% raw %}{{currentFilename()}}{% endraw %}
-      <span class="filestatus" ng-bind="filestatus">x</span>
+      <span class="filestatus" ng-bind="filestatus"></span>
     </div>
     <div id="source-code"></div>
     <img id="source-image">
@@ -71,9 +72,13 @@ function file_context_menu(id) {
 
 
   {# hidden bits #}
-  <div id='file-context-menu'>
-    <div ng-click="prompt_file_rename()">Rename</div>
-    <div ng-click="prompt_file_delete()">Delete</div>
+  <div id="file-context-menu" class="context-menu">
+    <div ng-click="prompt_file_rename()"><b>Rename</b> <code>{% raw %}{{currentFilename()}}{% endraw %}</code></div>
+    <div ng-click="prompt_file_delete()"><b>Delete</b> <code>{% raw %}{{currentFilename()}}{% endraw %}</code></div>
+  </div>
+  <div id="project-context-menu" class="context-menu">
+    <div ng-click="prompt_project_rename()"><b>Rename</b> {{project_name}}</div>
+    <div ng-click="prompt_project_delete()"><b>Delete</b> {{project_name}}</div>
   </div>
 </div>
 {% endblock %}
