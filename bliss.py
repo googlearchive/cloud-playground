@@ -244,13 +244,6 @@ class BlissHandler(SessionHandler):
       datastore_admin_url = None
       memcache_admin_url = None
 
-    if self.project:
-      project_id = self.project.key.id()
-      kwargs['project_id'] = project_id
-      kwargs['project_name'] = self.project.project_name
-      kwargs['project_description'] = self.project.project_description
-      kwargs['project_run_url'] = self._GetPlaygroundRunUrl(project_id)
-
     if users.get_current_user():
       kwargs['is_logged_in'] = True
     if users.is_current_user_admin():
@@ -280,6 +273,10 @@ class GetConfig(BlissHandler):
     assert project_id
     r = {
         'BLISS_USER_CONTENT_HOST': settings.BLISS_USER_CONTENT_HOST,
+        'project_id': project_id,
+        'project_name': self.project.project_name,
+        'project_description': self.project.project_description,
+        'project_run_url': self._GetPlaygroundRunUrl(project_id),
     }
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))

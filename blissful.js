@@ -84,7 +84,7 @@ function ProjectController($scope, $http, $resource, $filter) {
     _output_window = undefined;
   }
 
-  $scope.run = function(url, project_id) {
+  $scope.run = function() {
     $scope.save(function() {
       var container = document.getElementById('output-container');
       if (_output_window && _output_window.closed) {
@@ -92,12 +92,13 @@ function ProjectController($scope, $http, $resource, $filter) {
       }
       if (_popout) {
         container.style.display = 'none';
-        _output_window = window.open(url, project_id);
+        _output_window = window.open($scope.config.project_run_url,
+                                     $scope.config.project_id);
       } else {
         container.style.display = 'block';
         var where = document.getElementById('output-url');
         var iframe = document.getElementById('output-iframe');
-        iframe.src = url;
+        iframe.src = $scope.config.project_run_url;
         where.innerHTML = iframe.src;
       }
     });
@@ -150,6 +151,16 @@ function ProjectController($scope, $http, $resource, $filter) {
       return;
     }
     $scope.deletepath($scope.currentFilename());
+  }
+
+  $scope.prompt_project_rename = function() {
+    var new_project_name = prompt(
+        'Enter a new name for this project',
+        $scope.config.project_name);
+    if (!new_project_name) {
+      return;
+    }
+    $scope.config.project_name = new_project_name;
   }
 
   $scope.prompt_file_rename = function() {
