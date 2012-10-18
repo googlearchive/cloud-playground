@@ -14,11 +14,10 @@ angular.module('blissful', ['ngResource'])
       } else if (err.headers('X-Bliss-Error')) {
         alert('Error:\n' + err.data);
       } else {
+        // TODO: address problems such as OPTIONS pre-flight request failures
+        console.log('err', err);
         alert(err.status + ' <- ' + err.config.method + ' ' + err.config.url +
               '\n' + err.data);
-        // TODO: address problems such as OPTIONS pre-flight request failures
-        alert('FIXME: see console.log for details');
-        console.log('err', err);
       }
       return $q.reject(err);
     });
