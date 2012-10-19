@@ -295,11 +295,14 @@ def GetProjectIdFromServerName():
 
 def GetProjectIdFromQueryParam():
   """Returns the project id from the project id query param."""
+  global _most_recent_query_string_project_id
   qs = os.environ.get('QUERY_STRING')
-  if not qs:
-    return ''
-  params = dict(urlparse.parse_qsl(qs, strict_parsing=True))
-  return params.get(common.config.PROJECT_ID_QUERY_PARAM, '')
+  if qs:
+    params = dict(urlparse.parse_qsl(qs, strict_parsing=True))
+    _most_recent_query_string_project_id = params.get(
+        common.config.PROJECT_ID_QUERY_PARAM,
+        _most_recent_query_string_project_id)
+  return _most_recent_query_string_project_id
 
 
 def GetProjectIdFromPathInfo(path_info):
@@ -329,12 +332,9 @@ def GetProjectId():
   project_id = GetProjectIdFromServerName()
   if project_id:
     return project_id
-  # in the dev_appserver determine project id via a cookie
+  # in the dev_appserver determine project id via a query parameter
   if common.IsDevMode():
-    global _most_recent_query_string_project_id
-    project_id = (GetProjectIdFromQueryParam()
-                  or _most_recent_query_string_project_id)
-    _most_recent_query_string_project_id = project_id
+    project_id = GetProjectIdFromQueryParam()
   return project_id
 
 
