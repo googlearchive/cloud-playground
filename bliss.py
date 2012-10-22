@@ -180,11 +180,8 @@ class BlissHandler(SessionHandler):
   def PerformValidation(self):
     super(BlissHandler, self).PerformValidation()
     if not shared.ThisIsBlissApp():
-      url = 'https://{0}/bliss'.format(settings.BLISS_HOST)
       self.error(501)  # not implemented
-      self.response.write('Bliss user interface not implemented here.<br>'
-                          'See <a href="{0}">{0}</a> instead.'
-                          .format(url))
+      self.response.write('Bliss user interface not implemented here.')
       return
     if self.request.method not in _HTTP_READ_METHODS:
       self._PerformWriteAccessCheck()
@@ -290,14 +287,13 @@ class GetFile(BlissHandler):
     # If not a CORS request, do nothing
     if not origin:
       return
-    bliss_origin = '{0}://{1}'.format(self.request.scheme,
-                                      settings.BLISS_HOST)
+    bliss_origins = ['{0}://{1}'.format(self.request.scheme, h)
+                     for h in settings.BLISS_HOSTS]
 
-    if origin != bliss_origin:
+    if origin not in bliss_origins:
       self.response.set_status(401)
       self.response.headers['Content-Type'] = 'text/plain'
-      self.response.write('CORS supported only from origin {0}'
-                          .format(bliss_origin))
+      self.response.write('Unrecognized origin {0}'.format(origin))
       return
     if self.request.host != settings.BLISS_USER_CONTENT_HOST:
       self.response.set_status(401)
@@ -306,7 +302,7 @@ class GetFile(BlissHandler):
                           .format(settings.BLISS_USER_CONTENT_HOST))
       return
     # OK, CORS access allowed
-    self.response.headers['Access-Control-Allow-Origin'] = bliss_origin
+    self.response.headers['Access-Control-Allow-Origin'] = origin
     self.response.headers['Access-Control-Allow-Methods'] = 'GET'
     self.response.headers['Access-Control-Max-Age'] = '600'
     allowed_headers = 'Origin, X-XSRF-Token, X-Requested-With, Accept'

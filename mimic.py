@@ -53,7 +53,7 @@ class Mimic(object):
     try:
       if common.IsDevMode():
         logging.warn('\n' * 3)
-      if (os.environ['HTTP_HOST'] == settings.BLISS_HOST
+      if (os.environ['HTTP_HOST'] in settings.BLISS_HOSTS
           and os.environ['PATH_INFO'] == '/'):
         yield self._RedirectResponse('/bliss')
         return

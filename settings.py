@@ -24,11 +24,12 @@ USER_CONTENT_PREFIX = 'user-content'
 _APP_IDS = (BLISS_APP_ID, PLAYGROUND_APP_ID)
 
 if _DEV_MODE:
-  BLISS_HOST = 'localhost:8080'
+  BLISS_HOSTS = ('localhost:8080', '127.0.0.1:8080')
   BLISS_USER_CONTENT_HOST = 'localhost:9100'
   PLAYGROUND_HOST = 'localhost:9200'
 else:
-  BLISS_HOST = '{0}.appspot.com'.format(BLISS_APP_ID)
+  BLISS_HOSTS = ('{0}.appspot.com'.format(BLISS_APP_ID),
+                 'cloud-playground.appspot.com')
   BLISS_USER_CONTENT_HOST = ('{0}-dot-{1}.appspot.com'
                              .format(USER_CONTENT_PREFIX, BLISS_APP_ID))
   PLAYGROUND_HOST = '{0}.appspot.com'.format(PLAYGROUND_APP_ID)
