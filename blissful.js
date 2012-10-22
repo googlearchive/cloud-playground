@@ -1,7 +1,8 @@
 angular.module('blissful', ['ngResource'])
 
-.config(function($httpProvider) {
+.config(function($httpProvider, $locationProvider) {
   $httpProvider.responseInterceptors.push('blissHttpInterceptor');
+  $locationProvider.html5Mode(true);
 })
 
 .factory('blissHttpInterceptor', function($q) {
@@ -38,7 +39,11 @@ function AdminController($scope, $http) {
 
 }
 
-function MainController($scope, $http) {
+function MainController($scope, $http, $location, $window) {
+
+  $scope.go = function(url) {
+    $window.location.href = url;
+  }
 
   $scope.prompt_for_new_project = function(template_url, project_name,
                                            project_description) {

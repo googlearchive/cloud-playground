@@ -17,6 +17,7 @@
 
     <thead>
       <tr class="project">
+        <th></th>
         <th class="projectid">Project</th>
         <th class="projectdescription">Description</th>
         <th class=""></th>
@@ -27,14 +28,15 @@
       {% if projects %}
         {% for id, name, description in projects %}
           <tr class="project {{ loop.cycle('odd', 'even') }}">
-            <td class="projectname link"><a href="/bliss/p/{{id}}/">{{name}}</a></td>
-            <td class="projectdescription"><a href="/bliss/p/{{id}}/">{{description}}</a></td>
+            <td><button class="btn btn-small btn-success" ng-click="go('/bliss/p/{{id}}/')">Run</button>
+            <td class="projectname">{{name}}</td>
+            <td class="projectdescription">{{description}}</td>
             <td><button class="btn btn-small btn-danger" ng-click="prompt_to_delete_project('{{id}}','{{name}}')">delete</button></td>
           </tr>
         {% endfor %}
       {% else %}
         <tr class="project odd">
-           <td colspan="3">
+           <td colspan="4">
              <div>
                No projects created yet.<br>
              </div>
