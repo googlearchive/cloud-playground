@@ -205,8 +205,6 @@ function ProjectController($scope, $http, $resource, $filter) {
     menuDiv.style.display = 'block';
     menuDiv.style.left = evt.pageX + 'px';
     menuDiv.style.top = evt.pageY + 'px';
-    var elem = evt.srcElement.parentNode();
-    insertAfter(menuDiv, elem);
   };
 
   $scope.file_context_menu = function(evt, i) {
@@ -217,8 +215,6 @@ function ProjectController($scope, $http, $resource, $filter) {
     menuDiv.style.display = 'block';
     menuDiv.style.left = evt.pageX + 'px';
     menuDiv.style.top = evt.pageY + 'px';
-    var elem = document.getElementById('file-' + i);
-    insertAfter(menuDiv, elem);
   };
 
   $scope.orderFilesAndSelectByPath = function(path) {
