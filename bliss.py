@@ -180,9 +180,7 @@ class BlissHandler(SessionHandler):
   def PerformValidation(self):
     super(BlissHandler, self).PerformValidation()
     if not shared.ThisIsBlissApp():
-      self.error(501)  # not implemented
-      self.response.write('Bliss user interface not implemented here.')
-      return
+      raise error.BlissError('Bliss user interface not implemented here.')
     if self.request.method not in _HTTP_READ_METHODS:
       self._PerformWriteAccessCheck()
 
