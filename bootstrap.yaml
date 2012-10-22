@@ -1,0 +1,5 @@
+handlers:
+- url: /bootstrap/bootstrap.css
+  static_files: bootstrap/docs/assets/css/bootstrap.css
+  upload: bootstrap/docs/assets/css/bootstrap.css
+  secure: always

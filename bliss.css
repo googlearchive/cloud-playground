@@ -17,6 +17,10 @@ A, .link, .newthing {
   text-decoration: none;
 }
 
+  A:hover {
+    text-decoration: none;
+  }
+
   .newthing:hover, .link {
     color: #0000ee;
   }
@@ -43,30 +47,10 @@ HR.divider {
     padding: 2px;
   }
 
-BUTTON {
-  color: white;
-  background-color: #22F;
-  border: 1px solid #11E;
-  border-radius: 4px;
-  display: inline-block;
-  padding: 8px;
-  font-weight: bold;
+.btn {
+  margin-left: 10px;
   margin-right: 10px;
 }
-
-  BUTTON:hover {
-    cursor: pointer;
-  }
-
-  BUTTON.login {
-    background-color: #44e;
-    border: 1px solid #33d;
-  }
-
-  BUTTON.logout {
-    background-color: #ccc;
-    border: 1px solid #bbb;
-  }
 
 .context-menu {
   display: none;
@@ -152,7 +136,7 @@ TABLE {
 .logo {
   font-size: 2em;
   font-weight: bold;
-  color: #000;
+  color: #000 !important;
   text-decoration: none;
 }
 
@@ -162,7 +146,7 @@ TABLE {
     vertical-align: top;
   }
 
-  .logo:HOVER .app-back {
+  .logo:hover .app-back {
     color: #555;
   }
 
@@ -267,25 +251,13 @@ h1 {
   .one .newproject .name {
     color: #484;
   }
-  .one .newproject BUTTON {
-    background-color: #484;
-    border: 1px solid #373;
-  }
 
   .two .newproject .name {
     color: #448;
   }
-  .two .newproject BUTTON {
-    background-color: #448;
-    border: 1px solid #337;
-  }
 
   .three .newproject .name {
     color: #844;
-  }
-  .three .newproject BUTTON {
-    background-color: #844;
-    border: 1px solid #733;
   }
 
 #container {

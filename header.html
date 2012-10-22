@@ -12,9 +12,9 @@
     <div class="email">
       <span>{{email}}</span>
       {% if is_logged_in %}
-        <button class="logout" onclick="window.location='/bliss/logout'">logout</button>
+        <button class="btn" onclick="window.location='/bliss/logout'">logout</button>
       {% else %}
-        <button class="login" onclick="window.location='/bliss/login'">login</button>
+        <button class="btn btn-success" onclick="window.location='/bliss/login'">login</button>
       {% endif %}
     </div>
   </div>
