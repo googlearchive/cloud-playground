@@ -10,6 +10,10 @@ handlers:
   upload: (blissful.js|bliss.js|bliss.css)
   secure: always
 
+- url: /bliss/((main|project)\.html)
+  static_files: \1
+  upload: (main.html|project.html)
+
 - url: /bliss|/bliss/.*
   script: bliss.app
   secure: always

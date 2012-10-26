@@ -1,8 +1,20 @@
 angular.module('blissful', ['ngResource'])
 
-.config(function($httpProvider, $locationProvider) {
+.config(function($httpProvider, $locationProvider, $routeProvider) {
   $httpProvider.responseInterceptors.push('blissHttpInterceptor');
+
   $locationProvider.html5Mode(true);
+
+  $routeProvider
+    .when('/bliss/', {
+       templateUrl: '/bliss/main.html',
+       controller: MainController,
+    })
+    .when('/bliss/p/:project_id/', {
+       templateUrl: '/bliss/project.html',
+       controller: ProjectController,
+    })
+    .otherwise({redirectTo: '/bliss/'});
 })
 
 .factory('blissHttpInterceptor', function($q) {
@@ -23,7 +35,20 @@ angular.module('blissful', ['ngResource'])
       return $q.reject(err);
     });
   };
+})
+
+.factory('Config', function($resource) {
+  var Config = $resource('getprojects');
+  return Config;
 });
+
+function HeaderController($scope, $location) {
+
+  $scope.alreadyhome = function() {
+    return $location.path() == '/bliss/';
+  }
+
+}
 
 function AdminController($scope, $http) {
 
@@ -39,19 +64,24 @@ function AdminController($scope, $http) {
 
 }
 
-function MainController($scope, $http, $location, $window) {
+function MainController($scope, $http, $location, $window, Config) {
 
-  $scope.go = function(url) {
-    $window.location.href = url;
+  $scope.config = Config.get({}, function(data) { data.loaded=true; });
+
+  $scope.login = function() {
+    $window.location = '/bliss/login';
   }
 
-  $scope.prompt_for_new_project = function(template_url, project_name,
-                                           project_description) {
+  $scope.select_project = function(project) {
+    $location.path('/bliss/p/' + project.key);
+  }
+
+  $scope.prompt_for_new_project = function(template) {
     box = lightbox('Creating project', 'Please wait.');
     $http.post('createproject', {
-        template_url: template_url,
-        project_name: project_name,
-        project_description: project_description})
+        template_url: template.key,
+        project_name: template.name,
+        project_description: template.description})
     .success(function(data, status, headers, config) {
       box();
       document.body.scrollTop = 0;
@@ -59,13 +89,13 @@ function MainController($scope, $http, $location, $window) {
     });
   };
 
-  $scope.prompt_to_delete_project = function(project_id, project_name) {
+  $scope.prompt_to_delete_project = function(project) {
     var answer = prompt("Are you sure you want to delete project " +
-                        project_name + "?\nType 'yes' to confirm.", "no");
+                        project.name + "?\nType 'yes' to confirm.", "no");
     if (!answer || answer.toLowerCase()[0] != 'y') {
       return;
     }
-    $http.post('/bliss/p/' + encodeURI(project_id) + '/delete')
+    $http.post('/bliss/p/' + encodeURI(project.key) + '/delete')
     .success(function(data, status, headers, config) {
       document.body.scrollTop = 0;
       window.location.reload();
@@ -78,6 +108,10 @@ function ProjectController($scope, $http, $resource, $filter) {
 
   var Files = $resource('listfiles');
 
+  var source_code = document.getElementById('source-code');
+  var source_container = document.getElementById('source-container');
+  var source_image = document.getElementById('source-image');
+
   var _editor;
   var _dirty = false;
   var _save_timeout;
@@ -87,6 +121,12 @@ function ProjectController($scope, $http, $resource, $filter) {
   $scope.popout = function() {
     _popout = true;
     _output_window = undefined;
+  }
+
+  $scope.selectme = function(evt) {
+    var elem = evt.srcElement;
+    elem.focus();
+    elem.select();
   }
 
   $scope.run = function() {
@@ -101,10 +141,8 @@ function ProjectController($scope, $http, $resource, $filter) {
                                      $scope.config.project_id);
       } else {
         container.style.display = 'block';
-        var where = document.getElementById('output-url');
         var iframe = document.getElementById('output-iframe');
         iframe.src = $scope.config.project_run_url;
-        where.innerHTML = iframe.src;
       }
     });
   }
@@ -185,13 +223,14 @@ function ProjectController($scope, $http, $resource, $filter) {
   }
 
   function hide_context_menus() {
-    document.getElementById('file-context-menu').style.display = 'None';
-    document.getElementById('project-context-menu').style.display = 'None';
+    $scope.showfilecontextmenu = false;
+    $scope.showprojectcontextmenu = false;
   }
 
-  // setup file context menu clear handler
+  // setup context menu clear handler
   window.addEventListener('click', function(evt) {
     hide_context_menus();
+    $scope.$apply();
   }, false);
 
   function insertAfter(newNode, existingNode) {
@@ -206,8 +245,8 @@ function ProjectController($scope, $http, $resource, $filter) {
   $scope.project_context_menu = function(evt) {
     evt.stopPropagation();
     hide_context_menus();
+    $scope.showprojectcontextmenu = true;
     var menuDiv = document.getElementById('project-context-menu');
-    menuDiv.style.display = 'block';
     menuDiv.style.left = evt.pageX + 'px';
     menuDiv.style.top = evt.pageY + 'px';
   };
@@ -216,8 +255,8 @@ function ProjectController($scope, $http, $resource, $filter) {
     evt.stopPropagation();
     hide_context_menus();
     $scope.select(i);
+    $scope.showfilecontextmenu = true;
     var menuDiv = document.getElementById('file-context-menu');
-    menuDiv.style.display = 'block';
     menuDiv.style.left = evt.pageX + 'px';
     menuDiv.style.top = evt.pageY + 'px';
   };

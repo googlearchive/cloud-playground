@@ -1,36 +1,4 @@
-{% extends 'base.html' %}
-
-
-{% block head %}
-  <link rel="stylesheet" href="/codemirror/lib/codemirror.css">
-
-  <script src="/codemirror/lib/codemirror.js"></script>
-
-  <script src="/codemirror/mode/clike/clike.js"></script>
-  <script src="/codemirror/mode/css/css.js"></script>
-  <script src="/codemirror/mode/htmlmixed/htmlmixed.js"></script>
-  <script src="/codemirror/mode/htmlembedded/htmlembedded.js"></script>
-  <script src="/codemirror/mode/javascript/javascript.js"></script>
-  <script src="/codemirror/mode/mysql/mysql.js"></script>
-  <script src="/codemirror/mode/php/php.js"></script>
-  <script src="/codemirror/mode/python/python.js"></script>
-  <script src="/codemirror/mode/shell/shell.js"></script>
-  <script src="/codemirror/mode/xml/xml.js"></script>
-  <script src="/codemirror/mode/yaml/yaml.js"></script>
-
-  <script src="/codemirror/lib/util/formatting.js"></script>
-
-<script>
-function file_context_menu(id) {
-  console.log(id);
-}
-</script>
-{% endblock %}
-
-{% block main %}
-{% raw %}
-<div ng-cloak ng-controller="ProjectController">
-
+<div>
   <div id="source-container">
     <div id="nav">
       <div id="navheader">
@@ -63,7 +31,10 @@ function file_context_menu(id) {
   <hr id="divider1" class="divider movable"/>
 
   <div id="output-container">
-    <div id="output-url" ng-click="popout(); run()"></div>
+    <div>
+      <button ng-click="popout(); run()"><i class="icon-resize-full"></i></button>
+      <input ng-model="config.project_run_url" class="output-url" ng-click="selectme($event)">
+    </div>
     <iframe id="output-iframe">
     </iframe>
     <hr id="divider2" class="divider movable"/>
@@ -71,14 +42,12 @@ function file_context_menu(id) {
 
 
   <!-- hidden bits -->
-  <div id="file-context-menu" class="context-menu">
+  <div id="file-context-menu" class="context-menu" ng-show="showfilecontextmenu">
     <div ng-click="prompt_file_rename()"><b>Rename</b> <code>{{currentFilename()}}</code></div>
     <div ng-click="prompt_file_delete()"><b>Delete</b> <code>{{currentFilename()}}</code></div>
   </div>
-  <div id="project-context-menu" class="context-menu">
+  <div id="project-context-menu" class="context-menu" ng-show="showprojectcontextmenu">
     <div ng-click="prompt_project_rename()"><b>Rename</b> {{config.project_name}}</div>
     <div ng-click="prompt_to_delete_project()"><b>Delete</b> {{config.project_name}}</div>
   </div>
 </div>
-{% endraw %}
-{% endblock %}

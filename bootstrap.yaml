@@ -1,5 +1,10 @@
 handlers:
-- url: /bootstrap/bootstrap.css
+- url: /bootstrap/css/bootstrap\.css
   static_files: bootstrap/docs/assets/css/bootstrap.css
   upload: bootstrap/docs/assets/css/bootstrap.css
+  secure: always
+
+- url: /bootstrap/img/(.*\.png)
+  static_files: bootstrap/docs/assets/img/\1
+  upload: bootstrap/docs/assets/img/.*.png
   secure: always

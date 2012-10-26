@@ -170,7 +170,21 @@ def _GetTemplateSources():
   return sources
 
 
-def GetTemplates(template_source):
+def GetTemplates():
+  """Get templates from a given template source."""
+  _MEMCACHE_KEY = '{0}'.format(Template.__name__)
+  templates = memcache.get(_MEMCACHE_KEY, namespace=settings.BLISS_NAMESPACE)
+  if templates:
+    return templates
+  templates = (Template.query(namespace=settings.BLISS_NAMESPACE)
+               .order(Template.key).fetch())
+  templates.sort(key=lambda template: template.name.lower())
+  memcache.set(_MEMCACHE_KEY, templates, namespace=settings.BLISS_NAMESPACE,
+               time=_MEMCACHE_TIME)
+  return templates
+
+
+def GetTemplatesBySource(template_source):
   """Get templates from a given template source."""
   _MEMCACHE_KEY = '{0}-{1}'.format(Template.__name__,
                                    template_source.key.id())

@@ -6,11 +6,6 @@ window.onerror = function(msg, url, line) {
 // Keep track of z-index to allow layering of multiple glass messages
 var _glassMessageZIndex = 2147483647 - 100;
 
-var source_container = document.getElementById('source-container');
-var source_filename = document.getElementById('source-filename');
-var source_code = document.getElementById('source-code');
-var source_image = document.getElementById('source-image');
-
 
 function lightbox(summary, details) {
   outer = document.createElement('div');

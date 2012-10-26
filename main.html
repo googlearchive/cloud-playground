@@ -1,71 +1,54 @@
-{% extends 'base.html' %}
-
-{% block head %}
-<style>
-  .logo .app-back {
-    visibility: hidden;
-  }
-</style>
-{% endblock %}
-
-{% block main %}
-<div ng-cloak ng-controller="MainController">
-
+<div>
   <h1 class="projectlistheader">My Projects</h1>
 
-  <table class="projectlist">
+  <div ng-hide="config.loaded">Loading. Please wait...</div>
+
+  <table class="table-condensed" ng-show="config.loaded">
 
     <thead>
-      <tr class="project">
+      <tr>
         <th></th>
-        <th class="projectid">Project</th>
-        <th class="projectdescription">Description</th>
-        <th class=""></th>
+        <th>Project</th>
+        <th>Description</th>
+        <th></th>
       </tr>
     </thead>
 
     <tbody>
-      {% if projects %}
-        {% for id, name, description in projects %}
-          <tr class="project {{ loop.cycle('odd', 'even') }}">
-            <td><button class="btn btn-small btn-success" ng-click="go('/bliss/p/{{id}}/')">Run</button>
-            <td class="projectname">{{name}}</td>
-            <td class="projectdescription">{{description}}</td>
-            <td><button class="btn btn-small btn-danger" ng-click="prompt_to_delete_project('{{id}}','{{name}}')">delete</button></td>
-          </tr>
-        {% endfor %}
-      {% else %}
-        <tr class="project odd">
-           <td colspan="4">
-             <div>
-               No projects created yet.<br>
+      <tr ng-repeat="project in config.projects" ng-show="config.projects">
+        <td><button class="btn btn-small btn-success" ng-click="select_project(project)"><i class="icon-edit icon-white"></i> Run/Edit</button>
+        <td>{{project.name}}</td>
+        <td>{{project.description}}</td>
+        <td><button class="btn btn-small btn-danger" ng-click="prompt_to_delete_project(project)"><i class="icon-remove icon-white"></i> delete</button></td>
+      </tr>
+
+      <tr class="project" ng-hide="config.projects">
+         <td colspan="4">
+           <div>
+             <b>No projects created yet.</b>
+           </div>
+           <div style="color: gray;">
+              <div>Use the templates below to start a new project.</div>
+             <div ng-hide="config.is_logged_in">
+               Or <a ng-click="login()">login</a> to access your saved projects.
              </div>
-             <div style="color: gray;">
-               Use the templates below to start a new project.</br>
-               {% if not is_logged_in %}
-               Or <a href="/bliss/login">login</a> to access your saved projects.
-               {% endif %}
-             </div>
-           </td>
-        </tr>
-      {% endif %}
+           </div>
+         </td>
+      </tr>
     </tbody>
 
   </table>
-  {% for source, templates in template_tuples %}
+  <div ng-repeat="source in config.template_sources">
     <h1>{{source.description}}</h1>
-    <div class="{{ loop.cycle('one', 'two', 'three') }}">
-      {% for t in templates %}
-        <div class="newproject" style="margin: .5em;">
-          <button class="btn" style="float: left;" ng-click="prompt_for_new_project('{{t.key.id()}}', '{{t.name}}', '{{t.description}}')">New Project</button>
+    <div ng-repeat="template in config.templates | filter:{source_key: source.key}">
+        <div class="template" style="margin: .5em;">
+          <button class="btn" style="float: left;" ng-click="prompt_for_new_project(template)"><i class="icon-plus"></i> New Project</button>
           <div stlye="clear: both;">
-             <div class="name">{{t.name}}</div>
-             <div class="description">{{t.description}}</div>
+             <div class="name">{{template.name}}</div>
+             <div class="description">{{template.description}}</div>
           </div>
         </div>
-      {% endfor %}
     </div>
-  {% endfor %}
+  <div>
 
 </div>
-{% endblock %}

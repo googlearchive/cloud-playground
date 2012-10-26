@@ -8,10 +8,6 @@ BODY {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-A {
-  color: inherit;
-}
-
 A, .link, .newthing {
   cursor: pointer;
   text-decoration: none;
@@ -53,7 +49,6 @@ HR.divider {
 }
 
 .context-menu {
-  display: none;
   position: absolute;
   margin-left: -2em;
   margin-top: -.5em;
@@ -92,10 +87,6 @@ TABLE {
     text-align: left;
     padding: .35em 1em .25em .35em;
   }
-
-    TD.projectid {
-      color: #aaa;
-    }
 
 .experimental {
   color: #f00;
@@ -154,10 +145,6 @@ h1 {
   font-size: 1.2em;
   font-weight: bold;
   margin: 1.7em 0em .4em;
-}
-
-.projectlist .project {
-  list-style-type: none;
 }
 
 #navheader {
@@ -240,24 +227,11 @@ h1 {
   padding-top: .5em;
 }
 
-.newproject {
-  color: #aaa;
+.template {
+  padding-bottom: 0.4em;
 }
-
-  .newproject .name {
+  .template .name {
     font-weight: bold;
-  }
-
-  .one .newproject .name {
-    color: #484;
-  }
-
-  .two .newproject .name {
-    color: #448;
-  }
-
-  .three .newproject .name {
-    color: #844;
   }
 
 #container {
@@ -341,15 +315,14 @@ h1 {
   padding: .5em 0em 0em;
 }
 
-  #output-container #output-url {
+  #output-container .output-url,
+  #output-container .output-url:focus {
     cursor: pointer;
+    padding: 5px;
+    outline: none;
     border: 1px solid #ccc;
     border-radius: 5px;
-    /* popout.png is 42px x 32px */
-    background: no-repeat url(popout.png);
-    line-height: 32px;
-    height: 32px;
-    padding-left: 47px;
+    width: 90%;
   }
 
   #output-container #output-iframe {

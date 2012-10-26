@@ -213,12 +213,14 @@ class BlissHandler(SessionHandler):
     """Determine the playground run url."""
     assert project_id
     if common.IsDevMode():
-      return '//{0}/?{1}={2}'.format(settings.PLAYGROUND_HOST,
-                                     common.config.PROJECT_ID_QUERY_PARAM,
-                                     urllib.quote_plus(str(project_id)))
+      return '{0}://{1}/?{2}={3}'.format(self.request.scheme,
+                                         settings.PLAYGROUND_HOST,
+                                         common.config.PROJECT_ID_QUERY_PARAM,
+                                         urllib.quote_plus(str(project_id)))
     else:
-      return '//{0}{1}{2}/'.format(urllib.quote_plus(str(project_id)),
-                                   _DASH_DOT_DASH, settings.PLAYGROUND_HOST)
+      return '{0}://{1}{2}{3}/'.format(self.request.scheme,
+                                       urllib.quote_plus(str(project_id)),
+                                       _DASH_DOT_DASH, settings.PLAYGROUND_HOST)
 
   def render(self, template, *args, **kwargs):
     """Renders the provided template."""
@@ -272,6 +274,34 @@ class GetConfig(BlissHandler):
         'project_name': self.project.project_name,
         'project_description': self.project.project_description,
         'project_run_url': self._GetPlaygroundRunUrl(project_id),
+    }
+    self.response.headers['Content-Type'] = _JSON_MIME_TYPE
+    self.response.write(tojson(r))
+
+
+class GetProjects(BlissHandler):
+
+  def get(self):
+    projects = [{
+         'key': p.key.id(),
+         'name': p.project_name,
+         'description': p.project_description
+    } for p in model.GetProjects(self.user)]
+    template_sources = [{
+        'key': s.key.id(),
+        'description': s.description,
+    } for s in model.GetTemplateSources()]
+    templates = [{
+        'key': t.key.id(),
+        'source_key': t.key.parent().id(),
+        'name': t.name,
+        'description': t.description,
+    } for t in model.GetTemplates()]
+    r = {
+        'is_logged_in': bool(users.get_current_user()),
+        'projects': projects,
+        'template_sources': template_sources,
+        'templates': templates,
     }
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
@@ -387,29 +417,11 @@ class ListFiles(BlissHandler):
     self.response.write(tojson(r))
 
 
-class Project(BlissHandler):
-
-  def get(self, project_id):
-    """Handles HTTP GET requests."""
-    assert project_id
-    project = model.GetProject(project_id)
-    if not project:
-      return self.not_found()
-    self.render('project.html')
-
-
 class Bliss(BlissHandler):
 
   def get(self):
     """Handles HTTP GET requests."""
-    projects = model.GetProjects(self.user)
-    p = [(p.key.id(), p.project_name, p.project_description)
-         for p in projects]
-    template_sources = model.GetTemplateSources()
-    tuples = [(s, model.GetTemplates(s)) for s in template_sources]
-    self.render('main.html',
-                projects=p,
-                template_tuples=tuples)
+    self.render('index.html')
 
 
 class Login(BlissHandler):
@@ -514,14 +526,13 @@ app = webapp2.WSGIApplication([
     ('/bliss/p/(.*)/listfiles/?(.*)', ListFiles),
 
     # project actions
+    ('/bliss/getprojects', GetProjects),
     ('/bliss/p/(.*)/delete', DeleteProject),
     ('/bliss/p/(.*)/rename', RenameProject),
 
     # bliss actions
     ('/bliss/createproject', CreateProject),
 
-    # /bliss/p/project_id/
-    ('/bliss/p/(.*)/', Project),
     ('/bliss/p/[^/]+$', AddSlash),
 
     # admin tools
@@ -530,6 +541,8 @@ app = webapp2.WSGIApplication([
     # /bliss
     ('/bliss', AddSlash),
     ('/bliss/', Bliss),
+    # /bliss/p/project_id/
+    ('/bliss/p/.*/', Bliss),
     ('/bliss/login', Login),
     ('/bliss/logout', Logout),
 ], debug=True, config=config)
