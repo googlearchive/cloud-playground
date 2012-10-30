@@ -40,6 +40,48 @@ angular.module('blissful', ['ngResource'])
 .factory('Config', function($resource) {
   var Config = $resource('getprojects');
   return Config;
+})
+
+.factory('DoSerial', function($timeout, $log) {
+
+  var queue = [];
+
+  var timeout;
+
+  function _success() {
+    timeout = null;
+    _next();
+  }
+
+  function _error() {
+    timeout = null;
+    if (queue.length > 0) {
+      $log.warn('Aborting ' + queue.length + ' queued work item(s)');
+      queue = [];
+    }
+  }
+
+  function _next() {
+    if (!queue) {
+      return;
+    }
+    if (timeout) {
+      return;
+    }
+    var work = queue.shift()
+    if (!work) {
+      return;
+    }
+    timeout = $timeout(work).then(_success, _error);
+  }
+
+  return {
+    add: function(work) {
+      queue.push(work);
+      _next();
+    }
+  }
+
 });
 
 function HeaderController($scope, $location) {
