@@ -316,11 +316,13 @@ def DeleteProject(user, tree, project_id):
 
   @ndb.transactional(xg=True)
   def del_project():
-    # 2. delete project
+    # 2. get current entities
+    usr = user.key.get()
     prj = GetProject(project_id)
+    # 3. delete project
     prj.key.delete()
-    # 3. delete project references
-    user.projects.remove(prj.key)
-    user.put()
+    # 4. delete project references
+    usr.projects.remove(prj.key)
+    usr.put()
 
   del_project()
