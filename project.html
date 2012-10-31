@@ -7,11 +7,11 @@
       </div>
       <div id="filelist">
         <div id="file-{{$index}}" class="fileentry"
-             ng-click="select($index)"
-             ng-class="{selected: $index == currentIndex}"
+             ng-click="select(file.name)"
+             ng-class="{selected: file.name == currentPath}"
              ng-repeat="file in files">
           <div class="filename">{{file.name}}</div>
-          <div class="dropdown"><a ng-click="file_context_menu($event, $index)">…</a></div>
+          <div class="dropdown"><a ng-click="file_context_menu($event, file.name)">…</a></div>
         </div>
         <div class="newthing" ng-click="prompt_for_new_file()">+ new file</div>
       </div>
@@ -43,8 +43,8 @@
 
   <!-- hidden bits -->
   <div id="file-context-menu" class="context-menu" ng-show="showfilecontextmenu">
-    <div ng-click="prompt_file_rename()"><b>Rename</b> <code>{{currentFilename()}}</code></div>
-    <div ng-click="prompt_file_delete()"><b>Delete</b> <code>{{currentFilename()}}</code></div>
+    <div ng-click="prompt_file_rename()"><b>Rename</b> <code>{{currentPath}}</code></div>
+    <div ng-click="prompt_file_delete()"><b>Delete</b> <code>{{currentPath}}</code></div>
   </div>
   <div id="project-context-menu" class="context-menu" ng-show="showprojectcontextmenu">
     <div ng-click="prompt_project_rename()"><b>Rename</b> {{config.project_name}}</div>

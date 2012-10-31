@@ -146,7 +146,7 @@ function MainController($scope, $http, $location, $window, Config) {
 
 }
 
-function ProjectController($scope, $http, $resource, $filter) {
+function ProjectController($scope, $http, $resource, $filter, $log, DoSerial) {
 
   var Files = $resource('listfiles');
 
@@ -154,9 +154,17 @@ function ProjectController($scope, $http, $resource, $filter) {
   var source_container = document.getElementById('source-container');
   var source_image = document.getElementById('source-image');
 
+  // { "app.yaml" : {
+  //        "mime_type": "text/yaml",
+  //        "contents" : "...",
+  //        "dirty"    : false },
+  //   "main.py" : {
+  //        ...
+  //   }
+  // }
+  var files = {};
+
   var _editor;
-  var _dirty = false;
-  var _save_timeout;
   var _output_window;
   var _popout = false;
 
@@ -172,7 +180,8 @@ function ProjectController($scope, $http, $resource, $filter) {
   }
 
   $scope.run = function() {
-    $scope.save(function() {
+    // wait for pending saves to complete
+    DoSerial.add(function() {
       var container = document.getElementById('output-container');
       if (_output_window && _output_window.closed) {
         _popout = false;
@@ -189,53 +198,56 @@ function ProjectController($scope, $http, $resource, $filter) {
     });
   }
 
-  // called from setTimeout after editor is marked dirty
-  $scope.save = function(callback) {
-    if (!_dirty) {
-      if (callback) {
-        callback.call();
+  function _save(path) {
+    DoSerial.add(function() {
+      var file = files[path];
+      if (!file.dirty) {
+        return;
       }
-      return;
-    }
-
-    // TODO: fix me
-    _dirty = false;
-
-    $scope.filestatus = 'Saving...';
-    $scope.$apply();
-
-    $scope.putfile($scope.currentFilename(), _editor.getValue(), function () {
-      $scope.filestatus = ''; // saved
-      if (callback) {
-        callback.call();
-      }
+      file.dirty = false;
+      $scope.filestatus = 'Saving ' + path + ' ...';
+      return $http.put('putfile/' + encodeURI(path), file.contents, {
+                       headers: {'Content-Type': 'text/plain; charset=utf-8'}
+      })
+      .success(function(data, status, headers, config) {
+        $scope.filestatus = ''; // saved
+      })
+      .error(function(data, status, headers, config) {
+        $log.warn('Save failed', path);
+        file.dirty = true;
+      }).then(function() {
+        _saveDirtyFiles();
+      });
     });
   }
 
-  function markDirty() {
-    _dirty = true;
-
-    if (_save_timeout) {
-      return;
-    }
-    _save_timeout = setTimeout(function() {
-      $scope.save(function() {
-        _save_timeout = null;
+  function _saveDirtyFiles() {
+    for (var path in files) {
+      if (!files[path].dirty) {
+        continue;
+      }
+      var dirtypath = path;
+      DoSerial.add(function() {
+        _save(dirtypath);
       });
-    }, 1000);
+    }
   }
 
   // editor onChange
   function editorOnChange(from, to, text, next) {
-     markDirty();
+     var file = files[$scope.currentPath];
+     file.contents = _editor.getValue();
+     file.dirty = true;
+     _saveDirtyFiles();
   }
 
   $scope.prompt_file_delete = function() {
-    var answer = prompt("Are you sure you want to delete " + $scope.currentFilename() + "?\nType 'yes' to confirm.", "no");
+    var answer = prompt("Are you sure you want to delete " +
+                        $scope.currentPath + "?\nType 'yes' to confirm.", "no");
     if (!answer || answer.toLowerCase()[0] != 'y') {
       return;
     }
-    $scope.deletepath($scope.currentFilename());
+    $scope.deletepath($scope.currentPath);
   }
 
   $scope.prompt_project_rename = function() {
@@ -251,17 +263,17 @@ function ProjectController($scope, $http, $resource, $filter) {
   $scope.prompt_file_rename = function() {
     var new_filename = prompt(
         'New filename?\n(You may specify a full path such as: foo/bar.txt)',
-        $scope.currentFilename());
+        $scope.currentPath);
     if (!new_filename) {
       return;
     }
     if (new_filename[0] == '/') {
       new_filename = new_filename.substr(1);
     }
-    if (!new_filename || new_filename == $scope.currentFilename()) {
+    if (!new_filename || new_filename == $scope.currentPath) {
       return;
     }
-    $scope.movefile($scope.currentFilename(), new_filename);
+    $scope.movefile($scope.currentPath, new_filename);
   }
 
   function hide_context_menus() {
@@ -275,15 +287,6 @@ function ProjectController($scope, $http, $resource, $filter) {
     $scope.$apply();
   }, false);
 
-  function insertAfter(newNode, existingNode) {
-    var parentNode = existingNode.parentNode;
-    if (existingNode.nextSibling) {
-      return parentNode.insertBefore(newNode, existingNode.nextSibling);
-    } else {
-      return parentNode.appendChild(newNode);
-    }
-  }
-
   $scope.project_context_menu = function(evt) {
     evt.stopPropagation();
     hide_context_menus();
@@ -293,91 +296,76 @@ function ProjectController($scope, $http, $resource, $filter) {
     menuDiv.style.top = evt.pageY + 'px';
   };
 
-  $scope.file_context_menu = function(evt, i) {
+  $scope.file_context_menu = function(evt, path) {
     evt.stopPropagation();
     hide_context_menus();
-    $scope.select(i);
+    $scope.select(path);
     $scope.showfilecontextmenu = true;
     var menuDiv = document.getElementById('file-context-menu');
     menuDiv.style.left = evt.pageX + 'px';
     menuDiv.style.top = evt.pageY + 'px';
   };
 
-  $scope.orderFilesAndSelectByPath = function(path) {
+  $scope.orderFiles = function() {
     $scope.files = $filter('orderBy')($scope.files, 'name');
-    $scope.selectByPath(path);
   };
 
   $scope.insertPath = function(path) {
-    if ($scope.selectByPath(path)) {
-      return;
+    if (!(path in files)) {
+      files[path] = {
+          mime_type: 'text/plain',
+          contents: '',
+          dirty: false,
+      };
+      $scope.files.push({name: path});
+      $scope.orderFiles();
     }
-    $scope.putfile(path, '');
-    files = $scope.files;
-    files.push({name: path});
-    $scope.orderFilesAndSelectByPath(path);
+    $scope.select(path);
   };
 
   $scope.prompt_for_new_file = function() {
-    var filename = prompt('New filename?', '');
-    if (!filename) {
+    var path = prompt('New filename?', '');
+    if (!path) {
       return;
     }
-    if (filename[0] == '/') {
-      filename = filename.substr(1)
+    if (path[0] == '/') {
+      path = path.substr(1)
     }
 
-    $scope.insertPath(filename);
+    $scope.insertPath(path);
   };
 
-  $scope.currentFilename = function() {
-    if (!$scope.files) return '';
-    return $scope.files[$scope.currentIndex].name;
-  };
-
-  $scope.deletepath = function(filename) {
-    $http.post('deletepath/' + encodeURI(filename))
-    .success(function(data, status, headers, config) {
-      $scope.files.splice($scope.currentIndex, 1);
-      $scope.select(0);
+  $scope.deletepath = function(path) {
+    DoSerial.add(function() {
+      delete files[path];
+      return $http.post('deletepath/' + encodeURI(path))
+      .success(function(data, status, headers, config) {
+        for (var i=0; i<$scope.files.length; i++) {
+          if (path == $scope.files[i].name) {
+            $scope.files.splice(i, 1);
+            break;
+          }
+        }
+        $scope.select($scope.files[0].name);
+      });
     });
   };
 
   $scope.movefile = function(path, newpath) {
-    $http.post('movefile/' + encodeURI(path),{newpath: newpath})
-    .success(function(data, status, headers, config) {
-      $scope.files[$scope.currentIndex].name = newpath;
-      $scope.orderFilesAndSelectByPath(newpath);
-    });
-  };
-
-  $scope.putfile = function(filename, data, callback) {
-    
-    $http.put('putfile/' + encodeURI(filename), data, {
-           headers: {'Content-Type': 'text/plain; charset=utf-8'}
-    })
-    .success(function(data, status, headers, config) {
-      if (callback) {
-        callback.call();
+    DoSerial.add(function() {
+      files[newpath] = files[path];
+      delete files[path];
+      for (var i=0; i<$scope.files.length; i++) {
+        if (path == $scope.files[i].name) {
+          $scope.files[i].name = newpath;
+          break;
+        }
       }
-    }).error(function(resp) {
-      $scope.select($scope.currentIndex);
-    });
-  };
-
-  $scope.selectByPath = function(path) {
-    for (i in $scope.files) {
-      if ($scope.files[i].name == path) {
-        $scope.select(i);
-        return true;
-      }
-    }
-    return false;
-  };
-
-  $scope.select = function(i) {
-    $scope.save(function() {
-      _select(i)
+      return $http.post('movefile/' + encodeURI(path), {newpath: newpath})
+      .success(function(data, status, headers, config) {
+        $scope.currentPath = newpath;
+        $scope.orderFiles();
+      });
     });
   };
 
@@ -393,14 +381,23 @@ function ProjectController($scope, $http, $resource, $filter) {
 
   var noJsonTransform = function(data) { return data; };
 
-  var _select = function(i) {
-    $scope.currentIndex = i;
+  var _getfileurl = function(path) {
+    return '//' + $scope.config.BLISS_USER_CONTENT_HOST +
+           document.location.pathname + 'getfile/' +
+           encodeURI(path);
+  };
 
-    url = '//' + $scope.config.BLISS_USER_CONTENT_HOST +
-          document.location.pathname + 'getfile/' +
-          encodeURI($scope.currentFilename());
+  var _get = function(path, success_cb) {
+    if (files[path]) {
+      success_cb();
+      return;
+    }
+    var url = _getfileurl(path);
     $http.get(url, {transformResponse: noJsonTransform})
     .success(function(data, status, headers, config) {
+      if (files[path]) {
+        return;
+      }
       // e.g. 'text/html; charset=UTF-8'
       var mime_type = headers('Content-Type');
       // Workaround missing HTTP response headers for CORS requests
@@ -411,27 +408,41 @@ function ProjectController($scope, $http, $resource, $filter) {
       }
       // strip '; charset=...'
       mime_type = mime_type.replace(/ ?;.*/, '');
-      if (/^image\//.test(mime_type)) {
-        source_image.setAttribute('src', config.url);
+      files[path] = {
+          mime_type: mime_type,
+          contents: data,
+          dirty: false,
+      };
+      success_cb();
+    });
+  };
+
+  $scope.select = function(path) {
+    _get(path, function() {
+      var file = files[path];
+      if (/^image\//.test(file.mime_type)) {
+        var url = _getfileurl(path);
+        source_image.setAttribute('src', url);
         source_container.setAttribute('class', 'image');
       } else {
         while(source_code.hasChildNodes()) {
           source_code.removeChild(source_code.childNodes[0]);
         }
-        _editor = createEditor(mime_type);
+        _editor = createEditor(file.mime_type);
         _editor.getScrollerElement().id = 'scroller-element';
         source_container.setAttribute('class', 'code');
-        _editor.setValue(data);
+        _editor.setValue(file.contents);
         _editor.setOption('onChange', editorOnChange);
         _editor.focus();
       }
+      $scope.currentPath = path;
     });
   };
 
   var listfiles = function() {
     Files.query(function(files) {
       $scope.files = files;
-      $scope.select(0);
+      $scope.select($scope.files[0].name);
     });
   };
 
@@ -439,10 +450,10 @@ function ProjectController($scope, $http, $resource, $filter) {
     $http.get('getconfig')
     .success(function(data, status, headers, config) {
        $scope.config = data;
-       listfiles();
     });
   };
 
-  getconfig();
+  DoSerial.add(getconfig);
+  DoSerial.add(listfiles);
 
 }
