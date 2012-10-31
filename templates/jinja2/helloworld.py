@@ -63,6 +63,7 @@ class Guestbook(webapp2.RequestHandler):
     self.redirect('/?' + urllib.urlencode({'guestbook_name': guestbook_name}))
 
 
-app = webapp2.WSGIApplication([('/', MainPage),
-                               ('/sign', Guestbook)],
-                              debug=True)
+app = webapp2.WSGIApplication([
+    ('/', MainPage),
+    ('/sign', Guestbook),
+], debug=True)

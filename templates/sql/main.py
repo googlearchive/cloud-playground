@@ -51,10 +51,7 @@ class GuestBook(webapp.RequestHandler):
         self.redirect("/")
 
 
-application = webapp.WSGIApplication(
-    [
-        ("/", MainHandler),
-        ("/sign", GuestBook),
-    ],
-    debug=True
-)
+application = webapp.WSGIApplication([
+    ("/", MainHandler),
+    ("/sign", GuestBook),
+], debug=True)
