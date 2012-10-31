@@ -8,6 +8,7 @@
     <thead>
       <tr>
         <th></th>
+        <th></th>
         <th>Project</th>
         <th>Description</th>
         <th></th>
@@ -16,6 +17,7 @@
 
     <tbody>
       <tr ng-repeat="project in config.projects" ng-show="config.projects">
+        <td class="key">{{project.key}}</div>
         <td><button class="btn btn-small btn-success" ng-click="select_project(project)"><i class="icon-edit icon-white"></i> Run/Edit</button>
         <td>{{project.name}}</td>
         <td>{{project.description}}</td>

@@ -341,3 +341,9 @@ h1 {
   z-index: 2147483647;
   display: none;
 }
+
+.key {
+  color: #ccc;
+  text-align: right;
+  font-family: monospace;
+}
