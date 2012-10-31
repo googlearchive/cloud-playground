@@ -257,7 +257,12 @@ function ProjectController($scope, $http, $resource, $filter, $log, DoSerial) {
     if (!new_project_name) {
       return;
     }
-    $scope.config.project_name = new_project_name;
+    DoSerial.add(function() {
+      return $http.post('rename', {newname: new_project_name})
+      .success(function(data, status, headers, config) {
+        $scope.config.project_name = new_project_name;
+      });
+    });
   }
 
   $scope.prompt_file_rename = function() {

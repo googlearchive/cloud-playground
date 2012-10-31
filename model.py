@@ -106,6 +106,12 @@ def GetProject(project_id):
   return project
 
 
+def RenameProject(project_id, project_name):
+   project = GetProject(project_id)
+   project.project_name = project_name
+   project.put()
+
+
 def _UpdateProjectUserKeys(dest_user, source_user):
   projects = GetProjects(source_user)
   dest_user_key = dest_user.key.id()

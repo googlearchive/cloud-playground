@@ -487,7 +487,11 @@ class DeleteProject(BlissHandler):
 class RenameProject(BlissHandler):
 
   def post(self, project_id):
-    raise Exception('not implemented. unable to rename %s' % project_id)
+    assert project_id
+    data = json.loads(self.request.body)
+    newname = data.get('newname')
+    assert newname
+    model.RenameProject(project_id, newname)
 
 
 class AddSlash(webapp2.RequestHandler):
