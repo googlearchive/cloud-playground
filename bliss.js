@@ -76,6 +76,3 @@ function resizer(divider_id, content_id) {
 
   divider.addEventListener('mousedown', downfunc);
 }
-
-resizer('divider1', 'source-container');
-resizer('divider2', 'output-iframe');
