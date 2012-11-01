@@ -445,22 +445,21 @@ function ProjectController($scope, $http, $resource, $filter, $log, DoSerial) {
   };
 
   var listfiles = function() {
-    Files.query(function(files) {
+    return Files.query(function(files) {
       $scope.files = files;
       $scope.select($scope.files[0].name);
     });
   };
 
   var getconfig = function() {
-    $http.get('getconfig')
+    return $http.get('getconfig')
     .success(function(data, status, headers, config) {
        $scope.config = data;
     });
   };
 
-  DoSerial.add(getconfig);
-  DoSerial.add(listfiles);
-  DoSerial.add(listfiles);
+  DoSerial.add(getconfig());
+  DoSerial.add(listfiles());
   DoSerial.add(function() {
     resizer('divider1', 'source-container');
     resizer('divider2', 'output-iframe');
