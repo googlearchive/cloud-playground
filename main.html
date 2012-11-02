@@ -1,9 +1,10 @@
-<div>
+<div ng-hide="loaded">Loading. Please wait...</div>
+
+<div ng-show="loaded">
+
   <h1 class="projectlistheader">My Projects</h1>
 
-  <div ng-hide="loaded">Loading. Please wait...</div>
-
-  <table class="table-condensed" ng-show="loaded">
+  <table class="table-condensed">
 
     <thead>
       <tr>
@@ -16,7 +17,7 @@
     </thead>
 
     <tbody>
-      <tr ng-repeat="project in projects" ng-show="projects">
+      <tr ng-repeat="project in projects">
         <td class="key">{{project.key}}</div>
         <td><button class="btn btn-small btn-success" ng-click="select_project(project)"><i class="icon-edit icon-white"></i> Run/Edit</button>
         <td>{{project.name}}</td>
@@ -24,7 +25,7 @@
         <td><button class="btn btn-small btn-danger" ng-click="prompt_to_delete_project(project)"><i class="icon-remove icon-white"></i> delete</button></td>
       </tr>
 
-      <tr class="project" ng-hide="projects">
+      <tr class="project" ng-hide="projects.length > 0">
          <td colspan="5">
            <div>
              <b>No projects created yet.</b>

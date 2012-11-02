@@ -112,14 +112,8 @@ function MainController($scope, $http, $location, $window, $log, DoSerial) {
           project_name: template.name,
           project_description: template.description})
       .success(function(data, status, headers, config) {
-        // TODO figure out how we can modify $scope.projects directly
-        // and force 'ng-show/ng-hide="projects"' to re-evaluated
-        var projects = [];
-        for (i in $scope.projects) {
-          projects.push($scope.projects[i]);
-        }
-        projects.push(data);
-        $scope.projects = projects;
+        $scope.projects.push(data);
+        return;
       });
     });
   };
