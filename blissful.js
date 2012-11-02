@@ -37,9 +37,8 @@ angular.module('blissful', ['ngResource'])
   };
 })
 
-.factory('Config', function($resource) {
-  var Config = $resource('getprojects');
-  return Config;
+.factory('Templates', function($resource) {
+  return $resource('gettemplates');
 })
 
 .factory('DoSerial', function($q) {
@@ -81,9 +80,22 @@ function AdminController($scope, $http) {
 
 }
 
-function MainController($scope, $http, $location, $window, Config) {
+function MainController($scope, $http, $location, $window, $log, DoSerial,
+                       Templates) {
 
-  $scope.config = Config.get({}, function(data) { data.loaded=true; });
+  DoSerial
+  .then(function() {
+    return $http.get('getprojects')
+    .success(function(data, status, headers, config) {
+      $scope.projects = data;
+    });
+  })
+  .then(function() {
+    $scope.templates = Templates.get();
+  })
+  .then(function() {
+    $scope.loaded = true;
+  });
 
   $scope.login = function() {
     $window.location = '/bliss/login';
@@ -94,7 +106,7 @@ function MainController($scope, $http, $location, $window, Config) {
   }
 
   $scope.prompt_for_new_project = function(template) {
-    box = lightbox('Creating project', 'Please wait.');
+    var box = lightbox('Creating project', 'Please wait.');
     $http.post('createproject', {
         template_url: template.key,
         project_name: template.name,
@@ -156,7 +168,8 @@ function ProjectController($scope, $http, $resource, $filter, $log, DoSerial) {
 
   $scope.run = function() {
     // wait for pending saves to complete
-    DoSerial.then(function() {
+    return DoSerial
+    .then(function() {
       var container = document.getElementById('output-container');
       if (_output_window && _output_window.closed) {
         _popout = false;
@@ -174,7 +187,8 @@ function ProjectController($scope, $http, $resource, $filter, $log, DoSerial) {
   }
 
   function _save(path) {
-    DoSerial.then(function() {
+    return DoSerial
+    .then(function() {
       var file = files[path];
       if (!file.dirty) {
         return;
@@ -190,8 +204,6 @@ function ProjectController($scope, $http, $resource, $filter, $log, DoSerial) {
       .error(function(data, status, headers, config) {
         $log.warn('Save failed', path);
         file.dirty = true;
-      }).then(function() {
-        _saveDirtyFiles();
       });
     });
   }
@@ -202,8 +214,12 @@ function ProjectController($scope, $http, $resource, $filter, $log, DoSerial) {
         continue;
       }
       var dirtypath = path;
-      DoSerial.then(function() {
+      DoSerial
+      .then(function() {
         _save(dirtypath);
+      })
+      .then(function() {
+        _saveDirtyFiles();
       });
     }
   }
@@ -232,7 +248,8 @@ function ProjectController($scope, $http, $resource, $filter, $log, DoSerial) {
     if (!new_project_name) {
       return;
     }
-    DoSerial.then(function() {
+    DoSerial
+    .then(function() {
       return $http.post('rename', {newname: new_project_name})
       .success(function(data, status, headers, config) {
         $scope.config.project_name = new_project_name;
@@ -316,7 +333,8 @@ function ProjectController($scope, $http, $resource, $filter, $log, DoSerial) {
   };
 
   $scope.deletepath = function(path) {
-    DoSerial.then(function() {
+    DoSerial
+    .then(function() {
       delete files[path];
       return $http.post('deletepath/' + encodeURI(path))
       .success(function(data, status, headers, config) {
@@ -332,7 +350,8 @@ function ProjectController($scope, $http, $resource, $filter, $log, DoSerial) {
   };
 
   $scope.movefile = function(path, newpath) {
-    DoSerial.then(function() {
+    DoSerial
+    .then(function() {
       files[newpath] = files[path];
       delete files[path];
       for (var i=0; i<$scope.files.length; i++) {
@@ -433,9 +452,10 @@ function ProjectController($scope, $http, $resource, $filter, $log, DoSerial) {
     });
   };
 
-  DoSerial.then(getconfig);
-  DoSerial.then(listfiles);
-  DoSerial.then(function() {
+  DoSerial
+  .then(getconfig)
+  .then(listfiles)
+  .then(function() {
     resizer('divider1', 'source-container');
     resizer('divider2', 'output-iframe');
   });

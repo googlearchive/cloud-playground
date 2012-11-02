@@ -282,11 +282,18 @@ class GetConfig(BlissHandler):
 class GetProjects(BlissHandler):
 
   def get(self):
-    projects = [{
+    r = [{
          'key': p.key.id(),
          'name': p.project_name,
          'description': p.project_description
     } for p in model.GetProjects(self.user)]
+    self.response.headers['Content-Type'] = _JSON_MIME_TYPE
+    self.response.write(tojson(r))
+
+
+class GetTemplates(BlissHandler):
+
+  def get(self):
     template_sources = [{
         'key': s.key.id(),
         'description': s.description,
@@ -299,7 +306,6 @@ class GetProjects(BlissHandler):
     } for t in model.GetTemplates()]
     r = {
         'is_logged_in': bool(users.get_current_user()),
-        'projects': projects,
         'template_sources': template_sources,
         'templates': templates,
     }
@@ -530,6 +536,7 @@ app = webapp2.WSGIApplication([
     ('/bliss/p/(.*)/listfiles/?(.*)', ListFiles),
 
     # project actions
+    ('/bliss/gettemplates', GetTemplates),
     ('/bliss/getprojects', GetProjects),
     ('/bliss/p/(.*)/delete', DeleteProject),
     ('/bliss/p/(.*)/rename', RenameProject),

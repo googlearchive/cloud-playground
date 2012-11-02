@@ -1,9 +1,9 @@
 <div>
   <h1 class="projectlistheader">My Projects</h1>
 
-  <div ng-hide="config.loaded">Loading. Please wait...</div>
+  <div ng-hide="loaded">Loading. Please wait...</div>
 
-  <table class="table-condensed" ng-show="config.loaded">
+  <table class="table-condensed" ng-show="loaded">
 
     <thead>
       <tr>
@@ -16,7 +16,7 @@
     </thead>
 
     <tbody>
-      <tr ng-repeat="project in config.projects" ng-show="config.projects">
+      <tr ng-repeat="project in projects" ng-show="projects">
         <td class="key">{{project.key}}</div>
         <td><button class="btn btn-small btn-success" ng-click="select_project(project)"><i class="icon-edit icon-white"></i> Run/Edit</button>
         <td>{{project.name}}</td>
@@ -24,14 +24,14 @@
         <td><button class="btn btn-small btn-danger" ng-click="prompt_to_delete_project(project)"><i class="icon-remove icon-white"></i> delete</button></td>
       </tr>
 
-      <tr class="project" ng-hide="config.projects">
+      <tr class="project" ng-hide="projects">
          <td colspan="4">
            <div>
              <b>No projects created yet.</b>
            </div>
            <div style="color: gray;">
               <div>Use the templates below to start a new project.</div>
-             <div ng-hide="config.is_logged_in">
+             <div ng-hide="templates.is_logged_in">
                Or <a ng-click="login()">login</a> to access your saved projects.
              </div>
            </div>
@@ -40,9 +40,9 @@
     </tbody>
 
   </table>
-  <div ng-repeat="source in config.template_sources">
+  <div ng-repeat="source in templates.template_sources">
     <h1>{{source.description}}</h1>
-    <div ng-repeat="template in config.templates | filter:{source_key: source.key}">
+    <div ng-repeat="template in templates.templates | filter:{source_key: source.key}">
         <div class="template" style="margin: .5em;">
           <button class="btn" style="float: left;" ng-click="prompt_for_new_project(template)"><i class="icon-plus"></i> New Project</button>
           <div stlye="clear: both;">
