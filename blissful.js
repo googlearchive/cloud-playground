@@ -37,10 +37,6 @@ angular.module('blissful', ['ngResource'])
   };
 })
 
-.factory('Templates', function($resource) {
-  return $resource('gettemplates');
-})
-
 .factory('DoSerial', function($q) {
 
   var deferred = $q.defer();
@@ -81,8 +77,7 @@ function AdminController($scope, $http, $window, DoSerial) {
 
 }
 
-function MainController($scope, $http, $location, $window, $log, DoSerial,
-                       Templates) {
+function MainController($scope, $http, $location, $window, $log, DoSerial) {
 
   DoSerial
   .then(function() {
@@ -92,7 +87,10 @@ function MainController($scope, $http, $location, $window, $log, DoSerial,
     });
   })
   .then(function() {
-    $scope.templates = Templates.get();
+    return $http.get('gettemplates')
+    .success(function(data, status, headers, config) {
+      $scope.templates = data;
+    });
   })
   .then(function() {
     $scope.loaded = true;
