@@ -57,6 +57,9 @@ angular.module('blissful', ['ngResource'])
     timeout = null;
     if (queue.length > 0) {
       $log.warn('Aborting ' + queue.length + ' queued work item(s)');
+      for (item in queue) {
+        $log.warn(item, '--', queue[item]);
+      }
       queue = [];
     }
   }
