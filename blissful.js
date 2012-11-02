@@ -106,15 +106,15 @@ function MainController($scope, $http, $location, $window, $log, DoSerial,
   }
 
   $scope.prompt_for_new_project = function(template) {
-    var box = lightbox('Creating project', 'Please wait.');
-    $http.post('createproject', {
-        template_url: template.key,
-        project_name: template.name,
-        project_description: template.description})
-    .success(function(data, status, headers, config) {
-      box();
-      document.body.scrollTop = 0;
-      window.location.reload();
+    return DoSerial
+    .then(function() {
+      return $http.post('createproject', {
+          template_url: template.key,
+          project_name: template.name,
+          project_description: template.description})
+      .success(function(data, status, headers, config) {
+        $scope.projects.push(data);
+      });
     });
   };
 

@@ -63,6 +63,14 @@ def tojson(r):
   return _JSON_ENCODER.encode(r)
 
 
+def HashOfProject(project):
+  return {
+      'key': project.key.id(),
+      'name': project.project_name,
+      'description': project.project_description
+  }
+
+
 # From http://webapp-improved.appspot.com/guide/extras.html
 class SessionHandler(webapp2.RequestHandler):
   """Convenience request handler for dealing with sessions."""
@@ -282,11 +290,7 @@ class GetConfig(BlissHandler):
 class GetProjects(BlissHandler):
 
   def get(self):
-    r = [{
-         'key': p.key.id(),
-         'name': p.project_name,
-         'description': p.project_description
-    } for p in model.GetProjects(self.user)]
+    r = [HashOfProject(p) for p in model.GetProjects(self.user)]
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
 
@@ -478,7 +482,9 @@ class CreateProject(BlissHandler):
       raise error.BlissError('template_url required')
     project = self._MakeTemplateProject(template_url, project_name,
                                         project_description)
-    self.redirect('/bliss/p/{0}/'.format(project.key.id()))
+    r = HashOfProject(project)
+    self.response.headers['Content-Type'] = _JSON_MIME_TYPE
+    self.response.write(tojson(r))
 
 
 class DeleteProject(BlissHandler):
