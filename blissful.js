@@ -113,7 +113,14 @@ function MainController($scope, $http, $location, $window, $log, DoSerial,
           project_name: template.name,
           project_description: template.description})
       .success(function(data, status, headers, config) {
-        $scope.projects.push(data);
+        // TODO figure out how we can modify $scope.projects directly
+        // and force 'ng-show/ng-hide="projects"' to re-evaluated
+        var projects = [];
+        for (i in $scope.projects) {
+          projects.push($scope.projects[i]);
+        }
+        projects.push(data);
+        $scope.projects = projects;
       });
     });
   };
@@ -126,8 +133,15 @@ function MainController($scope, $http, $location, $window, $log, DoSerial,
     }
     $http.post('/bliss/p/' + encodeURI(project.key) + '/delete')
     .success(function(data, status, headers, config) {
-      document.body.scrollTop = 0;
-      window.location.reload();
+      // TODO figure out how we can modify $scope.projects directly
+      // and force 'ng-show/ng-hide="projects"' to re-evaluated
+      var projects = [];
+      for (i in $scope.projects) {
+        if ($scope.projects[i] != project) {
+          projects.push($scope.projects[i]);
+        }
+      }
+      $scope.projects = projects;
     });
   };
 
