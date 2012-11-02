@@ -21,7 +21,15 @@ PLAYGROUND_APP_ID = 'shared-playground'
 USER_CONTENT_PREFIX = 'user-content'
 
 # All app ids used by this project
-_APP_IDS = (BLISS_APP_ID, PLAYGROUND_APP_ID)
+_APP_IDS = set((BLISS_APP_ID, PLAYGROUND_APP_ID))
+
+# Our app id
+_APP_ID = os.environ['APPLICATION_ID'].split('~')[-1]
+
+# Automatically detect deployments to other app ids
+if _APP_ID not in _APP_IDS:
+  BLISS_APP_ID = _APP_ID
+  PLAYGROUND_APP_ID = _APP_ID
 
 if _DEV_MODE:
   BLISS_HOSTS = ('localhost:8080', '127.0.0.1:8080')
@@ -37,5 +45,4 @@ else:
 
 def PrintAppIdsInMap():
   """Prints a new line delimited list of known app ids."""
-  app_ids = set((BLISS_APP_ID, PLAYGROUND_APP_ID))
-  print '\n'.join(app_ids)
+  print '\n'.join(_APP_IDS)
