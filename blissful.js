@@ -461,8 +461,8 @@ function ProjectController($scope, $http, $resource, $filter, $log, DoSerial) {
     });
   };
 
-  DoSerial.add(getconfig());
-  DoSerial.add(listfiles());
+  DoSerial.add(getconfig);
+  DoSerial.add(listfiles);
   DoSerial.add(function() {
     resizer('divider1', 'source-container');
     resizer('divider2', 'output-iframe');
