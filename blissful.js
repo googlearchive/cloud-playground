@@ -48,11 +48,14 @@ angular.module('blissful', ['ngResource'])
   deferred.resolve();
   var promise = deferred.promise;
 
-  return {
+  var DoSerial = {
     then: function(success, error) {
       promise = promise.then(success, error);
+      // allow chained calls, e.g. DoSerial.then(...).then(...)
+      return DoSerial;
     }
   };
+  return DoSerial;
 
 });
 
