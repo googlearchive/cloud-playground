@@ -66,15 +66,16 @@ function HeaderController($scope, $location) {
 
 }
 
-function AdminController($scope, $http) {
+function AdminController($scope, $http, $window, DoSerial) {
 
   $scope.big_red_button = function() {
-    box = lightbox('Bye, bye, data.', 'Please wait...');
-    $http.post('nuke')
-    .success(function(data, status, headers, config) {
-      box();
-      document.body.scrollTop = 0;
-      window.location.reload();
+    DoSerial
+    .then(function() {
+      return $http.post('nuke')
+      .success(function(data, status, headers, config) {
+        document.body.scrollTop = 0;
+        $window.location.reload();
+      });
     });
   };
 
