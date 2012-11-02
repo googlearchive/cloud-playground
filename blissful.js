@@ -42,48 +42,17 @@ angular.module('blissful', ['ngResource'])
   return Config;
 })
 
-.factory('DoSerial', function($timeout, $log) {
+.factory('DoSerial', function($q) {
 
-  var queue = [];
-
-  var timeout;
-
-  function _success() {
-    timeout = null;
-    _next();
-  }
-
-  function _error() {
-    timeout = null;
-    if (queue.length > 0) {
-      $log.warn('Aborting ' + queue.length + ' queued work item(s)');
-      for (item in queue) {
-        $log.warn(item, '--', queue[item]);
-      }
-      queue = [];
-    }
-  }
-
-  function _next() {
-    if (!queue) {
-      return;
-    }
-    if (timeout) {
-      return;
-    }
-    var work = queue.shift()
-    if (!work) {
-      return;
-    }
-    timeout = $timeout(work).then(_success, _error);
-  }
+  var deferred = $q.defer();
+  deferred.resolve();
+  var promise = deferred.promise;
 
   return {
-    add: function(work) {
-      queue.push(work);
-      _next();
+    then: function(success, error) {
+      promise = promise.then(success, error);
     }
-  }
+  };
 
 });
 
@@ -184,7 +153,7 @@ function ProjectController($scope, $http, $resource, $filter, $log, DoSerial) {
 
   $scope.run = function() {
     // wait for pending saves to complete
-    DoSerial.add(function() {
+    DoSerial.then(function() {
       var container = document.getElementById('output-container');
       if (_output_window && _output_window.closed) {
         _popout = false;
@@ -202,7 +171,7 @@ function ProjectController($scope, $http, $resource, $filter, $log, DoSerial) {
   }
 
   function _save(path) {
-    DoSerial.add(function() {
+    DoSerial.then(function() {
       var file = files[path];
       if (!file.dirty) {
         return;
@@ -230,7 +199,7 @@ function ProjectController($scope, $http, $resource, $filter, $log, DoSerial) {
         continue;
       }
       var dirtypath = path;
-      DoSerial.add(function() {
+      DoSerial.then(function() {
         _save(dirtypath);
       });
     }
@@ -260,7 +229,7 @@ function ProjectController($scope, $http, $resource, $filter, $log, DoSerial) {
     if (!new_project_name) {
       return;
     }
-    DoSerial.add(function() {
+    DoSerial.then(function() {
       return $http.post('rename', {newname: new_project_name})
       .success(function(data, status, headers, config) {
         $scope.config.project_name = new_project_name;
@@ -344,7 +313,7 @@ function ProjectController($scope, $http, $resource, $filter, $log, DoSerial) {
   };
 
   $scope.deletepath = function(path) {
-    DoSerial.add(function() {
+    DoSerial.then(function() {
       delete files[path];
       return $http.post('deletepath/' + encodeURI(path))
       .success(function(data, status, headers, config) {
@@ -360,7 +329,7 @@ function ProjectController($scope, $http, $resource, $filter, $log, DoSerial) {
   };
 
   $scope.movefile = function(path, newpath) {
-    DoSerial.add(function() {
+    DoSerial.then(function() {
       files[newpath] = files[path];
       delete files[path];
       for (var i=0; i<$scope.files.length; i++) {
@@ -461,9 +430,9 @@ function ProjectController($scope, $http, $resource, $filter, $log, DoSerial) {
     });
   };
 
-  DoSerial.add(getconfig);
-  DoSerial.add(listfiles);
-  DoSerial.add(function() {
+  DoSerial.then(getconfig);
+  DoSerial.then(listfiles);
+  DoSerial.then(function() {
     resizer('divider1', 'source-container');
     resizer('divider2', 'output-iframe');
   });
