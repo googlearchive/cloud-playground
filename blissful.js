@@ -140,9 +140,7 @@ function MainController($scope, $http, $location, $window, $log, DoSerial) {
 
 }
 
-function ProjectController($scope, $http, $resource, $filter, $log, DoSerial) {
-
-  var Files = $resource('listfiles');
+function ProjectController($scope, $http, $filter, $log, DoSerial) {
 
   var source_code = document.getElementById('source-code');
   var source_container = document.getElementById('source-container');
@@ -446,7 +444,8 @@ function ProjectController($scope, $http, $resource, $filter, $log, DoSerial) {
   };
 
   var listfiles = function() {
-    return Files.query(function(files) {
+    return $http.get('listfiles')
+    .success(function(files) {
       $scope.files = files;
       $scope.select($scope.files[0].name);
     });
