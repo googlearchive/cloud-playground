@@ -34,6 +34,37 @@ angular.module('blissful', ['ngResource'])
   };
 })
 
+.factory('Backoff', function($timeout) {
+
+  "Exponential backoff service."
+
+  var INIITAL_BACKOFF_MS = 1000;
+  var backoff_ms;
+  var timer = undefined;
+
+  var Backoff = {
+    reset: function() {
+      backoff_ms = INIITAL_BACKOFF_MS;
+    },
+    backoff: function() {
+      backoff_ms = Math.min(120 * 1000, (backoff_ms || 1000) * 2);
+      return backoff_ms;
+    },
+    schedule: function(func) {
+      if (timer) {
+        return;
+      }
+      timer = $timeout(function() {
+        timer = undefined;
+        func();
+      }, backoff_ms);
+    },
+  };
+
+  Backoff.reset();
+  return Backoff;
+})
+
 .factory('DoSerial', function($q, $log) {
 
   var deferred = $q.defer();
@@ -150,7 +181,8 @@ function MainController($scope, $http, $location, $window, $log, DoSerial) {
 
 }
 
-function ProjectController($scope, $http, $filter, $log, $timeout, DoSerial) {
+function ProjectController($scope, $http, $filter, $log, $timeout, Backoff,
+                           DoSerial) {
 
   var source_code = document.getElementById('source-code');
   var source_container = document.getElementById('source-container');
@@ -218,28 +250,28 @@ function ProjectController($scope, $http, $filter, $log, $timeout, DoSerial) {
       })
       .success(function(data, status, headers, config) {
         $scope.filestatus = ''; // saved
+        Backoff.reset();
       })
       .error(function(data, status, headers, config) {
         $scope.filestatus = 'Failed to save ' + path;
-        $log.warn('Save failed', path);
         file.dirty = true;
+        var secs = Backoff.backoff() / 1000;
+        $log.warn(path, 'failed to save; will retry in', secs, 'secs');
+        Backoff.schedule(_saveDirtyFiles);
       });
     });
   }
 
   function _saveDirtyFiles() {
     for (var path in $scope.files) {
-      if (!$scope.files[path].dirty) {
-        continue;
+      if ($scope.files[path].dirty) {
+        var dirtypath = path;
+        DoSerial
+        .then(function() {
+          return _save(dirtypath);
+        })
+        break;
       }
-      var dirtypath = path;
-      DoSerial
-      .then(function() {
-        _save(dirtypath);
-      })
-      .then(function() {
-        _saveDirtyFiles();
-      });
     }
   }
 
@@ -252,9 +284,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, DoSerial) {
         return;
       }
       file.dirty = true;
-      $timeout(function() {
-        _saveDirtyFiles();
-      }, 1000);
+      Backoff.schedule(_saveDirtyFiles);
     });
   }
 
