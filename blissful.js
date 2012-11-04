@@ -278,23 +278,22 @@ function ProjectController($scope, $http, $filter, $log, $timeout, Backoff,
   // editor onChange
   function editorOnChange(from, to, text, next) {
     $scope.$apply(function() {
-      var file = $scope.files[$scope.currentPath];
-      file.contents = _editor.getValue();
-      if (file.dirty) {
+      $scope.currentFile.contents = _editor.getValue();
+      if ($scope.currentFile.dirty) {
         return;
       }
-      file.dirty = true;
+      $scope.currentFile.dirty = true;
       Backoff.schedule(_saveDirtyFiles);
     });
   }
 
   $scope.prompt_file_delete = function() {
     var answer = prompt("Are you sure you want to delete " +
-                        $scope.currentPath + "?\nType 'yes' to confirm.", "no");
+                        $scope.currentFile.name + "?\nType 'yes' to confirm.", "no");
     if (!answer || answer.toLowerCase()[0] != 'y') {
       return;
     }
-    $scope.deletepath($scope.currentPath);
+    $scope.deletefile($scope.currentFile);
   }
 
   $scope.prompt_project_rename = function() {
@@ -316,17 +315,17 @@ function ProjectController($scope, $http, $filter, $log, $timeout, Backoff,
   $scope.prompt_file_rename = function() {
     var new_filename = prompt(
         'New filename?\n(You may specify a full path such as: foo/bar.txt)',
-        $scope.currentPath);
+        $scope.currentFile.name);
     if (!new_filename) {
       return;
     }
     if (new_filename[0] == '/') {
       new_filename = new_filename.substr(1);
     }
-    if (!new_filename || new_filename == $scope.currentPath) {
+    if (!new_filename || new_filename == $scope.currentFile.name) {
       return;
     }
-    $scope.movefile($scope.currentPath, new_filename);
+    $scope.movefile($scope.currentFile, new_filename);
   }
 
   function hide_context_menus() {
@@ -349,10 +348,10 @@ function ProjectController($scope, $http, $filter, $log, $timeout, Backoff,
     menuDiv.style.top = evt.pageY + 'px';
   };
 
-  $scope.file_context_menu = function(evt, path) {
+  $scope.file_context_menu = function(evt, file) {
     evt.stopPropagation();
     hide_context_menus();
-    $scope.select(path);
+    $scope.select(file);
     $scope.showfilecontextmenu = true;
     var menuDiv = document.getElementById('file-context-menu');
     menuDiv.style.left = evt.pageX + 'px';
@@ -360,15 +359,17 @@ function ProjectController($scope, $http, $filter, $log, $timeout, Backoff,
   };
 
   $scope.insertPath = function(path) {
-    if (!(path in $scope.files)) {
-      $scope.files[path] = {
+    var file = $scope.files[path];
+    if (!file) {
+      file = {
           name: path,
           mime_type: 'text/plain',
           contents: '',
           dirty: false,
       };
+      $scope.files[path] = file;
     }
-    $scope.select(path);
+    $scope.select(file);
   };
 
   $scope.prompt_for_new_file = function() {
@@ -385,31 +386,32 @@ function ProjectController($scope, $http, $filter, $log, $timeout, Backoff,
 
   function _selectFirstFile() {
     for (path in $scope.files) {
-      $scope.select(path);
+      $scope.select($scope.files[path]);
       break;
     }
   }
 
-  $scope.deletepath = function(path) {
+  $scope.deletefile = function(file) {
     DoSerial
     .then(function() {
-      delete $scope.files[path];
-      return $http.post('deletepath/' + encodeURI(path))
+      return $http.post('deletepath/' + encodeURI(file.name))
       .success(function(data, status, headers, config) {
+        delete $scope.files[file.name];
         _selectFirstFile();
       });
     });
   };
 
-  $scope.movefile = function(path, newpath) {
+  $scope.movefile = function(file, newpath) {
     DoSerial
     .then(function() {
-      $scope.files[newpath] = $scope.files[path];
+      var oldpath = file.name;
+      $scope.files[newpath] = file;
       $scope.files[newpath].name = newpath;
-      delete $scope.files[path];
-      return $http.post('movefile/' + encodeURI(path), {newpath: newpath})
+      delete $scope.files[oldpath];
+      return $http.post('movefile/' + encodeURI(oldpath), {newpath: newpath})
       .success(function(data, status, headers, config) {
-        $scope.currentPath = newpath;
+        $scope.currentFile = file;
       });
     });
   };
@@ -426,36 +428,35 @@ function ProjectController($scope, $http, $filter, $log, $timeout, Backoff,
 
   var noJsonTransform = function(data) { return data; };
 
-  var _getfileurl = function(path) {
+  var _getfileurl = function(file) {
     return '//' + $scope.config.BLISS_USER_CONTENT_HOST +
            document.location.pathname + 'getfile/' +
-           encodeURI(path);
+           encodeURI(file.name);
   };
 
-  var _get = function(path, success_cb) {
-    if ($scope.files[path].hasOwnProperty('contents')) {
+  var _get = function(file, success_cb) {
+    if (file.hasOwnProperty('contents')) {
       success_cb();
       return;
     }
-    var url = _getfileurl(path);
+    var url = _getfileurl(file);
     $http.get(url, {transformResponse: noJsonTransform})
     .success(function(data, status, headers, config) {
-      $scope.files[path].contents = data;
-      $scope.files[path].dirty = false;
+      file.contents = data;
+      file.dirty = false;
       success_cb();
     });
   };
 
-  $scope.select = function(path) {
-    var file = $scope.files[path];
+  $scope.select = function(file) {
     if (/^image\//.test(file.mime_type)) {
-      var url = _getfileurl(path);
+      var url = _getfileurl(file);
       source_image.setAttribute('src', url);
       source_container.setAttribute('class', 'image');
-      $scope.currentPath = path;
+      $scope.currentFile = file;
       return;
     }
-    _get(path, function() {
+    _get(file, function() {
       while(source_code.hasChildNodes()) {
         source_code.removeChild(source_code.childNodes[0]);
       }
@@ -465,7 +466,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, Backoff,
       _editor.setValue(file.contents);
       _editor.setOption('onChange', editorOnChange);
       _editor.focus();
-      $scope.currentPath = path;
+      $scope.currentFile = file;
     });
   };
 
