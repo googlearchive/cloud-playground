@@ -17,15 +17,15 @@ angular.module('blissful', ['ngResource'])
     .otherwise({redirectTo: '/bliss/'});
 })
 
-.factory('blissHttpInterceptor', function($q, $log) {
+.factory('blissHttpInterceptor', function($q, $log, $window) {
   return function(promise) {
     return promise.then(function(response) {
       return response;
     }, function(err) {
       if (err instanceof Error) {
-        alert(err);
+        $window.alert(err);
       } else if (err.headers('X-Bliss-Error')) {
-        alert('Error:\n' + err.data);
+        $window.alert('Error:\n' + err.data);
       } else {
         $log.error('HTTP', err);
       }
