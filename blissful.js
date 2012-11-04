@@ -23,11 +23,11 @@ angular.module('blissful', ['ngResource'])
       return response;
     }, function(err) {
       if (err instanceof Error) {
-        $window.alert(err);
+        $log.error(err);
       } else if (err.headers('X-Bliss-Error')) {
-        $window.alert('Error:\n' + err.data);
+        $log.error('Error:\n' + err.data);
       } else {
-        $log.error('HTTP', err);
+        $log.error('HTTP ERROR', err);
       }
       return $q.reject(err);
     });
