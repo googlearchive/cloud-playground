@@ -40,13 +40,21 @@ angular.module('blissful', ['ngResource'])
   deferred.resolve();
   var promise = deferred.promise;
 
+  function promisehack(func) {
+    var result = func();
+    if (result && result.then) {
+      result = result.then;
+    }
+    return result;
+  }
+
   var DoSerial = {
     then: function(func) {
       promise = promise.then(function() {
-        return func();
+        return promisehack(func);
       }, function(err) {
         $log.error('DoSerial encountered', err);
-        return func();
+        return promisehack(func);
       });
       // allow chained calls, e.g. DoSerial.then(...).then(...)
       return DoSerial;
