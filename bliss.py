@@ -422,7 +422,7 @@ class ListFiles(BlissHandler):
     if not path:
       path = None
     r = self.tree.ListDirectory(path)
-    r = [{'name': name} for name in r]
+    r = [{'name': name, 'mime_type': shared.GuessMimeType(name)} for name in r]
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
 
