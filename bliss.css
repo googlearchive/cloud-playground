@@ -347,3 +347,7 @@ h1 {
   text-align: right;
   font-family: monospace;
 }
+
+.dirtymarker {
+  opacity: 0.3;
+}

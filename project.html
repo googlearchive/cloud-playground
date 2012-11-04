@@ -10,7 +10,7 @@
              ng-click="select(file.name)"
              ng-class="{selected: file.name == currentPath}"
              ng-repeat="file in files">
-          <div class="filename">{{file.name}}</div>
+          <div class="filename">{{file.name}} <i class="icon-asterisk dirtymarker" ng-show="file.dirty"></i></div>
           <div class="dropdown"><a ng-click="file_context_menu($event, file.name)">…</a></div>
         </div>
         <div class="newthing" ng-click="prompt_for_new_file()">+ new file</div>
