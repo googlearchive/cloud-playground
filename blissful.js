@@ -145,7 +145,7 @@ function MainController($scope, $http, $location, $window, $log, DoSerial) {
 
 }
 
-function ProjectController($scope, $http, $filter, $log, DoSerial) {
+function ProjectController($scope, $http, $filter, $log, $timeout, DoSerial) {
 
   var source_code = document.getElementById('source-code');
   var source_container = document.getElementById('source-container');
@@ -178,8 +178,10 @@ function ProjectController($scope, $http, $filter, $log, DoSerial) {
   }
 
   $scope.run = function() {
-    // wait for pending saves to complete
     return DoSerial
+    .then(function() {
+        _saveDirtyFiles();
+    })
     .then(function() {
       var container = document.getElementById('output-container');
       if (_output_window && _output_window.closed) {
@@ -213,6 +215,7 @@ function ProjectController($scope, $http, $filter, $log, DoSerial) {
         $scope.filestatus = ''; // saved
       })
       .error(function(data, status, headers, config) {
+        $scope.filestatus = 'Failed to save ' + path;
         $log.warn('Save failed', path);
         file.dirty = true;
       });
@@ -237,10 +240,17 @@ function ProjectController($scope, $http, $filter, $log, DoSerial) {
 
   // editor onChange
   function editorOnChange(from, to, text, next) {
-     var file = $scope.files[$scope.currentPath];
-     file.contents = _editor.getValue();
-     file.dirty = true;
-     _saveDirtyFiles();
+    $scope.$apply(function() {
+      var file = $scope.files[$scope.currentPath];
+      file.contents = _editor.getValue();
+      if (file.dirty) {
+        return;
+      }
+      file.dirty = true;
+      $timeout(function() {
+        _saveDirtyFiles();
+      }, 1000);
+    });
   }
 
   $scope.prompt_file_delete = function() {
