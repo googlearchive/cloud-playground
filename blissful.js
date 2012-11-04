@@ -37,15 +37,20 @@ angular.module('blissful', ['ngResource'])
   };
 })
 
-.factory('DoSerial', function($q) {
+.factory('DoSerial', function($q, $log) {
 
   var deferred = $q.defer();
   deferred.resolve();
   var promise = deferred.promise;
 
   var DoSerial = {
-    then: function(success, error) {
-      promise = promise.then(success, error);
+    then: function(func) {
+      promise = promise.then(function() {
+        return func();
+      }, function(err) {
+        $log.error('DoSerial encountered', err);
+        return func();
+      });
       // allow chained calls, e.g. DoSerial.then(...).then(...)
       return DoSerial;
     }
