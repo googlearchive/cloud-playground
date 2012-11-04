@@ -17,7 +17,7 @@ angular.module('blissful', ['ngResource'])
     .otherwise({redirectTo: '/bliss/'});
 })
 
-.factory('blissHttpInterceptor', function($q) {
+.factory('blissHttpInterceptor', function($q, $log) {
   return function(promise) {
     return promise.then(function(response) {
       return response;
@@ -27,10 +27,7 @@ angular.module('blissful', ['ngResource'])
       } else if (err.headers('X-Bliss-Error')) {
         alert('Error:\n' + err.data);
       } else {
-        // TODO: address problems such as OPTIONS pre-flight request failures
-        console.log('err', err);
-        alert(err.status + ' <- ' + err.config.method + ' ' + err.config.url +
-              '\n' + err.data);
+        $log.error('HTTP', err);
       }
       return $q.reject(err);
     });
