@@ -417,7 +417,6 @@ function ProjectController($scope, $http, $filter, $log, $timeout, Backoff,
 
   function createEditor(mime_type) {
     return CodeMirror(source_code, {
-      value: 'Initializing...',
       mode: mime_type,
       lineNumbers: true,
       matchBrackets: true,
