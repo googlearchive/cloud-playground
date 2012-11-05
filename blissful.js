@@ -473,12 +473,18 @@ function ProjectController($scope, $http, $filter, $log, $timeout, Backoff,
       return;
     }
     _get(file, function() {
-      _editor = createEditor(file.mime_type);
-      _editor.getScrollerElement().id = 'scroller-element';
-      _editor.setValue(file.contents);
-      _editor.setOption('onChange', editorOnChange);
-      _editor.focus();
-      $scope.currentFile = file;
+      return DoSerial
+      .then(function() {
+        $scope.currentFile = file;
+      })
+      .tick() // needed when switching from source-image to editor
+      .then(function() {
+        _editor = createEditor(file.mime_type);
+        _editor.getScrollerElement().id = 'scroller-element';
+        _editor.setValue(file.contents);
+        _editor.setOption('onChange', editorOnChange);
+        _editor.focus();
+      });
     });
   };
 
