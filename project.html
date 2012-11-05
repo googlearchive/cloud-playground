@@ -1,5 +1,5 @@
 <div>
-  <div id="source-container">
+  <div class="source-container">
     <div id="nav">
       <div id="navheader">
         <div id="projectname" title="{{config.project_description}}">{{config.project_name}}</div>
@@ -22,8 +22,8 @@
       {{currentFile.name}}
       <span class="filestatus" ng-bind="filestatus"></span>
     </div>
-    <div id="source-code"></div>
-    <img id="source-image">
+    <div ng-hide="isImageMimeType(currentFile.mime_type)" id="source-code"></div>
+    <img ng-show="isImageMimeType(currentFile.mime_type)" ng-src="{{image_url_of(currentFile)}}">
   </div>
 
 <br>

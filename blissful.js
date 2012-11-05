@@ -185,7 +185,6 @@ function ProjectController($scope, $http, $filter, $log, $timeout, Backoff,
                            DoSerial) {
 
   var source_code = document.getElementById('source-code');
-  var source_container = document.getElementById('source-container');
   var source_image = document.getElementById('source-image');
 
   // { "app.yaml" : {
@@ -428,10 +427,14 @@ function ProjectController($scope, $http, $filter, $log, $timeout, Backoff,
 
   var noJsonTransform = function(data) { return data; };
 
-  var _getfileurl = function(file) {
+  function url_of(file) {
     return '//' + $scope.config.BLISS_USER_CONTENT_HOST +
            document.location.pathname + 'getfile/' +
            encodeURI(file.name);
+  };
+
+  $scope.image_url_of = function(file) {
+    return (file && $scope.isImageMimeType(file.mime_type)) ? url_of(file) : '';
   };
 
   var _get = function(file, success_cb) {
@@ -439,7 +442,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, Backoff,
       success_cb();
       return;
     }
-    var url = _getfileurl(file);
+    var url = url_of(file);
     $http.get(url, {transformResponse: noJsonTransform})
     .success(function(data, status, headers, config) {
       file.contents = data;
@@ -448,21 +451,21 @@ function ProjectController($scope, $http, $filter, $log, $timeout, Backoff,
     });
   };
 
+  $scope.isImageMimeType = function(mime_type) {
+    return /^image\//.test(mime_type);
+  };
+
   $scope.select = function(file) {
-    if (/^image\//.test(file.mime_type)) {
-      var url = _getfileurl(file);
-      source_image.setAttribute('src', url);
-      source_container.setAttribute('class', 'image');
+    if (_editor) {
+      angular.element(_editor.getWrapperElement()).remove();
+    }
+    if ($scope.isImageMimeType(file.mime_type)) {
       $scope.currentFile = file;
       return;
     }
     _get(file, function() {
-      while(source_code.hasChildNodes()) {
-        source_code.removeChild(source_code.childNodes[0]);
-      }
       _editor = createEditor(file.mime_type);
       _editor.getScrollerElement().id = 'scroller-element';
-      source_container.setAttribute('class', 'code');
       _editor.setValue(file.contents);
       _editor.setOption('onChange', editorOnChange);
       _editor.focus();

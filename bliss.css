@@ -277,25 +277,16 @@ h1 {
         margin: 0.4em;
       }
 
-#source-container {
+.source-container {
   height: 400px;
 }
 
-  #source-container #source-code {
+  .source-container #source-code {
     background-color: #f8fafc;
-    white-space: pre;
     height: 100%;
   }
 
-  #source-container #source-code , #source-container #source-image {
-    display: none;
-  }
-
-  #source-container.code #source-code , #source-container.image #source-image {
-    display: block;
-  }
-
-  #source-container IMG {
+  .source-container IMG {
     background: url(/bliss/checker.png) repeat;
     display: block;
   }
