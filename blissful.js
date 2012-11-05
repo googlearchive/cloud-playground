@@ -65,7 +65,7 @@ angular.module('blissful', ['ngResource'])
   return Backoff;
 })
 
-.factory('DoSerial', function($q, $log) {
+.factory('DoSerial', function($q, $timeout, $log) {
 
   var deferred = $q.defer();
   deferred.resolve();
@@ -80,6 +80,16 @@ angular.module('blissful', ['ngResource'])
   }
 
   var DoSerial = {
+    /* yield execution until next tick from the event loop */
+    tick: function() {
+      var d = $q.defer();
+      $timeout(function() {
+        d.resolve();
+      });
+      promise = promise.then(function() { return d.promise; });
+      return DoSerial;
+    },
+    /* schedule action to perform next */
     then: function(func) {
       promise = promise.then(function() {
         return promisehack(func);
