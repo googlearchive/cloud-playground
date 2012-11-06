@@ -1,0 +1,4 @@
+handlers:
+- url: /angularjs
+  static_dir: angularjs
+  secure: always

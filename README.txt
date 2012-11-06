@@ -15,6 +15,9 @@ other than Apache 2.0.
 
 * Bliss (i.e the source code in this repo). See LICENSE file.
 
+* AngularJS (code.angularjs.org). See
+  https://github.com/angular/angular.js/blob/master/LICENSE
+
 * CodeMirror (http://marijnhaverbeke.nl/git/codemirror) by Marijn Haverbeke. See
   http://codemirror.net/LICENSE.
 

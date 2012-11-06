@@ -1,4 +1,4 @@
-angular.module('blissful', ['ngResource'])
+angular.module('blissful', [])
 
 .config(function($httpProvider, $locationProvider, $routeProvider) {
   $httpProvider.responseInterceptors.push('blissHttpInterceptor');
