@@ -14,6 +14,11 @@ handlers:
   static_files: \1
   upload: (main.html|project.html)
 
+- url: /bliss/(p/.*/)?
+  static_files: index.html
+  upload: index.html
+  secure: always
+
 - url: /bliss|/bliss/.*
   script: bliss.app
   secure: always

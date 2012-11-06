@@ -273,7 +273,7 @@ h1 {
       float: right;
     }
 
-      #footer SPAN {
+      #footer #adminlinks > SPAN {
         margin: 0.4em;
       }
 

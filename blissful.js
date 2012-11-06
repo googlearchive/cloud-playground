@@ -71,12 +71,11 @@ angular.module('blissful', ['ngResource'])
   deferred.resolve();
   var promise = deferred.promise;
 
-  function promisehack(func) {
-    var result = func();
-    if (result && result.then) {
-      result = result.then;
+  function promisehack(val) {
+    if (val && val.then) {
+      return val;
     }
-    return result;
+    return val();
   }
 
   var DoSerial = {
@@ -93,7 +92,8 @@ angular.module('blissful', ['ngResource'])
     then: function(func) {
       promise = promise.then(function() {
         return promisehack(func);
-      }, function(err) {
+      },
+      function(err) {
         $log.error('DoSerial encountered', err);
         return promisehack(func);
       });
@@ -113,7 +113,20 @@ function HeaderController($scope, $location) {
 
 }
 
-function AdminController($scope, $http, $window, DoSerial) {
+function PageController($scope, $http, $location, $routeParams, $window, DoSerial) {
+
+  $scope.datastore_admin = function() {
+    $window.open('/bliss/datastore/' + namespace(), '_blank');
+  };
+
+  $scope.memcache_admin = function() {
+    $window.open('/bliss/memcache/' + namespace(), '_blank');
+  };
+
+  $scope.namespace = function() {
+    return $routeParams.project_id ||
+           ($scope.config && $scope.config.bliss_namespace);
+  };
 
   $scope.big_red_button = function() {
     DoSerial
@@ -126,26 +139,52 @@ function AdminController($scope, $http, $window, DoSerial) {
     });
   };
 
+  $scope.prompt_to_delete_project = function(project) {
+    var answer = prompt("Are you sure you want to delete project " +
+                        project.name + "?\nType 'yes' to confirm.", "no");
+    if (!answer || answer.toLowerCase()[0] != 'y') {
+      return;
+    }
+    $scope.project = undefined;
+    $http.post('/bliss/p/' + encodeURI(project.key) + '/delete')
+    .success(function(data, status, headers, config) {
+      delete $scope.projects[project.key];
+      $location.path('/bliss/');
+    });
+  };
+
+  $scope.hasprojects = function() {
+    var hasprojects = false;
+    angular.forEach($scope.projects, function() {
+      hasprojects = true;
+    });
+    return hasprojects;
+  };
+
+  function getconfig() {
+    return $http.get('/bliss/getconfig')
+    .success(function(data, status, headers, config) {
+       $scope.config = data;
+    });
+  };
+
+  function getprojects() {
+    return $http.get('/bliss/getprojects')
+    .success(function(data, status, headers, config) {
+      $scope.projects = {};
+      angular.forEach(data, function(props, i) {
+        $scope.projects[props.key] =  props;
+      });
+    });
+  };
+
+  DoSerial
+  .then(getconfig)
+  .then(getprojects)
+
 }
 
 function MainController($scope, $http, $location, $window, $log, DoSerial) {
-
-  DoSerial
-  .then(function() {
-    return $http.get('getprojects')
-    .success(function(data, status, headers, config) {
-      $scope.projects = data;
-    });
-  })
-  .then(function() {
-    return $http.get('gettemplates')
-    .success(function(data, status, headers, config) {
-      $scope.templates = data;
-    });
-  })
-  .then(function() {
-    $scope.loaded = true;
-  });
 
   $scope.login = function() {
     $window.location = '/bliss/login';
@@ -163,36 +202,26 @@ function MainController($scope, $http, $location, $window, $log, DoSerial) {
           project_name: template.name,
           project_description: template.description})
       .success(function(data, status, headers, config) {
-        $scope.projects.push(data);
-        return;
+        $scope.projects[data.key] = data;
       });
     });
   };
 
-  $scope.prompt_to_delete_project = function(project) {
-    var answer = prompt("Are you sure you want to delete project " +
-                        project.name + "?\nType 'yes' to confirm.", "no");
-    if (!answer || answer.toLowerCase()[0] != 'y') {
-      return;
-    }
-    $http.post('/bliss/p/' + encodeURI(project.key) + '/delete')
+  DoSerial
+  .then(function() {
+    return $http.get('gettemplates')
     .success(function(data, status, headers, config) {
-      // TODO figure out how we can modify $scope.projects directly
-      // and force 'ng-show/ng-hide="projects"' to re-evaluated
-      var projects = [];
-      for (i in $scope.projects) {
-        if ($scope.projects[i] != project) {
-          projects.push($scope.projects[i]);
-        }
-      }
-      $scope.projects = projects;
+      $scope.templates = data;
     });
-  };
+  })
+  .then(function() {
+    $scope.loaded = true;
+  });
 
 }
 
-function ProjectController($scope, $http, $filter, $log, $timeout, Backoff,
-                           DoSerial) {
+function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
+                           Backoff, DoSerial) {
 
   var source_code = document.getElementById('source-code');
   var source_image = document.getElementById('source-image');
@@ -235,12 +264,12 @@ function ProjectController($scope, $http, $filter, $log, $timeout, Backoff,
       }
       if (_popout) {
         container.style.display = 'none';
-        _output_window = window.open($scope.config.project_run_url,
-                                     $scope.config.project_id);
+        _output_window = window.open($scope.project.run_url,
+                                     $scope.project.key);
       } else {
         container.style.display = 'block';
         var iframe = document.getElementById('output-iframe');
-        iframe.src = $scope.config.project_run_url;
+        iframe.src = $scope.project.run_url;
       }
     });
   }
@@ -298,17 +327,17 @@ function ProjectController($scope, $http, $filter, $log, $timeout, Backoff,
 
   $scope.prompt_file_delete = function() {
     var answer = prompt("Are you sure you want to delete " +
-                        $scope.currentFile.name + "?\nType 'yes' to confirm.", "no");
+                        $scope.currentFile.name + "?\nType 'yes' to confirm.",
+                        "no");
     if (!answer || answer.toLowerCase()[0] != 'y') {
       return;
     }
     $scope.deletefile($scope.currentFile);
   }
 
-  $scope.prompt_project_rename = function() {
-    var new_project_name = prompt(
-        'Enter a new name for this project',
-        $scope.config.project_name);
+  $scope.prompt_project_rename = function(project) {
+    var new_project_name = prompt('Enter a new name for this project',
+                                  project.name);
     if (!new_project_name) {
       return;
     }
@@ -316,7 +345,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, Backoff,
     .then(function() {
       return $http.post('rename', {newname: new_project_name})
       .success(function(data, status, headers, config) {
-        $scope.config.project_name = new_project_name;
+        $scope.project = $scope.projects[data.key] = data;
       });
     });
   }
@@ -498,15 +527,10 @@ function ProjectController($scope, $http, $filter, $log, $timeout, Backoff,
     });
   };
 
-  var getconfig = function() {
-    return $http.get('getconfig')
-    .success(function(data, status, headers, config) {
-       $scope.config = data;
-    });
-  };
-
   DoSerial
-  .then(getconfig)
+  .then(function() {
+    $scope.project = $scope.projects[$routeParams.project_id];
+  })
   .then(listfiles)
   .then(function() {
     resizer('divider1', 'source-container');

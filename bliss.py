@@ -1,14 +1,12 @@
 """Module containing the bliss WSGI handlers."""
 
 import cgi
+import httplib
 import json
 import logging
 import os
 import re
 import urllib
-
-from jinja2 import Environment
-from jinja2 import FileSystemLoader
 
 import webapp2
 from webapp2_extras import security
@@ -37,8 +35,6 @@ _JSON_ENCODER.sort_keys = True
 
 _DEV_APPSERVER = os.environ['SERVER_SOFTWARE'].startswith('Development/')
 
-_JINJA2_ENV = Environment(autoescape=True, loader=FileSystemLoader(''))
-
 _DASH_DOT_DASH = '-dot-'
 
 # RFC1113 formatted 'Expires' to prevent HTTP/1.0 caching
@@ -61,14 +57,6 @@ _ANON_USER_KEY = u'anon_user_key'
 
 def tojson(r):
   return _JSON_ENCODER.encode(r)
-
-
-def HashOfProject(project):
-  return {
-      'key': project.key.id(),
-      'name': project.project_name,
-      'description': project.project_description
-  }
 
 
 # From http://webapp-improved.appspot.com/guide/extras.html
@@ -151,9 +139,6 @@ class SessionHandler(webapp2.RequestHandler):
 class BlissHandler(SessionHandler):
   """Convenice request handler with bliss specific functionality."""
 
-  def not_found(self):
-    self.render('404.html', path_info=self.request.path_info)
-
   @webapp2.cached_property
   def project_id(self):
     return mimic.GetProjectIdFromPathInfo(self.request.path_info)
@@ -217,6 +202,15 @@ class BlissHandler(SessionHandler):
     else:
       super(BlissHandler, self).handle_exception(exception, debug_mode)
 
+  def DictOfProject(self, project):
+    return {
+        'key': project.key.id(),
+        'name': project.project_name,
+        'description': project.project_description,
+        'run_url': self._GetPlaygroundRunUrl(project.key.id()),
+    }
+
+
   def _GetPlaygroundRunUrl(self, project_id):
     """Determine the playground run url."""
     assert project_id
@@ -228,40 +222,8 @@ class BlissHandler(SessionHandler):
     else:
       return '{0}://{1}{2}{3}/'.format(self.request.scheme,
                                        urllib.quote_plus(str(project_id)),
-                                       _DASH_DOT_DASH, settings.PLAYGROUND_HOST)
-
-  def render(self, template, *args, **kwargs):
-    """Renders the provided template."""
-    template = _JINJA2_ENV.get_template(template)
-
-    namespace = mimic.GetNamespace() or settings.BLISS_NAMESPACE
-    app_id = app_identity.get_application_id()
-
-    if _DEV_APPSERVER:
-      datastore_admin_url = '/_ah/admin/datastore?namespace=%s' % namespace
-      memcache_admin_url = '/_ah/admin/memcache?namespace=%s' % namespace
-    elif users.is_current_user_admin():
-      datastore_admin_url = ('https://appengine.google.com/datastore/explorer'
-                             '?&app_id=%s&namespace=%s' % (app_id, namespace))
-      memcache_admin_url = ('https://appengine.google.com/memcache'
-                            '?&app_id=%s&namespace=%s' % (app_id, namespace))
-    else:
-      datastore_admin_url = None
-      memcache_admin_url = None
-
-    if users.get_current_user():
-      kwargs['is_logged_in'] = True
-    if users.is_current_user_admin():
-      kwargs['is_admin'] = True
-
-    self.response.write(template.render(
-        *args,
-        namespace=namespace,
-        email=self.user.key.id(),
-        git_bliss_url='http://code.google.com/p/cloud-playground/',
-        datastore_admin_url=datastore_admin_url,
-        memcache_admin_url=memcache_admin_url,
-        **kwargs))
+                                       _DASH_DOT_DASH,
+                                       settings.PLAYGROUND_HOST)
 
   def dispatch(self):
     """WSGI request dispatch with automatic JSON parsing."""
@@ -271,17 +233,50 @@ class BlissHandler(SessionHandler):
     super(BlissHandler, self).dispatch()
 
 
+class RedirectHandler(BlissHandler):
+
+  def _GetAppId(self, namespace):
+      if namespace == settings.BLISS_NAMESPACE:
+        app_id = settings.BLISS_APP_ID
+      else:
+        app_id = settings.PLAYGROUND_APP_ID
+
+
+class DatastoreRedirect(RedirectHandler):
+
+  def get(self, namespace):
+    if _DEV_APPSERVER:
+      url = '/_ah/admin/datastore?namespace={0}'.format(namespace)
+    else:
+      url = ('https://appengine.google.com/datastore/explorer'
+             '?&app_id={0}&namespace={1}'
+             .format(self._GetAppId(namepsace), namespace))
+    self.redirect(url)
+
+
+class MemcacheRedirect(RedirectHandler):
+
+  def get(self, namespace):
+    if _DEV_APPSERVER:
+      url = '/_ah/admin/memcache?namespace={0}'.format(namespace)
+    else:
+      url = ('https://appengine.google.com/memcache'
+             '?&app_id={0}&namespace={1}'
+             .format(self._GetAppId(namespace), namespace))
+    self.redirect(url)
+
+
 class GetConfig(BlissHandler):
 
-  def get(self, project_id):
+  def get(self):
     """Handles HTTP GET requests."""
-    assert project_id
     r = {
         'BLISS_USER_CONTENT_HOST': settings.BLISS_USER_CONTENT_HOST,
-        'project_id': project_id,
-        'project_name': self.project.project_name,
-        'project_description': self.project.project_description,
-        'project_run_url': self._GetPlaygroundRunUrl(project_id),
+        'git_bliss_url': 'http://code.google.com/p/cloud-playground/',
+        'bliss_namespace': settings.BLISS_NAMESPACE,
+        'email': self.user.key.id(),
+        'is_logged_in': bool(users.get_current_user()),
+        'is_admin': bool(users.is_current_user_admin()),
     }
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
@@ -290,7 +285,7 @@ class GetConfig(BlissHandler):
 class GetProjects(BlissHandler):
 
   def get(self):
-    r = [HashOfProject(p) for p in model.GetProjects(self.user)]
+    r = [self.DictOfProject(p) for p in model.GetProjects(self.user)]
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
 
@@ -309,7 +304,6 @@ class GetTemplates(BlissHandler):
         'description': t.description,
     } for t in model.GetTemplates()]
     r = {
-        'is_logged_in': bool(users.get_current_user()),
         'template_sources': template_sources,
         'templates': templates,
     }
@@ -417,7 +411,8 @@ class ListFiles(BlissHandler):
     assert project_id
     project = model.GetProject(project_id)
     if not project:
-      return self.not_found()
+      self.response.set_status(httplib.NOT_FOUND)
+      return
     # 'path is None' means get all files recursively
     if not path:
       path = None
@@ -425,13 +420,6 @@ class ListFiles(BlissHandler):
     r = [{'name': name, 'mime_type': shared.GuessMimeType(name)} for name in r]
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
-
-
-class Bliss(BlissHandler):
-
-  def get(self):
-    """Handles HTTP GET requests."""
-    self.render('index.html')
 
 
 class Login(BlissHandler):
@@ -482,7 +470,7 @@ class CreateProject(BlissHandler):
       raise error.BlissError('template_url required')
     project = self._MakeTemplateProject(template_url, project_name,
                                         project_description)
-    r = HashOfProject(project)
+    r = self.DictOfProject(project)
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
 
@@ -503,7 +491,10 @@ class RenameProject(BlissHandler):
     data = json.loads(self.request.body)
     newname = data.get('newname')
     assert newname
-    model.RenameProject(project_id, newname)
+    project = model.RenameProject(project_id, newname)
+    r = self.DictOfProject(project)
+    self.response.headers['Content-Type'] = _JSON_MIME_TYPE
+    self.response.write(tojson(r))
 
 
 class AddSlash(webapp2.RequestHandler):
@@ -532,7 +523,7 @@ config['webapp2_extras.sessions'] = {
 
 app = webapp2.WSGIApplication([
     # config actions
-    ('/bliss/p/(.*)/getconfig', GetConfig),
+    ('/bliss/getconfig', GetConfig),
 
     # tree actions
     ('/bliss/p/(.*)/getfile/(.*)', GetFile),
@@ -557,9 +548,9 @@ app = webapp2.WSGIApplication([
 
     # /bliss
     ('/bliss', AddSlash),
-    ('/bliss/', Bliss),
     # /bliss/p/project_id/
-    ('/bliss/p/.*/', Bliss),
     ('/bliss/login', Login),
     ('/bliss/logout', Logout),
+    ('/bliss/datastore/(.*)', DatastoreRedirect),
+    ('/bliss/memcache/(.*)', MemcacheRedirect),
 ], debug=True, config=config)

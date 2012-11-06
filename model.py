@@ -110,6 +110,7 @@ def RenameProject(project_id, project_name):
    project = GetProject(project_id)
    project.project_name = project_name
    project.put()
+   return project
 
 
 def _UpdateProjectUserKeys(dest_user, source_user):

@@ -25,14 +25,14 @@
         <td><button class="btn btn-small btn-danger" ng-click="prompt_to_delete_project(project)"><i class="icon-remove icon-white"></i> delete</button></td>
       </tr>
 
-      <tr class="project" ng-hide="projects.length > 0">
+      <tr class="project" ng-hide="hasprojects()">
          <td colspan="5">
            <div>
              <b>No projects created yet.</b>
            </div>
            <div style="color: gray;">
               <div>Use the templates below to start a new project.</div>
-             <div ng-hide="templates.is_logged_in">
+             <div ng-hide="config.is_logged_in">
                Or <a ng-click="login()">login</a> to access your saved projects.
              </div>
            </div>

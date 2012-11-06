@@ -2,11 +2,10 @@
 <html ng-app="blissful">
   <head>
     <title>bliss</title>
-    {% block head %}{% endblock %}
     <link rel="stylesheet" href="/bootstrap/css/bootstrap.css">
     <link rel="stylesheet" href="/codemirror/lib/codemirror.css">
     <link rel="stylesheet" href="/bliss/bliss.css">
-    {# load angular in head section to ensure ngCloak CSS is loaded #}
+    <!-- load angular in head section to ensure ngCloak CSS is loaded -->
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular-resource.min.js"></script>
 
@@ -32,12 +31,54 @@
       }
     </style>
   </head>
-  <body>
-    {% include 'header.html' %}
+  <body ng-cloak ng-controller="PageController">
+    <div id="container">
 
-    <div ng-view></div>
+      <!-- cover up IFRAMEs during drag -->
+      <div id='drag-div'>
+      </div>
 
-    {% include 'footer.html' %}
+      <div id="header" ng-controller="HeaderController">
+        <a class="logo" ng-href="/bliss"><span class='app-back' ng-hide="alreadyhome()">&#x2039;</span>Cloud Playground</a>
+        <sup class="experimental">experimental</sup>
+
+        <div class="topbar">
+          <div class="email">
+            <span><i class="icon-user"></i> {{config.email}}</span>
+            <button ng-show="config.is_logged_in" class="btn" onclick="window.location='/bliss/logout'">logout</button>
+            <button ng-hide="config.is_logged_in" class="btn btn-success" onclick="window.location='/bliss/login'">login</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="butter">
+        Note: This is a shared public playground.
+        Anyone can read, modify or delete your projects, files and data at any time.
+        Your private source code and data are <em>not</em> safe here.
+      </div>
+
+      <hr class="divider">
+
+      <div id="main">
+        <div ng-view></div>
+      </div>
+
+      <div id="footer">
+        <div class="diag">
+          <span>namespace: {{namespace()}}</span>
+        </div>
+        <div id="adminlinks">
+          <span>git(<a class="link" href="{{git_bliss_url}}" target="_blank">bliss</a>)</span>
+
+          <span ng-show="config.is_admin">danger(<span class="link" ng-click="big_red_button()">big-red-button</span>)</span>
+
+          <span ng-show="config.is_admin">admin(<span class="link" ng-click="datastore_admin()" target="_blank">datastore</span>,
+                                                <span class="link" ng-click="memcache_admin()" target="_blank">memcache</span>)</span>
+
+        </div>
+      </div>
+    </div>
+
     <script src="/bliss/bliss.js"></script>
     <script src="/bliss/blissful.js"></script>
   </body>
