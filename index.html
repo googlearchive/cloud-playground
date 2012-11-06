@@ -68,7 +68,7 @@
           <span>namespace: {{namespace()}}</span>
         </div>
         <div id="adminlinks">
-          <span>git(<a class="link" href="{{git_bliss_url}}" target="_blank">bliss</a>)</span>
+          <span>git(<a class="link" ng-href="{{config.git_bliss_url}}" target="_blank">bliss</a>)</span>
 
           <span ng-show="config.is_admin">danger(<span class="link" ng-click="big_red_button()">big-red-button</span>)</span>
 

@@ -116,11 +116,11 @@ function HeaderController($scope, $location) {
 function PageController($scope, $http, $location, $routeParams, $window, DoSerial) {
 
   $scope.datastore_admin = function() {
-    $window.open('/bliss/datastore/' + namespace(), '_blank');
+    $window.open('/bliss/datastore/' + $scope.namespace(), '_blank');
   };
 
   $scope.memcache_admin = function() {
-    $window.open('/bliss/memcache/' + namespace(), '_blank');
+    $window.open('/bliss/memcache/' + $scope.namespace(), '_blank');
   };
 
   $scope.namespace = function() {
