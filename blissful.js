@@ -75,11 +75,7 @@ angular.module('blissful', [])
     if (val && val.then) {
       return val;
     }
-    var result = val();
-    if (result && result.then) {
-      return result.then;
-    }
-    return result;
+    return val();
   }
 
   var DoSerial = {
@@ -259,7 +255,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
   $scope.run = function() {
     return DoSerial
     .then(function() {
-        _saveDirtyFiles();
+      _saveDirtyFiles();
     })
     .then(function() {
       var container = document.getElementById('output-container');
@@ -279,28 +275,25 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
   }
 
   function _save(path) {
-    return DoSerial
-    .then(function() {
-      var file = $scope.files[path];
-      if (!file.dirty) {
-        return;
-      }
-      file.dirty = false;
-      $scope.filestatus = 'Saving ' + path + ' ...';
-      return $http.put('putfile/' + encodeURI(path), file.contents, {
-                       headers: {'Content-Type': 'text/plain; charset=utf-8'}
-      })
-      .success(function(data, status, headers, config) {
-        $scope.filestatus = ''; // saved
-        Backoff.reset();
-      })
-      .error(function(data, status, headers, config) {
-        $scope.filestatus = 'Failed to save ' + path;
-        file.dirty = true;
-        var secs = Backoff.backoff() / 1000;
-        $log.warn(path, 'failed to save; will retry in', secs, 'secs');
-        Backoff.schedule(_saveDirtyFiles);
-      });
+    var file = $scope.files[path];
+    if (!file.dirty) {
+      return;
+    }
+    file.dirty = false;
+    $scope.filestatus = 'Saving ' + path + ' ...';
+    return $http.put('putfile/' + encodeURI(path), file.contents, {
+                     headers: {'Content-Type': 'text/plain; charset=utf-8'}
+    })
+    .success(function(data, status, headers, config) {
+      $scope.filestatus = ''; // saved
+      Backoff.reset();
+    })
+    .error(function(data, status, headers, config) {
+      $scope.filestatus = 'Failed to save ' + path;
+      file.dirty = true;
+      var secs = Backoff.backoff() / 1000;
+      $log.warn(path, 'failed to save; will retry in', secs, 'secs');
+      Backoff.schedule(_saveDirtyFiles);
     });
   }
 
