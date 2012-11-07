@@ -322,6 +322,9 @@ h1 {
   bottom: 0px;
   position: absolute;
   z-index: 2147483647;
+}
+
+.hidden {
   display: none;
 }
 

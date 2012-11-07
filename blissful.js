@@ -105,23 +105,29 @@ angular.module('blissful', [])
 
 })
 
-.directive('resizer', function($window) {
+.factory('ElementById', function($window) {
+  return function(id) {
+    return angular.element($window.document.getElementById(id));
+  };
+})
+
+.directive('resizer', function(ElementById) {
   var downx, downy, isdown, initialheight, elem;
-  var dragDiv = $window.document.getElementById('drag-div');
+  var dragDiv = ElementById('drag-div');
 
   function movefunc(evt) {
     if (!isdown) {
       return;
     }
     var newheight = initialheight + (evt.pageY - downy);
-    elem.style.height = newheight + 'px';
+    elem.css('height', newheight + 'px');
   };
 
   function upfunc(evt) {
     isdown = false;
-    dragDiv.style.display = 'none';
-    dragDiv.removeEventListener('mousemove', movefunc);
-    dragDiv.removeEventListener('mouseup', upfunc);
+    dragDiv.addClass('hidden');
+    dragDiv.unbind('mousemove', movefunc);
+    dragDiv.unbind('mouseup', upfunc);
   };
 
   return function(scope, element, attr) {
@@ -137,11 +143,11 @@ angular.module('blissful', [])
       isdown = true;
       downx = evt.pageX;
       downy = evt.pageY;
-      elem = $window.document.getElementById(attr.resizer);
-      initialheight = elem.offsetHeight;
-      dragDiv.style.display = 'block';
-      dragDiv.addEventListener('mousemove', movefunc);
-      dragDiv.addEventListener('mouseup', upfunc);
+      elem = ElementById(attr.resizer);
+      initialheight = elem.prop('offsetHeight');
+      dragDiv.removeClass('hidden');
+      dragDiv.bind('mousemove', movefunc);
+      dragDiv.bind('mouseup', upfunc);
     });
   };
 });
