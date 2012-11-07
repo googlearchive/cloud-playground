@@ -105,15 +105,21 @@ angular.module('blissful', [])
 
 })
 
-.factory('ElementById', function($window) {
+.factory('DomElementById', function($window) {
   return function(id) {
-    return angular.element($window.document.getElementById(id));
+    return $window.document.getElementById(id);
   };
 })
 
-.directive('resizer', function(ElementById) {
+.factory('WrappedElementById', function(DomElementById) {
+  return function(id) {
+    return angular.element(DomElementById(id));
+  };
+})
+
+.directive('resizer', function(WrappedElementById) {
   var downx, downy, isdown, initialheight, elem;
-  var dragDiv = ElementById('drag-div');
+  var dragDiv = WrappedElementById('drag-div');
 
   function movefunc(evt) {
     if (!isdown) {
@@ -143,7 +149,7 @@ angular.module('blissful', [])
       isdown = true;
       downx = evt.pageX;
       downy = evt.pageY;
-      elem = ElementById(attr.resizer);
+      elem = WrappedElementById(attr.resizer);
       initialheight = elem.prop('offsetHeight');
       dragDiv.removeClass('hidden');
       dragDiv.bind('mousemove', movefunc);
@@ -268,10 +274,11 @@ function MainController($scope, $http, $location, $window, $log, DoSerial) {
 }
 
 function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
-                           Backoff, DoSerial) {
+                           Backoff, DoSerial, DomElementById,
+                           WrappedElementById) {
 
-  var source_code = document.getElementById('source-code');
-  var source_image = document.getElementById('source-image');
+  var source_code = DomElementById('source-code');
+  var source_image = WrappedElementById('source-image');
 
   // { "app.yaml" : {
   //        "name"     : "app.yaml",
@@ -305,18 +312,18 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
       _saveDirtyFiles();
     })
     .then(function() {
-      var container = document.getElementById('output-container');
+      var container = WrappedElementById('output-container');
       if (_output_window && _output_window.closed) {
         _popout = false;
       }
       if (_popout) {
-        container.style.display = 'none';
+        container.addClass('hidden');
         _output_window = window.open($scope.project.run_url,
                                      $scope.project.key);
       } else {
-        container.style.display = 'block';
-        var iframe = document.getElementById('output-iframe');
-        iframe.src = $scope.project.run_url;
+        container.removeClass('hidden');
+        var iframe = WrappedElementById('output-iframe');
+        iframe.attr('src', $scope.project.run_url);
       }
     });
   }
@@ -425,9 +432,9 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
     evt.stopPropagation();
     hide_context_menus();
     $scope.showprojectcontextmenu = true;
-    var menuDiv = document.getElementById('project-context-menu');
-    menuDiv.style.left = evt.pageX + 'px';
-    menuDiv.style.top = evt.pageY + 'px';
+    var menuDiv = WrappedElementById('project-context-menu');
+    menuDiv.css('left', evt.pageX + 'px');
+    menuDiv.css('top', evt.pageY + 'px');
   };
 
   $scope.file_context_menu = function(evt, file) {
@@ -435,9 +442,9 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
     hide_context_menus();
     $scope.select(file);
     $scope.showfilecontextmenu = true;
-    var menuDiv = document.getElementById('file-context-menu');
-    menuDiv.style.left = evt.pageX + 'px';
-    menuDiv.style.top = evt.pageY + 'px';
+    var menuDiv = WrappedElementById('file-context-menu');
+    menuDiv.css('left', evt.pageX + 'px');
+    menuDiv.css('top', evt.pageY + 'px');
   };
 
   $scope.insertPath = function(path) {
