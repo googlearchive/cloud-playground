@@ -103,6 +103,47 @@ angular.module('blissful', [])
   };
   return DoSerial;
 
+})
+
+.directive('resizer', function($window) {
+  var downx, downy, isdown, initialheight, elem;
+  var dragDiv = $window.document.getElementById('drag-div');
+
+  function movefunc(evt) {
+    if (!isdown) {
+      return;
+    }
+    var newheight = initialheight + (evt.pageY - downy);
+    elem.style.height = newheight + 'px';
+  };
+
+  function upfunc(evt) {
+    isdown = false;
+    dragDiv.style.display = 'none';
+    dragDiv.removeEventListener('mousemove', movefunc);
+    dragDiv.removeEventListener('mouseup', upfunc);
+  };
+
+  return function(scope, element, attr) {
+    element.css({
+      cursor: 'move',
+      borderTop: '4px solid #fff',
+      borderBottom: '4px solid #fff',
+      backgroundColor: '#eee',
+      padding: '2px',
+    });
+    element.bind('mousedown', function(evt) {
+      evt.preventDefault();
+      isdown = true;
+      downx = evt.pageX;
+      downy = evt.pageY;
+      elem = $window.document.getElementById(attr.resizer);
+      initialheight = elem.offsetHeight;
+      dragDiv.style.display = 'block';
+      dragDiv.addEventListener('mousemove', movefunc);
+      dragDiv.addEventListener('mouseup', upfunc);
+    });
+  };
 });
 
 function HeaderController($scope, $location) {
@@ -529,9 +570,5 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
     $scope.project = $scope.projects[$routeParams.project_id];
   })
   .then(listfiles)
-  .then(function() {
-    resizer('divider1', 'source-container');
-    resizer('divider2', 'output-iframe');
-  });
 
 }

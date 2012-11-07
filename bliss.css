@@ -35,14 +35,6 @@ HR.divider {
   padding: 2px;
 }
 
-  HR.divider.movable {
-    cursor: move;
-    border-top: 4px solid #fff;
-    border-bottom: 4px solid #fff;
-    background-color: #eee;
-    padding: 2px;
-  }
-
 .btn {
   margin-left: 10px;
   margin-right: 10px;
@@ -277,16 +269,16 @@ h1 {
         margin: 0.4em;
       }
 
-.source-container {
+#source-container {
   height: 400px;
 }
 
-  .source-container #source-code {
+  #source-container #source-code {
     background-color: #f8fafc;
     height: 100%;
   }
 
-  .source-container IMG {
+  #source-container IMG {
     background: url(/bliss/checker.png) repeat;
     display: block;
   }
