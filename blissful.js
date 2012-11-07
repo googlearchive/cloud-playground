@@ -76,9 +76,10 @@ angular.module('blissful', [])
       return val;
     }
     var result = val();
-    if (result  && result.then) {
+    if (result && result.then) {
       return result.then;
     }
+    return result;
   }
 
   var DoSerial = {
