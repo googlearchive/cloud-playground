@@ -7,7 +7,7 @@ handlers:
 - url: /bliss/([^/]*\.(js|css))
   static_files: \1
   # don't cast a wide net
-  upload: (blissful.js|bliss.js|bliss.css)
+  upload: (bliss.js|bliss.css)
   secure: always
 
 - url: /bliss/((main|project)\.html)
