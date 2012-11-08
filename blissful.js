@@ -15,6 +15,7 @@ angular.module('blissful', [])
        controller: ProjectController,
     })
     .otherwise({redirectTo: '/bliss/'});
+
 })
 
 .factory('blissHttpInterceptor', function($q, $log, $window) {
@@ -117,6 +118,18 @@ angular.module('blissful', [])
   };
 })
 
+.factory('LightBox', function($rootScope) {
+
+  $rootScope.lightboxes = [];
+
+  return {
+    lightbox: function(summary, details) {
+      $rootScope.lightboxes.push({'summary': summary, 'details': details});
+    }
+  };
+
+})
+
 .directive('resizer', function(WrappedElementById) {
   var downx, downy, isdown, initialheight, elem;
   var dragDiv = WrappedElementById('drag-div');
@@ -166,7 +179,8 @@ function HeaderController($scope, $location) {
 
 }
 
-function PageController($scope, $http, $location, $routeParams, $window, DoSerial) {
+function PageController($scope, $http, $location, $routeParams, $window,
+                        DoSerial, LightBox) {
 
   $scope.datastore_admin = function() {
     $window.open('/bliss/datastore/' + $scope.namespace(), '_blank');
@@ -234,6 +248,18 @@ function PageController($scope, $http, $location, $routeParams, $window, DoSeria
   DoSerial
   .then(getconfig)
   .then(getprojects)
+
+}
+
+function LightboxController($scope, $window) {
+
+  $scope.reload = function() {
+    $window.location.reload();
+  };
+
+  $scope.dismiss = function() {
+    $scope.lightboxes.pop();
+  };
 
 }
 
