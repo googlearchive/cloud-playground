@@ -1,4 +1,4 @@
-angular.module('blissful', [])
+angular.module('cloud-playground', [])
 
 .config(function($httpProvider, $locationProvider, $routeProvider) {
   $httpProvider.responseInterceptors.push('blissHttpInterceptor');
