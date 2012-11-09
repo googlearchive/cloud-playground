@@ -532,6 +532,9 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
   };
 
   function createEditor(mime_type) {
+    if (_editor) {
+      angular.element(_editor.getWrapperElement()).remove();
+    }
     return CodeMirror(source_code, {
       mode: mime_type,
       lineNumbers: true,
@@ -571,9 +574,6 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
   };
 
   $scope.select = function(file) {
-    if (_editor) {
-      angular.element(_editor.getWrapperElement()).remove();
-    }
     if ($scope.isImageMimeType(file.mime_type)) {
       $scope.currentFile = file;
       return;

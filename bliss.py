@@ -103,6 +103,7 @@ class SessionHandler(webapp2.RequestHandler):
       self._PerformCsrfRequestValidation()
 
   def dispatch(self):
+    import time; time.sleep(2)
     """WSGI request dispatch."""
     # Get a session store for this request.
     self.session_store = sessions.get_store(request=self.request)
