@@ -1,31 +1,31 @@
 angular.module('cloud-playground', [])
 
 .config(function($httpProvider, $locationProvider, $routeProvider) {
-  $httpProvider.responseInterceptors.push('blissHttpInterceptor');
+  $httpProvider.responseInterceptors.push('playgroundHttpInterceptor');
 
   $locationProvider.html5Mode(true);
 
   $routeProvider
-    .when('/bliss/', {
-       templateUrl: '/bliss/main.html',
+    .when('/playground/', {
+       templateUrl: '/playground/main.html',
        controller: MainController,
     })
-    .when('/bliss/p/:project_id/', {
-       templateUrl: '/bliss/project.html',
+    .when('/playground/p/:project_id/', {
+       templateUrl: '/playground/project.html',
        controller: ProjectController,
     })
-    .otherwise({redirectTo: '/bliss/'});
+    .otherwise({redirectTo: '/playground/'});
 
 })
 
-.factory('blissHttpInterceptor', function($q, $log, $window) {
+.factory('playgroundHttpInterceptor', function($q, $log, $window) {
   return function(promise) {
     return promise.then(function(response) {
       return response;
     }, function(err) {
       if (err instanceof Error) {
         $log.error(err);
-      } else if (err.headers('X-Bliss-Error')) {
+      } else if (err.headers('X-Cloud-Playground-Error')) {
         $log.error('Error:\n' + err.data);
       } else {
         $log.error('HTTP ERROR', err);
@@ -174,7 +174,7 @@ angular.module('cloud-playground', [])
 function HeaderController($scope, $location) {
 
   $scope.alreadyhome = function() {
-    return $location.path() == '/bliss/';
+    return $location.path() == '/playground/';
   }
 
 }
@@ -183,16 +183,16 @@ function PageController($scope, $http, $location, $routeParams, $window,
                         DoSerial, LightBox) {
 
   $scope.datastore_admin = function() {
-    $window.open('/bliss/datastore/' + $scope.namespace(), '_blank');
+    $window.open('/playground/datastore/' + $scope.namespace(), '_blank');
   };
 
   $scope.memcache_admin = function() {
-    $window.open('/bliss/memcache/' + $scope.namespace(), '_blank');
+    $window.open('/playground/memcache/' + $scope.namespace(), '_blank');
   };
 
   $scope.namespace = function() {
     return $routeParams.project_id ||
-           ($scope.config && $scope.config.bliss_namespace);
+           ($scope.config && $scope.config.playground_namespace);
   };
 
   $scope.big_red_button = function() {
@@ -213,10 +213,10 @@ function PageController($scope, $http, $location, $routeParams, $window,
       return;
     }
     $scope.project = undefined;
-    $http.post('/bliss/p/' + encodeURI(project.key) + '/delete')
+    $http.post('/playground/p/' + encodeURI(project.key) + '/delete')
     .success(function(data, status, headers, config) {
       delete $scope.projects[project.key];
-      $location.path('/bliss/');
+      $location.path('/playground/');
     });
   };
 
@@ -229,14 +229,14 @@ function PageController($scope, $http, $location, $routeParams, $window,
   };
 
   function getconfig() {
-    return $http.get('/bliss/getconfig')
+    return $http.get('/playground/getconfig')
     .success(function(data, status, headers, config) {
        $scope.config = data;
     });
   };
 
   function getprojects() {
-    return $http.get('/bliss/getprojects')
+    return $http.get('/playground/getprojects')
     .success(function(data, status, headers, config) {
       $scope.projects = {};
       angular.forEach(data, function(props, i) {
@@ -266,11 +266,11 @@ function LightboxController($scope, $window) {
 function MainController($scope, $http, $location, $window, $log, DoSerial) {
 
   $scope.login = function() {
-    $window.location = '/bliss/login';
+    $window.location = '/playground/login';
   }
 
   $scope.select_project = function(project) {
-    $location.path('/bliss/p/' + project.key);
+    $location.path('/playground/p/' + project.key);
   }
 
   $scope.prompt_for_new_project = function(template) {
@@ -546,7 +546,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
   var noJsonTransform = function(data) { return data; };
 
   function url_of(file) {
-    return '//' + $scope.config.BLISS_USER_CONTENT_HOST +
+    return '//' + $scope.config.PLAYGROUND_USER_CONTENT_HOST +
            document.location.pathname + 'getfile/' +
            encodeURI(file.name);
   };

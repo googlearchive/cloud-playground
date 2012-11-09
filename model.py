@@ -39,15 +39,15 @@ class Global(ndb.Model):
   udpated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
 
-class BlissUser(ndb.Model):
-  """A Model to store bliss users."""
+class PlaygroundUser(ndb.Model):
+  """A Model to store playground users."""
   projects = ndb.KeyProperty(repeated=True, indexed=False)
   created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
   udpated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
 
-class BlissProject(ndb.Model):
-  """A Model to store bliss projects."""
+class PlaygroundProject(ndb.Model):
+  """A Model to store playground projects."""
   project_name = ndb.StringProperty(indexed=False)
   project_description = ndb.StringProperty(indexed=False)
   template_url = ndb.StringProperty(indexed=False)
@@ -87,8 +87,8 @@ class Template(ndb.Model):
 
 
 def GetOrCreateUser(user_id):
-  return BlissUser.get_or_insert(user_id,
-                                 namespace=settings.BLISS_NAMESPACE)
+  return PlaygroundUser.get_or_insert(user_id,
+                                 namespace=settings.PLAYGROUND_NAMESPACE)
 
 
 def GetProjects(user):
@@ -101,8 +101,8 @@ def GetProjects(user):
 
 
 def GetProject(project_id):
-  project = BlissProject.get_by_id(long(project_id),
-                                   namespace=settings.BLISS_NAMESPACE)
+  project = PlaygroundProject.get_by_id(long(project_id),
+                                   namespace=settings.PLAYGROUND_NAMESPACE)
   return project
 
 
@@ -137,7 +137,7 @@ def AdoptProjects(dest_user_key, source_user_key):
 
 
 def GetGlobalRootEntity():
-  return Global.get_or_insert('config', namespace=settings.BLISS_NAMESPACE)
+  return Global.get_or_insert('config', namespace=settings.PLAYGROUND_NAMESPACE)
 
 
 def GetTemplateSource(url):
@@ -147,14 +147,14 @@ def GetTemplateSource(url):
 def GetTemplateSources():
   """Get template sources."""
   _MEMCACHE_KEY = TemplateSource.__name__
-  sources = memcache.get(_MEMCACHE_KEY, namespace=settings.BLISS_NAMESPACE)
+  sources = memcache.get(_MEMCACHE_KEY, namespace=settings.PLAYGROUND_NAMESPACE)
   if sources:
     return sources
   sources = TemplateSource.query(ancestor=GetGlobalRootEntity().key).fetch()
   if not sources:
     sources = _GetTemplateSources()
   sources.sort(key=lambda source: source.description)
-  memcache.set(_MEMCACHE_KEY, sources, namespace=settings.BLISS_NAMESPACE,
+  memcache.set(_MEMCACHE_KEY, sources, namespace=settings.PLAYGROUND_NAMESPACE,
                time=_MEMCACHE_TIME)
   return sources
 
@@ -170,7 +170,7 @@ def _GetTemplateSources():
       continue
     source = TemplateSource(key=key, description=description)
     shared.w('adding task to populate template source {0!r}'.format(uri))
-    taskqueue.add(url='/_bliss_tasks/template_source/populate',
+    taskqueue.add(url='/_playground_tasks/template_source/populate',
                   params={'key': source.key.id()})
     sources.append(source)
   ndb.put_multi(sources)
@@ -180,14 +180,15 @@ def _GetTemplateSources():
 def GetTemplates():
   """Get templates from a given template source."""
   _MEMCACHE_KEY = '{0}'.format(Template.__name__)
-  templates = memcache.get(_MEMCACHE_KEY, namespace=settings.BLISS_NAMESPACE)
+  templates = memcache.get(_MEMCACHE_KEY,
+                           namespace=settings.PLAYGROUND_NAMESPACE)
   if templates:
     return templates
-  templates = (Template.query(namespace=settings.BLISS_NAMESPACE)
+  templates = (Template.query(namespace=settings.PLAYGROUND_NAMESPACE)
                .order(Template.key).fetch())
   templates.sort(key=lambda template: template.name.lower())
-  memcache.set(_MEMCACHE_KEY, templates, namespace=settings.BLISS_NAMESPACE,
-               time=_MEMCACHE_TIME)
+  memcache.set(_MEMCACHE_KEY, templates,
+               namespace=settings.PLAYGROUND_NAMESPACE, time=_MEMCACHE_TIME)
   return templates
 
 
@@ -195,14 +196,15 @@ def GetTemplatesBySource(template_source):
   """Get templates from a given template source."""
   _MEMCACHE_KEY = '{0}-{1}'.format(Template.__name__,
                                    template_source.key.id())
-  templates = memcache.get(_MEMCACHE_KEY, namespace=settings.BLISS_NAMESPACE)
+  templates = memcache.get(_MEMCACHE_KEY,
+                           namespace=settings.PLAYGROUND_NAMESPACE)
   if templates:
     return templates
   templates = (Template.query(ancestor=template_source.key)
                .order(Template.key).fetch())
   templates.sort(key=lambda template: template.name.lower())
-  memcache.set(_MEMCACHE_KEY, templates, namespace=settings.BLISS_NAMESPACE,
-               time=_MEMCACHE_TIME)
+  memcache.set(_MEMCACHE_KEY, templates,
+               namespace=settings.PLAYGROUND_NAMESPACE, time=_MEMCACHE_TIME)
   return templates
 
 
@@ -261,13 +263,13 @@ def CreateProject(user, template_url, project_name, project_description):
     The new project entity.
 
   Raises:
-    BlissError: If the project name already exists.
+    PlaygroundError: If the project name already exists.
   """
-  prj = BlissProject(project_name=project_name,
-                     project_description=project_description,
-                     writers=[user.key.id()],
-                     template_url=template_url,
-                     namespace=settings.BLISS_NAMESPACE)
+  prj = PlaygroundProject(project_name=project_name,
+                          project_description=project_description,
+                          writers=[user.key.id()],
+                          template_url=template_url,
+                          namespace=settings.PLAYGROUND_NAMESPACE)
   prj.put()
   user.projects.append(prj.key)
   user.put()

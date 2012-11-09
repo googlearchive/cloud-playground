@@ -23,5 +23,5 @@ class PopulateTemplateSource(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
     # templates
-    ('/_bliss_tasks/template_source/populate', PopulateTemplateSource),
+    ('/_playground_tasks/template_source/populate', PopulateTemplateSource),
 ], debug=True)

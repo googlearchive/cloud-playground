@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html ng-app="cloud-playground">
   <head>
-    <title>bliss</title>
+    <title>Cloud Playground</title>
     <link rel="stylesheet" href="/bootstrap/css/bootstrap.css">
     <link rel="stylesheet" href="/codemirror/lib/codemirror.css">
-    <link rel="stylesheet" href="/bliss/bliss.css">
+    <link rel="stylesheet" href="/playground/playground.css">
     <!-- load angular in head section to ensure ngCloak CSS is loaded -->
     <script src="/angularjs/1.0.2/angular.js"></script>
 
@@ -38,14 +38,14 @@
       </div>
 
       <div id="header" ng-controller="HeaderController">
-        <a class="logo" ng-href="/bliss"><span class='app-back' ng-hide="alreadyhome()">&#x2039;</span>Cloud Playground</a>
+        <a class="logo" ng-href="/playground"><span class='app-back' ng-hide="alreadyhome()">&#x2039;</span>Cloud Playground</a>
         <sup class="experimental">experimental</sup>
 
         <div class="topbar">
           <div class="email">
             <span><i class="icon-user"></i> {{config.email}}</span>
-            <button ng-show="config.is_logged_in" class="btn" onclick="window.location='/bliss/logout'">logout</button>
-            <button ng-hide="config.is_logged_in" class="btn btn-success" onclick="window.location='/bliss/login'">login</button>
+            <button ng-show="config.is_logged_in" class="btn" onclick="window.location='/playground/logout'">logout</button>
+            <button ng-hide="config.is_logged_in" class="btn btn-success" onclick="window.location='/playground/login'">login</button>
           </div>
         </div>
       </div>
@@ -67,7 +67,7 @@
           <span>namespace: {{namespace()}}</span>
         </div>
         <div id="adminlinks">
-          <span>git(<a class="link" ng-href="{{config.git_bliss_url}}" target="_blank">bliss</a>)</span>
+          <span>git(<a class="link" ng-href="{{config.git_playground_url}}" target="_blank">playground</a>)</span>
 
           <span ng-show="config.is_admin">danger(<span class="link" ng-click="big_red_button()">big-red-button</span>)</span>
 
@@ -90,6 +90,6 @@
       <div class="screen" style="z-index: {{2147483647 - $index * 2 - 1}};"></div>
     </div>
 
-    <script src="/bliss/bliss.js"></script>
+    <script src="/playground/playground.js"></script>
   </body>
 </html>

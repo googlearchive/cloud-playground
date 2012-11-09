@@ -1,7 +1,7 @@
-"""Exceptions raised in bliss app."""
+"""Exceptions raised in playground app."""
 
 
-class BlissError(Exception):
+class PlaygroundError(Exception):
 
   def __init__(self, message):
-    super(BlissError, self).__init__(message)
+    super(PlaygroundError, self).__init__(message)

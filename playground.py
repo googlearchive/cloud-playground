@@ -1,4 +1,4 @@
-"""Module containing the bliss WSGI handlers."""
+"""Module containing the playground WSGI handlers."""
 
 import cgi
 import httplib
@@ -87,15 +87,16 @@ class SessionHandler(webapp2.RequestHandler):
     session_xsrf = self.session['xsrf']
     client_xsrf = self.request.headers.get(_XSRF_TOKEN_HEADER)
     if not client_xsrf:
-      raise error.BlissError('Missing client XSRF token. '
-                             'Clear your cookies and refresh the page.')
+      raise error.PlaygroundError('Missing client XSRF token. '
+                                  'Clear your cookies and refresh the page.')
     if client_xsrf != session_xsrf:
       # do not log tokens in production
       if common.IsDevMode():
         logging.error('Client XSRF token={0!r}, session XSRF token={1!r}'
                       .format(client_xsrf, session_xsrf))
-      raise error.BlissError('Client XSRF token does not match session XSRF '
-                             'token. Clear your cookies and refresh the page.')
+      raise error.PlaygroundError('Client XSRF token does not match session '
+                                  'XSRF token. Clear your cookies and refresh '
+                                  'the page.')
 
   def PerformValidation(self):
     """To be overriden by subclasses."""
@@ -112,7 +113,7 @@ class SessionHandler(webapp2.RequestHandler):
     try:
       self.user = model.GetOrCreateUser(self.get_user_key())
       self.PerformValidation()
-    except error.BlissError, e:
+    except error.PlaygroundError, e:
       # Manually dispatch to handle_exception
       self.handle_exception(e, self.app.debug)
       return
@@ -137,8 +138,8 @@ class SessionHandler(webapp2.RequestHandler):
     return session
 
 
-class BlissHandler(SessionHandler):
-  """Convenice request handler with bliss specific functionality."""
+class PlaygroundHandler(SessionHandler):
+  """Convenice request handler with playground specific functionality."""
 
   @webapp2.cached_property
   def project_id(self):
@@ -169,17 +170,18 @@ class BlissHandler(SessionHandler):
       # TODO: better approach which allows the creation of new projects
       return
     if user_key not in self.project.writers:
-      raise error.BlissError('You are not authorized to edit this project')
+      raise error.PlaygroundError('You are not authorized to edit this project')
 
   def PerformValidation(self):
-    super(BlissHandler, self).PerformValidation()
-    if not shared.ThisIsBlissApp():
-      raise error.BlissError('Bliss user interface not implemented here.')
+    super(PlaygroundHandler, self).PerformValidation()
+    if not shared.ThisIsPlaygroundApp():
+      raise error.PlaygroundError('Cloud Playground user interface not '
+                                  'implemented here.')
     if self.request.method not in _HTTP_READ_METHODS:
       self._PerformWriteAccessCheck()
 
-  def handle_bliss_error(self, exception):
-    """Called if this handled throws a BlissError.
+  def handle_playground_error(self, exception):
+    """Called if this handled throws a PlaygroundError.
 
     Args:
       exception: the exception that was thrown
@@ -188,7 +190,7 @@ class BlissHandler(SessionHandler):
     logging.exception(exception)
     self.response.clear()
     self.response.headers['Content-Type'] = 'text/plain'
-    self.response.headers['X-Bliss-Error'] = 'True'
+    self.response.headers['X-Cloud-Playground-Error'] = 'True'
     self.response.out.write('%s' % (cgi.escape(exception.message, quote=True)))
 
   def handle_exception(self, exception, debug_mode):
@@ -198,10 +200,10 @@ class BlissHandler(SessionHandler):
       exception: the exception that was thrown
       debug_mode: True if the web application is running in debug mode
     """
-    if isinstance(exception, error.BlissError):
-      self.handle_bliss_error(exception)
+    if isinstance(exception, error.PlaygroundError):
+      self.handle_playground_error(exception)
     else:
-      super(BlissHandler, self).handle_exception(exception, debug_mode)
+      super(PlaygroundHandler, self).handle_exception(exception, debug_mode)
 
   def DictOfProject(self, project):
     return {
@@ -217,30 +219,30 @@ class BlissHandler(SessionHandler):
     assert project_id
     if common.IsDevMode():
       return '{0}://{1}/?{2}={3}'.format(self.request.scheme,
-                                         settings.PLAYGROUND_HOST,
+                                         settings.EXEC_CODE_HOST,
                                          common.config.PROJECT_ID_QUERY_PARAM,
                                          urllib.quote_plus(str(project_id)))
     else:
       return '{0}://{1}{2}{3}/'.format(self.request.scheme,
                                        urllib.quote_plus(str(project_id)),
                                        _DASH_DOT_DASH,
-                                       settings.PLAYGROUND_HOST)
+                                       settings.EXEC_CODE_HOST)
 
   def dispatch(self):
     """WSGI request dispatch with automatic JSON parsing."""
     content_type = self.request.headers.get('Content-Type')
     if content_type and content_type.split(';')[0] == 'application/json':
       self.request.data = json.loads(self.request.body)
-    super(BlissHandler, self).dispatch()
+    super(PlaygroundHandler, self).dispatch()
 
 
-class RedirectHandler(BlissHandler):
+class RedirectHandler(PlaygroundHandler):
 
   def _GetAppId(self, namespace):
-      if namespace == settings.BLISS_NAMESPACE:
-        app_id = settings.BLISS_APP_ID
-      else:
+      if namespace == settings.PLAYGROUND_NAMESPACE:
         app_id = settings.PLAYGROUND_APP_ID
+      else:
+        app_id = settings.EXEC_CODE_APP_ID
 
 
 class DatastoreRedirect(RedirectHandler):
@@ -267,14 +269,14 @@ class MemcacheRedirect(RedirectHandler):
     self.redirect(url)
 
 
-class GetConfig(BlissHandler):
+class GetConfig(PlaygroundHandler):
 
   def get(self):
     """Handles HTTP GET requests."""
     r = {
-        'BLISS_USER_CONTENT_HOST': settings.BLISS_USER_CONTENT_HOST,
-        'git_bliss_url': 'http://code.google.com/p/cloud-playground/',
-        'bliss_namespace': settings.BLISS_NAMESPACE,
+        'PLAYGROUND_USER_CONTENT_HOST': settings.PLAYGROUND_USER_CONTENT_HOST,
+        'git_playground_url': 'http://code.google.com/p/cloud-playground/',
+        'playground_namespace': settings.PLAYGROUND_NAMESPACE,
         'email': self.user.key.id(),
         'is_logged_in': bool(users.get_current_user()),
         'is_admin': bool(users.is_current_user_admin()),
@@ -283,7 +285,7 @@ class GetConfig(BlissHandler):
     self.response.write(tojson(r))
 
 
-class GetProjects(BlissHandler):
+class GetProjects(PlaygroundHandler):
 
   def get(self):
     r = [self.DictOfProject(p) for p in model.GetProjects(self.user)]
@@ -291,7 +293,7 @@ class GetProjects(BlissHandler):
     self.response.write(tojson(r))
 
 
-class GetTemplates(BlissHandler):
+class GetTemplates(PlaygroundHandler):
 
   def get(self):
     template_sources = [{
@@ -312,7 +314,7 @@ class GetTemplates(BlissHandler):
     self.response.write(tojson(r))
 
 
-class GetFile(BlissHandler):
+class GetFile(PlaygroundHandler):
   """Get file handler."""
 
   def _CheckCors(self):
@@ -320,19 +322,19 @@ class GetFile(BlissHandler):
     # If not a CORS request, do nothing
     if not origin:
       return
-    bliss_origins = ['{0}://{1}'.format(self.request.scheme, h)
-                     for h in settings.BLISS_HOSTS]
+    playground_origins = ['{0}://{1}'.format(self.request.scheme, h)
+                          for h in settings.PLAYGROUND_HOSTS]
 
-    if origin not in bliss_origins:
+    if origin not in playground_origins:
       self.response.set_status(401)
       self.response.headers['Content-Type'] = 'text/plain'
       self.response.write('Unrecognized origin {0}'.format(origin))
       return
-    if self.request.host != settings.BLISS_USER_CONTENT_HOST:
+    if self.request.host != settings.PLAYGROUND_USER_CONTENT_HOST:
       self.response.set_status(401)
       self.response.headers['Content-Type'] = 'text/plain'
       self.response.write('Files may only be fetched from {0}'
-                          .format(settings.BLISS_USER_CONTENT_HOST))
+                          .format(settings.PLAYGROUND_USER_CONTENT_HOST))
       return
     # OK, CORS access allowed
     self.response.headers['Access-Control-Allow-Origin'] = origin
@@ -366,7 +368,7 @@ class GetFile(BlissHandler):
     self.response.write(contents)
 
 
-class PutFile(BlissHandler):
+class PutFile(PlaygroundHandler):
 
   def put(self, project_id, filename):
     """Handles HTTP PUT requests."""
@@ -378,7 +380,7 @@ class PutFile(BlissHandler):
     self.response.write('OK')
 
 
-class MoveFile(BlissHandler):
+class MoveFile(PlaygroundHandler):
 
   def post(self, project_id, oldpath):
     """Handles HTTP POST requests."""
@@ -390,12 +392,12 @@ class MoveFile(BlissHandler):
     newpath = data.get('newpath')
     assert newpath
     if self.tree.HasFile(newpath):
-      raise error.BlissError('Filename {0!r} already exists'
+      raise error.PlaygroundError('Filename {0!r} already exists'
                              .format(str(newpath)))
     self.tree.MoveFile(oldpath, newpath)
 
 
-class DeletePath(BlissHandler):
+class DeletePath(PlaygroundHandler):
 
   def post(self, project_id, path):
     """Handles HTTP POST requests."""
@@ -405,7 +407,7 @@ class DeletePath(BlissHandler):
     self.tree.DeletePath(path)
 
 
-class ListFiles(BlissHandler):
+class ListFiles(PlaygroundHandler):
 
   def get(self, project_id, path):
     """Handles HTTP GET requests."""
@@ -423,21 +425,21 @@ class ListFiles(BlissHandler):
     self.response.write(tojson(r))
 
 
-class Login(BlissHandler):
+class Login(PlaygroundHandler):
 
   def get(self):
     """Handles HTTP GET requests."""
-    self.redirect(users.create_login_url('/bliss'))
+    self.redirect(users.create_login_url('/playground'))
 
 
-class Logout(BlissHandler):
+class Logout(PlaygroundHandler):
 
   def get(self):
     """Handles HTTP GET requests."""
-    self.redirect(users.create_logout_url('/bliss'))
+    self.redirect(users.create_logout_url('/playground'))
 
 
-class CreateProject(BlissHandler):
+class CreateProject(PlaygroundHandler):
   """Request handler for creating projects via an HTML link."""
 
   @ndb.transactional(xg=True)
@@ -457,18 +459,18 @@ class CreateProject(BlissHandler):
 
   def get(self):
     # allow project creation via:
-    # https://appid.appspot.com/bliss/c?template_url=...
+    # https://appid.appspot.com/playground/c?template_url=...
     self.post()
 
   def post(self):
     project_name = self.request.data['project_name']
     if not project_name:
-      raise error.BlissError('project_name required')
+      raise error.PlaygroundError('project_name required')
     project_description = (self.request.data['project_description']
                            or project_name)
     template_url = self.request.data['template_url']
     if not template_url:
-      raise error.BlissError('template_url required')
+      raise error.PlaygroundError('template_url required')
     project = self._MakeTemplateProject(template_url, project_name,
                                         project_description)
     r = self.DictOfProject(project)
@@ -476,7 +478,7 @@ class CreateProject(BlissHandler):
     self.response.write(tojson(r))
 
 
-class DeleteProject(BlissHandler):
+class DeleteProject(PlaygroundHandler):
 
   def post(self, project_id):
     assert project_id
@@ -485,7 +487,7 @@ class DeleteProject(BlissHandler):
     model.DeleteProject(self.user, tree=self.tree, project_id=project_id)
 
 
-class RenameProject(BlissHandler):
+class RenameProject(PlaygroundHandler):
 
   def post(self, project_id):
     assert project_id
@@ -504,13 +506,13 @@ class AddSlash(webapp2.RequestHandler):
     self.redirect(self.request.path_info + '/')
 
 
-class Nuke(BlissHandler):
+class Nuke(PlaygroundHandler):
 
   def post(self):
     if not users.is_current_user_admin():
       shared.e('You must be an admin for this app')
     model.DeleteTemplates()
-    self.redirect('/bliss')
+    self.redirect('/playground')
 
 
 config = {}
@@ -524,34 +526,34 @@ config['webapp2_extras.sessions'] = {
 
 app = webapp2.WSGIApplication([
     # config actions
-    ('/bliss/getconfig', GetConfig),
+    ('/playground/getconfig', GetConfig),
 
     # tree actions
-    ('/bliss/p/(.*)/getfile/(.*)', GetFile),
-    ('/bliss/p/(.*)/putfile/(.*)', PutFile),
-    ('/bliss/p/(.*)/movefile/(.*)', MoveFile),
-    ('/bliss/p/(.*)/deletepath/(.*)', DeletePath),
-    ('/bliss/p/(.*)/listfiles/?(.*)', ListFiles),
+    ('/playground/p/(.*)/getfile/(.*)', GetFile),
+    ('/playground/p/(.*)/putfile/(.*)', PutFile),
+    ('/playground/p/(.*)/movefile/(.*)', MoveFile),
+    ('/playground/p/(.*)/deletepath/(.*)', DeletePath),
+    ('/playground/p/(.*)/listfiles/?(.*)', ListFiles),
 
     # project actions
-    ('/bliss/gettemplates', GetTemplates),
-    ('/bliss/getprojects', GetProjects),
-    ('/bliss/p/(.*)/delete', DeleteProject),
-    ('/bliss/p/(.*)/rename', RenameProject),
+    ('/playground/gettemplates', GetTemplates),
+    ('/playground/getprojects', GetProjects),
+    ('/playground/p/(.*)/delete', DeleteProject),
+    ('/playground/p/(.*)/rename', RenameProject),
 
-    # bliss actions
-    ('/bliss/createproject', CreateProject),
+    # playground actions
+    ('/playground/createproject', CreateProject),
 
-    ('/bliss/p/[^/]+$', AddSlash),
+    ('/playground/p/[^/]+$', AddSlash),
 
     # admin tools
-    ('/bliss/nuke', Nuke),
+    ('/playground/nuke', Nuke),
 
-    # /bliss
-    ('/bliss', AddSlash),
-    # /bliss/p/project_id/
-    ('/bliss/login', Login),
-    ('/bliss/logout', Logout),
-    ('/bliss/datastore/(.*)', DatastoreRedirect),
-    ('/bliss/memcache/(.*)', MemcacheRedirect),
+    # /playground
+    ('/playground', AddSlash),
+    # /playground/p/project_id/
+    ('/playground/login', Login),
+    ('/playground/logout', Logout),
+    ('/playground/datastore/(.*)', DatastoreRedirect),
+    ('/playground/memcache/(.*)', MemcacheRedirect),
 ], debug=True, config=config)

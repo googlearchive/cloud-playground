@@ -62,7 +62,7 @@ class UrlFetchTree(common.Tree):
     Returns:
       The URL Fetch response.
     """
-    url = ('https://{0}.appspot.com/bliss/p/{1}/getfile/{2}'
+    url = ('https://{0}.appspot.com/playground/p/{1}/getfile/{2}'
            .format(_config.SOURCE_CODE_APP_ID,
                    self.namespace,
                    path))
@@ -85,7 +85,7 @@ class UrlFetchTree(common.Tree):
     Returns:
       The URL Fetch response.
     """
-    url = ('https://{0}.appspot.com/bliss/p/{1}/putfile/{2}'
+    url = ('https://{0}.appspot.com/playground/p/{1}/putfile/{2}'
            .format(_config.SOURCE_CODE_APP_ID,
                    self.namespace,
                    path))
@@ -132,7 +132,7 @@ class UrlFetchTree(common.Tree):
     Returns:
       True if the move succeeded.
     """
-    url = ('https://{0}.appspot.com/bliss/p/{1}/movefile/{2}?newpath={3}'
+    url = ('https://{0}.appspot.com/playground/p/{1}/movefile/{2}?newpath={3}'
            .format(_config.SOURCE_CODE_APP_ID,
                    self.namespace,
                    path,
@@ -158,7 +158,7 @@ class UrlFetchTree(common.Tree):
     Returns:
       True if the delete succeeded.
     """
-    url = ('https://{0}.appspot.com/bliss/p/{1}/deletepath/{2}'
+    url = ('https://{0}.appspot.com/playground/p/{1}/deletepath/{2}'
            .format(_config.SOURCE_CODE_APP_ID,
                    self.namespace,
                    path))
@@ -194,7 +194,7 @@ class UrlFetchTree(common.Tree):
       A list of files in the specified directory or tree.
     """
     path = self._NormalizeDirectoryPath(path)
-    url = ('https://{0}.appspot.com/bliss/p/{1}/listfiles/'
+    url = ('https://{0}.appspot.com/playground/p/{1}/listfiles/'
            .format(_config.SOURCE_CODE_APP_ID,
                    self.namespace))
     headers = {}

@@ -1,6 +1,6 @@
 # keep in sync with urlfetch_tree_SOURCE_CODE_APP_ID in appengine_config.py
 application: try-appengine
-version: bliss
+version: playground
 runtime: python27
 api_version: 1
 # Mimic target environment is not yet threadsafe
@@ -10,7 +10,7 @@ includes:
 - angularjs.yaml
 - bootstrap.yaml
 - codemirror.yaml
-- bliss.yaml
+- playground.yaml
 - tasks.yaml
 
 # https://developers.google.com/appengine/docs/python/config/appconfig#Builtin_Handlers

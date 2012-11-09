@@ -1,4 +1,4 @@
-"""Module for shared bliss functions."""
+"""Module for shared playground functions."""
 
 import httplib
 import logging
@@ -85,11 +85,11 @@ def GuessMimeType(filename):
   return 'text/plain'
 
 
-def ThisIsBlissApp():
-  """Determines whether this is the bliss app id."""
+def ThisIsPlaygroundApp():
+  """Determines whether this is the playground app id."""
   if common.IsDevMode():
     return True
-  return app_identity.get_application_id() == settings.BLISS_APP_ID
+  return app_identity.get_application_id() == settings.PLAYGROUND_APP_ID
 
 
 def DoesCurrentProjectExist():

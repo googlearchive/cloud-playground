@@ -1,3 +1,3 @@
 handlers:
-- url: /_bliss_tasks/.*
+- url: /_playground_tasks/.*
   script: tasks.app

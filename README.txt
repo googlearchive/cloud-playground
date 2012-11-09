@@ -1,8 +1,8 @@
 ===================================
-bliss - Cloud Playground IDE
+playground - Cloud Playground IDE
 ===================================
 
-bliss is a "dev_appserver" in the cloud. It's an experimental IDE for the
+playground is a "dev_appserver" in the cloud. It's an experimental IDE for the
 Cloud Playground, which serves as a thin wrapper on top of mimic, demonstrating
 what you can do with mimic.
 

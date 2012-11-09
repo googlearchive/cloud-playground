@@ -53,9 +53,9 @@ class Mimic(object):
     try:
       if common.IsDevMode():
         logging.warn('\n' * 3)
-      if (os.environ['HTTP_HOST'] in settings.BLISS_HOSTS
+      if (os.environ['HTTP_HOST'] in settings.PLAYGROUND_HOSTS
           and os.environ['PATH_INFO'] == '/'):
-        yield self._RedirectResponse('/bliss')
+        yield self._RedirectResponse('/playground')
         return
       mimic.RunMimic(create_tree_func=common.config.CREATE_TREE_FUNC)
     except target_env.TargetAppError, err:

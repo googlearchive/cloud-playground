@@ -7,7 +7,7 @@ import settings
 from google.appengine.ext import ndb
 
 
-class BlissSecret(ndb.Model):
+class PlaygroundSecret(ndb.Model):
   """A model which stores secret keys."""
   secret_key = ndb.StringProperty(indexed=False)
   created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
@@ -17,13 +17,14 @@ class BlissSecret(ndb.Model):
 def GetSecret(key_name, entropy):
   """Returns and lazily creates random application secrets."""
   # optimistically try fast, transactionless get_by_key_name
-  entity = BlissSecret.get_by_id(key_name, namespace=settings.BLISS_NAMESPACE)
+  entity = PlaygroundSecret.get_by_id(key_name,
+                                      namespace=settings.PLAYGROUND_NAMESPACE)
   # fall back to slower get_or_insert
   if not entity:
     candidate_secret_key = security.generate_random_string(
         entropy=entropy, pool=security.LOWERCASE_ALPHANUMERIC)
-    entity = BlissSecret.get_or_insert(key_name,
-                                       secret_key=candidate_secret_key,
-                                       namespace=settings.BLISS_NAMESPACE)
+    entity = PlaygroundSecret.get_or_insert(
+        key_name, secret_key=candidate_secret_key,
+        namespace=settings.PLAYGROUND_NAMESPACE)
   # return the one true secret key from the datastore
   return str(entity.secret_key)

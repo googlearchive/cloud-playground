@@ -15,18 +15,18 @@ from google.appengine.api import app_identity
 # our current app id
 app_id = app_identity.get_application_id()
 
-urlfetch_tree_SOURCE_CODE_APP_ID = settings.BLISS_APP_ID
+urlfetch_tree_SOURCE_CODE_APP_ID = settings.PLAYGROUND_APP_ID
 
 if common.IsDevMode() or urlfetch_tree_SOURCE_CODE_APP_ID == app_id:
   mimic_CREATE_TREE_FUNC = datastore_tree.DatastoreTree
 else:
   mimic_CREATE_TREE_FUNC = caching_urlfetch_tree.CachingUrlFetchTree
 
-mimic_NAMESPACE = '_bliss'
+mimic_NAMESPACE = '_playground'
 
-mimic_PROJECT_ID_QUERY_PARAM = '_bliss_project'
+mimic_PROJECT_ID_QUERY_PARAM = '_playground_project'
 
-mimic_PROJECT_ID_FROM_PATH_INFO_RE = re.compile('/bliss/p/(.+?)/')
+mimic_PROJECT_ID_FROM_PATH_INFO_RE = re.compile('/playground/p/(.+?)/')
 
 
 def namespace_manager_default_namespace_for_request():
