@@ -220,6 +220,7 @@ def RunTargetApp(tree, path_info, namespace, users_mod):
   if not page:
     RespondWithStatus(httplib.NOT_FOUND, content_type='text/html',
                       data=_NOT_FOUND_PAGE % path_info)
+    return
 
   # in production redirect to https for handlers specifying 'secure: always'
   if (page.secure == target_info.SECURE_ALWAYS
