@@ -36,14 +36,14 @@ class Global(ndb.Model):
   A single root entity allows us to use ancestor queries for consistency.
   """
   created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
-  udpated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+  updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
 
 class PlaygroundUser(ndb.Model):
   """A Model to store playground users."""
   projects = ndb.KeyProperty(repeated=True, indexed=False)
   created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
-  udpated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+  updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
 
 class PlaygroundProject(ndb.Model):
@@ -53,7 +53,7 @@ class PlaygroundProject(ndb.Model):
   template_url = ndb.StringProperty(indexed=False)
   writers = ndb.StringProperty(repeated=True)
   created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
-  udpated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+  updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
 
 class TemplateSource(ndb.Model):
@@ -63,7 +63,7 @@ class TemplateSource(ndb.Model):
   """
   description = ndb.StringProperty(indexed=False)
   created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
-  udpated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+  updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
   @property
   def base_url(self):
@@ -79,7 +79,7 @@ class Template(ndb.Model):
   name = ndb.StringProperty(indexed=False)
   description = ndb.StringProperty(indexed=False)
   created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
-  udpated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+  updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
   @property
   def template_url(self):
