@@ -51,9 +51,14 @@ class PlaygroundProject(ndb.Model):
   project_name = ndb.StringProperty(indexed=False)
   project_description = ndb.StringProperty(indexed=False)
   template_url = ndb.StringProperty(indexed=False)
+  owner = ndb.StringProperty(required=True)
   writers = ndb.StringProperty(repeated=True)
   created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
   updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+  orderby = ndb.StringProperty(required=True)
+
+  def _pre_put_hook(self):
+    self.orderby = '{0}-{1}'.format(self.owner, self.updated.isoformat())
 
 
 class TemplateSource(ndb.Model):
@@ -118,11 +123,12 @@ def _UpdateProjectUserKeys(dest_user, source_user):
   dest_user_key = dest_user.key.id()
   source_user_key = source_user.key.id()
   for p in projects:
-    if not source_user_key in p.writers:
+    if source_user_key not in p.writers:
       continue
     p.writers.remove(source_user_key)
     if dest_user_key in p.writers:
       continue
+    p.owner = dest_user_key
     p.writers.append(dest_user_key)
   ndb.put_multi(projects)
 
@@ -267,6 +273,7 @@ def CreateProject(user, template_url, project_name, project_description):
   """
   prj = PlaygroundProject(project_name=project_name,
                           project_description=project_description,
+                          owner=user.key.id(),
                           writers=[user.key.id()],
                           template_url=template_url,
                           namespace=settings.PLAYGROUND_NAMESPACE)
