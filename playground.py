@@ -499,12 +499,6 @@ class RenameProject(PlaygroundHandler):
     self.response.write(tojson(r))
 
 
-class AddSlash(webapp2.RequestHandler):
-
-  def get(self):
-    self.redirect(self.request.path_info + '/')
-
-
 class Nuke(PlaygroundHandler):
 
   def post(self):
@@ -543,14 +537,10 @@ app = webapp2.WSGIApplication([
     # playground actions
     ('/playground/createproject', CreateProject),
 
-    ('/playground/p/[^/]+$', AddSlash),
-
     # admin tools
     ('/playground/nuke', Nuke),
 
     # /playground
-    ('/playground', AddSlash),
-    # /playground/p/project_id/
     ('/playground/login', Login),
     ('/playground/logout', Logout),
     ('/playground/datastore/(.*)', DatastoreRedirect),

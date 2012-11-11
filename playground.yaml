@@ -14,7 +14,7 @@ handlers:
   static_files: \1
   upload: (main.html|project.html)
 
-- url: /playground/(p/.*/)?
+- url: (/playground/?|/playground/p/[^/]*/?)?
   static_files: playground.html
   upload: playground.html
   secure: always
@@ -25,6 +25,6 @@ handlers:
   upload: playground.html
   secure: always
 
-- url: /playground|/playground/.*
+- url: /playground/.*
   script: playground.app
   secure: always
