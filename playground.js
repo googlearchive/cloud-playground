@@ -215,17 +215,21 @@ function PageController($scope, $http, $location, $routeParams, $window,
     $scope.project = undefined;
     $http.post('/playground/p/' + encodeURI(project.key) + '/delete')
     .success(function(data, status, headers, config) {
-      delete $scope.projects[project.key];
+      for (var i in $scope.projects) {
+        if ($scope.projects[i] == project) {
+          $scope.projects.splice(i, 1);
+          break;
+        }
+      }
       $location.path('/playground/');
     });
   };
 
   $scope.hasprojects = function() {
-    var hasprojects = false;
-    angular.forEach($scope.projects, function() {
-      hasprojects = true;
-    });
-    return hasprojects;
+    for (var i in $scope.projects) {
+      return true;
+    }
+    return false;
   };
 
   function getconfig() {
@@ -238,10 +242,7 @@ function PageController($scope, $http, $location, $routeParams, $window,
   function getprojects() {
     return $http.get('/playground/getprojects')
     .success(function(data, status, headers, config) {
-      $scope.projects = {};
-      angular.forEach(data, function(props, i) {
-        $scope.projects[props.key] =  props;
-      });
+      $scope.projects = data;
     });
   };
 
@@ -281,7 +282,7 @@ function MainController($scope, $http, $location, $window, $log, DoSerial) {
           project_name: template.name,
           project_description: template.description})
       .success(function(data, status, headers, config) {
-        $scope.projects[data.key] = data;
+        $scope.projects.push(data);
       });
     });
   };
@@ -422,7 +423,12 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
     .then(function() {
       return $http.post('rename', {newname: new_project_name})
       .success(function(data, status, headers, config) {
-        $scope.project = $scope.projects[data.key] = data;
+        for (var i in $scope.projects) {
+          if ($scope.projects[i] == project) {
+            $scope.project = $scope.projects[i] = data;
+            break;
+          }
+        }
       });
     });
   }
@@ -606,7 +612,12 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
 
   DoSerial
   .then(function() {
-    $scope.project = $scope.projects[$routeParams.project_id];
+    for (var i in $scope.projects) {
+      if ($scope.projects[i].key == $routeParams.project_id) {
+        $scope.project = $scope.projects[i];
+        break;
+      }
+    }
   })
   .then(listfiles)
 

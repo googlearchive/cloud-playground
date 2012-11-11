@@ -17,7 +17,7 @@
     </thead>
 
     <tbody>
-      <tr ng-repeat="project in projects">
+      <tr ng-repeat="project in projects | orderBy:'orderby':true">
         <td class="key">{{project.key}}</div>
         <td><button class="btn btn-small btn-success" ng-click="select_project(project)"><i class="icon-edit icon-white"></i> Run/Edit</button>
         <td>{{project.name}}</td>

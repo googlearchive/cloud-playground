@@ -209,6 +209,7 @@ class PlaygroundHandler(SessionHandler):
         'key': project.key.id(),
         'name': project.project_name,
         'description': project.project_description,
+        'orderby': project.orderby,
         'run_url': self._GetPlaygroundRunUrl(project.key.id()),
     }
 

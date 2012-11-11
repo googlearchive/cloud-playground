@@ -55,10 +55,10 @@ class PlaygroundProject(ndb.Model):
   writers = ndb.StringProperty(repeated=True)
   created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
   updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
-  orderby = ndb.StringProperty(required=True)
 
-  def _pre_put_hook(self):
-    self.orderby = '{0}-{1}'.format(self.owner, self.updated.isoformat())
+  @property
+  def orderby(self):
+    return '{0}-{1}'.format(self.owner, self.updated.isoformat())
 
 
 class TemplateSource(ndb.Model):
