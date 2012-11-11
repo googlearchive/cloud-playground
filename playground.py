@@ -500,6 +500,16 @@ class RenameProject(PlaygroundHandler):
     self.response.write(tojson(r))
 
 
+class TouchProject(PlaygroundHandler):
+
+  def post(self, project_id):
+    assert project_id
+    project = model.TouchProject(project_id)
+    r = self.DictOfProject(project)
+    self.response.headers['Content-Type'] = _JSON_MIME_TYPE
+    self.response.write(tojson(r))
+
+
 class Nuke(PlaygroundHandler):
 
   def post(self):
@@ -534,6 +544,7 @@ app = webapp2.WSGIApplication([
     ('/playground/getprojects', GetProjects),
     ('/playground/p/(.*)/delete', DeleteProject),
     ('/playground/p/(.*)/rename', RenameProject),
+    ('/playground/p/(.*)/touch', TouchProject),
 
     # playground actions
     ('/playground/createproject', CreateProject),

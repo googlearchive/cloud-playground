@@ -271,7 +271,19 @@ function MainController($scope, $http, $location, $window, $log, DoSerial) {
   }
 
   $scope.select_project = function(project) {
-    $location.path('/playground/p/' + project.key);
+    DoSerial
+    .then(function() {
+      return $http.post('/playground/p/' + project.key + '/touch')
+      .success(function(data, status, headers, config) {
+        for (var i in $scope.projects) {
+          if ($scope.projects[i] == project) {
+            $scope.projects[i] = project = data;
+            break;
+          }
+        }
+        $location.path('/playground/p/' + project.key);
+      });
+    });
   }
 
   $scope.prompt_for_new_project = function(template) {

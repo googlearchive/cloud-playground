@@ -118,6 +118,12 @@ def RenameProject(project_id, project_name):
    return project
 
 
+def TouchProject(project_id):
+   project = GetProject(project_id)
+   project.put()
+   return project
+
+
 def _UpdateProjectUserKeys(dest_user, source_user):
   projects = GetProjects(source_user)
   dest_user_key = dest_user.key.id()
