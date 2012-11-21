@@ -496,46 +496,46 @@ class MimicTest(unittest.TestCase):
     self.assertEquals('proj2', project_id)
 
   def testGetProjectIdFromQueryParam(self):
-    self.assertEquals('_mimic_project', common.config.PROJECT_ID_QUERY_PARAM)
+    self.assertEquals('_playground_project', common.config.PROJECT_ID_QUERY_PARAM)
     self.assertEquals('', mimic.GetProjectIdFromQueryParam())
     os.environ['QUERY_STRING'] = 'foo='
     self.assertEquals('', mimic.GetProjectIdFromQueryParam())
     os.environ['QUERY_STRING'] = 'foo=bar'
     self.assertEquals('', mimic.GetProjectIdFromQueryParam())
-    os.environ['QUERY_STRING'] = '_mimic_project=proj42'
+    os.environ['QUERY_STRING'] = '_playground_project=proj42'
     self.assertEquals('proj42', mimic.GetProjectIdFromQueryParam())
-    os.environ['QUERY_STRING'] = '_mimic_project=proj43&foo=bar'
+    os.environ['QUERY_STRING'] = '_playground_project=proj43&foo=bar'
     self.assertEquals('proj43', mimic.GetProjectIdFromQueryParam())
-    os.environ['QUERY_STRING'] = 'foo=bar&_mimic_project=proj44'
+    os.environ['QUERY_STRING'] = 'foo=bar&_playground_project=proj44'
     self.assertEquals('proj44', mimic.GetProjectIdFromQueryParam())
-    os.environ['QUERY_STRING'] = 'foo=bar&_mimic_project=proj45&a=b'
+    os.environ['QUERY_STRING'] = 'foo=bar&_playground_project=proj45&a=b'
     self.assertEquals('proj45', mimic.GetProjectIdFromQueryParam())
 
   def testGetProjectIdFromRecentQueryParam(self):
     os.environ['SERVER_SOFTWARE'] = 'Development/check-project-id'
     self.assertEquals('', mimic._most_recent_query_string_project_id)
-    self.assertEquals('_mimic_project', common.config.PROJECT_ID_QUERY_PARAM)
+    self.assertEquals('_playground_project', common.config.PROJECT_ID_QUERY_PARAM)
     self.assertEquals('', mimic.GetProjectIdFromQueryParam())
-    os.environ['QUERY_STRING'] = '_mimic_project=proj42'
+    os.environ['QUERY_STRING'] = '_playground_project=proj42'
     self.assertEquals('proj42', mimic.GetProjectIdFromQueryParam())
     self.assertEquals('proj42', mimic._most_recent_query_string_project_id)
     os.environ['QUERY_STRING'] = ''
     self.assertEquals('proj42', mimic.GetProjectIdFromQueryParam())
     self.assertEquals('proj42', mimic._most_recent_query_string_project_id)
-    os.environ['QUERY_STRING'] = '_mimic_project='
+    os.environ['QUERY_STRING'] = '_playground_project='
     self.assertEquals('proj42', mimic.GetProjectIdFromQueryParam())
     self.assertEquals('proj42', mimic._most_recent_query_string_project_id)
 
   def testGetProjectIdFromPathInfo(self):
-    self.assertEquals('/_mimic/p/(.+?)/',
+    self.assertEquals('/playground/p/(.+?)/',
                       common.config.PROJECT_ID_FROM_PATH_INFO_RE.pattern)
     self.assertEquals('', mimic.GetProjectIdFromPathInfo('/'))
-    self.assertEquals('foo', mimic.GetProjectIdFromPathInfo('/_mimic/p/foo/'))
-    self.assertEquals('', mimic.GetProjectIdFromPathInfo('/_mimic/p/foo'))
+    self.assertEquals('foo', mimic.GetProjectIdFromPathInfo('/playground/p/foo/'))
+    self.assertEquals('', mimic.GetProjectIdFromPathInfo('/playground/p/foo'))
     self.assertEquals('foo',
-                      mimic.GetProjectIdFromPathInfo('/_mimic/p/foo/bar'))
+                      mimic.GetProjectIdFromPathInfo('/playground/p/foo/bar'))
     self.assertEquals('foo',
-                      mimic.GetProjectIdFromPathInfo('/_mimic/p/foo/bar/'))
+                      mimic.GetProjectIdFromPathInfo('/playground/p/foo/bar/'))
 
   def checkProjectId(self, expected_value, header_value, path_info_value,
                      server_name_value, query_value, recent_query_value,
@@ -546,7 +546,7 @@ class MimicTest(unittest.TestCase):
       os.environ.pop('HTTP_X_APPENGINE_CURRENT_NAMESPACE', None)
 
     if path_info_value:
-      os.environ['PATH_INFO'] = '/_mimic/p/{0}/'.format(path_info_value)
+      os.environ['PATH_INFO'] = '/playground/p/{0}/'.format(path_info_value)
     else:
       os.environ['PATH_INFO'] = '/foo'
 
@@ -557,7 +557,7 @@ class MimicTest(unittest.TestCase):
       os.environ['SERVER_NAME'] = 'your-app-id.appspot.com'
 
     if query_value:
-      os.environ['QUERY_STRING'] = '_mimic_project={0}'.format(query_value)
+      os.environ['QUERY_STRING'] = '_playground_project={0}'.format(query_value)
     else:
       os.environ['QUERY_STRING'] = ''
 
