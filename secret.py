@@ -11,7 +11,7 @@ class PlaygroundSecret(ndb.Model):
   """A model which stores secret keys."""
   secret_key = ndb.StringProperty(indexed=False)
   created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
-  udpated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+  updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
 
 def GetSecret(key_name, entropy):
