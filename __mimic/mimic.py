@@ -86,7 +86,7 @@ _NOT_FOUND_PAGE = """
 """
 
 # most recently seen query string project_id (dev_appserver only)
-_most_recent_query_string_project_id = ''
+_most_recent_query_string_project_id = None
 
 
 def RespondWithStatus(status_code, expiration_s=0, content_type='text/plain',
@@ -271,13 +271,13 @@ def GetProjectIdFromServerName():
   -----------                              ------------
   proj1.your-app-id.appspot.com        ->  'proj1'
   proj1-dot-your-app-id.appspot.com    ->  'proj1'
-  your-app-id.appspot.com              ->  ''
+  your-app-id.appspot.com              ->  None
   www.mydomain.com                     ->  'www'
   proj2.www.mydomain.com               ->  'proj2'
-  localhost                            ->  ''
+  localhost                            ->  None
 
   Returns:
-    The project id or empty string ''.
+    The project id or None.
   """
   # The project id is sent as a "subdomain" of the app, e.g.
   # 'project-id-dot-your-app-id.appspot.com' or
@@ -289,7 +289,7 @@ def GetProjectIdFromServerName():
 
   if (server_name == 'localhost' or
       server_name == app_identity.get_default_version_hostname()):
-    return ''
+    return None
 
   return server_name.split('.')[0]
 
@@ -310,7 +310,7 @@ def GetProjectIdFromPathInfo(path_info):
   """Returns the project id from the request path."""
   m = common.config.PROJECT_ID_FROM_PATH_INFO_RE.match(path_info)
   if not m:
-    return ''
+    return None
   return m.group(1)
 
 
@@ -336,6 +336,7 @@ def GetProjectId():
   # in the dev_appserver determine project id via a query parameter
   if common.IsDevMode():
     project_id = GetProjectIdFromQueryParam()
+  # may be None
   return project_id
 
 
