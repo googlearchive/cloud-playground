@@ -294,9 +294,18 @@ def GetProjectIdFromServerName():
   return server_name.split('.')[0]
 
 
-def GetProjectIdFromQueryParam():
-  """Returns the project id from the project id query param."""
+def GetProjectIdFromDevAppserverQueryParam():
+  """Returns the project id from the (or a recent) project id query param.
+
+  In the dev_appserver, we need to support running any one of the (potentially)
+  many cloud playground projects. Because subdomains would be extremely painful
+  to use in the localhost environment, we extract the project id from the
+  current query string, or the most recently provided query string project id.
+  In production, we use subdomains, so always return None.
+  """
   global _most_recent_query_string_project_id
+  if not common.IsDevMode():
+    return None
   qs = os.environ.get('QUERY_STRING')
   if qs:
     params = dict(urlparse.parse_qsl(qs, strict_parsing=True))
@@ -333,11 +342,7 @@ def GetProjectId():
   project_id = GetProjectIdFromServerName()
   if project_id:
     return project_id
-  # in the dev_appserver determine project id via a query parameter
-  if common.IsDevMode():
-    project_id = GetProjectIdFromQueryParam()
-  # may be None
-  return project_id
+  return GetProjectIdFromDevAppserverQueryParam()
 
 
 def GetNamespace():
