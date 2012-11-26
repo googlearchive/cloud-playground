@@ -495,35 +495,34 @@ class MimicTest(unittest.TestCase):
     project_id = mimic.GetProjectIdFromServerName()
     self.assertEquals('proj2', project_id)
 
+  def checkProjectIdFromQueryString(self, expected_value, query_string):
+    os.environ['QUERY_STRING'] = query_string
+    self.assertEquals(expected_value, mimic.GetProjectIdFromQueryParam())
+
   def testGetProjectIdFromQueryParam(self):
     self.assertEquals('_playground_project', common.config.PROJECT_ID_QUERY_PARAM)
     self.assertEquals(None, mimic.GetProjectIdFromQueryParam())
-    os.environ['QUERY_STRING'] = 'foo='
-    self.assertEquals(None, mimic.GetProjectIdFromQueryParam())
-    os.environ['QUERY_STRING'] = 'foo=bar'
-    self.assertEquals(None, mimic.GetProjectIdFromQueryParam())
-    os.environ['QUERY_STRING'] = '_playground_project=proj42'
-    self.assertEquals('proj42', mimic.GetProjectIdFromQueryParam())
-    os.environ['QUERY_STRING'] = '_playground_project=proj43&foo=bar'
-    self.assertEquals('proj43', mimic.GetProjectIdFromQueryParam())
-    os.environ['QUERY_STRING'] = 'foo=bar&_playground_project=proj44'
-    self.assertEquals('proj44', mimic.GetProjectIdFromQueryParam())
-    os.environ['QUERY_STRING'] = 'foo=bar&_playground_project=proj45&a=b'
-    self.assertEquals('proj45', mimic.GetProjectIdFromQueryParam())
+    self.checkProjectIdFromQueryString(None, '')
+    self.checkProjectIdFromQueryString(None, 'foo=')
+    self.checkProjectIdFromQueryString(None, 'foo=bar')
+    self.checkProjectIdFromQueryString('proj42', '_playground_project=proj42')
+    self.checkProjectIdFromQueryString('proj43',
+                                       '_playground_project=proj43&foo=bar')
+    self.checkProjectIdFromQueryString('proj44',
+                                       'foo=bar&_playground_project=proj44')
+    self.checkProjectIdFromQueryString('proj45',
+                                       'foo=bar&_playground_project=proj45&a=b')
 
   def testGetProjectIdFromRecentQueryParam(self):
     os.environ['SERVER_SOFTWARE'] = 'Development/check-project-id'
     self.assertEquals(None, mimic._most_recent_query_string_project_id)
     self.assertEquals('_playground_project', common.config.PROJECT_ID_QUERY_PARAM)
     self.assertEquals(None, mimic.GetProjectIdFromQueryParam())
-    os.environ['QUERY_STRING'] = '_playground_project=proj42'
-    self.assertEquals('proj42', mimic.GetProjectIdFromQueryParam())
+    self.checkProjectIdFromQueryString('proj42', '_playground_project=proj42')
     self.assertEquals('proj42', mimic._most_recent_query_string_project_id)
-    os.environ['QUERY_STRING'] = ''
-    self.assertEquals('proj42', mimic.GetProjectIdFromQueryParam())
+    self.checkProjectIdFromQueryString('proj42', '')
     self.assertEquals('proj42', mimic._most_recent_query_string_project_id)
-    os.environ['QUERY_STRING'] = '_playground_project='
-    self.assertEquals('proj42', mimic.GetProjectIdFromQueryParam())
+    self.checkProjectIdFromQueryString('proj42', '_playground_project=')
     self.assertEquals('proj42', mimic._most_recent_query_string_project_id)
 
   def testGetProjectIdFromPathInfo(self):
