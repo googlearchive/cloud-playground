@@ -190,6 +190,8 @@ class MimicTest(unittest.TestCase):
 
   def setUp(self):
     test_util.InitAppHostingApi()
+    # save os.environ state so we car restore it in tearDown
+    self._environ = os.environ.copy()
     os.environ.pop('HTTP_X_APPENGINE_CURRENT_NAMESPACE', None)
     # used by app_identity.get_default_version_hostname()
     os.environ['DEFAULT_VERSION_HOSTNAME'] = 'your-app-id.appspot.com'
@@ -209,7 +211,9 @@ class MimicTest(unittest.TestCase):
     os.environ['HTTP_COOKIE'] = 'SID=ghi; SSID=def; HSID=abc;'
 
   def tearDown(self):
-    pass
+    # restore original os.environ
+    os.environ.clear()
+    os.environ.update(self._environ)
 
   def _CreateTree(self, namespace):
     tree = datastore_tree.DatastoreTree(namespace)
