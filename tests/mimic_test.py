@@ -501,29 +501,29 @@ class MimicTest(unittest.TestCase):
                       mimic.GetProjectIdFromDevAppserverQueryParam())
 
   def testGetProjectIdFromQueryParam(self):
-    self.assertEquals('_playground_project', common.config.PROJECT_ID_QUERY_PARAM)
+    self.assertEquals('_mimic_project', common.config.PROJECT_ID_QUERY_PARAM)
     self.assertEquals(None, mimic.GetProjectIdFromDevAppserverQueryParam())
     self.checkProjectIdFromQueryString(None, '')
     self.checkProjectIdFromQueryString(None, 'foo=')
     self.checkProjectIdFromQueryString(None, 'foo=bar')
-    self.checkProjectIdFromQueryString('proj42', '_playground_project=proj42')
+    self.checkProjectIdFromQueryString('proj42', '_mimic_project=proj42')
     self.checkProjectIdFromQueryString('proj43',
-                                       '_playground_project=proj43&foo=bar')
+                                       '_mimic_project=proj43&foo=bar')
     self.checkProjectIdFromQueryString('proj44',
-                                       'foo=bar&_playground_project=proj44')
+                                       'foo=bar&_mimic_project=proj44')
     self.checkProjectIdFromQueryString('proj45',
-                                       'foo=bar&_playground_project=proj45&a=b')
+                                       'foo=bar&_mimic_project=proj45&a=b')
 
   def testGetProjectIdFromRecentQueryParam(self):
     os.environ['SERVER_SOFTWARE'] = 'Development/check-project-id'
     self.assertEquals(None, mimic._most_recent_query_string_project_id)
-    self.assertEquals('_playground_project', common.config.PROJECT_ID_QUERY_PARAM)
+    self.assertEquals('_mimic_project', common.config.PROJECT_ID_QUERY_PARAM)
     self.assertEquals(None, mimic.GetProjectIdFromDevAppserverQueryParam())
-    self.checkProjectIdFromQueryString('proj42', '_playground_project=proj42')
+    self.checkProjectIdFromQueryString('proj42', '_mimic_project=proj42')
     self.assertEquals('proj42', mimic._most_recent_query_string_project_id)
     self.checkProjectIdFromQueryString('proj42', '')
     self.assertEquals('proj42', mimic._most_recent_query_string_project_id)
-    self.checkProjectIdFromQueryString('proj42', '_playground_project=')
+    self.checkProjectIdFromQueryString('proj42', '_mimic_project=')
     self.assertEquals('proj42', mimic._most_recent_query_string_project_id)
 
   def testGetProjectIdFromPathInfo(self):
@@ -557,7 +557,7 @@ class MimicTest(unittest.TestCase):
       os.environ['SERVER_NAME'] = 'your-app-id.appspot.com'
 
     if query_value:
-      os.environ['QUERY_STRING'] = '_playground_project={0}'.format(query_value)
+      os.environ['QUERY_STRING'] = '_mimic_project={0}'.format(query_value)
     else:
       os.environ['QUERY_STRING'] = ''
 
