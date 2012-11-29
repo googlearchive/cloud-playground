@@ -34,14 +34,10 @@ import StringIO
 import sys
 import traceback
 
-from __mimic import common
 from __mimic import composite_query
 from __mimic import target_info
 from __mimic.util import patch
 
-from google.appengine.api import datastore
-from google.appengine.api import datastore_types
-from google.appengine.api import memcache
 from google.appengine.api import namespace_manager
 from google.appengine.ext.webapp.util import run_wsgi_app
 

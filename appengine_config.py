@@ -29,5 +29,6 @@ mimic_PROJECT_ID_QUERY_PARAM = '_mimic_project'
 mimic_PROJECT_ID_FROM_PATH_INFO_RE = re.compile('/playground/p/(.+?)/')
 
 
+# pylint: disable-msg=C6409
 def namespace_manager_default_namespace_for_request():
   return mimic.GetNamespace()

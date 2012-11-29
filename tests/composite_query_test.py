@@ -130,15 +130,15 @@ class CompositeQueryTest(unittest.TestCase):
 
 
 def setUp():
-  global _MODULE_SETUP
+  global _MODULE_SETUP  # pylint: disable-msg=W0603
   if _MODULE_SETUP:
     return
   _MODULE_SETUP = True
 
   test_util.InitAppHostingApi()
 
-  global _ROOT_ITEM_KEY
-  _ROOT_ITEM_KEY = Item(key_name='root_entity')
+  global _ROOT_ITEM_KEY  # pylint: disable-msg=W0603
+  _ROOT_ITEM_KEY = Item(key_name='root_entity')  # pylint: disable-msg=C6409
 
   # add some data
   for x in range(5):

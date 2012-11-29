@@ -13,7 +13,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""This script runs all the unittests. See README.txt for usage."""
+
+"""This script runs all the unittests.
+
+See README.txt for usage.
+"""
 
 import os
 import sys

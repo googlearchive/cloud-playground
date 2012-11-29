@@ -302,8 +302,11 @@ def GetProjectIdFromDevAppserverQueryParam():
   to use in the localhost environment, we extract the project id from the
   current query string, or the most recently provided query string project id.
   In production, we use subdomains, so always return None.
+
+  Returns:
+    The project id or None.
   """
-  global _most_recent_query_string_project_id
+  global _most_recent_query_string_project_id  # pylint: disable-msg=W0603
   if not common.IsDevMode():
     return None
   qs = os.environ.get('QUERY_STRING')

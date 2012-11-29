@@ -27,7 +27,7 @@ import os
 import sys
 import traceback
 
-from __mimic import common
+
 from __mimic import mimic
 from __mimic import target_env
 
