@@ -18,6 +18,9 @@ other than Apache 2.0.
 * AngularJS (code.angularjs.org). See
   https://github.com/angular/angular.js/blob/master/LICENSE
 
+* Testacular (http://vojtajina.github.com/testacular/). See
+  https://github.com/vojtajina/testacular/blob/stable/LICENSE
+
 * CodeMirror (http://marijnhaverbeke.nl/git/codemirror) by Marijn Haverbeke. See
   http://codemirror.net/LICENSE.
 
