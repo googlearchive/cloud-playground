@@ -2,7 +2,7 @@
 #
 set -ue
 
-./sdkapi.sh
+$(dirname $0)/sdkapi.sh
 
 function deploy() {
   echo -e "\n*** Rolling back any pending updates (just in case) ***\n"
