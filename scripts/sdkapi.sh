@@ -7,7 +7,8 @@
 
 set -ue
 
-APPCFG=$(which appcfg.py) || (echo "ERROR: appcfg.py must be in your PATH"; exit 1)
+APPCFG=$(which appcfg.py) \
+  || (echo "ERROR: appcfg.py must be in your PATH"; exit 1)
 while [ -L $APPCFG ]
 do
   APPCFG=$(readlink $APPCFG)
@@ -41,7 +42,7 @@ do
   d=$DST/$m.py
   echo "- google.appengine.api.$m"
   cat $s \
-  | sed -e 's/google.appengine.api/sdkapi/g' \
+  | sed -e 's#google.appengine.api#sdkapi#g' \
   | sed -e 's#google/appengine/api#sdkapi#g' \
   > $d
 done
