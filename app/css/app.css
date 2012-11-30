@@ -234,7 +234,7 @@ h1 {
   #header {
     border-bottom: 1px solid #ccc;
     /* developers-logo.png is 200px x 48px */
-    background: 7px 7px no-repeat url(/playground/developers-logo.png);
+    background: 7px 7px no-repeat url(/playground/img/developers-logo.png);
     padding-left: 215px;
     line-height: 67px;
     height: 67px;
@@ -278,7 +278,7 @@ h1 {
   }
 
   #source-container IMG {
-    background: url(/playground/checker.png) repeat;
+    background: url(/playground/img/checker.png) repeat;
     display: block;
   }
 

@@ -1,28 +1,23 @@
 handlers:
-- url: /playground/([^/]*\.(png|gif))
-  static_files: images/\1
-  upload: images/.*.(png|gif)
+- url: /playground/js
+  static_dir: app/js
   secure: always
 
-- url: /playground/([^/]*\.(js|css))
-  static_files: \1
-  # don't cast a wide net
-  upload: (playground.js|playground.css)
+- url: /playground/css
+  static_dir: app/css
+  secure: always
+
+- url: /playground/img
+  static_dir: app/img
   secure: always
 
 - url: /playground/((main|project)\.html)
-  static_files: \1
-  upload: (main.html|project.html)
+  static_files: app/\1
+  upload: app/(main.html|project.html)
 
 - url: (/playground/?|/playground/p/[^/]*/?)?
-  static_files: playground.html
-  upload: playground.html
-  secure: always
-
-# TODO: remove legacy /bliss links
-- url: /bliss.*
-  static_files: playground.html
-  upload: playground.html
+  static_files: app/index.html
+  upload: app/index.html
   secure: always
 
 - url: /playground/.*
