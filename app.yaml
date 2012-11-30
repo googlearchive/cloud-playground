@@ -57,28 +57,3 @@ libraries:
   version: latest
 - name: yaml
   version: latest
-
-skip_files:
-# default list
-- ^app\.ya?ml
-- ^(.*/)?index\.ya?ml
-- ^(.*/)?#.*#
-- ^(.*/)?.*~
-- ^(.*/)?.*\.py[co]
-- ^(.*/)?.*/RCS/.*
-- ^(.*/)?\..*
-- ^(.*/)?.*\.so
-
-
-
-
-
-
-
-
-
-
-# things that don't need to be uploaded
-- ^(.*/)?tests.*
-- ^(.*/)?run_tests\.py
-- ^(.*/)?README\.txt
