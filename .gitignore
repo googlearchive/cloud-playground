@@ -1,2 +1,5 @@
 /sdkapi/
 *.pyc
+/test_out/
+/.chrome-test/
+/.chrome-e2e/
