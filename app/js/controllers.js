@@ -10,7 +10,10 @@ function HeaderController($scope, $location) {
 
 }
 
-// *** TODO: TEST EVERYTHING BELOW THIS LINE *****
+function PageController() {
+}
+
+/*
 
 function PageController($scope, $http, $location, $routeParams, $window,
                         DoSerial, LightBox) {
@@ -467,3 +470,4 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
   .then(listfiles)
 
 }
+*/

@@ -13,7 +13,7 @@ angular.module('playgroundApp', ['playgroundApp.filters',
 
 })
 
-// *** TODO: TEST EVERYTHING BELOW THIS LINE *****
+/*
 
 .config(function($httpProvider, $locationProvider, $routeProvider) {
   $httpProvider.responseInterceptors.push('playgroundHttpInterceptor');
@@ -32,3 +32,5 @@ angular.module('playgroundApp', ['playgroundApp.filters',
     .otherwise({redirectTo: '/playground/'});
 
 })
+
+*/

@@ -4,7 +4,7 @@
 
 angular.module('playgroundApp.services', [])
 
-// *** TODO: TEST EVERYTHING BELOW THIS LINE *****
+/*
 
 .factory('playgroundHttpInterceptor', function($q, $log, $window) {
   return function(promise) {
@@ -158,3 +158,4 @@ angular.module('playgroundApp.services', [])
     });
   };
 });
+*/
