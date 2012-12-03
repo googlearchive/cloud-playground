@@ -40,12 +40,18 @@ google-chrome $CHROME_ARGS \
   http://localhost:6060/ &
 pids="$$ $pids"
 
-
 google-chrome $CHROME_ARGS \
   --window-size=520,300 \
   --window-position=100,250 \
   --user-data-dir=.chrome-e2e \
   http://localhost:7070/testacular/ &
+pids="$$ $pids"
+
+google-chrome $CHROME_ARGS \
+  --window-size=520,300 \
+  --window-position=100,550 \
+  --user-data-dir=.chrome-app \
+  http://localhost:8080/ &
 pids="$$ $pids"
 
 while [ true ]
