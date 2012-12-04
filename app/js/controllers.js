@@ -10,7 +10,26 @@ function HeaderController($scope, $location) {
 
 }
 
-function PageController() {
+function PageController($scope, $http) {
+
+  function getconfig() {
+    return $http.get('/playground/getconfig')
+    .success(function(data, status, headers, config) {
+       $scope.config = data;
+    });
+  };
+
+  function getprojects() {
+    return $http.get('/playground/getprojects')
+    .success(function(data, status, headers, config) {
+      $scope.projects = data;
+    });
+  };
+
+  // TODO serialize with DoSerial
+  getconfig();
+  getprojects();
+
 }
 
 /*
@@ -66,20 +85,6 @@ function PageController($scope, $http, $location, $routeParams, $window,
       return true;
     }
     return false;
-  };
-
-  function getconfig() {
-    return $http.get('/playground/getconfig')
-    .success(function(data, status, headers, config) {
-       $scope.config = data;
-    });
-  };
-
-  function getprojects() {
-    return $http.get('/playground/getprojects')
-    .success(function(data, status, headers, config) {
-      $scope.projects = data;
-    });
   };
 
   DoSerial

@@ -31,14 +31,35 @@ describe('HeaderController', function() {
 });
 
 
-xdescribe('MyCtrl2', function() {
-  var myCtrl2;
+describe('PageController', function() {
+  var scope, controller, $httpBackend;
 
-  beforeEach(function(){
-    myCtrl2 = new MyCtrl2();
+  beforeEach(module('playgroundApp'));
+  beforeEach(inject(function($rootScope, $controller, $injector) {
+    scope = $rootScope.$new();
+    controller = $controller;
+    $httpBackend = $injector.get('$httpBackend');
+
+    $httpBackend
+    .when('GET', '/playground/getconfig')
+    .respond();
+
+    $httpBackend
+    .when('GET', '/playground/getprojects')
+    .respond();
+  }));
+
+
+  afterEach(function() {
+    $httpBackend.verifyNoOutstandingExpectation();
+    $httpBackend.verifyNoOutstandingRequest();
   });
 
-  xit('should ....', function() {
-    //spec body
+
+  it('should, when instantiated, get configuration, then project data', function() {
+    $httpBackend.expectGET('/playground/getconfig');
+    $httpBackend.expectGET('/playground/getprojects');
+    var ctrl = controller(PageController, {$scope: scope});
+    $httpBackend.flush();
   });
 });
