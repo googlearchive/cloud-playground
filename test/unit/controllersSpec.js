@@ -42,11 +42,18 @@ describe('PageController', function() {
 
     $httpBackend
     .when('GET', '/playground/getconfig')
-    .respond();
+    .respond({
+        "PLAYGROUND_USER_CONTENT_HOST": "localhost:9100",
+        "email": "user_q0inuf3vs5",
+        "git_playground_url": "http://code.google.com/p/cloud-playground/",
+        "is_admin": false,
+        "is_logged_in": false,
+        "playground_namespace": "_playground",
+    });
 
     $httpBackend
     .when('GET', '/playground/getprojects')
-    .respond();
+    .respond([]);
   }));
 
 
@@ -57,9 +64,16 @@ describe('PageController', function() {
 
 
   it('should, when instantiated, get configuration, then project data', function() {
+    expect(scope.config).toBeUndefined();
+    expect(scope.projects).toBeUndefined();
     $httpBackend.expectGET('/playground/getconfig');
     $httpBackend.expectGET('/playground/getprojects');
     var ctrl = controller(PageController, {$scope: scope});
     $httpBackend.flush();
+    expect(scope.config).toBeDefined();
+    expect(scope.config.email).toBeDefined();
+    expect(scope.config.playground_namespace).toBe('_playground');
+    expect(scope.projects).toBeDefined();
+    expect(scope.projects.length).toBe(0);
   });
 });
