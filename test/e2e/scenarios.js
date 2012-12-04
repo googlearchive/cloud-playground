@@ -8,14 +8,17 @@ describe('cloud playground app', function() {
     browser().navigateTo('/');
   });
 
+
   afterEach(function() {
     //sleep(1.5);
     //pause();
   });
 
+
   it('should have HTML5 mode enabled', function() {
     expect(browser().window().path()).toBe("/playground/");
   })
+
 
   it('should automatically redirect to /playground/', function() {
     expect(browser().location().url()).toBe("/playground/");
