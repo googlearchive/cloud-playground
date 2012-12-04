@@ -24,10 +24,10 @@ then
   xterm $XTERM_ARGS -geometry 120x32+0+1000 -e scripts/run.sh &
 fi
 
-xterm $XTERM_ARGS -geometry 100x15+1040+1000 -e scripts/test.sh --browsers= &
+xterm $XTERM_ARGS -geometry 180x15+1040+1000 -e scripts/test.sh --browsers= &
 pids="$$ $pids"
 
-xterm $XTERM_ARGS -geometry 100x15+1040+1290 -e scripts/e2e-test.sh --browsers= &
+xterm $XTERM_ARGS -geometry 180x15+1040+1290 -e scripts/e2e-test.sh --browsers= &
 pids="$$ $pids"
 
 sleep 1
