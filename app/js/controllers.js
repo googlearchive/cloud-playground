@@ -10,7 +10,7 @@ function HeaderController($scope, $location) {
 
 }
 
-function PageController($scope, $http) {
+function PageController($scope, $http, DoSerial) {
 
   function getconfig() {
     return $http.get('/playground/getconfig')
@@ -26,9 +26,9 @@ function PageController($scope, $http) {
     });
   };
 
-  // TODO serialize with DoSerial
-  getconfig();
-  getprojects();
+  DoSerial
+  .then(getconfig)
+  .then(getprojects)
 
 }
 
@@ -86,10 +86,6 @@ function PageController($scope, $http, $location, $routeParams, $window,
     }
     return false;
   };
-
-  DoSerial
-  .then(getconfig)
-  .then(getprojects)
 
 }
 

@@ -4,6 +4,46 @@
 
 angular.module('playgroundApp.services', [])
 
+.factory('DoSerial', function($q, $timeout, $log) {
+
+  var deferred = $q.defer();
+  deferred.resolve();
+  var promise = deferred.promise;
+
+  function promisehack(val) {
+    if (val && val.then) {
+      return val;
+    }
+    return val();
+  }
+
+  var DoSerial = {
+    // yield execution until next tick from the event loop
+    tick: function() {
+      var d = $q.defer();
+      $timeout(function() {
+        d.resolve();
+      });
+      promise = promise.then(function() { return d.promise; });
+      return DoSerial;
+    },
+    // schedule action to perform next
+    then: function(func) {
+      promise = promise.then(function() {
+        return promisehack(func);
+      },
+      function(err) {
+        $log.error('DoSerial encountered', err);
+        return promisehack(func);
+      });
+      // allow chained calls, e.g. DoSerial.then(...).then(...)
+      return DoSerial;
+    }
+  };
+  return DoSerial;
+
+})
+
 /*
 
 .factory('playgroundHttpInterceptor', function($q, $log, $window) {
@@ -52,46 +92,6 @@ angular.module('playgroundApp.services', [])
 
   Backoff.reset();
   return Backoff;
-})
-
-.factory('DoSerial', function($q, $timeout, $log) {
-
-  var deferred = $q.defer();
-  deferred.resolve();
-  var promise = deferred.promise;
-
-  function promisehack(val) {
-    if (val && val.then) {
-      return val;
-    }
-    return val();
-  }
-
-  var DoSerial = {
-    // yield execution until next tick from the event loop
-    tick: function() {
-      var d = $q.defer();
-      $timeout(function() {
-        d.resolve();
-      });
-      promise = promise.then(function() { return d.promise; });
-      return DoSerial;
-    },
-    // schedule action to perform next
-    then: function(func) {
-      promise = promise.then(function() {
-        return promisehack(func);
-      },
-      function(err) {
-        $log.error('DoSerial encountered', err);
-        return promisehack(func);
-      });
-      // allow chained calls, e.g. DoSerial.then(...).then(...)
-      return DoSerial;
-    }
-  };
-  return DoSerial;
-
 })
 
 .factory('DomElementById', function($window) {

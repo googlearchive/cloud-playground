@@ -63,17 +63,19 @@ describe('PageController', function() {
   });
 
 
-  it('should, when instantiated, get configuration, then project data', function() {
+  it('should, when instantiated, get configuration, then project data', inject(function($timeout) {
     expect(scope.config).toBeUndefined();
     expect(scope.projects).toBeUndefined();
     $httpBackend.expectGET('/playground/getconfig');
     $httpBackend.expectGET('/playground/getprojects');
     var ctrl = controller(PageController, {$scope: scope});
+    flushDoSerial($timeout);
     $httpBackend.flush();
     expect(scope.config).toBeDefined();
     expect(scope.config.email).toBeDefined();
     expect(scope.config.playground_namespace).toBe('_playground');
     expect(scope.projects).toBeDefined();
     expect(scope.projects.length).toBe(0);
-  });
+  }));
+
 });
