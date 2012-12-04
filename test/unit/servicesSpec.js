@@ -45,21 +45,25 @@ describe('service', function() {
     }));
 
 
-    // TODO: figure out how to test this functionality
-    xit('should continue after exception', inject(function(DoSerial, $timeout, $log) {
-      DoSerial
-      .then(function() { $log.log(1); })
-      .then(function() { throw 'banana peel'; })
-      .then(function() { $log.log(2); })
-      expect($log.assertEmpty());
-      try {
+    it('should log and continue after exception', function() {
+
+      module(function($exceptionHandlerProvider) {
+        $exceptionHandlerProvider.mode('log');
+      });
+
+      inject(function(DoSerial, $timeout, $log, $exceptionHandler) {
+        DoSerial
+        .then(function() { $log.log(1); })
+        .then(function() { throw 'banana peel'; })
+        .then(function() { $log.log(2); })
+        expect($log.assertEmpty());
         flushDoSerial($timeout);
-      } catch(e) {
-        $log.log('test caught:' + e);
-      }
-      expect($log.error.logs).toEqual([['DoSerial encountered']]);
-      expect($log.log.logs).toEqual([[1], ['test caught: banana peel'], [2]]);
-    }));
+        expect($exceptionHandler.errors).toEqual(['banana peel']);
+        expect($log.error.logs).toEqual([['DoSerial encountered', 'banana peel']]);
+        expect($log.log.logs).toEqual([[1], [2]]);
+      });
+
+    });
 
   });
 
