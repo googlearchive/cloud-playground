@@ -9,6 +9,14 @@ angular.module('playgroundApp', ['playgroundApp.filters',
   $locationProvider.html5Mode(true);
 
   $routeProvider
+  .when('/playground/', {
+     templateUrl: '/playground/main.html',
+     controller: MainController,
+  })
+  .when('/playground/p/:project_id/', {
+     templateUrl: '/playground/project.html',
+     controller: ProjectController,
+  })
   .otherwise({redirectTo: '/playground/'});
 
 })
@@ -17,20 +25,6 @@ angular.module('playgroundApp', ['playgroundApp.filters',
 
 .config(function($httpProvider, $locationProvider, $routeProvider) {
   $httpProvider.responseInterceptors.push('playgroundHttpInterceptor');
-
-  $locationProvider.html5Mode(true);
-
-  $routeProvider
-    .when('/playground/', {
-       templateUrl: '/playground/main.html',
-       controller: MainController,
-    })
-    .when('/playground/p/:project_id/', {
-       templateUrl: '/playground/project.html',
-       controller: ProjectController,
-    })
-    .otherwise({redirectTo: '/playground/'});
-
 })
 
 */

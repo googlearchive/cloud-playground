@@ -32,6 +32,12 @@ function PageController($scope, $http, DoSerial) {
 
 }
 
+function MainController() {
+}
+
+function ProjectController() {
+}
+
 /*
 
 function PageController($scope, $http, $location, $routeParams, $window,

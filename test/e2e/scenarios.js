@@ -33,7 +33,7 @@ describe('cloud playground app', function() {
 
 
     it('should render main view', function() {
-      //expect(element('[ng-view]').text()).toMatch(/My Projects/);
+      expect(element('[ng-view]').text()).toMatch(/My Projects/);
     });
 
     it('should show warning', function() {
@@ -56,7 +56,7 @@ describe('cloud playground app', function() {
 
 
     it('should render project view', function() {
-      //expect(element('[ng-view]').text()).toMatch(/\+ new file/);
+      expect(element('[ng-view]').text()).toMatch(/\+ new file/);
     });
 
   });
