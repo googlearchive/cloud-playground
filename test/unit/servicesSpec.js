@@ -12,6 +12,8 @@ describe('service', function() {
     it('should be chainable', inject(function(DoSerial) {
       var result = DoSerial.then(function() {});
       expect(result).toBe(DoSerial);
+      result = DoSerial.tick(function() {});
+      expect(result).toBe(DoSerial);
     }));
 
 
