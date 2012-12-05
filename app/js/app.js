@@ -17,7 +17,6 @@ angular.module('playgroundApp', ['playgroundApp.filters',
      templateUrl: '/playground/project.html',
      controller: ProjectController,
   })
-  .otherwise({redirectTo: '/playground/'});
 
   $httpProvider.responseInterceptors.push('playgroundHttpInterceptor');
 
