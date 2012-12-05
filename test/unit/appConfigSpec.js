@@ -21,4 +21,19 @@ describe('app config', function() {
 
   });
 
+
+  it('should enable html5Mode', function() {
+
+    var locationProvider;
+
+    module(function($locationProvider) {
+      locationProvider = $locationProvider;
+    });
+
+    inject(function() {
+      expect(locationProvider.html5Mode()).toEqual(true);
+    });
+
+  });
+
 });

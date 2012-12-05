@@ -15,7 +15,7 @@ describe('cloud playground app', function() {
   });
 
 
-  it('should have HTML5 mode enabled', function() {
+  it('should perform html5Mode redirect with trailing slash', function() {
     expect(browser().window().path()).toBe("/playground/");
   })
 
