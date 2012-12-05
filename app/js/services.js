@@ -44,8 +44,6 @@ angular.module('playgroundApp.services', [])
 
 })
 
-/*
-
 .factory('playgroundHttpInterceptor', function($q, $log, $window) {
   return function(promise) {
     return promise.then(function(response) {
@@ -62,6 +60,8 @@ angular.module('playgroundApp.services', [])
     });
   };
 })
+
+/*
 
 .factory('Backoff', function($timeout) {
 

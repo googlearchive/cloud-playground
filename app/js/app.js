@@ -4,7 +4,7 @@ angular.module('playgroundApp', ['playgroundApp.filters',
                                  'playgroundApp.services',
                                  'playgroundApp.directives'])
 
-.config(function($locationProvider, $routeProvider) {
+.config(function($locationProvider, $routeProvider, $httpProvider) {
 
   $locationProvider.html5Mode(true);
 
@@ -19,12 +19,6 @@ angular.module('playgroundApp', ['playgroundApp.filters',
   })
   .otherwise({redirectTo: '/playground/'});
 
-})
-
-/*
-
-.config(function($httpProvider, $locationProvider, $routeProvider) {
   $httpProvider.responseInterceptors.push('playgroundHttpInterceptor');
-})
 
-*/
+})

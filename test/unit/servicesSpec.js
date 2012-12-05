@@ -7,6 +7,78 @@ describe('service', function() {
   beforeEach(module('playgroundApp.services'));
 
 
+  describe('playgroundHttpInterceptor', function() {
+
+    it('should return HTTP normal responses unmodified', inject(function(playgroundHttpInterceptor) {
+      var called = false;
+      var http_promise = {
+        then: function(success_fn, error_fn) {
+          called = true;
+          // normal HTTP response
+          return success_fn('original http response');
+        }
+      };
+      expect(called).toBe(false);
+      var response = playgroundHttpInterceptor(http_promise);
+      expect(response).toEqual('original http response');
+      expect(called).toBe(true);
+    }));
+
+
+    it('should recognize and log X-Cloud-Playground-Error error repsonses', inject(function(playgroundHttpInterceptor, $log) {
+      var error_response = {
+        config: {},
+        data: 'error response body',
+        headers: function(name) { return name == 'X-Cloud-Playground-Error' ? 'True' : undefined; },
+        status: 500,
+      };
+      var http_promise = {
+        then: function(success_fn, error_fn) {
+          error_fn(error_response);
+        }
+      };
+      var response = playgroundHttpInterceptor(http_promise);
+      expect(response).toBeUndefined();
+      expect($log.error.logs.pop()).toEqual(['Error:\nerror response body']);
+      $log.assertEmpty();
+    }));
+
+
+    it('should log generic HTTP error repsonses', inject(function(playgroundHttpInterceptor, $log) {
+      var error_response = {
+        config: {},
+        data: 'error response body',
+        headers: function(name) { return undefined; },
+        status: 500,
+      };
+      var http_promise = {
+        then: function(success_fn, error_fn) {
+          error_fn(error_response);
+        }
+      };
+      var response = playgroundHttpInterceptor(http_promise);
+      expect(response).toBeUndefined();
+      expect($log.error.logs.pop()).toEqual(['HTTP ERROR', error_response]);
+      $log.assertEmpty();
+    }));
+
+
+    it('should log raised errors', inject(function(playgroundHttpInterceptor, $log) {
+      var error_response = Error('raised error');
+      var http_promise = {
+        then: function(success_fn, error_fn) {
+          error_fn(error_response);
+        }
+      };
+      var response = playgroundHttpInterceptor(http_promise);
+      expect(response).toBeUndefined();
+      expect($log.error.logs.pop()).toEqual([error_response]);
+      $log.assertEmpty();
+    }));
+
+  });
+
+
   describe('DoSerial', function() {
 
     it('should be chainable', inject(function(DoSerial) {
