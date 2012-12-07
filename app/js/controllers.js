@@ -349,7 +349,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
   };
 
   function _selectFirstFile() {
-    for (path in $scope.files) {
+    for (var path in $scope.files) {
       $scope.select($scope.files[path]);
       break;
     }
