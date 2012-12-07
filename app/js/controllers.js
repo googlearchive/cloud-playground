@@ -10,36 +10,6 @@ function HeaderController($scope, $location) {
 
 }
 
-function PageController($scope, $http, DoSerial) {
-
-  function getconfig() {
-    return $http.get('/playground/getconfig')
-    .success(function(data, status, headers, config) {
-       $scope.config = data;
-    });
-  };
-
-  function getprojects() {
-    return $http.get('/playground/getprojects')
-    .success(function(data, status, headers, config) {
-      $scope.projects = data;
-    });
-  };
-
-  DoSerial
-  .then(getconfig)
-  .then(getprojects)
-
-}
-
-function MainController() {
-}
-
-function ProjectController() {
-}
-
-/*
-
 function PageController($scope, $http, $location, $routeParams, $window,
                         DoSerial, LightBox) {
 
@@ -92,6 +62,24 @@ function PageController($scope, $http, $location, $routeParams, $window,
     }
     return false;
   };
+
+  function getconfig() {
+    return $http.get('/playground/getconfig')
+    .success(function(data, status, headers, config) {
+       $scope.config = data;
+    });
+  };
+
+  function getprojects() {
+    return $http.get('/playground/getprojects')
+    .success(function(data, status, headers, config) {
+      $scope.projects = data;
+    });
+  };
+
+  DoSerial
+  .then(getconfig)
+  .then(getprojects)
 
 }
 
@@ -477,4 +465,3 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
   .then(listfiles)
 
 }
-*/

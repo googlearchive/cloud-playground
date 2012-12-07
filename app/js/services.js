@@ -61,8 +61,6 @@ angular.module('playgroundApp.services', [])
   };
 })
 
-/*
-
 .factory('Backoff', function($timeout) {
 
   "Exponential backoff service."
@@ -158,4 +156,3 @@ angular.module('playgroundApp.services', [])
     });
   };
 });
-*/
