@@ -46,7 +46,7 @@ except ImportError:
     raise
 
 SCRIPT_DIR = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
-DIR_PATH = os.path.join(SCRIPT_DIR, '..')
+DIR_PATH = os.path.abspath(os.path.join(SCRIPT_DIR, '..'))
 
 
 def main():
