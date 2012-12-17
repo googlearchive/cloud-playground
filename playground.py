@@ -138,7 +138,7 @@ class SessionHandler(webapp2.RequestHandler):
 
 
 class PlaygroundHandler(SessionHandler):
-  """Convenice request handler with playground specific functionality."""
+  """Convenience request handler with playground specific functionality."""
 
   @webapp2.cached_property
   def project_id(self):
