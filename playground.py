@@ -364,6 +364,7 @@ class GetFile(PlaygroundHandler):
       return
 
     self.response.headers['Content-Type'] = shared.GuessMimeType(filename)
+    self.response.headers['Content-Disposition'] = 'attachment'
     self.response.headers['X-Content-Type-Options'] = 'nosniff'
     self.response.write(contents)
 
