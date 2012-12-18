@@ -4,10 +4,12 @@ handlers:
   # script. This handler doesn't require user login because client apps will
   # want to know if this is a mimic and its version.
   script: mimic.app
+  secure: always
 
 # block mimic control requests
 - url: /_ah/mimic/.*
   script: deny.app
+  secure: always
 
 # script handler for everything else / user code
 - url: /.*
@@ -20,4 +22,4 @@ handlers:
   #   within App Engine (offline requests like Task Queue, or webhooks like XMPP
   #   and Incoming Mail), the URL must require admin login (or no login)
   #login: admin
-  #secure: always
+  secure: always

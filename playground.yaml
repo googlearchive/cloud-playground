@@ -14,6 +14,7 @@ handlers:
 - url: /playground/((.*)\.html)
   static_files: app/\1
   upload: app/(.*\.html)
+  secure: always
 
 - url: (/playground/?|/playground/p/[^/]*/?)?
   static_files: app/index.html
