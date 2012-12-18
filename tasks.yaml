@@ -1,3 +1,4 @@
 handlers:
 - url: /_playground_tasks/.*
   script: tasks.app
+  secure: always
