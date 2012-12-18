@@ -120,6 +120,8 @@ class SessionHandler(webapp2.RequestHandler):
     try:
       # Exceptions during dispatch are automatically handled by handle_exception
       super(SessionHandler, self).dispatch()
+      # Note App Engine automatically sets a 'Date' header for us. See
+      # https://developers.google.com/appengine/docs/python/runtime#Responses
       self.response.headers['Expires'] = _LONG_AGO
       self.response.headers['Cache-Control'] = 'private, max-age=0'
       self.response.headers['X-Frame-Options'] = 'SAMEORIGIN'
@@ -190,6 +192,8 @@ class PlaygroundHandler(SessionHandler):
     self.error(500)
     logging.exception(exception)
     self.response.clear()
+    # Note App Engine automatically sets a 'Date' header for us. See
+    # https://developers.google.com/appengine/docs/python/runtime#Responses
     self.response.headers['Expires'] = _LONG_AGO
     self.response.headers['Cache-Control'] = 'private, max-age=0'
     self.response.headers['X-Frame-Options'] = 'SAMEORIGIN'
