@@ -118,9 +118,10 @@ class SessionHandler(webapp2.RequestHandler):
       return
 
     try:
-      # Exceptions during dispatch automatically handled by handle_exception
+      # Exceptions during dispatch are automatically handled by handle_exception
       super(SessionHandler, self).dispatch()
       self.response.headers['Expires'] = _LONG_AGO
+      self.response.headers['X-Frame-Options'] = 'SAMEORIGIN'
     finally:
       # Save all sessions.
       self.session_store.save_sessions(self.response)
@@ -188,6 +189,8 @@ class PlaygroundHandler(SessionHandler):
     self.error(500)
     logging.exception(exception)
     self.response.clear()
+    self.response.headers['Expires'] = _LONG_AGO
+    self.response.headers['X-Frame-Options'] = 'SAMEORIGIN'
     self.response.headers['Content-Type'] = 'text/plain'
     self.response.headers['X-Cloud-Playground-Error'] = 'True'
     self.response.out.write('%s' % (cgi.escape(exception.message, quote=True)))
