@@ -18,11 +18,14 @@ trap quit SIGINT
 
 XTERM_ARGS="-fa 'Mono' -fs 10"
 
-curl -v localhost:8080 2>/dev/null
-if [ $? -ne 0 ]
+# start dev_appserver if nothing is listening on port 8080
+curl localhost:8080 2>/dev/null
+if [ $? -eq 0 ]
 then
-  xterm $XTERM_ARGS -geometry 120x32+0+1000 -e scripts/run.sh &
+  echo "ERROR: localhost:8080 already in use."
+  exit 1
 fi
+xterm $XTERM_ARGS -geometry 120x32+0+1000 -e scripts/run.sh &
 
 xterm $XTERM_ARGS -geometry 180x15+1040+1000 -e scripts/test.sh --browsers= &
 pids="$$ $pids"
