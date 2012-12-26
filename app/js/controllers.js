@@ -39,6 +39,10 @@ function PageController($scope, $http, DoSerial, $routeParams, $window) {
     $window.open('/playground/datastore/' + $scope.namespace(), '_blank');
   };
 
+  $scope.memcache_admin = function() {
+    $window.open('/playground/memcache/' + $scope.namespace(), '_blank');
+  };
+
 }
 
 function MainController() {
@@ -51,10 +55,6 @@ function ProjectController() {
 
 function PageController($scope, $http, $location, $routeParams, $window,
                         DoSerial, LightBox) {
-
-  $scope.memcache_admin = function() {
-    $window.open('/playground/memcache/' + $scope.namespace(), '_blank');
-  };
 
   $scope.big_red_button = function() {
     DoSerial
