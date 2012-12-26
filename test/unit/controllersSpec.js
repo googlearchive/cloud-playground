@@ -81,4 +81,47 @@ describe('PageController', function() {
 
   });
 
+
+  describe('namespace function', function() {
+
+    var scope, ctrl;
+
+    beforeEach(module('playgroundApp.services'));
+
+    beforeEach(inject(function($rootScope, $controller, $injector, $routeParams) {
+      scope = $rootScope.$new();
+      scope.config = {};
+      $routeParams.project_id = undefined;
+      ctrl = $controller(PageController, {$scope: scope});
+    }));
+
+
+    it('should have no default', inject(function($routeParams) {
+      expect(scope.namespace()).toBeUndefined();
+    }));
+
+
+    it('should use $routeParams project_id', inject(function($routeParams) {
+      expect(scope.namespace()).toBeUndefined();
+      $routeParams.project_id = 'route_param';
+      expect(scope.namespace()).toBe('route_param');
+    }));
+
+
+    it('should use $scope.config.playground_namespace', inject(function($routeParams) {
+      expect(scope.namespace()).toBeUndefined();
+      scope.config.playground_namespace = 'pg_namepsace';
+      expect(scope.namespace()).toBe('pg_namepsace');
+    }));
+
+
+    it('should prefer $routeParams to $scope.config', inject(function($routeParams) {
+      expect(scope.namespace()).toBeUndefined();
+      $routeParams.project_id = 'route_param';
+      scope.config.playground_namespace = 'pg_namepsace';
+      expect(scope.namespace()).toBe('route_param');
+    }));
+
+  });
+
 });

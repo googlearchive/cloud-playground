@@ -10,7 +10,7 @@ function HeaderController($scope, $location) {
 
 }
 
-function PageController($scope, $http, DoSerial) {
+function PageController($scope, $http, DoSerial, $routeParams) {
 
   function getconfig() {
     return $http.get('/playground/getconfig')
@@ -29,6 +29,11 @@ function PageController($scope, $http, DoSerial) {
   DoSerial
   .then(getconfig)
   .then(getprojects)
+
+  $scope.namespace = function() {
+    return $routeParams.project_id ||
+           ($scope.config && $scope.config.playground_namespace);
+  };
 
 }
 
@@ -49,11 +54,6 @@ function PageController($scope, $http, $location, $routeParams, $window,
 
   $scope.memcache_admin = function() {
     $window.open('/playground/memcache/' + $scope.namespace(), '_blank');
-  };
-
-  $scope.namespace = function() {
-    return $routeParams.project_id ||
-           ($scope.config && $scope.config.playground_namespace);
   };
 
   $scope.big_red_button = function() {
