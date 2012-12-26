@@ -88,7 +88,7 @@ describe('PageController', function() {
 
     beforeEach(module('playgroundApp.services'));
 
-    beforeEach(inject(function($rootScope, $controller, $injector, $routeParams) {
+    beforeEach(inject(function($rootScope, $controller, $routeParams) {
       scope = $rootScope.$new();
       scope.config = {};
       $routeParams.project_id = undefined;
@@ -131,7 +131,7 @@ describe('PageController', function() {
 
     beforeEach(module('playgroundApp.services'));
 
-    beforeEach(inject(function($rootScope, $controller, $injector, $routeParams, $window) {
+    beforeEach(inject(function($rootScope, $controller, $routeParams, $window) {
       scope = $rootScope.$new();
       $routeParams.project_id = 'some_namespace';
       $window.open = jasmine.createSpy();
@@ -154,7 +154,7 @@ describe('PageController', function() {
 
     beforeEach(module('playgroundApp.services'));
 
-    beforeEach(inject(function($rootScope, $controller, $injector, $routeParams, $window) {
+    beforeEach(inject(function($rootScope, $controller, $routeParams, $window) {
       scope = $rootScope.$new();
       $routeParams.project_id = 'some_namespace';
       $window.open = jasmine.createSpy();
