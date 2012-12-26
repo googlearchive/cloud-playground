@@ -31,48 +31,51 @@ describe('HeaderController', function() {
 describe('PageController', function() {
   var scope, controller, $httpBackend;
 
-  beforeEach(module('playgroundApp'));
-  beforeEach(inject(function($rootScope, $controller, $injector) {
-    scope = $rootScope.$new();
-    controller = $controller;
-    $httpBackend = $injector.get('$httpBackend');
+  describe('initialization', function () {
+    beforeEach(module('playgroundApp'));
+    beforeEach(inject(function($rootScope, $controller, $injector) {
+      scope = $rootScope.$new();
+      controller = $controller;
+      $httpBackend = $injector.get('$httpBackend');
 
-    $httpBackend
-    .when('GET', '/playground/getconfig')
-    .respond({
-        "PLAYGROUND_USER_CONTENT_HOST": "localhost:9100",
-        "email": "user_q0inuf3vs5",
-        "git_playground_url": "http://code.google.com/p/cloud-playground/",
-        "is_admin": false,
-        "is_logged_in": false,
-        "playground_namespace": "_playground",
+      $httpBackend
+      .when('GET', '/playground/getconfig')
+      .respond({
+          "PLAYGROUND_USER_CONTENT_HOST": "localhost:9100",
+          "email": "user_q0inuf3vs5",
+          "git_playground_url": "http://code.google.com/p/cloud-playground/",
+          "is_admin": false,
+          "is_logged_in": false,
+          "playground_namespace": "_playground",
+      });
+
+      $httpBackend
+      .when('GET', '/playground/getprojects')
+      .respond([]);
+    }));
+
+
+    afterEach(function() {
+      $httpBackend.verifyNoOutstandingExpectation();
+      $httpBackend.verifyNoOutstandingRequest();
     });
 
-    $httpBackend
-    .when('GET', '/playground/getprojects')
-    .respond([]);
-  }));
 
+    it('should, when instantiated, get configuration, then project data', inject(function($timeout) {
+      expect(scope.config).toBeUndefined();
+      expect(scope.projects).toBeUndefined();
+      $httpBackend.expectGET('/playground/getconfig');
+      $httpBackend.expectGET('/playground/getprojects');
+      var ctrl = controller(PageController, {$scope: scope});
+      flushDoSerial($timeout);
+      $httpBackend.flush();
+      expect(scope.config).toBeDefined();
+      expect(scope.config.email).toBeDefined();
+      expect(scope.config.playground_namespace).toBe('_playground');
+      expect(scope.projects).toBeDefined();
+      expect(scope.projects.length).toBe(0);
+    }));
 
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
   });
-
-
-  it('should, when instantiated, get configuration, then project data', inject(function($timeout) {
-    expect(scope.config).toBeUndefined();
-    expect(scope.projects).toBeUndefined();
-    $httpBackend.expectGET('/playground/getconfig');
-    $httpBackend.expectGET('/playground/getprojects');
-    var ctrl = controller(PageController, {$scope: scope});
-    flushDoSerial($timeout);
-    $httpBackend.flush();
-    expect(scope.config).toBeDefined();
-    expect(scope.config.email).toBeDefined();
-    expect(scope.config.playground_namespace).toBe('_playground');
-    expect(scope.projects).toBeDefined();
-    expect(scope.projects.length).toBe(0);
-  }));
 
 });
