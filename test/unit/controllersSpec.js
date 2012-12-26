@@ -124,4 +124,28 @@ describe('PageController', function() {
 
   });
 
+
+
+  describe('datastore_admin function', function() {
+
+    var scope, ctrl;
+
+    beforeEach(module('playgroundApp.services'));
+
+    beforeEach(inject(function($rootScope, $controller, $injector, $routeParams, $window) {
+      scope = $rootScope.$new();
+      $routeParams.project_id = 'some_namespace';
+      $window.open = jasmine.createSpy();
+      ctrl = $controller(PageController, {$scope: scope});
+    }));
+
+
+    it('should open new window to /playground/datastore/some_namespace', inject(function($window) {
+      expect($window.open).not.toHaveBeenCalled();
+      scope.datastore_admin();
+      expect($window.open).toHaveBeenCalledWith('/playground/datastore/some_namespace', '_blank');
+    }));
+
+  });
+
 });

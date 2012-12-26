@@ -10,7 +10,7 @@ function HeaderController($scope, $location) {
 
 }
 
-function PageController($scope, $http, DoSerial, $routeParams) {
+function PageController($scope, $http, DoSerial, $routeParams, $window) {
 
   function getconfig() {
     return $http.get('/playground/getconfig')
@@ -35,6 +35,10 @@ function PageController($scope, $http, DoSerial, $routeParams) {
            ($scope.config && $scope.config.playground_namespace);
   };
 
+  $scope.datastore_admin = function() {
+    $window.open('/playground/datastore/' + $scope.namespace(), '_blank');
+  };
+
 }
 
 function MainController() {
@@ -47,10 +51,6 @@ function ProjectController() {
 
 function PageController($scope, $http, $location, $routeParams, $window,
                         DoSerial, LightBox) {
-
-  $scope.datastore_admin = function() {
-    $window.open('/playground/datastore/' + $scope.namespace(), '_blank');
-  };
 
   $scope.memcache_admin = function() {
     $window.open('/playground/memcache/' + $scope.namespace(), '_blank');
