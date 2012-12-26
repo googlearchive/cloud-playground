@@ -3,11 +3,11 @@
 /* jasmine specs for controllers */
 
 describe('HeaderController', function() {
-  var scope, ctrl, location;
+  var scope, location;
 
   beforeEach(inject(function($rootScope, $controller, $location) {
     scope = $rootScope.$new();
-    ctrl = $controller(HeaderController, {$scope: scope});
+    $controller(HeaderController, {$scope: scope});
     location = $location
   }));
 
@@ -30,15 +30,16 @@ describe('HeaderController', function() {
 
 describe('PageController', function() {
 
-  var scope, controller, $httpBackend;
+  var scope;
 
   describe('initialization', function () {
+
+    var $httpBackend;
 
     beforeEach(module('playgroundApp.services'));
 
     beforeEach(inject(function($rootScope, $controller, $injector) {
       scope = $rootScope.$new();
-      controller = $controller;
       $httpBackend = $injector.get('$httpBackend');
 
       $httpBackend
@@ -64,12 +65,12 @@ describe('PageController', function() {
     });
 
 
-    it('should, when instantiated, get configuration, then project data', inject(function($timeout) {
+    it('should, when instantiated, get configuration, then project data', inject(function($timeout, $controller) {
       expect(scope.config).toBeUndefined();
       expect(scope.projects).toBeUndefined();
       $httpBackend.expectGET('/playground/getconfig');
       $httpBackend.expectGET('/playground/getprojects');
-      var ctrl = controller(PageController, {$scope: scope});
+      $controller(PageController, {$scope: scope});
       flushDoSerial($timeout);
       $httpBackend.flush();
       expect(scope.config).toBeDefined();
@@ -84,7 +85,7 @@ describe('PageController', function() {
 
   describe('namespace function', function() {
 
-    var scope, ctrl;
+    var scope;
 
     beforeEach(module('playgroundApp.services'));
 
@@ -92,7 +93,7 @@ describe('PageController', function() {
       scope = $rootScope.$new();
       scope.config = {};
       $routeParams.project_id = undefined;
-      ctrl = $controller(PageController, {$scope: scope});
+      $controller(PageController, {$scope: scope});
     }));
 
 
@@ -127,7 +128,7 @@ describe('PageController', function() {
 
   describe('datastore_admin function', function() {
 
-    var scope, ctrl;
+    var scope;
 
     beforeEach(module('playgroundApp.services'));
 
@@ -135,7 +136,7 @@ describe('PageController', function() {
       scope = $rootScope.$new();
       $routeParams.project_id = 'some_namespace';
       $window.open = jasmine.createSpy();
-      ctrl = $controller(PageController, {$scope: scope});
+      $controller(PageController, {$scope: scope});
     }));
 
 
@@ -150,7 +151,7 @@ describe('PageController', function() {
 
   describe('memcache_admin function', function() {
 
-    var scope, ctrl;
+    var scope;
 
     beforeEach(module('playgroundApp.services'));
 
@@ -158,7 +159,7 @@ describe('PageController', function() {
       scope = $rootScope.$new();
       $routeParams.project_id = 'some_namespace';
       $window.open = jasmine.createSpy();
-      ctrl = $controller(PageController, {$scope: scope});
+      $controller(PageController, {$scope: scope});
     }));
 
 
