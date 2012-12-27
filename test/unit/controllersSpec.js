@@ -65,13 +65,13 @@ describe('PageController', function() {
     });
 
 
-    it('should, when instantiated, get configuration, then project data', inject(function($timeout, $controller) {
+    it('should, when instantiated, get configuration, then project data', inject(function($controller) {
       expect(scope.config).toBeUndefined();
       expect(scope.projects).toBeUndefined();
       $httpBackend.expectGET('/playground/getconfig');
       $httpBackend.expectGET('/playground/getprojects');
       $controller(PageController, {$scope: scope});
-      flushDoSerial($timeout);
+      flushDoSerial();
       $httpBackend.flush();
       expect(scope.config).toBeDefined();
       expect(scope.config.email).toBeDefined();
@@ -247,20 +247,20 @@ describe('MainController', function() {
     });
 
     function doInit() {
-      inject(function($controller, $timeout) {
+      inject(function($controller) {
         $controller(MainController, {$scope: scope});
-        flushDoSerial($timeout);
+        flushDoSerial();
         $httpBackend.flush();
       });
     }
 
-    it('should transition $scope.loaded state to true', inject(function($timeout, $controller) {
+    it('should transition $scope.loaded state to true', inject(function($controller) {
       expect(scope.loaded).toBeUndefined();
       doInit();
       expect(scope.loaded).toBe(true);
     }));
 
-    it('should get templates', inject(function($timeout, $controller) {
+    it('should get templates', inject(function($controller) {
       expect(scope.templates).toBeUndefined();
       $httpBackend.expectGET('/playground/gettemplates');
       doInit();

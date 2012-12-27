@@ -89,16 +89,16 @@ describe('service', function() {
     }));
 
 
-    it('should execute simple task', inject(function(DoSerial, $timeout) {
+    it('should execute simple task', inject(function(DoSerial) {
       var called = false;
       DoSerial.then(function() { called = true; });
       expect(called).toBe(false);
-      flushDoSerial($timeout);
+      flushDoSerial();
       expect(called).toBe(true);
     }));
 
 
-    it('should execute tasks in order', inject(function(DoSerial, $timeout, $log) {
+    it('should execute tasks in order', inject(function(DoSerial, $log) {
       DoSerial.then(function() { $log.log(1); });
       DoSerial.tick();
       DoSerial
@@ -107,7 +107,7 @@ describe('service', function() {
       .tick()
       .then(function() { $log.log(4); })
       DoSerial.tick();
-      flushDoSerial($timeout);
+      flushDoSerial();
       expect($log.log.logs).toEqual([[1], [2], [3], [4]]);
     }));
 
@@ -123,13 +123,13 @@ describe('service', function() {
         $exceptionHandlerProvider.mode('log');
       });
 
-      inject(function(DoSerial, $timeout, $log, $exceptionHandler) {
+      inject(function(DoSerial, $log, $exceptionHandler) {
         DoSerial
         .then(function() { $log.log(1); })
         .then(function() { throw 'banana peel'; })
         .then(function() { $log.log(2); })
         expect($log.assertEmpty());
-        flushDoSerial($timeout);
+        flushDoSerial();
         expect($exceptionHandler.errors).toEqual(['banana peel']);
         expect($log.error.logs).toEqual([['DoSerial encountered', 'banana peel']]);
         expect($log.log.logs).toEqual([[1], [2]]);
