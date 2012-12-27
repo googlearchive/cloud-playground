@@ -175,3 +175,36 @@ describe('PageController', function() {
   });
 
 });
+
+
+describe('MainController', function() {
+
+  var scope;
+
+  beforeEach(module(function($provide) {
+    $provide.factory('$window', function() {
+      return {
+        location: { replace: jasmine.createSpy() },
+        navigator: {},
+      };
+    });
+  }));
+
+
+  beforeEach(inject(function($rootScope, $controller, $window) {
+    scope = $rootScope.$new();
+    $controller(MainController, {$scope: scope});
+  }));
+
+
+  describe('login function', function() {
+
+    it('should navigate to /playground/login', inject(function($window) {
+      expect($window.location.replace).not.toHaveBeenCalled();
+      scope.login();
+      expect($window.location.replace).toHaveBeenCalledWith('/playground/login');
+    }));
+
+  });
+
+});

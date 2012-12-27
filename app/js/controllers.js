@@ -45,7 +45,12 @@ function PageController($scope, $http, DoSerial, $routeParams, $window) {
 
 }
 
-function MainController() {
+function MainController($scope, $window) {
+
+  $scope.login = function() {
+    $window.location.replace('/playground/login');
+  }
+
 }
 
 function ProjectController() {
@@ -108,10 +113,6 @@ function LightboxController($scope, $window) {
 }
 
 function MainController($scope, $http, $location, $window, $log, DoSerial) {
-
-  $scope.login = function() {
-    $window.location = '/playground/login';
-  }
 
   $scope.select_project = function(project) {
     DoSerial
