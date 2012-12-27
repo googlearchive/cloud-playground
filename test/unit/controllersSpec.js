@@ -32,15 +32,13 @@ describe('HeaderController', function() {
 
 describe('PageController', function() {
 
-  var scope;
-
   describe('initialization', function () {
 
-    var $httpBackend;
+    var scope, $httpBackend;
 
     beforeEach(module('playgroundApp.services'));
 
-    beforeEach(inject(function($rootScope, $controller, $injector) {
+    beforeEach(inject(function($rootScope, $injector) {
       scope = $rootScope.$new();
       $httpBackend = $injector.get('$httpBackend');
 
