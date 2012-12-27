@@ -45,7 +45,18 @@ function PageController($scope, $http, DoSerial, $routeParams, $window) {
 
 }
 
-function MainController($scope, $window) {
+function MainController($scope, $http, $window, DoSerial) {
+
+  DoSerial
+  .then(function() {
+    return $http.get('/playground/gettemplates')
+    .success(function(data, status, headers, config) {
+      $scope.templates = data;
+    });
+  })
+  .then(function() {
+    $scope.loaded = true;
+  });
 
   $scope.login = function() {
     $window.location.replace('/playground/login');
@@ -142,17 +153,6 @@ function MainController($scope, $http, $location, $window, $log, DoSerial) {
       });
     });
   };
-
-  DoSerial
-  .then(function() {
-    return $http.get('gettemplates')
-    .success(function(data, status, headers, config) {
-      $scope.templates = data;
-    });
-  })
-  .then(function() {
-    $scope.loaded = true;
-  });
 
 }
 

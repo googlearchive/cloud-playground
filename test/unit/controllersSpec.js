@@ -179,6 +179,8 @@ describe('MainController', function() {
 
   var scope;
 
+  beforeEach(module('playgroundApp.services'));
+
   beforeEach(module(function($provide) {
     $provide.factory('$window', function() {
       return {
@@ -201,6 +203,79 @@ describe('MainController', function() {
       expect($window.location.replace).not.toHaveBeenCalled();
       scope.login();
       expect($window.location.replace).toHaveBeenCalledWith('/playground/login');
+    }));
+
+  });
+
+});
+
+
+describe('MainController', function() {
+
+  describe('initialization', function () {
+
+    var scope, $httpBackend;
+
+    beforeEach(module('playgroundApp.services'));
+
+    beforeEach(inject(function($rootScope, $controller, $injector) {
+      scope = $rootScope.$new();
+      $httpBackend = $injector.get('$httpBackend');
+
+      $httpBackend
+      .when('GET', '/playground/gettemplates')
+      .respond({
+          "template_sources": [
+            { "key": "foo_key", "description": "foo_description" },
+            { "key": "bar_key", "description": "bar_description" },
+          ],
+          "templates": [
+            { "key": "boo_key", "description": "boo_description",
+              "name": "boo_name", "source_key": "boo_source_key" },
+          ]
+      });
+
+      $httpBackend
+      .when('GET', '/playground/getprojects')
+      .respond([]);
+    }));
+
+
+    afterEach(function() {
+      $httpBackend.verifyNoOutstandingExpectation();
+      $httpBackend.verifyNoOutstandingRequest();
+    });
+
+    function doInit() {
+      inject(function($controller, $timeout) {
+        $controller(MainController, {$scope: scope});
+        flushDoSerial($timeout);
+        $httpBackend.flush();
+      });
+    }
+
+    it('should transition $scope.loaded state to true', inject(function($timeout, $controller) {
+      expect(scope.loaded).toBeUndefined();
+      doInit();
+      expect(scope.loaded).toBe(true);
+    }));
+
+    it('should get templates', inject(function($timeout, $controller) {
+      expect(scope.templates).toBeUndefined();
+      $httpBackend.expectGET('/playground/gettemplates');
+      doInit();
+      expect(scope.templates).toBeDefined();
+      expect(scope.templates.template_sources.length).toBe(2);
+      expect(scope.templates.template_sources[0].key).toBe('foo_key');
+      expect(scope.templates.template_sources[0].description).toBe('foo_description');
+      expect(scope.templates.template_sources[1].key).toBe('bar_key');
+      expect(scope.templates.template_sources[1].description).toBe('bar_description');
+      expect(scope.templates.templates).toBeDefined();
+      expect(scope.templates.templates.length).toBe(1);
+      expect(scope.templates.templates[0].key).toBe('boo_key');
+      expect(scope.templates.templates[0].description).toBe('boo_description');
+      expect(scope.templates.templates[0].name).toBe('boo_name');
+      expect(scope.templates.templates[0].source_key).toBe('boo_source_key');
     }));
 
   });
