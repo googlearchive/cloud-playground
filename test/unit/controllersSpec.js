@@ -2,6 +2,8 @@
 
 /* jasmine specs for controllers */
 
+/* http://docs.angularjs.org/api/angular.mock.inject */
+
 describe('HeaderController', function() {
   var scope, location;
 
