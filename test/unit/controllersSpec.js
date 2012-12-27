@@ -45,12 +45,12 @@ describe('PageController', function() {
       $httpBackend
       .when('GET', '/playground/getconfig')
       .respond({
-          "PLAYGROUND_USER_CONTENT_HOST": "localhost:9100",
-          "email": "user_q0inuf3vs5",
-          "git_playground_url": "http://code.google.com/p/cloud-playground/",
-          "is_admin": false,
-          "is_logged_in": false,
-          "playground_namespace": "_playground",
+          'PLAYGROUND_USER_CONTENT_HOST': 'localhost:9100',
+          'email': 'user_q0inuf3vs5',
+          'git_playground_url': 'http://code.google.com/p/cloud-playground/',
+          'is_admin': false,
+          'is_logged_in': false,
+          'playground_namespace': '_playground',
       });
 
       $httpBackend
@@ -225,13 +225,13 @@ describe('MainController', function() {
       $httpBackend
       .when('GET', '/playground/gettemplates')
       .respond({
-          "template_sources": [
-            { "key": "foo_key", "description": "foo_description" },
-            { "key": "bar_key", "description": "bar_description" },
+          'template_sources': [
+            { 'key': 'foo_key', 'description': 'foo_description' },
+            { 'key': 'bar_key', 'description': 'bar_description' },
           ],
-          "templates": [
-            { "key": "boo_key", "description": "boo_description",
-              "name": "boo_name", "source_key": "boo_source_key" },
+          'templates': [
+            { 'key': 'boo_key', 'description': 'boo_description',
+              'name': 'boo_name', 'source_key': 'boo_source_key' },
           ]
       });
 
