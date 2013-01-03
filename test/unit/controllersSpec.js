@@ -120,14 +120,14 @@ describe('ProjectController', function() {
   });
 
 
-  describe('list_files function', function() {
+  describe('_list_files function', function() {
 
     it('should call /playground/p/:project_id/listfiles', inject(function($controller, $browser, $http) {
       $browser.url('/playground/p/20/');
       expect(scope.files).toBeUndefined();
       $httpBackend.expectGET('/playground/p/20/listfiles');
       $controller(ProjectController, {$scope: scope});
-      scope.list_files();
+      scope._list_files();
       $httpBackend.flush();
       expect(scope.files).toEqual(make_files_data());
     }));

@@ -103,7 +103,7 @@ function MainController($scope, $http, $window, $location, DoSerial) {
 
 function ProjectController($scope, $browser, $http, $routeParams, DoSerial) {
 
-  $scope.list_files = function() {
+  $scope._list_files = function() {
     // Workaround https://github.com/angular/angular.js/issues/1761
     var url = $browser.url() + 'listfiles';
     return $http.get(url)
@@ -124,7 +124,7 @@ function ProjectController($scope, $browser, $http, $routeParams, DoSerial) {
       }
     }
   })
-  .then($scope.list_files)
+  .then($scope._list_files)
   //.then(_selectFirstFile);
 
 }
