@@ -22,6 +22,7 @@ curl -v localhost:8080 2>/dev/null
 if [ $? -ne 0 ]
 then
   xterm $XTERM_ARGS -geometry 120x32+0+1000 -e scripts/run.sh &
+  sleep .5
 fi
 
 xterm $XTERM_ARGS -geometry 180x15+1040+1000 -e scripts/test.sh --browsers= &
