@@ -30,6 +30,77 @@ describe('HeaderController', function() {
 });
 
 
+
+describe('ProjectController', function() {
+
+  var scope, $httpBackend;
+
+  function make_files_response() {
+    return [
+        { 'mime_type': 'text/x-yaml',
+          'name': 'app.yaml', },
+        { 'mime_type': 'image/x-icon',
+          'name': 'favicon.ico', },
+        { 'mime_type': 'text/x-python',
+          'name': 'main.py', }
+    ];
+  }
+
+  function make_files_data() {
+    return {
+        'app.yaml': { 'mime_type': 'text/x-yaml',
+                      'name': 'app.yaml', },
+        'favicon.ico': { 'mime_type': 'image/x-icon',
+                         'name': 'favicon.ico', },
+        'main.py': { 'mime_type': 'text/x-python',
+                     'name': 'main.py', }
+    };
+  }
+
+  beforeEach(module(function($provide) {
+    $provide.factory('$window', function() {
+      return {
+        location: { replace: jasmine.createSpy() },
+        navigator: {},
+      };
+    });
+  }));
+
+  beforeEach(module('playgroundApp.services'));
+
+  beforeEach(inject(function($rootScope, $injector) {
+    scope = $rootScope.$new();
+    $httpBackend = $injector.get('$httpBackend');
+
+    $httpBackend
+    .when('GET', '/playground/p/20/listfiles')
+    .respond(make_files_response())
+  }));
+
+
+  afterEach(function() {
+    $httpBackend.verifyNoOutstandingExpectation();
+    $httpBackend.verifyNoOutstandingRequest();
+  });
+
+
+  describe('list_files function', function () {
+
+    it('should call /playground/p/:project_id/listfiles', inject(function($controller, $browser, $http) {
+      $browser.url('/playground/p/20/');
+      expect($browser.url()).toEqual('/playground/p/20/');
+      expect(scope.files).toBeUndefined();
+      $httpBackend.expectGET('/playground/p/20/listfiles');
+      $controller(ProjectController, {$scope: scope});
+      scope.list_files();
+      $httpBackend.flush();
+      expect(scope.files).toEqual(make_files_data());
+    }));
+
+  });
+
+});
+
 describe('PageController', function() {
 
   describe('initialization', function () {
