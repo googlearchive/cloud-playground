@@ -45,25 +45,26 @@ describe('ProjectController', function() {
 
   var scope, $httpBackend;
 
+  function make_file(filename, mime_type) {
+    return {
+        'name': filename,
+        'mime_type': mime_type,
+    };
+  }
+
   function make_files_response() {
     return [
-        { 'mime_type': 'text/x-yaml',
-          'name': 'app.yaml', },
-        { 'mime_type': 'image/x-icon',
-          'name': 'favicon.ico', },
-        { 'mime_type': 'text/x-python',
-          'name': 'main.py', }
+        make_file('app.yaml',    'text/x-yaml'),
+        make_file('favicon.ico', 'image/x-icon'),
+        make_file('main.py',     'text/x-python'),
     ];
   }
 
   function make_files_data() {
     return {
-        'app.yaml': { 'mime_type': 'text/x-yaml',
-                      'name': 'app.yaml', },
-        'favicon.ico': { 'mime_type': 'image/x-icon',
-                         'name': 'favicon.ico', },
-        'main.py': { 'mime_type': 'text/x-python',
-                     'name': 'main.py', }
+        'app.yaml':    make_file('app.yaml',    'text/x-yaml'),
+        'favicon.ico': make_file('favicon.ico', 'image/x-icon'),
+        'main.py':     make_file('main.py',     'text/x-python'),
     };
   }
 
@@ -158,8 +159,8 @@ describe('ProjectController', function() {
       scope.files = make_files_data();
       expect(scope.select).not.toHaveBeenCalled();
       scope._select_first_file();
-      expect(scope.select).toHaveBeenCalledWith({mime_type: 'text/x-yaml',
-                                                 name: 'app.yaml'});
+      expect(scope.select).toHaveBeenCalledWith(make_file('app.yaml',
+                                                          'text/x-yaml'));
     }));
 
   });
