@@ -121,6 +121,28 @@ describe('ProjectController', function() {
   });
 
 
+  describe('no_json_transform function', function() {
+
+    it('should provide the identity transform', inject(function($controller) {
+      $controller(ProjectController, {$scope: scope});
+      var data = 'foo';
+      expect(scope.no_json_transform(data)).toBe(data);
+      expect(scope.no_json_transform(data)).toEqual('foo');
+      data = '[1,2,3]';
+      expect(scope.no_json_transform(data)).toBe(data);
+      expect(scope.no_json_transform(data)).toEqual('[1,2,3]');
+      data = undefined;
+      expect(scope.no_json_transform(data)).toBe(undefined);
+      data = null;
+      expect(scope.no_json_transform(data)).toBe(null);
+      data = Error('x');
+      expect(scope.no_json_transform(data)).toEqual(Error('x'));
+      expect(scope.no_json_transform(data)).toBe(data);
+    }));
+
+  });
+
+
   describe('is_image_mime_type function', function() {
 
     it('should return true for image/* MIME Types', inject(function($controller) {

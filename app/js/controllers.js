@@ -103,6 +103,9 @@ function MainController($scope, $http, $window, $location, DoSerial) {
 
 function ProjectController($scope, $browser, $http, $routeParams, DoSerial) {
 
+  // TODO remove once file contents are returned in JSON response
+  $scope.no_json_transform = function(data) { return data; };
+
   $scope.is_image_mime_type = function(mime_type) {
     return /^image\//.test(mime_type);
   };
@@ -438,8 +441,6 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
     });
   }
 
-  var noJsonTransform = function(data) { return data; };
-
   function url_of(file) {
     return '//' + $scope.config.PLAYGROUND_USER_CONTENT_HOST +
            document.location.pathname + 'getfile/' +
@@ -456,7 +457,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
       return;
     }
     var url = url_of(file);
-    $http.get(url, {transformResponse: noJsonTransform})
+    $http.get(url, {transformResponse: no_json_transform})
     .success(function(data, status, headers, config) {
       file.contents = data;
       file.dirty = false;
