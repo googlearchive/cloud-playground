@@ -115,6 +115,13 @@ function ProjectController($scope, $browser, $http, $routeParams, DoSerial) {
     });
   };
 
+  $scope._select_first_file = function() {
+    for (var path in $scope.files) {
+      $scope.select($scope.files[path]);
+      break;
+    }
+  }
+
   DoSerial
   .then(function() {
     for (var i in $scope.projects) {
@@ -125,7 +132,7 @@ function ProjectController($scope, $browser, $http, $routeParams, DoSerial) {
     }
   })
   .then($scope._list_files)
-  //.then(_selectFirstFile);
+  //.then($scope._select_first_file);
 
 }
 
@@ -390,20 +397,13 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
     $scope.insertPath(path);
   };
 
-  function _selectFirstFile() {
-    for (var path in $scope.files) {
-      $scope.select($scope.files[path]);
-      break;
-    }
-  }
-
   $scope.deletefile = function(file) {
     DoSerial
     .then(function() {
       return $http.post('deletepath/' + encodeURI(file.name))
       .success(function(data, status, headers, config) {
         delete $scope.files[file.name];
-        _selectFirstFile();
+        $scope._select_first_file();
       });
     });
   };

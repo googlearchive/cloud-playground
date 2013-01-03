@@ -134,6 +134,21 @@ describe('ProjectController', function() {
 
   });
 
+
+  describe('_select_first_file function', function() {
+
+    it('should call $scope.select(:first_file)', inject(function($controller) {
+      $controller(ProjectController, {$scope: scope});
+      scope.select = jasmine.createSpy();
+      scope.files = make_files_data();
+      expect(scope.select).not.toHaveBeenCalled();
+      scope._select_first_file();
+      expect(scope.select).toHaveBeenCalledWith({mime_type: 'text/x-yaml',
+                                                 name: 'app.yaml'});
+    }));
+
+  });
+
 });
 
 describe('PageController', function() {
