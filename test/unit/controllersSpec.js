@@ -88,15 +88,29 @@ describe('ProjectController', function() {
     $httpBackend = $injector.get('$httpBackend');
 
     $httpBackend
-    .when('GET', '/playground/p/20/listfiles')
+    .whenGET('/playground/p/20/listfiles')
     .respond(make_files_response())
+  }));
+
+  beforeEach(inject(function($browser, $httpBackend) {
+    $browser.url('/playground/p/20/');
   }));
 
 
   afterEach(function() {
+    flushDoSerial();
     $httpBackend.verifyNoOutstandingExpectation();
     $httpBackend.verifyNoOutstandingRequest();
   });
+
+
+  function doInit() {
+    inject(function($controller) {
+      $controller(ProjectController, {$scope: scope});
+      flushDoSerial();
+      $httpBackend.flush();
+    });
+  }
 
 
   describe('initialization', function() {
@@ -107,122 +121,120 @@ describe('ProjectController', function() {
       scope.projects = [make_project(17), project, make_project(13)];
       expect(scope.projects[1]).toBe(project);
       expect(scope.project).toBeUndefined();
-      $httpBackend.expectGET('http://server/listfiles').respond('');
-      $controller(ProjectController, {$scope: scope});
-      flushDoSerial();
-      $httpBackend.flush();
+      doInit();
       expect(scope.project).toBe(project);
     }));
 
     it('should call /playground/p/:project_id/listfiles', inject(function($controller, $browser) {
-      $browser.url('/playground/p/20/');
       $httpBackend.expectGET('/playground/p/20/listfiles');
-      $controller(ProjectController, {$scope: scope});
-      flushDoSerial();
-      $httpBackend.flush();
+      doInit();
     }));
 
   });
 
 
-  describe('no_json_transform function', function() {
+  describe('runtime behavior', function() {
 
-    it('should provide the identity transform', inject(function($controller) {
-      $controller(ProjectController, {$scope: scope});
-      var data = 'foo';
-      expect(scope.no_json_transform(data)).toBe(data);
-      expect(scope.no_json_transform(data)).toEqual('foo');
-      data = '[1,2,3]';
-      expect(scope.no_json_transform(data)).toBe(data);
-      expect(scope.no_json_transform(data)).toEqual('[1,2,3]');
-      data = undefined;
-      expect(scope.no_json_transform(data)).toBe(undefined);
-      data = null;
-      expect(scope.no_json_transform(data)).toBe(null);
-      data = Error('x');
-      expect(scope.no_json_transform(data)).toEqual(Error('x'));
-      expect(scope.no_json_transform(data)).toBe(data);
-    }));
+    beforeEach(function() {
+      doInit();
+    });
 
-  });
+    describe('no_json_transform function', function() {
 
+      it('should provide the identity transform', inject(function($controller) {
+        var data = 'foo';
+        expect(scope.no_json_transform(data)).toBe(data);
+        expect(scope.no_json_transform(data)).toEqual('foo');
+        data = '[1,2,3]';
+        expect(scope.no_json_transform(data)).toBe(data);
+        expect(scope.no_json_transform(data)).toEqual('[1,2,3]');
+        data = undefined;
+        expect(scope.no_json_transform(data)).toBe(undefined);
+        data = null;
+        expect(scope.no_json_transform(data)).toBe(null);
+        data = Error('x');
+        expect(scope.no_json_transform(data)).toEqual(Error('x'));
+        expect(scope.no_json_transform(data)).toBe(data);
+      }));
 
-  describe('is_image_mime_type function', function() {
-
-    it('should return true for "image/*" MIME types', inject(function($controller) {
-      $controller(ProjectController, {$scope: scope});
-      expect(scope.is_image_mime_type('image/png')).toBe(true);
-      expect(scope.is_image_mime_type('image/gif')).toBe(true);
-      expect(scope.is_image_mime_type('image')).toBe(false);
-      expect(scope.is_image_mime_type('text/plain')).toBe(false);
-      expect(scope.is_image_mime_type('text/png')).toBe(false);
-      expect(scope.is_image_mime_type('application/octet-stream')).toBe(false);
-    }));
-
-  });
+    });
 
 
-  describe('url_of function', function() {
+    describe('is_image_mime_type function', function() {
 
-    it('should return //localhost:9100/p/:project_id/getfile/:filename', inject(function($controller, $window) {
-      $controller(ProjectController, {$scope: scope});
-      $window.location.pathname = '/playground/p/42/';
-      var png = make_file('logo.png', 'image/png');
-      expect(scope.url_of(png)).toEqual('//localhost:9100/playground/p/42/getfile/logo.png');
-    }));
+      it('should return true for "image/*" MIME types', inject(function($controller) {
+        expect(scope.is_image_mime_type('image/png')).toBe(true);
+        expect(scope.is_image_mime_type('image/gif')).toBe(true);
+        expect(scope.is_image_mime_type('image')).toBe(false);
+        expect(scope.is_image_mime_type('text/plain')).toBe(false);
+        expect(scope.is_image_mime_type('text/png')).toBe(false);
+        expect(scope.is_image_mime_type('application/octet-stream')).toBe(false);
+      }));
 
-  });
-
-
-  describe('image_url_of function', function() {
-
-    it('should return emtpty string when no file is given', inject(function($controller) {
-      $controller(ProjectController, {$scope: scope});
-      expect(scope.image_url_of()).toEqual('');
-      expect(scope.image_url_of(null)).toEqual('');
-    }));
-
-    it('should return empty string for none "image/*" MIME types ', inject(function($controller) {
-      $controller(ProjectController, {$scope: scope});
-      expect(scope.image_url_of(make_file('filename', 'text/html'))).toEqual('');
-    }));
-
-    it('should pass through to url_of() for "image/*" MIME types ', inject(function($controller) {
-      $controller(ProjectController, {$scope: scope});
-      var png = make_file('filename', 'image/png');
-      var file_url = scope.url_of(png);
-      expect(scope.image_url_of(png)).toBe(file_url);
-    }));
-
-  });
+    });
 
 
-  describe('_list_files function', function() {
+    describe('url_of function', function() {
 
-    it('should call /playground/p/:project_id/listfiles', inject(function($controller, $browser, $http) {
-      $browser.url('/playground/p/20/');
-      expect(scope.files).toBeUndefined();
-      $httpBackend.expectGET('/playground/p/20/listfiles');
-      $controller(ProjectController, {$scope: scope});
-      scope._list_files();
-      $httpBackend.flush();
-      expect(scope.files).toEqual(make_files_data());
-    }));
+      it('should return //localhost:9100/p/:project_id/getfile/:filename', inject(function($controller, $window) {
+        $window.location.pathname = '/playground/p/42/';
+        var png = make_file('logo.png', 'image/png');
+        expect(scope.url_of(png)).toEqual('//localhost:9100/playground/p/42/getfile/logo.png');
+      }));
 
-  });
+    });
 
 
-  describe('_select_first_file function', function() {
+    describe('image_url_of function', function() {
 
-    it('should call $scope.select(:first_file)', inject(function($controller) {
-      $controller(ProjectController, {$scope: scope});
-      scope.select = jasmine.createSpy();
-      scope.files = make_files_data();
-      expect(scope.select).not.toHaveBeenCalled();
-      scope._select_first_file();
-      expect(scope.select).toHaveBeenCalledWith(make_file('app.yaml',
-                                                          'text/x-yaml'));
-    }));
+      it('should return emtpty string when no file is given', inject(function($controller) {
+        expect(scope.image_url_of()).toEqual('');
+        expect(scope.image_url_of(null)).toEqual('');
+      }));
+
+      it('should return empty string for none "image/*" MIME types ', inject(function($controller) {
+        expect(scope.image_url_of(make_file('filename', 'text/html'))).toEqual('');
+      }));
+
+      it('should pass through to url_of() for "image/*" MIME types ', inject(function($controller) {
+        var png = make_file('filename', 'image/png');
+        var file_url = scope.url_of(png);
+        expect(scope.image_url_of(png)).toBe(file_url);
+      }));
+
+    });
+
+
+    describe('_list_files function', function() {
+
+      it('should call /playground/p/:project_id/listfiles', inject(function($controller, $browser, $http) {
+        $httpBackend.verifyNoOutstandingRequest();
+        $httpBackend.verifyNoOutstandingExpectation();
+        expect(scope.files).toEqual(make_files_data());
+        $httpBackend
+        .expectGET('/playground/p/20/listfiles')
+        .respond([make_file(21)]);
+        scope.files = null;
+        scope._list_files();
+        $httpBackend.flush();
+        expect(scope.files).toEqual({21: make_file(21)});
+      }));
+
+    });
+
+
+    describe('_select_first_file function', function() {
+
+      it('should call $scope.select(:first_file)', inject(function($controller) {
+        scope.select = jasmine.createSpy();
+        scope.files = make_files_data();
+        expect(scope.select).not.toHaveBeenCalled();
+        scope._select_first_file();
+        expect(scope.select).toHaveBeenCalledWith(make_file('app.yaml',
+                                                            'text/x-yaml'));
+      }));
+
+    });
 
   });
 
@@ -258,6 +270,7 @@ describe('PageController', function() {
 
 
     afterEach(function() {
+      flushDoSerial();
       $httpBackend.verifyNoOutstandingExpectation();
       $httpBackend.verifyNoOutstandingRequest();
     });
@@ -412,6 +425,7 @@ describe('MainController', function() {
   }));
 
   afterEach(function() {
+    flushDoSerial();
     $httpBackend.verifyNoOutstandingExpectation();
     $httpBackend.verifyNoOutstandingRequest();
   });
