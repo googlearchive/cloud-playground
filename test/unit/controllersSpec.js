@@ -84,7 +84,7 @@ describe('ProjectController', function() {
   });
 
 
-  describe('list_files function', function () {
+  describe('list_files function', function() {
 
     it('should call /playground/p/:project_id/listfiles', inject(function($controller, $browser, $http) {
       $browser.url('/playground/p/20/');
@@ -103,7 +103,7 @@ describe('ProjectController', function() {
 
 describe('PageController', function() {
 
-  describe('initialization', function () {
+  describe('initialization', function() {
 
     var scope, $httpBackend;
 
@@ -298,7 +298,7 @@ describe('MainController', function() {
   }
 
 
-  describe('initialization', function () {
+  describe('initialization', function() {
 
     it('should transition $scope.loaded state to true', inject(function($controller) {
       expect(scope.loaded).toBeUndefined();
