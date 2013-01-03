@@ -14,7 +14,7 @@ describe('HeaderController', function() {
   }));
 
 
-  it('should provide "alreadyhome" function', function() {
+  it('alreadyhome function should only return true for /playground/', function() {
     expect(typeof scope.alreadyhome).toEqual('function');
 
     location.path('/');
