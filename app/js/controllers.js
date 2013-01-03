@@ -113,6 +113,11 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
            encodeURI(file.name);
   };
 
+  $scope.image_url_of = function(file) {
+    return (file && $scope.is_image_mime_type(file.mime_type)) ?
+        $scope.url_of(file) : '';
+  };
+
   $scope.is_image_mime_type = function(mime_type) {
     return /^image\//.test(mime_type);
   };
@@ -448,16 +453,12 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
     });
   }
 
-  $scope.image_url_of = function(file) {
-    return (file && $scope.is_image_mime_type(file.mime_type)) ? url_of(file) : '';
-  };
-
   var _get = function(file, success_cb) {
     if (file.hasOwnProperty('contents')) {
       success_cb();
       return;
     }
-    var url = url_of(file);
+    var url = $scope.url_of(file);
     $http.get(url, {transformResponse: no_json_transform})
     .success(function(data, status, headers, config) {
       file.contents = data;

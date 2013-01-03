@@ -149,7 +149,7 @@ describe('ProjectController', function() {
 
   describe('is_image_mime_type function', function() {
 
-    it('should return true for image/* MIME Types', inject(function($controller) {
+    it('should return true for "image/*" MIME types', inject(function($controller) {
       $controller(ProjectController, {$scope: scope});
       expect(scope.is_image_mime_type('image/png')).toBe(true);
       expect(scope.is_image_mime_type('image/gif')).toBe(true);
@@ -169,6 +169,29 @@ describe('ProjectController', function() {
       $window.location.pathname = '/playground/p/42/';
       var png = make_file('logo.png', 'image/png');
       expect(scope.url_of(png)).toEqual('//localhost:9100/playground/p/42/getfile/logo.png');
+    }));
+
+  });
+
+
+  describe('image_url_of function', function() {
+
+    it('should return emtpty string when no file is given', inject(function($controller) {
+      $controller(ProjectController, {$scope: scope});
+      expect(scope.image_url_of()).toEqual('');
+      expect(scope.image_url_of(null)).toEqual('');
+    }));
+
+    it('should return empty string for none "image/*" MIME types ', inject(function($controller) {
+      $controller(ProjectController, {$scope: scope});
+      expect(scope.image_url_of(make_file('filename', 'text/html'))).toEqual('');
+    }));
+
+    it('should pass through to url_of() for "image/*" MIME types ', inject(function($controller) {
+      $controller(ProjectController, {$scope: scope});
+      var png = make_file('filename', 'image/png');
+      var file_url = scope.url_of(png);
+      expect(scope.image_url_of(png)).toBe(file_url);
     }));
 
   });
