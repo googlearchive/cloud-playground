@@ -177,7 +177,7 @@ describe('PageController', function() {
 
 describe('MainController', function() {
 
-  var scope;
+  var scope, $httpBackend;
 
   beforeEach(module('playgroundApp.services'));
 
@@ -190,69 +190,44 @@ describe('MainController', function() {
     });
   }));
 
-
-  beforeEach(inject(function($rootScope, $controller, $window) {
+  beforeEach(inject(function($rootScope, $injector) {
     scope = $rootScope.$new();
-    $controller(MainController, {$scope: scope});
-  }));
+    scope.projects = [];
+    $httpBackend = $injector.get('$httpBackend');
 
-
-  describe('login function', function() {
-
-    it('should navigate to /playground/login', inject(function($window) {
-      expect($window.location.replace).not.toHaveBeenCalled();
-      scope.login();
-      expect($window.location.replace).toHaveBeenCalledWith('/playground/login');
-    }));
-
-  });
-
-});
-
-
-describe('MainController', function() {
-
-  describe('initialization', function () {
-
-    var scope, $httpBackend;
-
-    beforeEach(module('playgroundApp.services'));
-
-    beforeEach(inject(function($rootScope, $controller, $injector) {
-      scope = $rootScope.$new();
-      $httpBackend = $injector.get('$httpBackend');
-
-      $httpBackend
-      .when('GET', '/playground/gettemplates')
-      .respond({
-          'template_sources': [
-            { 'key': 'foo_key', 'description': 'foo_description' },
-            { 'key': 'bar_key', 'description': 'bar_description' },
-          ],
-          'templates': [
-            { 'key': 'boo_key', 'description': 'boo_description',
-              'name': 'boo_name', 'source_key': 'boo_source_key' },
-          ]
-      });
-
-      $httpBackend
-      .when('GET', '/playground/getprojects')
-      .respond([]);
-    }));
-
-
-    afterEach(function() {
-      $httpBackend.verifyNoOutstandingExpectation();
-      $httpBackend.verifyNoOutstandingRequest();
+    $httpBackend
+    .when('GET', '/playground/gettemplates')
+    .respond({
+        'template_sources': [
+          { 'key': 'foo_key', 'description': 'foo_description' },
+          { 'key': 'bar_key', 'description': 'bar_description' },
+        ],
+        'templates': [
+          { 'key': 'boo_key', 'description': 'boo_description',
+            'name': 'boo_name', 'source_key': 'boo_source_key' },
+        ]
     });
 
-    function doInit() {
-      inject(function($controller) {
-        $controller(MainController, {$scope: scope});
-        flushDoSerial();
-        $httpBackend.flush();
-      });
-    }
+    $httpBackend
+    .when('GET', '/playground/getprojects')
+    .respond([]);
+  }));
+
+  afterEach(function() {
+    $httpBackend.verifyNoOutstandingExpectation();
+    $httpBackend.verifyNoOutstandingRequest();
+  });
+
+  function doInit() {
+    inject(function($controller) {
+      $controller(MainController, {$scope: scope});
+      flushDoSerial();
+      $httpBackend.flush();
+    });
+  }
+
+
+  describe('initialization', function () {
 
     it('should transition $scope.loaded state to true', inject(function($controller) {
       expect(scope.loaded).toBeUndefined();
@@ -277,6 +252,61 @@ describe('MainController', function() {
       expect(scope.templates.templates[0].name).toBe('boo_name');
       expect(scope.templates.templates[0].source_key).toBe('boo_source_key');
     }));
+
+  });
+
+  describe('runtime behavior', function() {
+
+    beforeEach(inject(function($controller) {
+      $controller(MainController, {$scope: scope});
+      flushDoSerial();
+      $httpBackend.flush();
+      //doInit();
+    }));
+
+    afterEach(function() {
+      flushDoSerial();
+      //$httpBackend.flush();
+    });
+
+    describe('login function', function() {
+
+      it('should navigate to /playground/login', inject(function($window) {
+        expect($window.location.replace).not.toHaveBeenCalled();
+        scope.login();
+        expect($window.location.replace).toHaveBeenCalledWith('/playground/login');
+      }));
+
+    });
+
+    describe('new_project function', function() {
+
+      beforeEach(function() {
+        $httpBackend
+        .when('POST', '/playground/createproject')
+        .respond({
+          'description': 'The project description',
+          'key': 42,
+          'name': 'New project name',
+          'orderby': 'test@example.com-2013-01-03T01:05:32.273955',
+          'run_url': 'http://localhost:9200/?_mimic_project=42',
+        });
+      });
+
+      it('should call /playground/createproject', inject(function() {
+        expect(scope.projects).toBeDefined();
+        expect(scope.templates.templates).toBeDefined();
+        expect(scope.templates.templates.length).toBeGreaterThan(0);
+        $httpBackend.expectPOST('/playground/createproject');
+        scope.new_project(scope.templates.templates[0]);
+        flushDoSerial();
+        $httpBackend.flush();
+        expect(scope.projects.length).toBe(1);
+        expect(scope.projects[0].key).toBe(42);
+        expect(scope.projects[0].name).toBe('New project name');
+      }));
+
+    });
 
   });
 

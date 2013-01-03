@@ -17,12 +17,12 @@
     </thead>
 
     <tbody>
-      <tr ng-repeat="project in projects | orderBy:'orderby':true">
+      <tr ng-repeat="project in projects | orderBy:'orderby':true" ng-class="{ghost: !project.key}">
         <td class="key">{{project.key}}</div>
-        <td><button class="btn btn-small btn-success" ng-click="select_project(project)"><i class="icon-edit icon-white"></i> Run/Edit</button>
+        <td><button class="btn btn-small btn-success" ng-class="{disabled: !project.key}" ng-click="select_project(project)"><i class="icon-edit icon-white"></i> Run/Edit</button>
         <td>{{project.name}}</td>
         <td>{{project.description}}</td>
-        <td><button class="btn btn-small btn-danger" ng-click="prompt_to_delete_project(project)"><i class="icon-remove icon-white"></i> delete</button></td>
+        <td><button class="btn btn-small btn-danger" ng-class="{disabled: !project.key}" ng-click="prompt_to_delete_project(project)"><i class="icon-remove icon-white"></i> delete</button></td>
       </tr>
 
       <tr class="project" ng-hide="hasprojects()">
@@ -45,7 +45,7 @@
     <h1>{{source.description}}</h1>
     <div ng-repeat="template in templates.templates | filter:{source_key: source.key}">
         <div class="template" style="margin: .5em;">
-          <button class="btn" style="float: left;" ng-click="prompt_for_new_project(template)"><i class="icon-plus"></i> New Project</button>
+          <button class="btn" style="float: left;" ng-click="new_project(template)"><i class="icon-plus"></i> New Project</button>
           <div stlye="clear: both;">
              <div class="name">{{template.name}}</div>
              <div class="description">{{template.description}}</div>

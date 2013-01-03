@@ -62,6 +62,27 @@ function MainController($scope, $http, $window, DoSerial) {
     $window.location.replace('/playground/login');
   }
 
+  $scope.new_project = function(template) {
+    DoSerial
+    .then(function() {
+      var data = {
+        'name': '(Creating project...)',
+        'description': '(Please wait...)',
+      };
+      $scope.projects.push(data);
+    })
+    .then(function() {
+      return $http.post('/playground/createproject', {
+          template_url: template.key,
+          project_name: template.name,
+          project_description: template.description})
+      .success(function(data, status, headers, config) {
+        $scope.projects.pop();
+        $scope.projects.push(data);
+      });
+    });
+  };
+
 }
 
 function ProjectController() {
@@ -140,19 +161,6 @@ function MainController($scope, $http, $location, $window, $log, DoSerial) {
       });
     });
   }
-
-  $scope.prompt_for_new_project = function(template) {
-    return DoSerial
-    .then(function() {
-      return $http.post('createproject', {
-          template_url: template.key,
-          project_name: template.name,
-          project_description: template.description})
-      .success(function(data, status, headers, config) {
-        $scope.projects.push(data);
-      });
-    });
-  };
 
 }
 
