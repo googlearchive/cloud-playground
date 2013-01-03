@@ -81,6 +81,10 @@ describe('ProjectController', function() {
 
   beforeEach(inject(function($rootScope, $injector) {
     scope = $rootScope.$new();
+    // TODO: remove if we instead instantiate a PageController
+    scope.config = {
+        'PLAYGROUND_USER_CONTENT_HOST': 'localhost:9100',
+    };
     $httpBackend = $injector.get('$httpBackend');
 
     $httpBackend
@@ -153,6 +157,18 @@ describe('ProjectController', function() {
       expect(scope.is_image_mime_type('text/plain')).toBe(false);
       expect(scope.is_image_mime_type('text/png')).toBe(false);
       expect(scope.is_image_mime_type('application/octet-stream')).toBe(false);
+    }));
+
+  });
+
+
+  describe('url_of function', function() {
+
+    it('should return //localhost:9100/p/:project_id/getfile/:filename', inject(function($controller, $window) {
+      $controller(ProjectController, {$scope: scope});
+      $window.location.pathname = '/playground/p/42/';
+      var png = make_file('logo.png', 'image/png');
+      expect(scope.url_of(png)).toEqual('//localhost:9100/playground/p/42/getfile/logo.png');
     }));
 
   });
