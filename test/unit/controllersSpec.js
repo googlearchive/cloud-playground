@@ -261,13 +261,7 @@ describe('MainController', function() {
       $controller(MainController, {$scope: scope});
       flushDoSerial();
       $httpBackend.flush();
-      //doInit();
     }));
-
-    afterEach(function() {
-      flushDoSerial();
-      //$httpBackend.flush();
-    });
 
     describe('login function', function() {
 
