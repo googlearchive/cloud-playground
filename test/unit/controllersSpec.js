@@ -255,13 +255,28 @@ describe('MainController', function() {
 
   });
 
+
   describe('runtime behavior', function() {
 
-    beforeEach(inject(function($controller) {
+    var location;
+
+    function make_project(key, subsecond) {
+      return {
+          'description': 'The project description',
+          'key': key,
+          'name': 'New project name',
+          'orderby': 'test@example.com-2013-01-03T01:05:32.' + subsecond,
+          'run_url': 'http://localhost:9200/?_mimic_project=' + key,
+      }
+    };
+
+    beforeEach(inject(function($controller, $location) {
       $controller(MainController, {$scope: scope});
       flushDoSerial();
       $httpBackend.flush();
+      location = $location;
     }));
+
 
     describe('login function', function() {
 
@@ -273,18 +288,13 @@ describe('MainController', function() {
 
     });
 
+
     describe('new_project function', function() {
 
       beforeEach(function() {
         $httpBackend
         .when('POST', '/playground/createproject')
-        .respond({
-          'description': 'The project description',
-          'key': 42,
-          'name': 'New project name',
-          'orderby': 'test@example.com-2013-01-03T01:05:32.273955',
-          'run_url': 'http://localhost:9200/?_mimic_project=42',
-        });
+        .respond(make_project(42, 1));
       });
 
       it('should call /playground/createproject', inject(function() {
@@ -299,6 +309,32 @@ describe('MainController', function() {
         expect(scope.projects[0].key).toBe(42);
         expect(scope.projects[0].name).toBe('New project name');
       }));
+
+    });
+
+
+    describe('select_project function', function() {
+
+      beforeEach(function() {
+        $httpBackend
+        .when('POST', '/playground/p/15/touch')
+        .respond(make_project(15, 2));
+      });
+
+
+      it('should call /playground/p/:project_id/touch', function() {
+        var project = make_project(15, 1);
+        scope.projects = [make_project(14, 1), project, make_project(16, 1),
+                          make_project(17, 1)];
+        expect(scope.projects[1]).toEqual(make_project(15, 1));
+        expect(location.path()).toEqual('');
+        scope.select_project(project);
+        flushDoSerial();
+        $httpBackend.flush();
+        expect(scope.projects[1]).not.toEqual(make_project(15, 1));
+        expect(scope.projects[1]).toEqual(make_project(15, 2));
+        expect(location.path()).toEqual('/playground/p/15');
+      });
 
     });
 

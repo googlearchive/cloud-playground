@@ -45,7 +45,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window) {
 
 }
 
-function MainController($scope, $http, $window, DoSerial) {
+function MainController($scope, $http, $window, $location, DoSerial) {
 
   DoSerial
   .then(function() {
@@ -82,6 +82,22 @@ function MainController($scope, $http, $window, DoSerial) {
       });
     });
   };
+
+  $scope.select_project = function(project) {
+    DoSerial
+    .then(function() {
+      return $http.post('/playground/p/' + project.key + '/touch')
+      .success(function(data, status, headers, config) {
+        for (var i in $scope.projects) {
+          if ($scope.projects[i] == project) {
+            $scope.projects[i] = project = data;
+            break;
+          }
+        }
+        $location.path('/playground/p/' + project.key);
+      });
+    });
+  }
 
 }
 
@@ -141,26 +157,6 @@ function LightboxController($scope, $window) {
   $scope.dismiss = function() {
     $scope.lightboxes.pop();
   };
-
-}
-
-function MainController($scope, $http, $location, $window, $log, DoSerial) {
-
-  $scope.select_project = function(project) {
-    DoSerial
-    .then(function() {
-      return $http.post('/playground/p/' + project.key + '/touch')
-      .success(function(data, status, headers, config) {
-        for (var i in $scope.projects) {
-          if ($scope.projects[i] == project) {
-            $scope.projects[i] = project = data;
-            break;
-          }
-        }
-        $location.path('/playground/p/' + project.key);
-      });
-    });
-  }
 
 }
 
