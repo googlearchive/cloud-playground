@@ -29,6 +29,9 @@ angular.module('playgroundApp.services', [])
     },
     // schedule action to perform next
     then: function(func) {
+      if (func == null) {
+        throw 'DoSerial.then() must not be called with null value';
+      }
       promise = promise.then(function() {
         return promisehack(func);
       },

@@ -89,6 +89,11 @@ describe('service', function() {
     }));
 
 
+    it('should not except null argument', inject(function(DoSerial) {
+      expect(DoSerial.then).toThrow();
+    }));
+
+
     it('should execute simple task', inject(function(DoSerial) {
       var called = false;
       DoSerial.then(function() { called = true; });
