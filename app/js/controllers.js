@@ -103,7 +103,7 @@ function MainController($scope, $http, $window, $location, DoSerial) {
 
 function ProjectController($scope, $browser, $http, $routeParams, DoSerial) {
 
-  // TODO remove once file contents are returned in JSON response
+  // TODO: remove once file contents are returned in JSON response
   $scope.no_json_transform = function(data) { return data; };
 
   $scope.is_image_mime_type = function(mime_type) {
