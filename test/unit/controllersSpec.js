@@ -120,6 +120,21 @@ describe('ProjectController', function() {
   });
 
 
+  describe('is_image_mime_type function', function() {
+
+    it('should return true for image/* MIME Types', inject(function($controller) {
+      $controller(ProjectController, {$scope: scope});
+      expect(scope.is_image_mime_type('image/png')).toBe(true);
+      expect(scope.is_image_mime_type('image/gif')).toBe(true);
+      expect(scope.is_image_mime_type('image')).toBe(false);
+      expect(scope.is_image_mime_type('text/plain')).toBe(false);
+      expect(scope.is_image_mime_type('text/png')).toBe(false);
+      expect(scope.is_image_mime_type('application/octet-stream')).toBe(false);
+    }));
+
+  });
+
+
   describe('_list_files function', function() {
 
     it('should call /playground/p/:project_id/listfiles', inject(function($controller, $browser, $http) {

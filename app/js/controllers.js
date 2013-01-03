@@ -103,6 +103,10 @@ function MainController($scope, $http, $window, $location, DoSerial) {
 
 function ProjectController($scope, $browser, $http, $routeParams, DoSerial) {
 
+  $scope.is_image_mime_type = function(mime_type) {
+    return /^image\//.test(mime_type);
+  };
+
   $scope._list_files = function() {
     // Workaround https://github.com/angular/angular.js/issues/1761
     var url = $browser.url() + 'listfiles';
@@ -443,7 +447,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
   };
 
   $scope.image_url_of = function(file) {
-    return (file && $scope.isImageMimeType(file.mime_type)) ? url_of(file) : '';
+    return (file && $scope.is_image_mime_type(file.mime_type)) ? url_of(file) : '';
   };
 
   var _get = function(file, success_cb) {
@@ -458,10 +462,6 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
       file.dirty = false;
       success_cb();
     });
-  };
-
-  $scope.isImageMimeType = function(mime_type) {
-    return /^image\//.test(mime_type);
   };
 
   $scope.select = function(file) {
