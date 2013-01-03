@@ -4,6 +4,16 @@
 
 /* http://docs.angularjs.org/api/angular.mock.inject */
 
+function make_project(key, subsecond) {
+  return {
+      'description': 'The project description',
+      'key': key,
+      'name': 'New project name',
+      'orderby': 'test@example.com-2013-01-03T01:05:32.' + subsecond,
+      'run_url': 'http://localhost:9200/?_mimic_project=' + key,
+  }
+};
+
 describe('HeaderController', function() {
   var scope, location;
 
@@ -84,11 +94,36 @@ describe('ProjectController', function() {
   });
 
 
+  describe('initialization', function() {
+
+    it('should set $scope.project to the project identified by $routeParams.project_id', inject(function($routeParams, $controller) {
+      $routeParams.project_id = 42;
+      var project = make_project(42);
+      scope.projects = [make_project(17), project, make_project(13)];
+      expect(scope.projects[1]).toBe(project);
+      expect(scope.project).toBeUndefined();
+      $httpBackend.expectGET('http://server/listfiles').respond('');
+      $controller(ProjectController, {$scope: scope});
+      flushDoSerial();
+      $httpBackend.flush();
+      expect(scope.project).toBe(project);
+    }));
+
+    it('should call /playground/p/:project_id/listfiles', inject(function($controller, $browser) {
+      $browser.url('/playground/p/20/');
+      $httpBackend.expectGET('/playground/p/20/listfiles');
+      $controller(ProjectController, {$scope: scope});
+      flushDoSerial();
+      $httpBackend.flush();
+    }));
+
+  });
+
+
   describe('list_files function', function() {
 
     it('should call /playground/p/:project_id/listfiles', inject(function($controller, $browser, $http) {
       $browser.url('/playground/p/20/');
-      expect($browser.url()).toEqual('/playground/p/20/');
       expect(scope.files).toBeUndefined();
       $httpBackend.expectGET('/playground/p/20/listfiles');
       $controller(ProjectController, {$scope: scope});
@@ -330,16 +365,6 @@ describe('MainController', function() {
   describe('runtime behavior', function() {
 
     var location;
-
-    function make_project(key, subsecond) {
-      return {
-          'description': 'The project description',
-          'key': key,
-          'name': 'New project name',
-          'orderby': 'test@example.com-2013-01-03T01:05:32.' + subsecond,
-          'run_url': 'http://localhost:9200/?_mimic_project=' + key,
-      }
-    };
 
     beforeEach(inject(function($controller, $location) {
       $controller(MainController, {$scope: scope});

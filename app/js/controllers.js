@@ -101,7 +101,7 @@ function MainController($scope, $http, $window, $location, DoSerial) {
 
 }
 
-function ProjectController($scope, $browser, $http) {
+function ProjectController($scope, $browser, $http, $routeParams, DoSerial) {
 
   $scope.list_files = function() {
     // Workaround https://github.com/angular/angular.js/issues/1761
@@ -114,6 +114,18 @@ function ProjectController($scope, $browser, $http) {
       });
     });
   };
+
+  DoSerial
+  .then(function() {
+    for (var i in $scope.projects) {
+      if ($scope.projects[i].key == $routeParams.project_id) {
+        $scope.project = $scope.projects[i];
+        break;
+      }
+    }
+  })
+  .then($scope.list_files)
+  //.then(_selectFirstFile);
 
 }
 
@@ -472,18 +484,6 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
       });
     });
   };
-
-  DoSerial
-  .then(function() {
-    for (var i in $scope.projects) {
-      if ($scope.projects[i].key == $routeParams.project_id) {
-        $scope.project = $scope.projects[i];
-        break;
-      }
-    }
-  })
-  .then(list_files)
-  .then(_selectFirstFile);
 
 }
 */
