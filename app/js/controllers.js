@@ -118,6 +118,20 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
         $scope.url_of(file) : '';
   };
 
+  $scope._get = function(file, success_cb) {
+    if (file.hasOwnProperty('contents')) {
+      success_cb();
+      return;
+    }
+    var url = $scope.url_of(file);
+    $http.get(url, {transformResponse: $scope.no_json_transform})
+    .success(function(data, status, headers, config) {
+      file.contents = data;
+      file.dirty = false;
+      success_cb();
+    });
+  };
+
   $scope.is_image_mime_type = function(mime_type) {
     return /^image\//.test(mime_type);
   };
@@ -452,20 +466,6 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
       undoDepth: 440, // default = 40
     });
   }
-
-  var _get = function(file, success_cb) {
-    if (file.hasOwnProperty('contents')) {
-      success_cb();
-      return;
-    }
-    var url = $scope.url_of(file);
-    $http.get(url, {transformResponse: $scope.no_json_transform})
-    .success(function(data, status, headers, config) {
-      file.contents = data;
-      file.dirty = false;
-      success_cb();
-    });
-  };
 
   $scope.select = function(file) {
     if ($scope.isImageMimeType(file.mime_type)) {

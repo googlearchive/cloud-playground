@@ -221,6 +221,69 @@ describe('ProjectController', function() {
 
     });
 
+
+    describe('_get function', function() {
+
+      it('should call success_cb when file has contents', function() {
+        var success_cb = jasmine.createSpy();
+        var file = make_file('app.yaml', 'text/x-yaml', 'version: 1');
+        scope._get(file, success_cb);
+        expect(success_cb).toHaveBeenCalledWith();
+      });
+
+      it('should call success_cb when file has no contents', function() {
+        var success_cb = jasmine.createSpy();
+        var file = make_file('app.yaml', 'text/x-yaml');
+        expect(file.contents).toBeUndefined();
+        expect(file.hasOwnProperty('contents')).toBe(false);
+        $httpBackend.expectGET(scope.url_of(file)).respond('foo: bar');
+        scope._get(file, success_cb);
+        $httpBackend.flush();
+        expect(file.contents).toEqual('foo: bar');
+        expect(success_cb).toHaveBeenCalledWith();
+      });
+
+      it('should not overwrite file contents regardless of dirty flag', function() {
+        var noop = function() {};
+        var file = make_file('app.yaml', 'text/x-yaml', 'version: 1');
+        scope._get(file, noop);
+        expect(file.dirty).not.toBeDefined();
+        expect(file.hasOwnProperty('dirty')).toBe(false);
+        expect(file.contents).toEqual('version: 1');
+        file.dirty = true;
+        scope._get(file, noop);
+        expect(file.contents).toEqual('version: 1');
+        file.dirty = false;
+        scope._get(file, noop);
+        expect(file.contents).toEqual('version: 1');
+      });
+
+      it('should set file.dirty=false after fetching contents', function() {
+        var success_cb = jasmine.createSpy();
+        var file = make_file('app.yaml', 'text/x-yaml');
+        expect(file.contents).toBeUndefined();
+        expect(file.hasOwnProperty('contents')).toBe(false);
+        expect(file.dirty).toBe(undefined);
+        $httpBackend.expectGET(scope.url_of(file)).respond('version: bar');
+        scope._get(file, success_cb);
+        $httpBackend.flush();
+        expect(file.contents).toEqual('version: bar');
+        expect(file.dirty).toBe(false);
+      });
+
+      it('should HTTP GET missing file contents', function() {
+        var success_cb = jasmine.createSpy();
+        var file = make_file('app.yaml', 'text/x-yaml');
+        $httpBackend.expectGET(scope.url_of(file)).respond('x: y');
+        expect(file.contents).toBeUndefined();
+        scope._get(file, success_cb);
+        $httpBackend.flush();
+        expect(file.contents).toEqual('x: y');
+      });
+
+    });
+
+
     describe('_list_files function', function() {
 
       it('should call /playground/p/:project_id/listfiles', function() {
