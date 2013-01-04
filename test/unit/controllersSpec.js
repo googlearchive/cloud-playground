@@ -253,7 +253,7 @@ describe('PageController', function() {
       $httpBackend = $injector.get('$httpBackend');
 
       $httpBackend
-      .when('GET', '/playground/getconfig')
+      .whenGET('/playground/getconfig')
       .respond({
           'PLAYGROUND_USER_CONTENT_HOST': 'localhost:9100',
           'email': 'user_q0inuf3vs5',
@@ -264,7 +264,7 @@ describe('PageController', function() {
       });
 
       $httpBackend
-      .when('GET', '/playground/getprojects')
+      .whenGET('/playground/getprojects')
       .respond([]);
     }));
 
@@ -407,7 +407,7 @@ describe('MainController', function() {
     $httpBackend = $injector.get('$httpBackend');
 
     $httpBackend
-    .when('GET', '/playground/gettemplates')
+    .whenGET('/playground/gettemplates')
     .respond({
         'template_sources': [
           { 'key': 'foo_key', 'description': 'foo_description' },
@@ -420,7 +420,7 @@ describe('MainController', function() {
     });
 
     $httpBackend
-    .when('GET', '/playground/getprojects')
+    .whenGET('/playground/getprojects')
     .respond([]);
   }));
 
