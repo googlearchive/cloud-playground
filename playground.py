@@ -253,7 +253,7 @@ class DatastoreRedirect(RedirectHandler):
     else:
       url = ('https://appengine.google.com/datastore/explorer'
              '?&app_id={0}&namespace={1}'
-             .format(self._GetAppId(namepsace), namespace))
+             .format(self._GetAppId(namespace), namespace))
     self.redirect(url)
 
 
