@@ -459,7 +459,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
       return;
     }
     var url = $scope.url_of(file);
-    $http.get(url, {transformResponse: no_json_transform})
+    $http.get(url, {transformResponse: $scope.no_json_transform})
     .success(function(data, status, headers, config) {
       file.contents = data;
       file.dirty = false;

@@ -15,13 +15,26 @@ function make_project(key, subsecond) {
 };
 
 describe('HeaderController', function() {
-  var scope, location;
 
-  beforeEach(inject(function($rootScope, $controller, $location) {
+  var scope, $httpBackend, location;
+
+  beforeEach(inject(function($rootScope, $injector) {
     scope = $rootScope.$new();
-    $controller(HeaderController, {$scope: scope});
+    //$httpBackend = $injector.get('$httpBackend');
+  }));
+
+  beforeEach(inject(function($location) {
+    doInit();
     location = $location
   }));
+
+  function doInit() {
+    inject(function($controller) {
+      $controller(HeaderController, {$scope: scope});
+      flushDoSerial();
+      //$httpBackend.flush();
+    });
+  }
 
 
   it('alreadyhome function should only return true for /playground/', function() {
@@ -45,11 +58,15 @@ describe('ProjectController', function() {
 
   var scope, $httpBackend;
 
-  function make_file(filename, mime_type) {
-    return {
+  function make_file(filename, mime_type, contents) {
+    var file = {
         'name': filename,
         'mime_type': mime_type,
     };
+    if (contents) {
+      file.contents = contents;
+    }
+    return file;
   }
 
   function make_files_response() {
@@ -92,7 +109,7 @@ describe('ProjectController', function() {
     .respond(make_files_response())
   }));
 
-  beforeEach(inject(function($browser, $httpBackend) {
+  beforeEach(inject(function($browser) {
     $browser.url('/playground/p/20/');
   }));
 
@@ -115,7 +132,7 @@ describe('ProjectController', function() {
 
   describe('initialization', function() {
 
-    it('should set $scope.project to the project identified by $routeParams.project_id', inject(function($routeParams, $controller) {
+    it('should set $scope.project to the project identified by $routeParams.project_id', inject(function($routeParams) {
       $routeParams.project_id = 42;
       var project = make_project(42);
       scope.projects = [make_project(17), project, make_project(13)];
@@ -125,10 +142,10 @@ describe('ProjectController', function() {
       expect(scope.project).toBe(project);
     }));
 
-    it('should call /playground/p/:project_id/listfiles', inject(function($controller, $browser) {
+    it('should call /playground/p/:project_id/listfiles', function() {
       $httpBackend.expectGET('/playground/p/20/listfiles');
       doInit();
-    }));
+    });
 
   });
 
@@ -141,7 +158,7 @@ describe('ProjectController', function() {
 
     describe('no_json_transform function', function() {
 
-      it('should provide the identity transform', inject(function($controller) {
+      it('should provide the identity transform', function() {
         var data = 'foo';
         expect(scope.no_json_transform(data)).toBe(data);
         expect(scope.no_json_transform(data)).toEqual('foo');
@@ -155,28 +172,28 @@ describe('ProjectController', function() {
         data = Error('x');
         expect(scope.no_json_transform(data)).toEqual(Error('x'));
         expect(scope.no_json_transform(data)).toBe(data);
-      }));
+      });
 
     });
 
 
     describe('is_image_mime_type function', function() {
 
-      it('should return true for "image/*" MIME types', inject(function($controller) {
+      it('should return true for "image/*" MIME types', function() {
         expect(scope.is_image_mime_type('image/png')).toBe(true);
         expect(scope.is_image_mime_type('image/gif')).toBe(true);
         expect(scope.is_image_mime_type('image')).toBe(false);
         expect(scope.is_image_mime_type('text/plain')).toBe(false);
         expect(scope.is_image_mime_type('text/png')).toBe(false);
         expect(scope.is_image_mime_type('application/octet-stream')).toBe(false);
-      }));
+      });
 
     });
 
 
     describe('url_of function', function() {
 
-      it('should return //localhost:9100/p/:project_id/getfile/:filename', inject(function($controller, $window) {
+      it('should return //localhost:9100/p/:project_id/getfile/:filename', inject(function($window) {
         $window.location.pathname = '/playground/p/42/';
         var png = make_file('logo.png', 'image/png');
         expect(scope.url_of(png)).toEqual('//localhost:9100/playground/p/42/getfile/logo.png');
@@ -187,27 +204,26 @@ describe('ProjectController', function() {
 
     describe('image_url_of function', function() {
 
-      it('should return emtpty string when no file is given', inject(function($controller) {
+      it('should return emtpty string when no file is given', function() {
         expect(scope.image_url_of()).toEqual('');
         expect(scope.image_url_of(null)).toEqual('');
-      }));
+      });
 
-      it('should return empty string for none "image/*" MIME types ', inject(function($controller) {
+      it('should return empty string for none "image/*" MIME types ', function() {
         expect(scope.image_url_of(make_file('filename', 'text/html'))).toEqual('');
-      }));
+      });
 
-      it('should pass through to url_of() for "image/*" MIME types ', inject(function($controller) {
+      it('should pass through to url_of() for "image/*" MIME types ', function() {
         var png = make_file('filename', 'image/png');
         var file_url = scope.url_of(png);
         expect(scope.image_url_of(png)).toBe(file_url);
-      }));
+      });
 
     });
 
-
     describe('_list_files function', function() {
 
-      it('should call /playground/p/:project_id/listfiles', inject(function($controller, $browser, $http) {
+      it('should call /playground/p/:project_id/listfiles', function() {
         $httpBackend.verifyNoOutstandingRequest();
         $httpBackend.verifyNoOutstandingExpectation();
         expect(scope.files).toEqual(make_files_data());
@@ -218,21 +234,21 @@ describe('ProjectController', function() {
         scope._list_files();
         $httpBackend.flush();
         expect(scope.files).toEqual({21: make_file(21)});
-      }));
+      });
 
     });
 
 
     describe('_select_first_file function', function() {
 
-      it('should call $scope.select(:first_file)', inject(function($controller) {
+      it('should call $scope.select(:first_file)', function() {
         scope.select = jasmine.createSpy();
         scope.files = make_files_data();
         expect(scope.select).not.toHaveBeenCalled();
         scope._select_first_file();
         expect(scope.select).toHaveBeenCalledWith(make_file('app.yaml',
                                                             'text/x-yaml'));
-      }));
+      });
 
     });
 
@@ -242,9 +258,15 @@ describe('ProjectController', function() {
 
 describe('PageController', function() {
 
-  describe('initialization', function() {
+  var scope, $httpBackend;
 
-    var scope, $httpBackend;
+  function doInit() {
+    inject(function($controller) {
+      $controller(PageController, {$scope: scope});
+      flushDoSerial();
+      $httpBackend.flush();
+    });
+  }
 
     beforeEach(module('playgroundApp.services'));
 
@@ -269,6 +291,8 @@ describe('PageController', function() {
     }));
 
 
+  describe('initialization', function() {
+
     afterEach(function() {
       flushDoSerial();
       $httpBackend.verifyNoOutstandingExpectation();
@@ -276,110 +300,98 @@ describe('PageController', function() {
     });
 
 
-    it('should, when instantiated, get configuration, then project data', inject(function($controller) {
+    it('should, when instantiated, get configuration, then project data', function() {
       expect(scope.config).toBeUndefined();
       expect(scope.projects).toBeUndefined();
       $httpBackend.expectGET('/playground/getconfig');
       $httpBackend.expectGET('/playground/getprojects');
-      $controller(PageController, {$scope: scope});
-      flushDoSerial();
-      $httpBackend.flush();
+      doInit();
       expect(scope.config).toBeDefined();
       expect(scope.config.email).toBeDefined();
       expect(scope.config.playground_namespace).toBe('_playground');
       expect(scope.projects).toBeDefined();
       expect(scope.projects.length).toBe(0);
-    }));
-
-  });
-
-
-  describe('namespace function', function() {
-
-    var scope, routeParams;
-
-    beforeEach(module('playgroundApp.services'));
-
-    beforeEach(inject(function($rootScope, $controller, $routeParams) {
-      scope = $rootScope.$new();
-      scope.config = {};
-      routeParams = $routeParams;
-      routeParams.project_id = undefined;
-      $controller(PageController, {$scope: scope});
-    }));
-
-
-    it('should have no default', function() {
-      expect(scope.namespace()).toBeUndefined();
-    });
-
-
-    it('should use $routeParams project_id', function() {
-      expect(scope.namespace()).toBeUndefined();
-      routeParams.project_id = 'route_param';
-      expect(scope.namespace()).toBe('route_param');
-    });
-
-
-    it('should use $scope.config.playground_namespace', function() {
-      expect(scope.namespace()).toBeUndefined();
-      scope.config.playground_namespace = 'pg_namepsace';
-      expect(scope.namespace()).toBe('pg_namepsace');
-    });
-
-
-    it('should prefer $routeParams to $scope.config', function() {
-      expect(scope.namespace()).toBeUndefined();
-      routeParams.project_id = 'route_param';
-      scope.config.playground_namespace = 'pg_namepsace';
-      expect(scope.namespace()).toBe('route_param');
     });
 
   });
 
 
-  describe('datastore_admin function', function() {
+  describe('runtion behavior', function() {
 
-    var scope;
+    beforeEach(function() {
+      doInit();
+    });
 
-    beforeEach(module('playgroundApp.services'));
+    describe('namespace function', function() {
 
-    beforeEach(inject(function($rootScope, $controller, $routeParams, $window) {
-      scope = $rootScope.$new();
-      $routeParams.project_id = 'some_namespace';
-      $window.open = jasmine.createSpy();
-      $controller(PageController, {$scope: scope});
-    }));
+      var routeParams;
 
-
-    it('should open new window to /playground/datastore/some_namespace', inject(function($window) {
-      expect($window.open).not.toHaveBeenCalled();
-      scope.datastore_admin();
-      expect($window.open).toHaveBeenCalledWith('/playground/datastore/some_namespace', '_blank');
-    }));
-
-  });
+      beforeEach(inject(function($routeParams) {
+        scope.config = {};
+        routeParams = $routeParams;
+        routeParams.project_id = undefined;
+      }));
 
 
-  describe('memcache_admin function', function() {
-
-    var scope;
-
-    beforeEach(module('playgroundApp.services'));
-
-    beforeEach(inject(function($rootScope, $controller, $routeParams, $window) {
-      scope = $rootScope.$new();
-      $routeParams.project_id = 'some_namespace';
-      $window.open = jasmine.createSpy();
-      $controller(PageController, {$scope: scope});
-    }));
+      it('should have no default', function() {
+        expect(scope.namespace()).toBeUndefined();
+      });
 
 
-    it('should open new window to /playground/memcache/some_namespace', inject(function($window) {
-      expect($window.open).not.toHaveBeenCalled();
-      scope.memcache_admin();
-      expect($window.open).toHaveBeenCalledWith('/playground/memcache/some_namespace', '_blank');
-    }));
+      it('should use $routeParams project_id', function() {
+        expect(scope.namespace()).toBeUndefined();
+        routeParams.project_id = 'route_param';
+        expect(scope.namespace()).toBe('route_param');
+      });
+
+
+      it('should use $scope.config.playground_namespace', function() {
+        expect(scope.namespace()).toBeUndefined();
+        scope.config.playground_namespace = 'pg_namepsace';
+        expect(scope.namespace()).toBe('pg_namepsace');
+      });
+
+
+      it('should prefer $routeParams to $scope.config', function() {
+        expect(scope.namespace()).toBeUndefined();
+        routeParams.project_id = 'route_param';
+        scope.config.playground_namespace = 'pg_namepsace';
+        expect(scope.namespace()).toBe('route_param');
+      });
+
+    });
+
+
+    describe('link functions', function() {
+
+      beforeEach(inject(function($routeParams, $window) {
+        $routeParams.project_id = 'some_namespace';
+        $window.open = jasmine.createSpy();
+      }));
+
+
+      describe('datastore_admin function', function() {
+
+        it('should open new window to /playground/datastore/some_namespace', inject(function($window) {
+          expect($window.open).not.toHaveBeenCalled();
+          scope.datastore_admin();
+          expect($window.open).toHaveBeenCalledWith('/playground/datastore/some_namespace', '_blank');
+        }));
+
+      });
+
+
+      describe('memcache_admin function', function() {
+
+        it('should open new window to /playground/memcache/some_namespace', inject(function($window) {
+          expect($window.open).not.toHaveBeenCalled();
+          scope.memcache_admin();
+          expect($window.open).toHaveBeenCalledWith('/playground/memcache/some_namespace', '_blank');
+        }));
+
+      });
+
+    });
 
   });
 
@@ -441,13 +453,13 @@ describe('MainController', function() {
 
   describe('initialization', function() {
 
-    it('should transition $scope.loaded state to true', inject(function($controller) {
+    it('should transition $scope.loaded state to true', function() {
       expect(scope.loaded).toBeUndefined();
       doInit();
       expect(scope.loaded).toBe(true);
-    }));
+    });
 
-    it('should get templates', inject(function($controller) {
+    it('should get templates', function() {
       expect(scope.templates).toBeUndefined();
       $httpBackend.expectGET('/playground/gettemplates');
       doInit();
@@ -463,7 +475,7 @@ describe('MainController', function() {
       expect(scope.templates.templates[0].description).toBe('boo_description');
       expect(scope.templates.templates[0].name).toBe('boo_name');
       expect(scope.templates.templates[0].source_key).toBe('boo_source_key');
-    }));
+    });
 
   });
 
@@ -472,10 +484,8 @@ describe('MainController', function() {
 
     var location;
 
-    beforeEach(inject(function($controller, $location) {
-      $controller(MainController, {$scope: scope});
-      flushDoSerial();
-      $httpBackend.flush();
+    beforeEach(inject(function( $location) {
+      doInit();
       location = $location;
     }));
 
