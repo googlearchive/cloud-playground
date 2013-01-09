@@ -5,6 +5,10 @@ handlers:
   # want to know if this is a mimic and its version.
   script: mimic.app
 
+# block mimic control requests
+- url: /_ah/mimic/.*
+  script: deny.app
+
 # script handler for everything else / user code
 - url: /.*
   # This module must be removed from sys.modules in TargetEnvironment.RunScript
