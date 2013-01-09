@@ -533,6 +533,7 @@ app = webapp2.WSGIApplication([
     ('/playground/getconfig', GetConfig),
 
     # tree actions
+    # TODO use handlers in mimic control app instead
     ('/playground/p/(.*)/getfile/(.*)', GetFile),
     ('/playground/p/(.*)/putfile/(.*)', PutFile),
     ('/playground/p/(.*)/movefile/(.*)', MoveFile),
