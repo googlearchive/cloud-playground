@@ -287,17 +287,21 @@ describe('ProjectController', function() {
 
     describe('_list_files function', function() {
 
+      function make_plain_file() {
+        return make_file('foo.txt', 'text/plain');
+      }
+
       it('should call /playground/p/:project_id/listfiles', function() {
         $httpBackend.verifyNoOutstandingRequest();
         $httpBackend.verifyNoOutstandingExpectation();
         expect(scope.files).toEqual(make_files_data());
         $httpBackend
         .expectGET('/playground/p/20/listfiles')
-        .respond([make_file(21)]);
+        .respond([make_plain_file()]);
         scope.files = null;
         scope._list_files();
         $httpBackend.flush();
-        expect(scope.files).toEqual({21: make_file(21)});
+        expect(scope.files).toEqual({'foo.txt': make_plain_file()});
       });
 
     });
