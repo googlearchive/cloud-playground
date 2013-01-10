@@ -106,12 +106,12 @@ describe('ProjectController', function() {
     $httpBackend = $injector.get('$httpBackend');
 
     $httpBackend
-    .whenGET('/playground/p/20/listfiles')
+    .whenGET('/playground/p/76/listfiles')
     .respond(make_files_response())
   }));
 
   beforeEach(inject(function($browser) {
-    $browser.url('/playground/p/20/');
+    $browser.url('/playground/p/76/');
   }));
 
 
@@ -144,7 +144,7 @@ describe('ProjectController', function() {
     }));
 
     it('should call /playground/p/:project_id/listfiles', function() {
-      $httpBackend.expectGET('/playground/p/20/listfiles');
+      $httpBackend.expectGET('/playground/p/76/listfiles');
       doInit();
     });
 
@@ -296,7 +296,7 @@ describe('ProjectController', function() {
         $httpBackend.verifyNoOutstandingExpectation();
         expect(scope.files).toEqual(make_files_data());
         $httpBackend
-        .expectGET('/playground/p/20/listfiles')
+        .expectGET('/playground/p/76/listfiles')
         .respond([make_plain_file()]);
         scope.files = null;
         scope._list_files();
