@@ -243,7 +243,6 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
   // }
   $scope.files = {};
 
-  var _editor;
   var _output_window;
   var _popout = false;
 
@@ -319,7 +318,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
   // editor onChange
   function editorOnChange(from, to, text, next) {
     $scope.$apply(function() {
-      $scope.current_file.contents = _editor.getValue();
+      $scope.current_file.contents = $scope._editor.getValue();
       if ($scope.current_file.dirty) {
         return;
       }
@@ -456,8 +455,8 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
   };
 
   function createEditor(mime_type) {
-    if (_editor) {
-      angular.element(_editor.getWrapperElement()).remove();
+    if ($scope._editor) {
+      angular.element($scope._editor.getWrapperElement()).remove();
     }
     return CodeMirror(source_code, {
       mode: mime_type,
@@ -479,11 +478,11 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
       })
       .tick() // needed when switching from source-image to editor
       .then(function() {
-        _editor = createEditor(file.mime_type);
-        _editor.getScrollerElement().id = 'scroller-element';
-        _editor.setValue(file.contents);
-        _editor.setOption('onChange', editorOnChange);
-        _editor.focus();
+        $scope._editor = createEditor(file.mime_type);
+        $scope._editor.getScrollerElement().id = 'scroller-element';
+        $scope._editor.setValue(file.contents);
+        $scope._editor.setOption('onChange', editorOnChange);
+        $scope._editor.focus();
       });
     });
   };
