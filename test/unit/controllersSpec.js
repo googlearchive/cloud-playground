@@ -151,10 +151,12 @@ describe('ProjectController', function() {
       expect(scope.project).toBe(project);
     }));
 
-    it('should call /playground/p/:project_id/listfiles', function() {
-      $httpBackend.expectGET('/playground/p/76/listfiles');
+    it('should call $scope._list_files()', inject(function($controller, DoSerial) {
+      spyOn(DoSerial, 'then').andCallThrough();
+      expect(DoSerial.then).not.toHaveBeenCalled();
       doInit();
-    });
+      expect(DoSerial.then).toHaveBeenCalledWith(scope._list_files);
+    }));
 
     it('should call $scope._select_first_file()', inject(function($controller, DoSerial) {
       spyOn(DoSerial, 'then').andCallThrough();
