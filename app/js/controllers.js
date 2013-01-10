@@ -148,6 +148,23 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     });
   };
 
+  $scope.select_file = function(file) {
+    if ($scope.is_image_mime_type(file.mime_type)) {
+      $scope.current_file = file;
+      return;
+    }
+    $scope._get(file, function() {
+      return DoSerial
+      .then(function() {
+        $scope.current_file = file;
+      })
+      .tick() // needed when switching from source-image to editor
+      .then(function() {
+        $scope.create_editor(file.mime_type);
+      });
+    });
+  };
+
   $scope._select_first_file = function() {
     for (var path in $scope.files) {
       $scope.select_file($scope.files[path]);
@@ -454,38 +471,21 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
     });
   };
 
-  function createEditor(mime_type) {
+  $scope.create_editor = function(mime_type) {
     if ($scope._editor) {
       angular.element($scope._editor.getWrapperElement()).remove();
     }
-    return CodeMirror(source_code, {
+    $scope._editor = CodeMirror(source_code, {
       mode: mime_type,
       lineNumbers: true,
       matchBrackets: true,
       undoDepth: 440, // default = 40
     });
+    $scope._editor.getScrollerElement().id = 'scroller-element';
+    $scope._editor.setValue(file.contents);
+    $scope._editor.setOption('onChange', editorOnChange);
+    $scope._editor.focus();
   }
-
-  $scope.select_file = function(file) {
-    if ($scope.isImageMimeType(file.mime_type)) {
-      $scope.current_file = file;
-      return;
-    }
-    _get(file, function() {
-      return DoSerial
-      .then(function() {
-        $scope.current_file = file;
-      })
-      .tick() // needed when switching from source-image to editor
-      .then(function() {
-        $scope._editor = createEditor(file.mime_type);
-        $scope._editor.getScrollerElement().id = 'scroller-element';
-        $scope._editor.setValue(file.contents);
-        $scope._editor.setOption('onChange', editorOnChange);
-        $scope._editor.focus();
-      });
-    });
-  };
 
 }
 */

@@ -307,6 +307,62 @@ describe('ProjectController', function() {
     });
 
 
+    describe('select_file function', function() {
+
+      describe('with "image/*" MIME types', function() {
+
+        function make_image_file() {
+          return make_file('foo.png', 'image/png');
+        }
+
+        it('should set $scope.current_file', function() {
+          expect(scope.current_file).toBeUndefined();
+          scope.select_file(make_image_file());
+          expect(scope.current_file).toEqual(make_image_file());
+        });
+
+        it('should return undefined', function() {
+          var result = scope.select_file(make_image_file());
+          expect(result).toBeUndefined();
+        });
+
+      });
+
+      describe('with MIME types other than "image/*"', function() {
+
+        function make_text_file() {
+          return make_file('app.yaml', 'text/x-yaml', 'version: 1');
+        }
+
+        beforeEach(function() {
+          scope.create_editor = jasmine.createSpy();
+        });
+
+        it('should set $scope.current_file', function() {
+          expect(scope.current_file).toBeUndefined();
+          scope.select_file(make_text_file());
+          flushDoSerial();
+          expect(scope.current_file).toEqual(make_text_file());
+        });
+
+        it('should call DoSerial.then() and DoSerial.tick()', inject(function(DoSerial) {
+          spyOn(DoSerial, 'then').andCallThrough();
+          spyOn(DoSerial, 'tick').andCallThrough();
+          scope.select_file(make_text_file());
+          expect(DoSerial.then).toHaveBeenCalled();
+          expect(DoSerial.tick).toHaveBeenCalled();
+        }));
+
+        it('should call $scope.create_editor(:mime_type)', function() {
+          scope.select_file(make_text_file());
+          flushDoSerial();
+          expect(scope.create_editor).toHaveBeenCalledWith('text/x-yaml');
+        });
+
+      });
+
+    });
+
     describe('_select_first_file function', function() {
 
       it('should call $scope.select_file(:first_file)', function() {
