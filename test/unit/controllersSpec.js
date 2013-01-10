@@ -97,6 +97,10 @@ describe('ProjectController', function() {
 
   beforeEach(module('playgroundApp.services'));
 
+  beforeEach(inject(function($browser) {
+    $browser.url('/playground/p/76/');
+  }));
+
   beforeEach(inject(function($rootScope, $injector) {
     scope = $rootScope.$new();
     // TODO: remove if we instead instantiate a PageController
@@ -108,10 +112,6 @@ describe('ProjectController', function() {
     $httpBackend
     .whenGET('/playground/p/76/listfiles')
     .respond(make_files_response())
-  }));
-
-  beforeEach(inject(function($browser) {
-    $browser.url('/playground/p/76/');
   }));
 
 
