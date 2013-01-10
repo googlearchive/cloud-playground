@@ -148,6 +148,9 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     });
   };
 
+  $scope.create_editor = function(mime_type) {
+  };
+
   $scope.select_file = function(file) {
     if ($scope.is_image_mime_type(file.mime_type)) {
       $scope.current_file = file;
@@ -182,7 +185,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     }
   })
   .then($scope._list_files)
-  //.then($scope._select_first_file);
+  .then($scope._select_first_file);
 
 }
 

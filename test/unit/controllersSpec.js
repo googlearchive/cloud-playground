@@ -58,13 +58,16 @@ describe('ProjectController', function() {
 
   var scope, $httpBackend;
 
-  function make_file(filename, mime_type, contents) {
+  function make_file(filename, mime_type, contents, dirty) {
     var file = {
         'name': filename,
         'mime_type': mime_type,
     };
     if (contents) {
       file.contents = contents;
+    }
+    if (dirty != undefined) {
+      file.dirty = dirty;
     }
     return file;
   }
@@ -79,7 +82,8 @@ describe('ProjectController', function() {
 
   function make_files_data() {
     return {
-        'app.yaml':    make_file('app.yaml',    'text/x-yaml'),
+        // Contents of first file fetched during controller initialization
+        'app.yaml':    make_file('app.yaml',    'text/x-yaml', 'one: two', false),
         'favicon.ico': make_file('favicon.ico', 'image/x-icon'),
         'main.py':     make_file('main.py',     'text/x-python'),
     };
@@ -111,7 +115,11 @@ describe('ProjectController', function() {
 
     $httpBackend
     .whenGET('/playground/p/76/listfiles')
-    .respond(make_files_response())
+    .respond(make_files_response());
+
+    $httpBackend
+    .whenGET('//localhost:9100/playground/p/76/getfile/app.yaml')
+    .respond('one: two');
   }));
 
 
@@ -147,6 +155,13 @@ describe('ProjectController', function() {
       $httpBackend.expectGET('/playground/p/76/listfiles');
       doInit();
     });
+
+    it('should call $scope._select_first_file()', inject(function($controller, DoSerial) {
+      spyOn(DoSerial, 'then').andCallThrough();
+      expect(DoSerial.then).not.toHaveBeenCalled();
+      doInit();
+      expect(DoSerial.then).toHaveBeenCalledWith(scope._select_first_file);
+    }));
 
   });
 
@@ -316,7 +331,7 @@ describe('ProjectController', function() {
         }
 
         it('should set $scope.current_file', function() {
-          expect(scope.current_file).toBeUndefined();
+          scope.current_file = undefined;
           scope.select_file(make_image_file());
           expect(scope.current_file).toEqual(make_image_file());
         });
@@ -339,7 +354,7 @@ describe('ProjectController', function() {
         });
 
         it('should set $scope.current_file', function() {
-          expect(scope.current_file).toBeUndefined();
+          scope.current_file = undefined;
           scope.select_file(make_text_file());
           flushDoSerial();
           expect(scope.current_file).toEqual(make_text_file());
@@ -366,11 +381,11 @@ describe('ProjectController', function() {
     describe('_select_first_file function', function() {
 
       it('should call $scope.select_file(:first_file)', function() {
+        doInit();
         scope.select_file = jasmine.createSpy();
-        scope.files = make_files_data();
+        var expected_file = make_file('app.yaml', 'text/x-yaml', 'one: two', false);
         expect(scope.select_file).not.toHaveBeenCalled();
         scope._select_first_file();
-        var expected_file = make_file('app.yaml', 'text/x-yaml');
         expect(scope.select_file).toHaveBeenCalledWith(expected_file);
       });
 
