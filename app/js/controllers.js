@@ -319,23 +319,23 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
   // editor onChange
   function editorOnChange(from, to, text, next) {
     $scope.$apply(function() {
-      $scope.currentFile.contents = _editor.getValue();
-      if ($scope.currentFile.dirty) {
+      $scope.current_file.contents = _editor.getValue();
+      if ($scope.current_file.dirty) {
         return;
       }
-      $scope.currentFile.dirty = true;
+      $scope.current_file.dirty = true;
       Backoff.schedule(_saveDirtyFiles);
     });
   }
 
   $scope.prompt_file_delete = function() {
     var answer = prompt("Are you sure you want to delete " +
-                        $scope.currentFile.name + "?\nType 'yes' to confirm.",
+                        $scope.current_file.name + "?\nType 'yes' to confirm.",
                         "no");
     if (!answer || answer.toLowerCase()[0] != 'y') {
       return;
     }
-    $scope.deletefile($scope.currentFile);
+    $scope.deletefile($scope.current_file);
   }
 
   $scope.prompt_project_rename = function(project) {
@@ -361,17 +361,17 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
   $scope.prompt_file_rename = function() {
     var new_filename = prompt(
         'New filename?\n(You may specify a full path such as: foo/bar.txt)',
-        $scope.currentFile.name);
+        $scope.current_file.name);
     if (!new_filename) {
       return;
     }
     if (new_filename[0] == '/') {
       new_filename = new_filename.substr(1);
     }
-    if (!new_filename || new_filename == $scope.currentFile.name) {
+    if (!new_filename || new_filename == $scope.current_file.name) {
       return;
     }
-    $scope.movefile($scope.currentFile, new_filename);
+    $scope.movefile($scope.current_file, new_filename);
   }
 
   function hide_context_menus() {
@@ -450,7 +450,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
       delete $scope.files[oldpath];
       return $http.post('movefile/' + encodeURI(oldpath), {newpath: newpath})
       .success(function(data, status, headers, config) {
-        $scope.currentFile = file;
+        $scope.current_file = file;
       });
     });
   };
@@ -469,13 +469,13 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
 
   $scope.select_file = function(file) {
     if ($scope.isImageMimeType(file.mime_type)) {
-      $scope.currentFile = file;
+      $scope.current_file = file;
       return;
     }
     _get(file, function() {
       return DoSerial
       .then(function() {
-        $scope.currentFile = file;
+        $scope.current_file = file;
       })
       .tick() // needed when switching from source-image to editor
       .then(function() {
