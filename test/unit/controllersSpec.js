@@ -88,7 +88,8 @@ describe('ProjectController', function() {
   beforeEach(module(function($provide) {
     $provide.factory('$window', function() {
       return {
-        location: { replace: jasmine.createSpy() },
+        location: { replace: jasmine.createSpy(),
+                    pathname: '/playground/p/76/' },
         navigator: {},
       };
     });
