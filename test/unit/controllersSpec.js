@@ -304,13 +304,13 @@ describe('ProjectController', function() {
 
     describe('_select_first_file function', function() {
 
-      it('should call $scope.select(:first_file)', function() {
-        scope.select = jasmine.createSpy();
+      it('should call $scope.select_file(:first_file)', function() {
+        scope.select_file = jasmine.createSpy();
         scope.files = make_files_data();
-        expect(scope.select).not.toHaveBeenCalled();
+        expect(scope.select_file).not.toHaveBeenCalled();
         scope._select_first_file();
-        expect(scope.select).toHaveBeenCalledWith(make_file('app.yaml',
-                                                            'text/x-yaml'));
+        var expected_file = make_file('app.yaml', 'text/x-yaml');
+        expect(scope.select_file).toHaveBeenCalledWith(expected_file);
       });
 
     });

@@ -150,7 +150,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
 
   $scope._select_first_file = function() {
     for (var path in $scope.files) {
-      $scope.select($scope.files[path]);
+      $scope.select_file($scope.files[path]);
       break;
     }
   }
@@ -397,7 +397,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
   $scope.file_context_menu = function(evt, file) {
     evt.stopPropagation();
     hide_context_menus();
-    $scope.select(file);
+    $scope.select_file(file);
     $scope.showfilecontextmenu = true;
     var menuDiv = WrappedElementById('file-context-menu');
     menuDiv.css('left', evt.pageX + 'px');
@@ -415,7 +415,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
       };
       $scope.files[path] = file;
     }
-    $scope.select(file);
+    $scope.select_file(file);
   };
 
   $scope.prompt_for_new_file = function() {
@@ -467,7 +467,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
     });
   }
 
-  $scope.select = function(file) {
+  $scope.select_file = function(file) {
     if ($scope.isImageMimeType(file.mime_type)) {
       $scope.currentFile = file;
       return;
