@@ -239,10 +239,10 @@ class PlaygroundHandler(SessionHandler):
 class RedirectHandler(PlaygroundHandler):
 
   def _GetAppId(self, namespace):
-      if namespace == settings.PLAYGROUND_NAMESPACE:
-        app_id = settings.PLAYGROUND_APP_ID
-      else:
-        app_id = settings.EXEC_CODE_APP_ID
+    if namespace == settings.PLAYGROUND_NAMESPACE:
+      return settings.PLAYGROUND_APP_ID
+    else:
+      return settings.EXEC_CODE_APP_ID
 
 
 class DatastoreRedirect(RedirectHandler):
