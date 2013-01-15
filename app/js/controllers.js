@@ -148,6 +148,19 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     });
   };
 
+  $scope.editorOnChange = function(from, to, text, next) {
+/*
+    $scope.$apply(function() {
+      $scope.current_file.contents = $scope._editor.getValue();
+      if ($scope.current_file.dirty) {
+        return;
+      }
+      $scope.current_file.dirty = true;
+      Backoff.schedule(_saveDirtyFiles);
+    });
+*/
+  };
+
   $scope.create_editor = function(mime_type) {
     if ($scope._editor) {
       angular.element($scope._editor.getWrapperElement()).remove();
@@ -158,12 +171,10 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
       matchBrackets: true,
       undoDepth: 440, // default = 40
     });
-/*
-    $scope._editor.getScrollerElement().id = 'scroller-element';
-    $scope._editor.setValue(file.contents);
-    $scope._editor.setOption('onChange', editorOnChange);
+    //$scope._editor.getScrollerElement().id = 'scroller-element';
+    $scope._editor.setValue($scope.current_file.contents);
+    $scope._editor.setOption('onChange', $scope.editorOnChange);
     $scope._editor.focus();
-*/
   }
 
 
@@ -348,18 +359,6 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
         break;
       }
     }
-  }
-
-  // editor onChange
-  function editorOnChange(from, to, text, next) {
-    $scope.$apply(function() {
-      $scope.current_file.contents = $scope._editor.getValue();
-      if ($scope.current_file.dirty) {
-        return;
-      }
-      $scope.current_file.dirty = true;
-      Backoff.schedule(_saveDirtyFiles);
-    });
   }
 
   $scope.prompt_file_delete = function() {

@@ -127,7 +127,9 @@ describe('ProjectController', function() {
     };
     $httpBackend = $injector.get('$httpBackend');
 
-    $window.CodeMirror = jasmine.createSpy('CodeMirror');
+    $window.CodeMirror = jasmine.createSpy('CodeMirror').andReturn(
+        jasmine.createSpyObj('CodeMirror', ['getWrapperElement', 'setValue', 'setOption', 'focus'])
+    );
 
     $httpBackend
     .whenGET('/playground/p/76/listfiles')
@@ -362,6 +364,7 @@ describe('ProjectController', function() {
       });
 
       it('should instantiate a new CodeMirror editor', inject(function($window) {
+        expect(scope._editor).toBeUndefined();
         scope.create_editor('text/plain');
         var expected_config = {
             mode : 'text/plain',
@@ -372,6 +375,25 @@ describe('ProjectController', function() {
         expect($window.CodeMirror).toHaveBeenCalledWith('source-code-elem',
                                                         expected_config);
       }));
+
+      it('should set editor contents', function() {
+        expect(scope._editor).toBeUndefined();
+        scope.create_editor('text/x-yaml');
+        expect(scope._editor.setValue).toHaveBeenCalledWith('one: two');
+      });
+
+      it('should set editor onChange handler', function() {
+        scope.editorOnChange = function() {};
+        expect(scope._editor).toBeUndefined();
+        scope.create_editor('text/x-yaml');
+        expect(scope._editor.setOption).toHaveBeenCalledWith('onChange', scope.editorOnChange);
+      });
+
+      it('should set editor focus', function() {
+        expect(scope._editor).toBeUndefined();
+        scope.create_editor('text/x-yaml');
+        expect(scope._editor.focus).toHaveBeenCalled();
+      });
 
     });
 
