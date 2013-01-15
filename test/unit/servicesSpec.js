@@ -157,4 +157,17 @@ describe('service', function() {
 
   });
 
+  describe('WrappedElementById', function() {
+
+    it('should return angular.element(:elem)', inject(function($window, WrappedElementById) {
+      var elem = $window.document.createElement('div');
+      var wrappedElem = angular.element(elem);
+      $window.document.getElementById = jasmine.createSpy('getElementById').andReturn(elem);
+      var result = WrappedElementById('myid');
+      expect($window.document.getElementById).toHaveBeenCalledWith('myid');
+      expect(result).toEqual(wrappedElem);
+    }));
+
+  });
+
 });

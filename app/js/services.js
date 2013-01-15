@@ -70,6 +70,12 @@ angular.module('playgroundApp.services', [])
   };
 })
 
+.factory('WrappedElementById', function(DomElementById) {
+  return function(id) {
+    return angular.element(DomElementById(id));
+  };
+})
+
 /*
 
 .factory('Backoff', function($timeout) {
@@ -101,12 +107,6 @@ angular.module('playgroundApp.services', [])
 
   Backoff.reset();
   return Backoff;
-})
-
-.factory('WrappedElementById', function(DomElementById) {
-  return function(id) {
-    return angular.element(DomElementById(id));
-  };
 })
 
 .factory('LightBox', function($rootScope) {
