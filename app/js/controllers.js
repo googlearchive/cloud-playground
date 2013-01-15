@@ -104,6 +104,8 @@ function MainController($scope, $http, $window, $location, DoSerial) {
 function ProjectController($scope, $browser, $http, $routeParams, $window,
                            DoSerial) {
 
+  //$scope.source_code = DomElementById('source-code');
+
   // TODO: remove once file contents are returned in JSON response
   $scope.no_json_transform = function(data) { return data; };
 
@@ -149,7 +151,23 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   };
 
   $scope.create_editor = function(mime_type) {
-  };
+    if ($scope._editor) {
+      angular.element($scope._editor.getWrapperElement()).remove();
+    }
+/*
+    $scope._editor = CodeMirror($scope.source_code, {
+      mode: mime_type,
+      lineNumbers: true,
+      matchBrackets: true,
+      undoDepth: 440, // default = 40
+    });
+    $scope._editor.getScrollerElement().id = 'scroller-element';
+    $scope._editor.setValue(file.contents);
+    $scope._editor.setOption('onChange', editorOnChange);
+    $scope._editor.focus();
+*/
+  }
+
 
   $scope.select_file = function(file) {
     if ($scope.is_image_mime_type(file.mime_type)) {
@@ -249,7 +267,6 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
                            Backoff, DoSerial, DomElementById,
                            WrappedElementById) {
 
-  var source_code = DomElementById('source-code');
   var source_image = WrappedElementById('source-image');
 
   // { "app.yaml" : {
@@ -473,22 +490,6 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
       });
     });
   };
-
-  $scope.create_editor = function(mime_type) {
-    if ($scope._editor) {
-      angular.element($scope._editor.getWrapperElement()).remove();
-    }
-    $scope._editor = CodeMirror(source_code, {
-      mode: mime_type,
-      lineNumbers: true,
-      matchBrackets: true,
-      undoDepth: 440, // default = 40
-    });
-    $scope._editor.getScrollerElement().id = 'scroller-element';
-    $scope._editor.setValue(file.contents);
-    $scope._editor.setOption('onChange', editorOnChange);
-    $scope._editor.focus();
-  }
 
 }
 */

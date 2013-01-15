@@ -324,6 +324,47 @@ describe('ProjectController', function() {
     });
 
 
+/*
+  $scope.create_editor = function(mime_type) {
+    if ($scope._editor) {
+      angular.element($scope._editor.getWrapperElement()).remove();
+    }
+    $scope._editor = CodeMirror(source_code, {
+      mode: mime_type,
+      lineNumbers: true,
+      matchBrackets: true,
+      undoDepth: 440, // default = 40
+    });
+    $scope._editor.getScrollerElement().id = 'scroller-element';
+    $scope._editor.setValue(file.contents);
+    $scope._editor.setOption('onChange', editorOnChange);
+    $scope._editor.focus();
+  }
+*/
+    describe('create_editor function', function() {
+
+      it('should not not fail if $scope._editor is undefined', function() {
+        scope._editor = undefined;
+        scope.create_editor('text/plain');
+      });
+
+      it('should remove current editor from the DOM', function() {
+        scope._editor = jasmine.createSpyObj('_editor', ['getWrapperElement']);
+        var elem = document.createElement('div');
+        document.body.appendChild(elem);
+        scope._editor.getWrapperElement = jasmine.createSpy('getWrapperElement').andReturn(elem);
+        var angularElementSpy = jasmine.createSpyObj('angularElementSpy', ['remove']);
+        spyOn(angular, 'element').andCallThrough();
+        expect(angular.element).not.toHaveBeenCalled();
+        expect(elem.parentNode).toBe(document.body);
+        scope.create_editor('text/plain');
+        expect(angular.element).toHaveBeenCalledWith(elem);
+        expect(elem.parentNode).toBe(null);
+      });
+
+    });
+
+
     describe('select_file function', function() {
 
       describe('with "image/*" MIME types', function() {
