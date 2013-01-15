@@ -64,6 +64,12 @@ angular.module('playgroundApp.services', [])
   };
 })
 
+.factory('DomElementById', function($window) {
+  return function(id) {
+    return $window.document.getElementById(id);
+  };
+})
+
 /*
 
 .factory('Backoff', function($timeout) {
@@ -95,12 +101,6 @@ angular.module('playgroundApp.services', [])
 
   Backoff.reset();
   return Backoff;
-})
-
-.factory('DomElementById', function($window) {
-  return function(id) {
-    return $window.document.getElementById(id);
-  };
 })
 
 .factory('WrappedElementById', function(DomElementById) {

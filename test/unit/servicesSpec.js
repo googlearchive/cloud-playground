@@ -144,4 +144,17 @@ describe('service', function() {
 
   });
 
+  describe('DomElementById', function() {
+
+    it('should call $window.document.getElementById(:id)', inject(function($window, DomElementById) {
+      var elem = $window.document.createElement('div');
+      elem.id = 'myid';
+      $window.document.getElementById = jasmine.createSpy('getElementById').andReturn(elem);
+      var result = DomElementById('myid');
+      expect($window.document.getElementById).toHaveBeenCalledWith('myid');
+      expect(result).toBe(elem);
+    }));
+
+  });
+
 });
