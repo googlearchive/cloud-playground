@@ -89,13 +89,27 @@ describe('ProjectController', function() {
     };
   }
 
+  var findable_elements;
+
   beforeEach(module(function($provide) {
     $provide.factory('$window', function() {
-      return {
+      var $window = {
         location: { replace: jasmine.createSpy(),
                     pathname: '/playground/p/76/' },
+        document: {
+          createElement: jasmine.createSpy('createElement').andCallFake(function(id) {
+                           return id + '-elem';
+                         }),
+          getElementById: jasmine.createSpy('getElementById').andCallFake(function(id) {
+                            return findable_elements[id];
+                          }),
+        },
         navigator: {},
       };
+      findable_elements = {
+        'source-code': $window.document.createElement('source-code'),
+      };
+      return $window;
     });
   }));
 
@@ -105,13 +119,15 @@ describe('ProjectController', function() {
     $browser.url('/playground/p/76/');
   }));
 
-  beforeEach(inject(function($rootScope, $injector) {
+  beforeEach(inject(function($rootScope, $injector, $window) {
     scope = $rootScope.$new();
     // TODO: remove if we instead instantiate a PageController
     scope.config = {
         'PLAYGROUND_USER_CONTENT_HOST': 'localhost:9100',
     };
     $httpBackend = $injector.get('$httpBackend');
+
+    $window.CodeMirror = jasmine.createSpy('CodeMirror');
 
     $httpBackend
     .whenGET('/playground/p/76/listfiles')
@@ -324,23 +340,6 @@ describe('ProjectController', function() {
     });
 
 
-/*
-  $scope.create_editor = function(mime_type) {
-    if ($scope._editor) {
-      angular.element($scope._editor.getWrapperElement()).remove();
-    }
-    $scope._editor = CodeMirror(source_code, {
-      mode: mime_type,
-      lineNumbers: true,
-      matchBrackets: true,
-      undoDepth: 440, // default = 40
-    });
-    $scope._editor.getScrollerElement().id = 'scroller-element';
-    $scope._editor.setValue(file.contents);
-    $scope._editor.setOption('onChange', editorOnChange);
-    $scope._editor.focus();
-  }
-*/
     describe('create_editor function', function() {
 
       it('should not not fail if $scope._editor is undefined', function() {
@@ -361,6 +360,18 @@ describe('ProjectController', function() {
         expect(angular.element).toHaveBeenCalledWith(elem);
         expect(elem.parentNode).toBe(null);
       });
+
+      it('should instantiate a new CodeMirror editor', inject(function($window) {
+        scope.create_editor('text/plain');
+        var expected_config = {
+            mode : 'text/plain',
+            lineNumbers : true,
+            matchBrackets : true,
+            undoDepth : 440
+        };
+        expect($window.CodeMirror).toHaveBeenCalledWith('source-code-elem',
+                                                        expected_config);
+      }));
 
     });
 
