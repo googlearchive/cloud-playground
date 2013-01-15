@@ -29,12 +29,6 @@ A, .link, .newthing {
     color: #800080;
   }
 
-HR.divider {
-  clear: both;
-  border: none;
-  padding: 2px;
-}
-
 .btn {
   margin-right: 10px;
 }
