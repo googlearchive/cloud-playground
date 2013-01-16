@@ -10,6 +10,7 @@ describe('service', function() {
   describe('playgroundHttpInterceptor', function() {
 
     it('should return HTTP normal responses unmodified', inject(function(playgroundHttpInterceptor) {
+      // TODO: use jasmine spy instead
       var called = false;
       var http_promise = {
         then: function(success_fn, error_fn) {
@@ -124,6 +125,7 @@ describe('service', function() {
 
     it('should log and continue after exception', function() {
 
+      // TODO: determine better way to test  with $exceptionHandlerProvider
       module(function($exceptionHandlerProvider) {
         $exceptionHandlerProvider.mode('log');
       });
@@ -144,6 +146,7 @@ describe('service', function() {
 
   });
 
+  // TODO: determine if there's a better way to test window / document stuff
   describe('DomElementById', function() {
 
     it('should call $window.document.getElementById(:id)', inject(function($window, DomElementById) {

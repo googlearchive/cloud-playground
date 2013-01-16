@@ -35,10 +35,12 @@ function PageController($scope, $http, DoSerial, $routeParams, $window) {
            ($scope.config && $scope.config.playground_namespace);
   };
 
+  // TODO: determine if there's a better way
   $scope.datastore_admin = function() {
     $window.open('/playground/datastore/' + $scope.namespace(), '_blank');
   };
 
+  // TODO: determine if there's a better way
   $scope.memcache_admin = function() {
     $window.open('/playground/memcache/' + $scope.namespace(), '_blank');
   };
@@ -118,6 +120,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
         $scope.url_of(file) : '';
   };
 
+  // TODO: don't expose function on $scope, while retaining testability
   $scope._get = function(file, success_cb) {
     if (file.hasOwnProperty('contents')) {
       success_cb();
@@ -161,6 +164,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
 */
   };
 
+  // TODO: consider replacing DOM maniupulation here with a directive
   $scope.create_editor = function(mime_type) {
     if ($scope._editor) {
       angular.element($scope._editor.getWrapperElement()).remove();
@@ -232,6 +236,7 @@ function PageController($scope, $http, $location, $routeParams, $window,
     });
   };
 
+  // TODO: don't use prompt()
   $scope.prompt_to_delete_project = function(project) {
     var answer = prompt("Are you sure you want to delete project " +
                         project.name + "?\nType 'yes' to confirm.", "no");
@@ -262,6 +267,7 @@ function PageController($scope, $http, $location, $routeParams, $window,
 
 function LightboxController($scope, $window) {
 
+  // TODO: determine if there's a better way
   $scope.reload = function() {
     $window.location.reload();
   };
@@ -276,6 +282,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
                            Backoff, DoSerial, DomElementById,
                            WrappedElementById) {
 
+  // TODO: determine if there's a better way
   var source_image = WrappedElementById('source-image');
 
   // { "app.yaml" : {
@@ -309,6 +316,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
       _saveDirtyFiles();
     })
     .then(function() {
+      // TODO: try to avoid DOM access
       var container = WrappedElementById('output-container');
       if (_output_window && _output_window.closed) {
         _popout = false;
@@ -342,6 +350,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
     .error(function(data, status, headers, config) {
       $scope.filestatus = 'Failed to save ' + path;
       file.dirty = true;
+      // implement seconds() function
       var secs = Backoff.backoff() / 1000;
       $log.warn(path, 'failed to save; will retry in', secs, 'secs');
       Backoff.schedule(_saveDirtyFiles);
@@ -361,6 +370,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
     }
   }
 
+  // TODO: don't use prompt()
   $scope.prompt_file_delete = function() {
     var answer = prompt("Are you sure you want to delete " +
                         $scope.current_file.name + "?\nType 'yes' to confirm.",
@@ -371,6 +381,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
     $scope.deletefile($scope.current_file);
   }
 
+  // TODO: don't use prompt()
   $scope.prompt_project_rename = function(project) {
     var new_project_name = prompt('Enter a new name for this project',
                                   project.name);
@@ -391,6 +402,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
     });
   }
 
+  // TODO: don't use prompt()
   $scope.prompt_file_rename = function() {
     var new_filename = prompt(
         'New filename?\n(You may specify a full path such as: foo/bar.txt)',
@@ -407,17 +419,20 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
     $scope.movefile($scope.current_file, new_filename);
   }
 
+  // TODO: determine if there's a better way
   function hide_context_menus() {
     $scope.showfilecontextmenu = false;
     $scope.showprojectcontextmenu = false;
   }
 
   // setup context menu clear handler
+  // TODO: use $window rather than window
   window.addEventListener('click', function(evt) {
     hide_context_menus();
     $scope.$apply();
   }, false);
 
+  // TODO: avoid DOM access
   $scope.project_context_menu = function(evt) {
     evt.stopPropagation();
     hide_context_menus();
@@ -427,6 +442,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
     menuDiv.css('top', evt.pageY + 'px');
   };
 
+  // TODO: avoid DOM access
   $scope.file_context_menu = function(evt, file) {
     evt.stopPropagation();
     hide_context_menus();

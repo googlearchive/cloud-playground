@@ -4,6 +4,7 @@
 
 angular.module('playgroundApp.services', [])
 
+// TODO: improve upon flushDoSerial(); allow one step to be executed at a time
 .factory('DoSerial', function($q, $timeout, $log) {
 
   var deferred = $q.defer();
@@ -64,12 +65,14 @@ angular.module('playgroundApp.services', [])
   };
 })
 
+// TODO: determine if there's a better way
 .factory('DomElementById', function($window) {
   return function(id) {
     return $window.document.getElementById(id);
   };
 })
 
+// TODO: determine if there's a better way
 .factory('WrappedElementById', function(DomElementById) {
   return function(id) {
     return angular.element(DomElementById(id));
@@ -78,6 +81,7 @@ angular.module('playgroundApp.services', [])
 
 /*
 
+// TODO: determine if there's a better way
 .factory('Backoff', function($timeout) {
 
   "Exponential backoff service."

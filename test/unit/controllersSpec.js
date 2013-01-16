@@ -92,6 +92,7 @@ describe('ProjectController', function() {
   var findable_elements;
 
   beforeEach(module(function($provide) {
+    // TODO: there has to be a better way
     $provide.factory('$window', function() {
       var $window = {
         location: { replace: jasmine.createSpy(),
@@ -121,12 +122,15 @@ describe('ProjectController', function() {
 
   beforeEach(inject(function($rootScope, $injector, $window) {
     scope = $rootScope.$new();
+
+    // TODO: determine how we should test when this controller relies on scope initialized by a parent controller
     // TODO: remove if we instead instantiate a PageController
     scope.config = {
         'PLAYGROUND_USER_CONTENT_HOST': 'localhost:9100',
     };
     $httpBackend = $injector.get('$httpBackend');
 
+    // TODO: determine if there's a better way to test JavaScript functions which are expected to exist thanks to script tags
     $window.CodeMirror = jasmine.createSpy('CodeMirror').andReturn(
         jasmine.createSpyObj('CodeMirror', ['getWrapperElement', 'setValue', 'setOption', 'focus'])
     );
@@ -159,6 +163,7 @@ describe('ProjectController', function() {
 
   describe('initialization', function() {
 
+    // TODO: determine if there's a better way to ensure that $routeParams is populated
     it('should set $scope.project to the project identified by $routeParams.project_id', inject(function($routeParams) {
       $routeParams.project_id = 42;
       var project = make_project(42);
@@ -232,6 +237,7 @@ describe('ProjectController', function() {
       it('should return //localhost:9100/p/:project_id/getfile/:filename', inject(function($window) {
         $window.location.pathname = '/playground/p/42/';
         var png = make_file('logo.png', 'image/png');
+        // TODO: try to avoid localhost:9100
         expect(scope.url_of(png)).toEqual('//localhost:9100/playground/p/42/getfile/logo.png');
       }));
 
@@ -436,6 +442,7 @@ describe('ProjectController', function() {
           expect(scope.current_file).toEqual(make_text_file());
         });
 
+        // TODO: test order of calls to DoSerial functions
         it('should call DoSerial.then() and DoSerial.tick()', inject(function(DoSerial) {
           spyOn(DoSerial, 'then').andCallThrough();
           spyOn(DoSerial, 'tick').andCallThrough();
