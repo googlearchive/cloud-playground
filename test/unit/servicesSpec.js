@@ -125,7 +125,7 @@ describe('service', function() {
 
     it('should log and continue after exception', function() {
 
-      // TODO: determine better way to test  with $exceptionHandlerProvider
+      // TODO: DETERMINE better way to test  with $exceptionHandlerProvider
       module(function($exceptionHandlerProvider) {
         $exceptionHandlerProvider.mode('log');
       });
@@ -146,7 +146,7 @@ describe('service', function() {
 
   });
 
-  // TODO: determine if there's a better way to test window / document stuff
+  // TODO: DETERMINE if there's a better way to test window / document stuff
   describe('DomElementById', function() {
 
     it('should call $window.document.getElementById(:id)', inject(function($window, DomElementById) {

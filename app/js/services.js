@@ -18,6 +18,7 @@ angular.module('playgroundApp.services', [])
     return val();
   }
 
+  // TODO: rename to 'Queue'
   var DoSerial = {
     // yield execution until next tick from the event loop
     tick: function() {
@@ -25,6 +26,7 @@ angular.module('playgroundApp.services', [])
       $timeout(function() {
         d.resolve();
       });
+      // TODO: stop leaks; maybe use array instead; use array of promises; push()
       promise = promise.then(function() { return d.promise; });
       return DoSerial;
     },
@@ -65,14 +67,15 @@ angular.module('playgroundApp.services', [])
   };
 })
 
-// TODO: determine if there's a better way
+// TODO: if want to focus() element create Focus service
 .factory('DomElementById', function($window) {
   return function(id) {
     return $window.document.getElementById(id);
   };
 })
 
-// TODO: determine if there's a better way
+// TODO: move output iframe into directive with a template.html
+// TODO: get rid of other uses
 .factory('WrappedElementById', function(DomElementById) {
   return function(id) {
     return angular.element(DomElementById(id));
@@ -81,7 +84,7 @@ angular.module('playgroundApp.services', [])
 
 /*
 
-// TODO: determine if there's a better way
+// TODO: DETERMINE if there's a better way
 .factory('Backoff', function($timeout) {
 
   "Exponential backoff service."

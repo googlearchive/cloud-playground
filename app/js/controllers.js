@@ -35,12 +35,12 @@ function PageController($scope, $http, DoSerial, $routeParams, $window) {
            ($scope.config && $scope.config.playground_namespace);
   };
 
-  // TODO: determine if there's a better way
+  // TODO: use window open service
   $scope.datastore_admin = function() {
     $window.open('/playground/datastore/' + $scope.namespace(), '_blank');
   };
 
-  // TODO: determine if there's a better way
+  // TODO: use window open service
   $scope.memcache_admin = function() {
     $window.open('/playground/memcache/' + $scope.namespace(), '_blank');
   };
@@ -111,7 +111,10 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
 
   $scope.url_of = function(file) {
     return '//' + $scope.config.PLAYGROUND_USER_CONTENT_HOST +
-           $window.location.pathname + 'getfile/' +
+           // TODO: replace with $location.path()
+           //$location.path() +
+           $window.location.pathname +
+           'getfile/' +
            encodeURI(file.name);
   };
 
@@ -120,7 +123,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
         $scope.url_of(file) : '';
   };
 
-  // TODO: don't expose function on $scope, while retaining testability
+  // TODO: this.foo = function() {...} // for testability
   $scope._get = function(file, success_cb) {
     if (file.hasOwnProperty('contents')) {
       success_cb();
@@ -165,6 +168,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   };
 
   // TODO: consider replacing DOM maniupulation here with a directive
+  // TODO: create CodeMirror service (directives can't be injected into controller)
   $scope.create_editor = function(mime_type) {
     if ($scope._editor) {
       angular.element($scope._editor.getWrapperElement()).remove();
@@ -267,7 +271,7 @@ function PageController($scope, $http, $location, $routeParams, $window,
 
 function LightboxController($scope, $window) {
 
-  // TODO: determine if there's a better way
+  // TODO: DETERMINE if there's a better way
   $scope.reload = function() {
     $window.location.reload();
   };
@@ -282,7 +286,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
                            Backoff, DoSerial, DomElementById,
                            WrappedElementById) {
 
-  // TODO: determine if there's a better way
+  // TODO: use directive
   var source_image = WrappedElementById('source-image');
 
   // { "app.yaml" : {
@@ -323,6 +327,8 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
       }
       if (_popout) {
         container.addClass('hidden');
+        // TODO: create open window service (so we can test)
+        // TODO: read https://github.com/vojtajina/ng-directive-testing
         _output_window = window.open($scope.project.run_url,
                                      $scope.project.key);
       } else {
@@ -419,7 +425,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
     $scope.movefile($scope.current_file, new_filename);
   }
 
-  // TODO: determine if there's a better way
+  // TODO: use regular binding instead
   function hide_context_menus() {
     $scope.showfilecontextmenu = false;
     $scope.showprojectcontextmenu = false;
@@ -427,12 +433,13 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
 
   // setup context menu clear handler
   // TODO: use $window rather than window
+  // TODO: DETERMINE if context is a directive, can / should we add document level click handler??
   window.addEventListener('click', function(evt) {
     hide_context_menus();
     $scope.$apply();
   }, false);
 
-  // TODO: avoid DOM access
+  // TODO: avoid DOM access; use directive instead
   $scope.project_context_menu = function(evt) {
     evt.stopPropagation();
     hide_context_menus();
@@ -442,7 +449,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
     menuDiv.css('top', evt.pageY + 'px');
   };
 
-  // TODO: avoid DOM access
+  // TODO: avoid DOM access; use directive instead
   $scope.file_context_menu = function(evt, file) {
     evt.stopPropagation();
     hide_context_menus();

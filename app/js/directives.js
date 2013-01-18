@@ -4,7 +4,7 @@
 
 angular.module('playgroundApp.directives', [])
 
-// TODO test this directive
+// TODO: DETERMINE how must of this we should test
 .directive('resizer', function(WrappedElementById) {
   var downx, downy, isdown, initialheight, elem;
   var dragDiv = WrappedElementById('drag-div');

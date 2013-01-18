@@ -8,6 +8,9 @@ angular.module('playgroundApp', ['playgroundApp.filters',
 
   $locationProvider.html5Mode(true);
 
+  // TODO: add list of promises to be resolved for injection
+  // TODO: resolved promises are injected into controller
+  // TODO: see http://www.youtube.com/watch?v=P6KITGRQujQ
   $routeProvider
   .when('/playground/', {
      templateUrl: '/playground/main.html',
