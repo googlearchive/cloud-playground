@@ -95,16 +95,14 @@ describe('service', function() {
     }));
 
 
-    it('should execute simple task', inject(function(DoSerial) {
-      var called = false;
-      DoSerial.then(function() { called = true; });
-      expect(called).toBe(false);
-      flushDoSerial();
-      expect(called).toBe(true);
+    it('should execute simple task synchronously', inject(function(DoSerial) {
+      var fn = jasmine.createSpy();
+      DoSerial.then(fn);
+      expect(fn).toHaveBeenCalled();
     }));
 
 
-    it('should execute tasks in order', inject(function(DoSerial, $log) {
+    it('should execute tasks in order', inject(function(DoSerial, $log, $timeout) {
       DoSerial.then(function() { $log.log(1); });
       DoSerial.tick();
       DoSerial
@@ -113,8 +111,19 @@ describe('service', function() {
       .tick()
       .then(function() { $log.log(4); })
       DoSerial.tick();
-      flushDoSerial();
+      expect($log.log.logs).toEqual([[1]]);
+      $timeout.flush();
       expect($log.log.logs).toEqual([[1], [2], [3], [4]]);
+    }));
+
+
+    it('should wait for promise to be satisfied before continuing', inject(function(DoSerial, $log, $timeout) {
+      DoSerial
+      .then(function() { return $timeout(function() { $log.log(1); }); })
+      .then(function() { $log.log(2); })
+      expect($log.log.logs).toEqual([]);
+      $timeout.flush();
+      expect($log.log.logs).toEqual([[1], [2]]);
     }));
 
 
@@ -123,23 +132,40 @@ describe('service', function() {
     }));
 
 
-    it('should log and continue after exception', function() {
+    it('should log and continue after synchronous exception', function() {
 
-      // TODO: DETERMINE better way to test  with $exceptionHandlerProvider
       module(function($exceptionHandlerProvider) {
         $exceptionHandlerProvider.mode('log');
       });
 
-      inject(function(DoSerial, $log, $exceptionHandler) {
+      inject(function(DoSerial, $log, $exceptionHandler, $timeout) {
+        expect($log.assertEmpty());
         DoSerial
         .then(function() { $log.log(1); })
         .then(function() { throw 'banana peel'; })
         .then(function() { $log.log(2); })
-        expect($log.assertEmpty());
-        flushDoSerial();
         expect($exceptionHandler.errors).toEqual(['banana peel']);
-        expect($log.error.logs).toEqual([['DoSerial encountered', 'banana peel']]);
         expect($log.log.logs).toEqual([[1], [2]]);
+      });
+
+    });
+
+    it('should log and continue after exception in promise', function() {
+
+      module(function($exceptionHandlerProvider) {
+        $exceptionHandlerProvider.mode('log');
+      });
+
+      inject(function(DoSerial, $log, $exceptionHandler, $timeout) {
+        expect($log.assertEmpty());
+        DoSerial
+        .then(function() { $log.log(1); })
+        .then(function() { return $timeout(function() { $log.log(2); }); })
+        .then(function() { return $timeout(function() { throw 'apple core'; }); })
+        .then(function() { $log.log(3); })
+        $timeout.flush();
+        expect($exceptionHandler.errors).toEqual(['apple core']);
+        expect($log.log.logs).toEqual([[1], [2], [3]]);
       });
 
     });

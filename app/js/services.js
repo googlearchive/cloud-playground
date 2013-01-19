@@ -5,49 +5,52 @@
 angular.module('playgroundApp.services', [])
 
 // TODO: improve upon flushDoSerial(); allow one step to be executed at a time
-.factory('DoSerial', function($q, $timeout, $log) {
+.factory('DoSerial', function($timeout, $log, $exceptionHandler) {
 
-  var deferred = $q.defer();
-  deferred.resolve();
-  var promise = deferred.promise;
+  var work_items = [];
+  var pending_promise;
 
-  function promisehack(val) {
-    if (val && val.then) {
-      return val;
-    }
-    return val();
+  var on_promised_satisfied = function() {
+    pending_promise = undefined;
+    maybe_next();
   }
+
+  var maybe_next = function() {
+    if (pending_promise) return;
+    if (!work_items.length) return;
+
+    var result;
+    try {
+      result = work_items.shift()();
+    } catch(err) {
+      $exceptionHandler(err);
+    }
+
+    if (result && result.then) {
+      pending_promise = result.then(on_promised_satisfied,
+                                    on_promised_satisfied);
+    } else {
+      maybe_next();
+    }
+  };
 
   // TODO: rename to 'Queue'
   var DoSerial = {
     // yield execution until next tick from the event loop
     tick: function() {
-      var d = $q.defer();
-      $timeout(function() {
-        d.resolve();
+      return this.then(function() {
+        return $timeout(angular.noop);
       });
-      // TODO: stop leaks; maybe use array instead; use array of promises; push()
-      promise = promise.then(function() { return d.promise; });
-      return DoSerial;
     },
     // schedule action to perform next
     then: function(func) {
-      if (func == null) {
-        throw 'DoSerial.then() must not be called with null value';
-      }
-      promise = promise.then(function() {
-        return promisehack(func);
-      },
-      function(err) {
-        $log.error('DoSerial encountered', err);
-        return promisehack(func);
-      });
-      // allow chained calls, e.g. DoSerial.then(...).then(...)
+      work_items.push(func);
+      maybe_next();
       return DoSerial;
     }
   };
-  return DoSerial;
 
+  return DoSerial;
 })
 
 .factory('playgroundHttpInterceptor', function($q, $log, $window) {
