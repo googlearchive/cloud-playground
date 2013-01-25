@@ -1,7 +1,4 @@
 HTML, BODY {
-  height: 100%;
-  margin: 0;
-  padding: 0;
 }
 
 BODY {
@@ -77,16 +74,6 @@ TABLE {
   color: #f00;
   top: -0.9em;
   position: relative;
-}
-
-.butter {
-  color: #444;
-  background-color: #fe8;
-  box-shadow: 0 .23em .4em rgba(0, 0, 0, .3);
-  font-weight: bold;
-  margin: 0 auto;
-  padding: .25em 15px .2em 15px;
-  text-align: center;
 }
 
 .topbar {
