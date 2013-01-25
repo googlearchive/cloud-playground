@@ -30,10 +30,10 @@
 <br>
   <hr resizer="source-container">
 
-  <div id="output-container" class="hidden">
-    <div>
-      <button ng-click="popout(); run()"><i class="icon-resize-full"></i></button>
-      <input ng-model="project.run_url" class="output-url" ng-click="selectme($event)">
+  <div class="hidden">
+    <div class='form-inline'>
+      <button ng-click='popout(); run()' class='btn'><i class="icon-resize-full"></i></button>
+      <input ng-model='project.run_url' type='url' class='span10' ng-click='selectme($event)'>
     </div>
     <iframe id="output-iframe">
     </iframe>
