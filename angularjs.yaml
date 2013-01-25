@@ -1,4 +1,4 @@
 handlers:
 - url: /playground/lib/angular
-  static_dir: app/lib/angular
+  static_dir: app/lib/angular-1.0.4
   secure: always
