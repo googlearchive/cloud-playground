@@ -11,9 +11,9 @@ handlers:
   static_dir: app/img
   secure: always
 
-- url: /playground/((main|project)\.html)
+- url: /playground/((.*)\.html)
   static_files: app/\1
-  upload: app/(main.html|project.html)
+  upload: app/(.*\.html)
 
 - url: (/playground/?|/playground/p/[^/]*/?)?
   static_files: app/index.html

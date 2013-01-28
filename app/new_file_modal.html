@@ -1,0 +1,22 @@
+<form class='modal hide' id='new-file-modal' ng-controller='NewFileController' ng-submit='create_file()'>
+
+  <div class='modal-header'>
+    <button type='button' class='close' ng-click='close()'>&times;</button>
+    <h3>Create new file</h3>
+  </div>
+
+  <div class='modal-body form-horizontal'>
+    <div class='control-group'>
+      <label class='control-label' for='new_filename'>New filename</label>
+      <div class='controls'>
+        <input class='span4' type='text' id='new_filename' ng-model='filename'>
+      </div>
+    </div>
+  </div>
+
+  <div class='modal-footer'>
+    <button type='button' class='btn' ng-click='close()'>Close</button>
+    <button type='submit' class='btn btn-primary' ng-click='close()'>Create file</button>
+  </div>
+
+</form>

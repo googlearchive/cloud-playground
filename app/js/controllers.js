@@ -104,7 +104,7 @@ function MainController($scope, $http, $window, $location, DoSerial) {
 }
 
 function ProjectController($scope, $browser, $http, $routeParams, $window,
-                           DoSerial, DomElementById) {
+                           $log, DoSerial, DomElementById) {
 
   // TODO: remove once file contents are returned in JSON response
   $scope.no_json_transform = function(data) { return data; };
@@ -221,6 +221,56 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   })
   .then($scope._list_files)
   .then($scope._select_first_file);
+
+  $scope.insert_path = function(path) {
+    $log.log('TODO: insert_path("' + path + '")');
+/*
+    // TODO: implement and test
+    var file = $scope.files[path];
+    if (!file) {
+      file = {
+          name: path,
+          mime_type: 'text/plain',
+          contents: '',
+          dirty: false,
+      };
+      $scope.files[path] = file;
+    }
+    $scope.select_file(file);
+*/
+  };
+
+  $scope.$on('new_file', function(evt, path) {
+    $scope.insert_path(path);
+  });
+
+  $scope.prompt_new_file = function() {
+    $scope.$broadcast('prompt_new_file');
+  };
+
+}
+
+function NewFileController($scope, $log) {
+
+  // TODO: avoid DOM access
+  var new_file_modal = $('#new-file-modal');
+
+  $scope.$on('prompt_new_file', function() {
+    $scope.filename = '';
+    new_file_modal.modal('show');
+    // TODO: avoid DOM access
+    $('#new_filename')[0].focus();
+  });
+
+  $scope.create_file = function() {
+    // remove leading and trailing slash(es)
+    var path = $scope.filename.replace(/^\/*(.*?)\/*$/, '$1')
+    $scope.$emit('new_file', path);
+  }
+
+  $scope.close = function() {
+    new_file_modal.modal('hide');
+  }
 
 }
 
@@ -458,32 +508,6 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
     var menuDiv = WrappedElementById('file-context-menu');
     menuDiv.css('left', evt.pageX + 'px');
     menuDiv.css('top', evt.pageY + 'px');
-  };
-
-  $scope.insertPath = function(path) {
-    var file = $scope.files[path];
-    if (!file) {
-      file = {
-          name: path,
-          mime_type: 'text/plain',
-          contents: '',
-          dirty: false,
-      };
-      $scope.files[path] = file;
-    }
-    $scope.select_file(file);
-  };
-
-  $scope.prompt_for_new_file = function() {
-    var path = prompt('New filename?', '');
-    if (!path) {
-      return;
-    }
-    if (path[0] == '/') {
-      path = path.substr(1)
-    }
-
-    $scope.insertPath(path);
   };
 
   $scope.deletefile = function(file) {
