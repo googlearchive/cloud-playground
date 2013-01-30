@@ -1,10 +1,13 @@
 'use strict';
 
-angular.module('playgroundApp', ['playgroundApp.filters',
-                                 'playgroundApp.services',
-                                 'playgroundApp.directives'])
+angular.module('playgroundApp', [
+    'playgroundApp.filters',
+    'playgroundApp.services',
+    'playgroundApp.directives',
+    'ui.bootstrap',
+])
 
-.config(function($locationProvider, $routeProvider, $httpProvider) {
+.config(function($locationProvider, $routeProvider, $httpProvider, $dialogProvider) {
 
   $locationProvider.html5Mode(true);
 
@@ -22,5 +25,11 @@ angular.module('playgroundApp', ['playgroundApp.filters',
   })
 
   $httpProvider.responseInterceptors.push('playgroundHttpInterceptor');
+
+  // TODO: test these defaults?
+  $dialogProvider.options({
+      backdropFade: true,
+      modalFade: true,
+  });
 
 })

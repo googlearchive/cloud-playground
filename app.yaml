@@ -8,6 +8,7 @@ threadsafe: false
 
 includes:
 - angularjs.yaml
+- angular-ui.yaml
 - bootstrap.yaml
 - codemirror.yaml
 - playground.yaml

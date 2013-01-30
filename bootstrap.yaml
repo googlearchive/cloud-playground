@@ -1,8 +1,8 @@
 handlers:
-- url: /bootstrap/js
-  mime_type: application/javascript; charset=utf-8
-  static_dir: bootstrap/docs/assets/js
-  secure: always
+#- url: /bootstrap/js
+#  mime_type: application/javascript; charset=utf-8
+#  static_dir: bootstrap/docs/assets/js
+#  secure: always
 
 - url: /bootstrap/css
   mime_type: text/css; charset=utf-8

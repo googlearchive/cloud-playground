@@ -104,7 +104,7 @@ function MainController($scope, $http, $window, $location, DoSerial) {
 }
 
 function ProjectController($scope, $browser, $http, $routeParams, $window,
-                           $log, DoSerial, DomElementById) {
+                           $dialog, $log, DoSerial, DomElementById) {
 
   // TODO: remove once file contents are returned in JSON response
   $scope.no_json_transform = function(data) { return data; };
@@ -240,36 +240,26 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
 */
   };
 
-  $scope.$on('new_file', function(evt, path) {
-    $scope.insert_path(path);
-  });
-
   $scope.prompt_new_file = function() {
-    $scope.$broadcast('prompt_new_file');
+    $dialog.dialog({
+        controller: 'NewFileController',
+        templateUrl: '/playground/new_file_modal.html',
+    })
+    .open().then(function(path) {
+      if (path) {
+        // remove leading and trailing slash(es)
+        path = path.replace(/^\/*(.*?)\/*$/, '$1')
+        $scope.insert_path(path);
+      }
+    });
   };
 
 }
 
-function NewFileController($scope, $log) {
+function NewFileController($scope, $log, dialog) {
 
-  // TODO: avoid DOM access
-  var new_file_modal = $('#new-file-modal');
-
-  $scope.$on('prompt_new_file', function() {
-    $scope.filename = '';
-    new_file_modal.modal('show');
-    // TODO: avoid DOM access
-    $('#new_filename')[0].focus();
-  });
-
-  $scope.create_file = function() {
-    // remove leading and trailing slash(es)
-    var path = $scope.filename.replace(/^\/*(.*?)\/*$/, '$1')
-    $scope.$emit('new_file', path);
-  }
-
-  $scope.close = function() {
-    new_file_modal.modal('hide');
+  $scope.close = function(path) {
+    dialog.close(path);
   }
 
 }

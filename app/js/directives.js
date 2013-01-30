@@ -6,6 +6,7 @@ angular.module('playgroundApp.directives', [])
 
 // TODO: DETERMINE how must of this we should test
 .directive('resizer', function(WrappedElementById) {
+
   var downx, downy, isdown, initialheight, elem;
   var dragDiv = WrappedElementById('drag-div');
 
@@ -44,4 +45,5 @@ angular.module('playgroundApp.directives', [])
       dragDiv.bind('mouseup', upfunc);
     });
   };
-});
+
+})
