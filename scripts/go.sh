@@ -42,7 +42,6 @@ then
   xterm $XTERM_ARGS -geometry $GEOMETRY_RUN -e $DIRNAME/run.sh &
   sleep .5
 fi
-xterm $XTERM_ARGS -geometry 120x32+0+1000 -e scripts/run.sh &
 
 xterm $XTERM_ARGS -geometry $GEOMETRY_UNIT -e $DIRNAME/test.sh --browsers= &
 pids="$$ $pids"
