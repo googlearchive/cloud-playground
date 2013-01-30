@@ -406,6 +406,63 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   };
 
   // TODO: test
+  $scope.delete_file = function(file) {
+    DoSerial
+    .then(function() {
+      return $http.post('deletepath/' + encodeURI(file.name))
+      .success(function(data, status, headers, config) {
+        delete $scope.files[file.name];
+        $scope._select_first_file();
+      });
+    });
+  };
+
+  // TODO: test
+  $scope.move_file = function(file, newpath) {
+    DoSerial
+    .then(function() {
+      var oldpath = file.name;
+      $scope.files[newpath] = file;
+      $scope.files[newpath].name = newpath;
+      delete $scope.files[oldpath];
+      return $http.post('movefile/' + encodeURI(oldpath), {newpath: newpath})
+      .success(function(data, status, headers, config) {
+        $scope.current_file = file;
+      });
+    });
+  };
+
+  // TODO: test
+  $scope.prompt_file_delete = function() {
+    // TODO: use $dialog instead of prompt()
+    var answer = prompt("Are you sure you want to delete " +
+                        $scope.current_file.name + "?\nType 'yes' to confirm.",
+                        "no");
+    if (!answer || answer.toLowerCase()[0] != 'y') {
+      return;
+    }
+    $scope.delete_file($scope.current_file);
+  }
+
+  // TODO: test
+  $scope.prompt_file_rename = function() {
+    // TODO: use $dialog instead of prompt()
+    var new_filename = prompt(
+        'New filename?\n(You may specify a full path such as: foo/bar.txt)',
+        $scope.current_file.name);
+    if (!new_filename) {
+      return;
+    }
+    if (new_filename[0] == '/') {
+      new_filename = new_filename.substr(1);
+    }
+    if (!new_filename || new_filename == $scope.current_file.name) {
+      return;
+    }
+    $scope.move_file($scope.current_file, new_filename);
+  }
+
+  // TODO: test
   $scope.popout = function() {
     _popout = true;
     _output_window = undefined;
@@ -463,59 +520,6 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
       }
     });
   }
-
-  // TODO: don't use prompt()
-  $scope.prompt_file_delete = function() {
-    var answer = prompt("Are you sure you want to delete " +
-                        $scope.current_file.name + "?\nType 'yes' to confirm.",
-                        "no");
-    if (!answer || answer.toLowerCase()[0] != 'y') {
-      return;
-    }
-    $scope.deletefile($scope.current_file);
-  }
-
-  // TODO: don't use prompt()
-  $scope.prompt_file_rename = function() {
-    var new_filename = prompt(
-        'New filename?\n(You may specify a full path such as: foo/bar.txt)',
-        $scope.current_file.name);
-    if (!new_filename) {
-      return;
-    }
-    if (new_filename[0] == '/') {
-      new_filename = new_filename.substr(1);
-    }
-    if (!new_filename || new_filename == $scope.current_file.name) {
-      return;
-    }
-    $scope.movefile($scope.current_file, new_filename);
-  }
-
-  $scope.deletefile = function(file) {
-    DoSerial
-    .then(function() {
-      return $http.post('deletepath/' + encodeURI(file.name))
-      .success(function(data, status, headers, config) {
-        delete $scope.files[file.name];
-        $scope._select_first_file();
-      });
-    });
-  };
-
-  $scope.movefile = function(file, newpath) {
-    DoSerial
-    .then(function() {
-      var oldpath = file.name;
-      $scope.files[newpath] = file;
-      $scope.files[newpath].name = newpath;
-      delete $scope.files[oldpath];
-      return $http.post('movefile/' + encodeURI(oldpath), {newpath: newpath})
-      .success(function(data, status, headers, config) {
-        $scope.current_file = file;
-      });
-    });
-  };
 
 }
 */
