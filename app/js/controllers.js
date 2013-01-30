@@ -240,6 +240,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
 */
   };
 
+  // TODO: test
   $scope.prompt_new_file = function() {
     $dialog.dialog({
         controller: 'NewFileController',
@@ -256,6 +257,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
 
 }
 
+// TODO: test
 function NewFileController($scope, $log, dialog) {
 
   $scope.close = function(path) {
