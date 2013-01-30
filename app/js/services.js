@@ -85,8 +85,7 @@ angular.module('playgroundApp.services', [])
   };
 })
 
-/*
-
+// TODO: test
 // TODO: DETERMINE if there's a better way
 .factory('Backoff', function($timeout) {
 
@@ -118,5 +117,3 @@ angular.module('playgroundApp.services', [])
   Backoff.reset();
   return Backoff;
 })
-
-*/
