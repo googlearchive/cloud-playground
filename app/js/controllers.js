@@ -103,6 +103,15 @@ function MainController($scope, $http, $window, $location, DoSerial) {
 
 }
 
+// TODO: test
+function NewFileController($scope, $log, dialog) {
+
+  $scope.close = function(path) {
+    dialog.close(path);
+  }
+
+}
+
 function ProjectController($scope, $browser, $http, $routeParams, $window,
                            $dialog, $log, DoSerial, DomElementById) {
 
@@ -254,15 +263,6 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
       }
     });
   };
-
-}
-
-// TODO: test
-function NewFileController($scope, $log, dialog) {
-
-  $scope.close = function(path) {
-    dialog.close(path);
-  }
 
 }
 
