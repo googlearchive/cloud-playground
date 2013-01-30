@@ -153,8 +153,8 @@ function NewFileController($scope, $log, dialog) {
 
 }
 
-function ProjectController($scope, $browser, $http, $routeParams, $window,
-                           $dialog, $log, DoSerial, DomElementById) {
+function ProjectController($scope, $browser, $http, $routeParams, $window, $location,
+                           $dialog, $log, DoSerial, DomElementById, WrappedElementById) {
 
   // TODO: remove once file contents are returned in JSON response
   $scope.no_json_transform = function(data) { return data; };
@@ -302,6 +302,53 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     });
   };
 
+  // TODO: remove
+  function hide_context_menus() {
+    $scope.showfilecontextmenu = false;
+    $scope.showprojectcontextmenu = false;
+  }
+
+  // TODO: remove
+  window.addEventListener('click', function(evt) {
+    hide_context_menus();
+    $scope.$apply();
+  }, false);
+
+  // TODO: test
+  // TODO: replace with $dialog
+  $scope.project_context_menu = function(evt) {
+    // TODO: avoid DOM access; use directive instead
+    evt.stopPropagation();
+    hide_context_menus();
+    $scope.showprojectcontextmenu = true;
+    var menuDiv = WrappedElementById('project-context-menu');
+    menuDiv.css('left', evt.pageX + 'px');
+    menuDiv.css('top', evt.pageY + 'px');
+  };
+
+
+  // TODO: test
+  $scope.prompt_project_rename = function(project) {
+    // TODO: user $dialog instead of prompt()
+    var new_project_name = prompt('Enter a new name for this project',
+                                  project.name);
+    if (!new_project_name) {
+      return;
+    }
+    DoSerial
+    .then(function() {
+      return $http.post('rename', {newname: new_project_name})
+      .success(function(data, status, headers, config) {
+        for (var i in $scope.projects) {
+          if ($scope.projects[i] == project) {
+            $scope.project = $scope.projects[i] = data;
+            break;
+          }
+        }
+      });
+    });
+  }
+
 }
 
 /*
@@ -412,27 +459,6 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
   }
 
   // TODO: don't use prompt()
-  $scope.prompt_project_rename = function(project) {
-    var new_project_name = prompt('Enter a new name for this project',
-                                  project.name);
-    if (!new_project_name) {
-      return;
-    }
-    DoSerial
-    .then(function() {
-      return $http.post('rename', {newname: new_project_name})
-      .success(function(data, status, headers, config) {
-        for (var i in $scope.projects) {
-          if ($scope.projects[i] == project) {
-            $scope.project = $scope.projects[i] = data;
-            break;
-          }
-        }
-      });
-    });
-  }
-
-  // TODO: don't use prompt()
   $scope.prompt_file_rename = function() {
     var new_filename = prompt(
         'New filename?\n(You may specify a full path such as: foo/bar.txt)',
@@ -448,30 +474,6 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
     }
     $scope.movefile($scope.current_file, new_filename);
   }
-
-  // TODO: use regular binding instead
-  function hide_context_menus() {
-    $scope.showfilecontextmenu = false;
-    $scope.showprojectcontextmenu = false;
-  }
-
-  // setup context menu clear handler
-  // TODO: use $window rather than window
-  // TODO: DETERMINE if context is a directive, can / should we add document level click handler??
-  window.addEventListener('click', function(evt) {
-    hide_context_menus();
-    $scope.$apply();
-  }, false);
-
-  // TODO: avoid DOM access; use directive instead
-  $scope.project_context_menu = function(evt) {
-    evt.stopPropagation();
-    hide_context_menus();
-    $scope.showprojectcontextmenu = true;
-    var menuDiv = WrappedElementById('project-context-menu');
-    menuDiv.css('left', evt.pageX + 'px');
-    menuDiv.css('top', evt.pageY + 'px');
-  };
 
   // TODO: avoid DOM access; use directive instead
   $scope.file_context_menu = function(evt, file) {
