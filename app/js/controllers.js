@@ -45,6 +45,18 @@ function PageController($scope, $http, DoSerial, $routeParams, $window) {
     $window.open('/playground/memcache/' + $scope.namespace(), '_blank');
   };
 
+  // TODO: test
+  $scope.big_red_button = function() {
+    DoSerial
+    .then(function() {
+      return $http.post('/playground/nuke')
+      .success(function(data, status, headers, config) {
+        document.body.scrollTop = 0;
+        $window.location.reload();
+      });
+    });
+  };
+
 }
 
 function MainController($scope, $http, $window, $location, DoSerial) {
@@ -267,17 +279,6 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
 
 function PageController($scope, $http, $location, $routeParams, $window,
                         DoSerial, LightBox) {
-
-  $scope.big_red_button = function() {
-    DoSerial
-    .then(function() {
-      return $http.post('nuke')
-      .success(function(data, status, headers, config) {
-        document.body.scrollTop = 0;
-        $window.location.reload();
-      });
-    });
-  };
 
   // TODO: don't use prompt()
   $scope.prompt_to_delete_project = function(project) {
