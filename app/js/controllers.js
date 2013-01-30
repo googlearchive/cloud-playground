@@ -10,7 +10,7 @@ function HeaderController($scope, $location) {
 
 }
 
-function PageController($scope, $http, DoSerial, $routeParams, $window) {
+function PageController($scope, $http, DoSerial, $routeParams, $window, $location) {
 
   function getconfig() {
     return $http.get('/playground/getconfig')
@@ -63,6 +63,27 @@ function PageController($scope, $http, DoSerial, $routeParams, $window) {
       return true;
     }
     return false;
+  };
+
+  // TODO: test
+  $scope.prompt_to_delete_project = function(project) {
+    // TODO: use $dialog instead of prompt()
+    var answer = prompt("Are you sure you want to delete project " +
+                        project.name + "?\nType 'yes' to confirm.", "no");
+    if (!answer || answer.toLowerCase()[0] != 'y') {
+      return;
+    }
+    $scope.project = undefined;
+    $http.post('/playground/p/' + encodeURI(project.key) + '/delete')
+    .success(function(data, status, headers, config) {
+      for (var i in $scope.projects) {
+        if ($scope.projects[i] == project) {
+          $scope.projects.splice(i, 1);
+          break;
+        }
+      }
+      $location.path('/playground/');
+    });
   };
 
 }
@@ -284,32 +305,6 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
 }
 
 /*
-
-function PageController($scope, $http, $location, $routeParams, $window,
-                        DoSerial, LightBox) {
-
-  // TODO: don't use prompt()
-  $scope.prompt_to_delete_project = function(project) {
-    var answer = prompt("Are you sure you want to delete project " +
-                        project.name + "?\nType 'yes' to confirm.", "no");
-    if (!answer || answer.toLowerCase()[0] != 'y') {
-      return;
-    }
-    $scope.project = undefined;
-    $http.post('/playground/p/' + encodeURI(project.key) + '/delete')
-    .success(function(data, status, headers, config) {
-      for (var i in $scope.projects) {
-        if ($scope.projects[i] == project) {
-          $scope.projects.splice(i, 1);
-          break;
-        }
-      }
-      $location.path('/playground/');
-    });
-  };
-
-}
-
 function LightboxController($scope, $window) {
 
   // TODO: DETERMINE if there's a better way
