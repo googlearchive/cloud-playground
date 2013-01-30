@@ -475,28 +475,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     elem.select();
   }
 
-}
-
-/*
-
-function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
-                           Backoff, DoSerial, DomElementById,
-                           WrappedElementById) {
-
-  // TODO: use directive
-  var source_image = WrappedElementById('source-image');
-
-  // { "app.yaml" : {
-  //        "name"     : "app.yaml",
-  //        "mime_type": "text/yaml",
-  //        "contents" : "...",
-  //        "dirty"    : false },
-  //   "main.py" : {
-  //        ...
-  //   }
-  // }
-  $scope.files = {};
-
+  // TODO: test
   $scope.run = function() {
     return DoSerial
     .then(function() {
@@ -523,4 +502,3 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
   }
 
 }
-*/
