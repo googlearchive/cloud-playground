@@ -153,7 +153,7 @@ function NewFileController($scope, $log, dialog) {
 
 }
 
-function ProjectController($scope, $browser, $http, $routeParams, $window, $location,
+function ProjectController($scope, $browser, $http, $routeParams, $window,
                            $dialog, $log, DoSerial, DomElementById, WrappedElementById) {
 
   // TODO: remove once file contents are returned in JSON response
@@ -325,7 +325,6 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $loca
     menuDiv.css('left', evt.pageX + 'px');
     menuDiv.css('top', evt.pageY + 'px');
   };
-
 
   // TODO: test
   $scope.prompt_project_rename = function(project) {
