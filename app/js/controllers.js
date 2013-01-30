@@ -154,7 +154,8 @@ function NewFileController($scope, $log, dialog) {
 }
 
 function ProjectController($scope, $browser, $http, $routeParams, $window,
-                           $dialog, $log, DoSerial, DomElementById, WrappedElementById) {
+                           $dialog, $log, DoSerial, DomElementById, WrappedElementById,
+                           Backoff) {
 
   // TODO: remove once file contents are returned in JSON response
   $scope.no_json_transform = function(data) { return data; };
@@ -203,6 +204,31 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
       });
     });
   };
+
+  // TODO: test
+  function _save(path) {
+    var file = $scope.files[path];
+    if (!file.dirty) {
+      return;
+    }
+    file.dirty = false;
+    $scope.filestatus = 'Saving ' + path + ' ...';
+    return $http.put('putfile/' + encodeURI(path), file.contents, {
+                     headers: {'Content-Type': 'text/plain; charset=utf-8'}
+    })
+    .success(function(data, status, headers, config) {
+      $scope.filestatus = ''; // saved
+      Backoff.reset();
+    })
+    .error(function(data, status, headers, config) {
+      $scope.filestatus = 'Failed to save ' + path;
+      file.dirty = true;
+      // implement seconds() function
+      var secs = Backoff.backoff() / 1000;
+      $log.warn(path, 'failed to save; will retry in', secs, 'secs');
+      Backoff.schedule(_save_dirty_files);
+    });
+  }
 
   // TODO: test
   function _save_dirty_files() {
@@ -419,30 +445,6 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
         var iframe = WrappedElementById('output-iframe');
         iframe.attr('src', $scope.project.run_url);
       }
-    });
-  }
-
-  function _save(path) {
-    var file = $scope.files[path];
-    if (!file.dirty) {
-      return;
-    }
-    file.dirty = false;
-    $scope.filestatus = 'Saving ' + path + ' ...';
-    return $http.put('putfile/' + encodeURI(path), file.contents, {
-                     headers: {'Content-Type': 'text/plain; charset=utf-8'}
-    })
-    .success(function(data, status, headers, config) {
-      $scope.filestatus = ''; // saved
-      Backoff.reset();
-    })
-    .error(function(data, status, headers, config) {
-      $scope.filestatus = 'Failed to save ' + path;
-      file.dirty = true;
-      // implement seconds() function
-      var secs = Backoff.backoff() / 1000;
-      $log.warn(path, 'failed to save; will retry in', secs, 'secs');
-      Backoff.schedule(_save_dirty_files);
     });
   }
 
