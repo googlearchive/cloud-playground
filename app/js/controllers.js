@@ -204,6 +204,20 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     });
   };
 
+  // TODO: test
+  function _save_dirty_files() {
+    for (var path in $scope.files) {
+      if ($scope.files[path].dirty) {
+        var dirtypath = path;
+        DoSerial
+        .then(function() {
+          return _save(dirtypath);
+        })
+        break;
+      }
+    }
+  }
+
   $scope.editorOnChange = function(from, to, text, next) {
 /*
     $scope.$apply(function() {
@@ -212,7 +226,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
         return;
       }
       $scope.current_file.dirty = true;
-      Backoff.schedule(_saveDirtyFiles);
+      Backoff.schedule(_save_dirty_files);
     });
 */
   };
@@ -387,7 +401,7 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
   $scope.run = function() {
     return DoSerial
     .then(function() {
-      _saveDirtyFiles();
+      _save_dirty_files();
     })
     .then(function() {
       // TODO: try to avoid DOM access
@@ -429,21 +443,8 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
       // implement seconds() function
       var secs = Backoff.backoff() / 1000;
       $log.warn(path, 'failed to save; will retry in', secs, 'secs');
-      Backoff.schedule(_saveDirtyFiles);
+      Backoff.schedule(_save_dirty_files);
     });
-  }
-
-  function _saveDirtyFiles() {
-    for (var path in $scope.files) {
-      if ($scope.files[path].dirty) {
-        var dirtypath = path;
-        DoSerial
-        .then(function() {
-          return _save(dirtypath);
-        })
-        break;
-      }
-    }
   }
 
   // TODO: don't use prompt()
