@@ -394,6 +394,18 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   }
 
   // TODO: test
+  // TODO: avoid DOM access; use directive instead
+  $scope.file_context_menu = function(evt, file) {
+    evt.stopPropagation();
+    hide_context_menus();
+    $scope.select_file(file);
+    $scope.showfilecontextmenu = true;
+    var menuDiv = WrappedElementById('file-context-menu');
+    menuDiv.css('left', evt.pageX + 'px');
+    menuDiv.css('top', evt.pageY + 'px');
+  };
+
+  // TODO: test
   $scope.popout = function() {
     _popout = true;
     _output_window = undefined;
@@ -479,17 +491,6 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
     }
     $scope.movefile($scope.current_file, new_filename);
   }
-
-  // TODO: avoid DOM access; use directive instead
-  $scope.file_context_menu = function(evt, file) {
-    evt.stopPropagation();
-    hide_context_menus();
-    $scope.select_file(file);
-    $scope.showfilecontextmenu = true;
-    var menuDiv = WrappedElementById('file-context-menu');
-    menuDiv.css('left', evt.pageX + 'px');
-    menuDiv.css('top', evt.pageY + 'px');
-  };
 
   $scope.deletefile = function(file) {
     DoSerial
