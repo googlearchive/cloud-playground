@@ -42,10 +42,10 @@ then
   sleep .5
 fi
 
-xterm $XTERM_ARGS -geometry $GEOMETRY_UNIT -e scripts/test.sh --browsers= &
+xterm $XTERM_ARGS -geometry $GEOMETRY_UNIT -e $DIRNAME/test.sh --browsers= &
 pids="$$ $pids"
 
-xterm $XTERM_ARGS -geometry $GEOMETRY_E2E -e scripts/e2e-test.sh --browsers= &
+xterm $XTERM_ARGS -geometry $GEOMETRY_E2E -e $DIRNAME/e2e-test.sh --browsers= &
 pids="$$ $pids"
 
 sleep 1
