@@ -52,8 +52,6 @@ describe('HeaderController', function() {
 
 });
 
-
-
 describe('ProjectController', function() {
 
   var scope, $httpBackend;
@@ -120,6 +118,8 @@ describe('ProjectController', function() {
   }));
 
   beforeEach(module('playgroundApp.services'));
+
+  beforeEach(module('mocks.dialog'));
 
   beforeEach(inject(function($browser) {
     $browser.url('/playground/p/76/');
