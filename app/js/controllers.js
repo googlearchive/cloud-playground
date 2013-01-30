@@ -57,6 +57,14 @@ function PageController($scope, $http, DoSerial, $routeParams, $window) {
     });
   };
 
+  // TODO: test
+  $scope.has_projects = function() {
+    for (var i in $scope.projects) {
+      return true;
+    }
+    return false;
+  };
+
 }
 
 function MainController($scope, $http, $window, $location, DoSerial) {
@@ -298,13 +306,6 @@ function PageController($scope, $http, $location, $routeParams, $window,
       }
       $location.path('/playground/');
     });
-  };
-
-  $scope.hasprojects = function() {
-    for (var i in $scope.projects) {
-      return true;
-    }
-    return false;
   };
 
 }
