@@ -37,7 +37,7 @@ XTERM_ARGS="-fa 'Mono' -fs 10"
 
 # start dev_appserver if nothing is listening on port 8080
 curl localhost:8080 2>/dev/null
-if [ $? -eq 0 ]
+if [ $? -ne 0 ]
 then
   xterm $XTERM_ARGS -geometry $GEOMETRY_RUN -e $DIRNAME/run.sh &
   sleep .5
