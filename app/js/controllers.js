@@ -427,6 +427,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
       delete $scope.files[oldpath];
       return $http.post('movefile/' + encodeURI(oldpath), {newpath: newpath})
       .success(function(data, status, headers, config) {
+        // TODO: have server send updated MIME type
         $scope.current_file = file;
       });
     });
