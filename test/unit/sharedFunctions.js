@@ -1,5 +1,7 @@
-function flushDoSerial($timeout) {
+function flushDoSerial() {
   "Flush a dummy $timeout to force a tick of the event loop"
-  $timeout(function() {});
-  $timeout.flush();
+  inject(function($timeout) {
+    $timeout(function() {});
+    $timeout.flush();
+  });
 }

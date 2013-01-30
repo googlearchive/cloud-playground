@@ -1,13 +1,19 @@
 'use strict';
 
-angular.module('playgroundApp', ['playgroundApp.filters',
-                                 'playgroundApp.services',
-                                 'playgroundApp.directives'])
+angular.module('playgroundApp', [
+    'playgroundApp.filters',
+    'playgroundApp.services',
+    'playgroundApp.directives',
+    'ui.bootstrap',
+])
 
-.config(function($locationProvider, $routeProvider, $httpProvider) {
+.config(function($locationProvider, $routeProvider, $httpProvider, $dialogProvider) {
 
   $locationProvider.html5Mode(true);
 
+  // TODO: add list of promises to be resolved for injection
+  // TODO: resolved promises are injected into controller
+  // TODO: see http://www.youtube.com/watch?v=P6KITGRQujQ
   $routeProvider
   .when('/playground/', {
      templateUrl: '/playground/main.html',
@@ -19,5 +25,11 @@ angular.module('playgroundApp', ['playgroundApp.filters',
   })
 
   $httpProvider.responseInterceptors.push('playgroundHttpInterceptor');
+
+  // TODO: test these defaults?
+  $dialogProvider.options({
+      backdropFade: true,
+      modalFade: true,
+  });
 
 })

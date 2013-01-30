@@ -4,44 +4,53 @@
 
 angular.module('playgroundApp.services', [])
 
-.factory('DoSerial', function($q, $timeout, $log) {
+// TODO: improve upon flushDoSerial(); allow one step to be executed at a time
+.factory('DoSerial', function($timeout, $log, $exceptionHandler) {
 
-  var deferred = $q.defer();
-  deferred.resolve();
-  var promise = deferred.promise;
+  var work_items = [];
+  var pending_promise;
 
-  function promisehack(val) {
-    if (val && val.then) {
-      return val;
-    }
-    return val();
+  var on_promised_satisfied = function() {
+    pending_promise = undefined;
+    maybe_next();
   }
 
+  var maybe_next = function() {
+    if (pending_promise) return;
+    if (!work_items.length) return;
+
+    var result;
+    try {
+      result = work_items.shift()();
+    } catch(err) {
+      $exceptionHandler(err);
+    }
+
+    if (result && result.then) {
+      pending_promise = result.then(on_promised_satisfied,
+                                    on_promised_satisfied);
+    } else {
+      maybe_next();
+    }
+  };
+
+  // TODO: rename to 'Queue'
   var DoSerial = {
     // yield execution until next tick from the event loop
     tick: function() {
-      var d = $q.defer();
-      $timeout(function() {
-        d.resolve();
+      return this.then(function() {
+        return $timeout(angular.noop);
       });
-      promise = promise.then(function() { return d.promise; });
-      return DoSerial;
     },
     // schedule action to perform next
     then: function(func) {
-      promise = promise.then(function() {
-        return promisehack(func);
-      },
-      function(err) {
-        $log.error('DoSerial encountered', err);
-        return promisehack(func);
-      });
-      // allow chained calls, e.g. DoSerial.then(...).then(...)
+      work_items.push(func);
+      maybe_next();
       return DoSerial;
     }
   };
-  return DoSerial;
 
+  return DoSerial;
 })
 
 .factory('playgroundHttpInterceptor', function($q, $log, $window) {
@@ -61,6 +70,23 @@ angular.module('playgroundApp.services', [])
   };
 })
 
+// TODO: if want to focus() element create Focus service
+.factory('DomElementById', function($window) {
+  return function(id) {
+    return $window.document.getElementById(id);
+  };
+})
+
+// TODO: move output iframe into directive with a template.html
+// TODO: get rid of other uses
+.factory('WrappedElementById', function(DomElementById) {
+  return function(id) {
+    return angular.element(DomElementById(id));
+  };
+})
+
+// TODO: test
+// TODO: DETERMINE if there's a better way
 .factory('Backoff', function($timeout) {
 
   "Exponential backoff service."
@@ -91,68 +117,3 @@ angular.module('playgroundApp.services', [])
   Backoff.reset();
   return Backoff;
 })
-
-.factory('DomElementById', function($window) {
-  return function(id) {
-    return $window.document.getElementById(id);
-  };
-})
-
-.factory('WrappedElementById', function(DomElementById) {
-  return function(id) {
-    return angular.element(DomElementById(id));
-  };
-})
-
-.factory('LightBox', function($rootScope) {
-
-  $rootScope.lightboxes = [];
-
-  return {
-    lightbox: function(summary, details) {
-      $rootScope.lightboxes.push({'summary': summary, 'details': details});
-    }
-  };
-
-})
-
-.directive('resizer', function(WrappedElementById) {
-  var downx, downy, isdown, initialheight, elem;
-  var dragDiv = WrappedElementById('drag-div');
-
-  function movefunc(evt) {
-    if (!isdown) {
-      return;
-    }
-    var newheight = initialheight + (evt.pageY - downy);
-    elem.css('height', newheight + 'px');
-  };
-
-  function upfunc(evt) {
-    isdown = false;
-    dragDiv.addClass('hidden');
-    dragDiv.unbind('mousemove', movefunc);
-    dragDiv.unbind('mouseup', upfunc);
-  };
-
-  return function(scope, element, attr) {
-    element.css({
-      cursor: 'move',
-      borderTop: '4px solid #fff',
-      borderBottom: '4px solid #fff',
-      backgroundColor: '#eee',
-      padding: '2px',
-    });
-    element.bind('mousedown', function(evt) {
-      evt.preventDefault();
-      isdown = true;
-      downx = evt.pageX;
-      downy = evt.pageY;
-      elem = WrappedElementById(attr.resizer);
-      initialheight = elem.prop('offsetHeight');
-      dragDiv.removeClass('hidden');
-      dragDiv.bind('mousemove', movefunc);
-      dragDiv.bind('mouseup', upfunc);
-    });
-  };
-});

@@ -1,6 +1,6 @@
 'use strict';
 
-/* jasmine specs for services */
+/* jasmine specs for app config */
 
 describe('app config', function() {
 

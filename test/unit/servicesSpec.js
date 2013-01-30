@@ -10,6 +10,7 @@ describe('service', function() {
   describe('playgroundHttpInterceptor', function() {
 
     it('should return HTTP normal responses unmodified', inject(function(playgroundHttpInterceptor) {
+      // TODO: use jasmine spy instead
       var called = false;
       var http_promise = {
         then: function(success_fn, error_fn) {
@@ -89,16 +90,19 @@ describe('service', function() {
     }));
 
 
-    it('should execute simple task', inject(function(DoSerial, $timeout) {
-      var called = false;
-      DoSerial.then(function() { called = true; });
-      expect(called).toBe(false);
-      flushDoSerial($timeout);
-      expect(called).toBe(true);
+    it('should not except null argument', inject(function(DoSerial) {
+      expect(DoSerial.then).toThrow();
     }));
 
 
-    it('should execute tasks in order', inject(function(DoSerial, $timeout, $log) {
+    it('should execute simple task synchronously', inject(function(DoSerial) {
+      var fn = jasmine.createSpy();
+      DoSerial.then(fn);
+      expect(fn).toHaveBeenCalled();
+    }));
+
+
+    it('should execute tasks in order', inject(function(DoSerial, $log, $timeout) {
       DoSerial.then(function() { $log.log(1); });
       DoSerial.tick();
       DoSerial
@@ -107,8 +111,19 @@ describe('service', function() {
       .tick()
       .then(function() { $log.log(4); })
       DoSerial.tick();
-      flushDoSerial($timeout);
+      expect($log.log.logs).toEqual([[1]]);
+      $timeout.flush();
       expect($log.log.logs).toEqual([[1], [2], [3], [4]]);
+    }));
+
+
+    it('should wait for promise to be satisfied before continuing', inject(function(DoSerial, $log, $timeout) {
+      DoSerial
+      .then(function() { return $timeout(function() { $log.log(1); }); })
+      .then(function() { $log.log(2); })
+      expect($log.log.logs).toEqual([]);
+      $timeout.flush();
+      expect($log.log.logs).toEqual([[1], [2]]);
     }));
 
 
@@ -117,25 +132,70 @@ describe('service', function() {
     }));
 
 
-    it('should log and continue after exception', function() {
+    it('should log and continue after synchronous exception', function() {
 
       module(function($exceptionHandlerProvider) {
         $exceptionHandlerProvider.mode('log');
       });
 
-      inject(function(DoSerial, $timeout, $log, $exceptionHandler) {
+      inject(function(DoSerial, $log, $exceptionHandler, $timeout) {
+        expect($log.assertEmpty());
         DoSerial
         .then(function() { $log.log(1); })
         .then(function() { throw 'banana peel'; })
         .then(function() { $log.log(2); })
-        expect($log.assertEmpty());
-        flushDoSerial($timeout);
         expect($exceptionHandler.errors).toEqual(['banana peel']);
-        expect($log.error.logs).toEqual([['DoSerial encountered', 'banana peel']]);
         expect($log.log.logs).toEqual([[1], [2]]);
       });
 
     });
+
+    it('should log and continue after exception in promise', function() {
+
+      module(function($exceptionHandlerProvider) {
+        $exceptionHandlerProvider.mode('log');
+      });
+
+      inject(function(DoSerial, $log, $exceptionHandler, $timeout) {
+        expect($log.assertEmpty());
+        DoSerial
+        .then(function() { $log.log(1); })
+        .then(function() { return $timeout(function() { $log.log(2); }); })
+        .then(function() { return $timeout(function() { throw 'apple core'; }); })
+        .then(function() { $log.log(3); })
+        $timeout.flush();
+        expect($exceptionHandler.errors).toEqual(['apple core']);
+        expect($log.log.logs).toEqual([[1], [2], [3]]);
+      });
+
+    });
+
+  });
+
+  // TODO: DETERMINE if there's a better way to test window / document stuff
+  describe('DomElementById', function() {
+
+    it('should call $window.document.getElementById(:id)', inject(function($window, DomElementById) {
+      var elem = $window.document.createElement('div');
+      elem.id = 'myid';
+      $window.document.getElementById = jasmine.createSpy('getElementById').andReturn(elem);
+      var result = DomElementById('myid');
+      expect($window.document.getElementById).toHaveBeenCalledWith('myid');
+      expect(result).toBe(elem);
+    }));
+
+  });
+
+  describe('WrappedElementById', function() {
+
+    it('should return angular.element(:elem)', inject(function($window, WrappedElementById) {
+      var elem = $window.document.createElement('div');
+      var wrappedElem = angular.element(elem);
+      $window.document.getElementById = jasmine.createSpy('getElementById').andReturn(elem);
+      var result = WrappedElementById('myid');
+      expect($window.document.getElementById).toHaveBeenCalledWith('myid');
+      expect(result).toEqual(wrappedElem);
+    }));
 
   });
 

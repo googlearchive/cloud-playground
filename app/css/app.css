@@ -1,7 +1,4 @@
 HTML, BODY {
-  height: 100%;
-  margin: 0;
-  padding: 0;
 }
 
 BODY {
@@ -28,12 +25,6 @@ A, .link, .newthing {
   .newthing:visited, .link A:visited {
     color: #800080;
   }
-
-HR.divider {
-  clear: both;
-  border: none;
-  padding: 2px;
-}
 
 .btn {
   margin-right: 10px;
@@ -85,16 +76,6 @@ TABLE {
   position: relative;
 }
 
-.butter {
-  color: #444;
-  background-color: #fe8;
-  box-shadow: 0 .23em .4em rgba(0, 0, 0, .3);
-  font-weight: bold;
-  margin: 0 auto;
-  padding: .25em 15px .2em 15px;
-  text-align: center;
-}
-
 .topbar {
   position: absolute;
   right: 0em;
@@ -132,7 +113,7 @@ TABLE {
     color: #555;
   }
 
-h1 {
+H1 {
   font-size: 1.2em;
   font-weight: bold;
   margin: 1.7em 0em .4em;
@@ -292,26 +273,12 @@ h1 {
     height: 100%;
   }
 
-#output-container {
-  padding: .5em 0em 0em;
+#output-iframe {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 100%;
+  height: 17em;
 }
-
-  #output-container .output-url,
-  #output-container .output-url:focus {
-    cursor: pointer;
-    padding: 5px;
-    outline: none;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 90%;
-  }
-
-  #output-container #output-iframe {
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 100%;
-    height: 17em;
-  }
 
 #drag-div {
   top: 0px;
@@ -336,38 +303,6 @@ h1 {
   opacity: 0.3;
 }
 
-.lightbox {
+.ghost {
+  opacity: 0.5;
 }
-
-  .lightbox .content {
-    position: absolute;
-    left: 50px;
-    top: 50px;
-    width: 600px;
-    color: #FFF;
-    font-family: verdana;
-    text-align: left;
-  }
-
-    .lightbox .content > DIV {
-      padding-bottom: 15px;
-    }
-
-  .lightbox .summary {
-    font-size: 30px;
-    font-weight: bold;
-  }
-
-  .lightbox .details {
-    font-size: 15px;
-  }
-
-  .screen {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    right: 0px;
-    bottom: 0px;
-    opacity: 0.6;
-    background-color: #000;
-  }

@@ -53,7 +53,7 @@ describe('cloud playground app', function() {
       login(true);
       expect(element('button:contains("login")').count()).toEqual(1);
       expect(element('button:contains("login")').css('display')).toEqual('none');
-      // TODO figure out why this fails:
+      // TODO: figure out why this fails:
       //expect(element('button:contains("login")').height()).toEqual(0);
     });
 
@@ -66,7 +66,7 @@ describe('cloud playground app', function() {
       logout();
       expect(element('button:contains("logout")').count()).toEqual(1);
       expect(element('button:contains("logout")').css('display')).toEqual('none');
-      // TODO figure out why this fails:
+      // TODO: figure out why this fails:
       //expect(element('button:contains("logout")').height()).toEqual(0);
     });
 
