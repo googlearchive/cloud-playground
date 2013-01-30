@@ -157,6 +157,12 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
                            $dialog, $log, DoSerial, DomElementById, WrappedElementById,
                            Backoff) {
 
+  // TODO: remove; don't maintain DOM references
+  var _output_window;
+
+  // TODO: remove; don't maintain DOM references
+  var _popout = false;
+
   // TODO: remove once file contents are returned in JSON response
   $scope.no_json_transform = function(data) { return data; };
 
@@ -387,6 +393,12 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     });
   }
 
+  // TODO: test
+  $scope.popout = function() {
+    _popout = true;
+    _output_window = undefined;
+  }
+
 }
 
 /*
@@ -408,14 +420,6 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
   //   }
   // }
   $scope.files = {};
-
-  var _output_window;
-  var _popout = false;
-
-  $scope.popout = function() {
-    _popout = true;
-    _output_window = undefined;
-  }
 
   $scope.selectme = function(evt) {
     var elem = evt.srcElement;
