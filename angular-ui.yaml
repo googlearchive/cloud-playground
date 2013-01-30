@@ -1,4 +1,0 @@
-handlers:
-- url: /angular-ui
-  static_dir: app/lib/angular-ui/
-  secure: always

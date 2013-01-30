@@ -1,0 +1,4 @@
+handlers:
+- url: /ui-bootstrap
+  static_dir: app/lib/ui-bootstrap/
+  secure: always
