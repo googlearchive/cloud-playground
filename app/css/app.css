@@ -303,42 +303,6 @@ H1 {
   opacity: 0.3;
 }
 
-.lightbox {
-}
-
-  .lightbox .content {
-    position: absolute;
-    left: 50px;
-    top: 50px;
-    width: 600px;
-    color: #FFF;
-    font-family: verdana;
-    text-align: left;
-  }
-
-    .lightbox .content > DIV {
-      padding-bottom: 15px;
-    }
-
-  .lightbox .summary {
-    font-size: 30px;
-    font-weight: bold;
-  }
-
-  .lightbox .details {
-    font-size: 15px;
-  }
-
-  .screen {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    right: 0px;
-    bottom: 0px;
-    opacity: 0.6;
-    background-color: #000;
-  }
-
 .ghost {
   opacity: 0.5;
 }

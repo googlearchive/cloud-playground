@@ -73,18 +73,6 @@
       </div>
     </div>
 
-    <div class="lightbox" ng-repeat="box in lightboxes" ng-controller="LightboxController">
-      <div class="content" style="absolute; z-index: {{2147483647 - $index * 2}};">
-        <div>
-          <button ng-click="reload()" class="btn"><i class="icon-refresh"></i> Reload Page</button>
-          <button ng-click="dismiss()" class="btn"><i class="icon-remove"></i> Dismiss</button>
-        </div>
-        <div class="summary">{{box.summary}}</div>
-        <div class="details">{{box.details}}</div>
-      </div>
-      <div class="screen" style="z-index: {{2147483647 - $index * 2 - 1}};"></div>
-    </div>
-
     <script src='/angular-ui/ui-bootstrap-tpls-0.1.0-SNAPSHOT.js'></script>
     <script src="/playground/js/app.js"></script>
     <script src="/playground/js/services.js"></script>

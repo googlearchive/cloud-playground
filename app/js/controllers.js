@@ -305,18 +305,6 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
 }
 
 /*
-function LightboxController($scope, $window) {
-
-  // TODO: DETERMINE if there's a better way
-  $scope.reload = function() {
-    $window.location.reload();
-  };
-
-  $scope.dismiss = function() {
-    $scope.lightboxes.pop();
-  };
-
-}
 
 function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
                            Backoff, DoSerial, DomElementById,

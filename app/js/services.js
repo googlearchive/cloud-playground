@@ -119,16 +119,4 @@ angular.module('playgroundApp.services', [])
   return Backoff;
 })
 
-.factory('LightBox', function($rootScope) {
-
-  $rootScope.lightboxes = [];
-
-  return {
-    lightbox: function(summary, details) {
-      $rootScope.lightboxes.push({'summary': summary, 'details': details});
-    }
-  };
-
-})
-
 */
