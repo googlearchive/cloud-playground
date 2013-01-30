@@ -468,6 +468,13 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     _output_window = undefined;
   }
 
+  // TODO: test
+  $scope.select_me = function(evt) {
+    var elem = evt.srcElement;
+    elem.focus();
+    elem.select();
+  }
+
 }
 
 /*
@@ -489,12 +496,6 @@ function ProjectController($scope, $http, $filter, $log, $timeout, $routeParams,
   //   }
   // }
   $scope.files = {};
-
-  $scope.selectme = function(evt) {
-    var elem = evt.srcElement;
-    elem.focus();
-    elem.select();
-  }
 
   $scope.run = function() {
     return DoSerial
