@@ -7,7 +7,7 @@
       </div>
       <div id="filelist">
         <div id="file-{{$index}}" class="fileentry"
-             ng-click="select(file)"
+             ng-click="select_file(file)"
              ng-class="{selected: file == current_file}"
              ng-repeat="file in files">
           <div class="filename">{{file.name}} <i class="icon-asterisk dirtymarker" ng-show="file.dirty"></i></div>
