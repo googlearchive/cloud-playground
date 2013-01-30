@@ -231,10 +231,8 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   .then($scope._list_files)
   .then($scope._select_first_file);
 
+  // TODO: test
   $scope.insert_path = function(path) {
-    $log.log('TODO: insert_path("' + path + '")');
-/*
-    // TODO: implement and test
     var file = $scope.files[path];
     if (!file) {
       file = {
@@ -246,7 +244,6 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
       $scope.files[path] = file;
     }
     $scope.select_file(file);
-*/
   };
 
   // TODO: test
