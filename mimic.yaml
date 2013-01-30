@@ -11,15 +11,6 @@ handlers:
   script: deny.app
   secure: always
 
-# block mimic control requests
-- url: /_ah/mimic/.*
-  script: deny.app
-  secure: always
-
-# block mimic control requests
-- url: /_ah/mimic/.*
-  script: deny.app
-
 # script handler for everything else / user code
 - url: /.*
   # This module must be removed from sys.modules in TargetEnvironment.RunScript
