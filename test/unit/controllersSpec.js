@@ -573,15 +573,15 @@ describe('PageController', function() {
 
       it('should use $scope.config.playground_namespace', function() {
         expect(scope.namespace()).toBeUndefined();
-        scope.config.playground_namespace = 'pg_namepsace';
-        expect(scope.namespace()).toBe('pg_namepsace');
+        scope.config.playground_namespace = 'pg_namespace';
+        expect(scope.namespace()).toBe('pg_namespace');
       });
 
 
       it('should prefer $routeParams to $scope.config', function() {
         expect(scope.namespace()).toBeUndefined();
         routeParams.project_id = 'route_param';
-        scope.config.playground_namespace = 'pg_namepsace';
+        scope.config.playground_namespace = 'pg_namespace';
         expect(scope.namespace()).toBe('route_param');
       });
 
