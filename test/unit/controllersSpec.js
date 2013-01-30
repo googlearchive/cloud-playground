@@ -393,10 +393,10 @@ describe('ProjectController', function() {
       });
 
       it('should set editor onChange handler', function() {
-        scope.editorOnChange = function() {};
+        scope.editor_on_change = function() {};
         expect(scope._editor).toBeUndefined();
         scope.create_editor('text/x-yaml');
-        expect(scope._editor.setOption).toHaveBeenCalledWith('onChange', scope.editorOnChange);
+        expect(scope._editor.setOption).toHaveBeenCalledWith('onChange', scope.editor_on_change);
       });
 
       it('should set editor focus', function() {

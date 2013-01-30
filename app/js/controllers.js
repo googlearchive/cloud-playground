@@ -218,8 +218,8 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     }
   }
 
-  $scope.editorOnChange = function(from, to, text, next) {
-/*
+  // TODO: test
+  $scope.editor_on_change = function(from, to, text, next) {
     $scope.$apply(function() {
       $scope.current_file.contents = $scope._editor.getValue();
       if ($scope.current_file.dirty) {
@@ -228,7 +228,6 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
       $scope.current_file.dirty = true;
       Backoff.schedule(_save_dirty_files);
     });
-*/
   };
 
   // TODO: consider replacing DOM maniupulation here with a directive
@@ -245,7 +244,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     });
     //$scope._editor.getScrollerElement().id = 'scroller-element';
     $scope._editor.setValue($scope.current_file.contents);
-    $scope._editor.setOption('onChange', $scope.editorOnChange);
+    $scope._editor.setOption('onChange', $scope.editor_on_change);
     $scope._editor.focus();
   }
 
