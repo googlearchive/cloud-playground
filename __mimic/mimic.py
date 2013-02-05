@@ -207,13 +207,13 @@ def RunTargetApp(tree, path_info, namespace, users_mod):
     RespondWithStatus(httplib.NOT_FOUND, data='Error: no app.yaml file.')
     return
   try:
-    config = yaml.load(app_yaml)
+    config = yaml.safe_load(app_yaml)
   except yaml.YAMLError:
     errmsg = ('Error: app.yaml configuration is missing or invalid: {0}'
               .format(sys.exc_info()[1]))
     RespondWithStatus(httplib.NOT_FOUND, data=errmsg)
     return
-  # bail if yaml.load fails to return dict due to malformed yaml input
+  # bail if yaml.safe_load fails to return dict due to malformed yaml input
   if not isinstance(config, dict):
     errmsg = 'Error: app.yaml configuration is missing or invalid.'
     RespondWithStatus(httplib.NOT_FOUND, data=errmsg)
