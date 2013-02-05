@@ -4,6 +4,7 @@ import webapp2
 
 import codesite
 import model
+import settings
 import shared
 
 
@@ -13,7 +14,7 @@ class PopulateTemplateSource(webapp2.RequestHandler):
     key = self.request.get('key')
     template_source = model.GetTemplateSource(key)
     url = template_source.key.id()
-    if url == 'templates/':
+    if url == settings.TEMPLATE_PROJECT_DIR:
       return model.PopulateFileSystemTemplates(template_source)
     elif codesite.IsCodesiteURL(url):
       return codesite.PopulateTemplates(template_source)

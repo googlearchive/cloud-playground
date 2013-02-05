@@ -21,7 +21,7 @@ _MEMCACHE_TIME = 3600
 
 # tuples containing templates (uri, description)
 _TEMPLATE_SOURCES = [
-    ('templates/',
+    (settings.TEMPLATE_PROJECT_DIR,
      'Playground Templates'),
     ('https://google-app-engine-samples.googlecode.com/svn/trunk/',
      'Python App Engine Samples'),
@@ -223,14 +223,19 @@ def GetTemplatesBySource(template_source):
 def PopulateFileSystemTemplates(template_source):
   """Populate file system templates.
 
+  Creates one template project for each top level directory in template dir.
+
   Args:
     template_source: The template source entity.
   """
   templates = []
   template_dir = template_source.key.id()
   for dirname in os.listdir(template_dir):
+    dirpath = os.path.join(template_dir, dirname)
+    if not os.path.isdir(dirpath):
+      continue
     try:
-      f = open(os.path.join(template_dir, dirname, _PLAYGROUND_JSON))
+      f = open(os.path.join(dirpath, _PLAYGROUND_JSON))
       data = json.loads(f.read())
       name = data.get('template_name')
       description = data.get('template_description')
