@@ -1,5 +1,16 @@
 handlers:
-- url: /codemirror
-  static_dir: codemirror
+- url: /codemirror/lib/(codemirror\.(js|css))
+  static_files: codemirror/lib/\1
+  upload: codemirror/lib/codemirror\.(js|css)
+  expiration: 10m
+  secure: always
+
+- url: /codemirror/lib/util/
+  static_dir: codemirror/lib/util
+  expiration: 10m
+  secure: always
+
+- url: /codemirror/mode/
+  static_dir: codemirror/mode
   expiration: 10m
   secure: always
