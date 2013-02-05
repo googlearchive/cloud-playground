@@ -1,21 +1,4 @@
 handlers:
-# explicit MIME Type for LICENSE files
-- url: /codemirror/(.*LICENSE)
-  static_files: codemirror/\1
-  upload: codemirror/.*LICENSE
-  mime_type: text/plain
-  expiration: 10m
-  secure: always
-
-# explicit MIME Type for README files
-- url: /codemirror/(.*README.*)
-  static_files: codemirror/\1
-  upload: codemirror/.*README.*
-  mime_type: text/plain
-  expiration: 10m
-  secure: always
-
-# other codemirror resources
 - url: /codemirror
   static_dir: codemirror
   expiration: 10m
