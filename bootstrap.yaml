@@ -9,7 +9,7 @@ handlers:
   static_dir: bootstrap/docs/assets/css
   secure: always
 
-- url: /bootstrap/img/(.*\.png)
+- url: /bootstrap/img/(glyphicons-halflings.*\.png)
   static_files: bootstrap/docs/assets/img/\1
-  upload: bootstrap/docs/assets/img/.*.png
+  upload: bootstrap/docs/assets/img/glyphicons-halflings.*.png
   secure: always
