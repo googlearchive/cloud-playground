@@ -16,7 +16,7 @@ from webapp2_extras import security
 from webapp2_extras import sessions
 
 import error
-import mimic
+import mimic_wsgi
 import model
 import secret
 import settings
@@ -147,7 +147,7 @@ class PlaygroundHandler(SessionHandler):
 
   @webapp2.cached_property
   def project_id(self):
-    return mm.GetProjectIdFromPathInfo(self.request.path_info)
+    return mimic.GetProjectIdFromPathInfo(self.request.path_info)
 
   @webapp2.cached_property
   def project(self):
@@ -530,7 +530,7 @@ class Nuke(PlaygroundHandler):
     self.redirect('/playground')
 
 
-class MimicIntercept(mimic.Mimic):
+class MimicIntercept(mimic_wsgi.Mimic):
   """WSGI app which handles all requests destined for the target app."""
 
   def __iter__(self):
