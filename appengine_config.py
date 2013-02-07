@@ -1,7 +1,11 @@
 """App Engine configuration file."""
 
+import os
 import re
+import sys
 
+# append 'mimic' directory to sys.path
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mimic'))
 
 from __mimic import common
 from __mimic import datastore_tree

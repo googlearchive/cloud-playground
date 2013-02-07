@@ -4,3 +4,6 @@
 [submodule "bootstrap"]
 	path = bootstrap
 	url = https://github.com/twitter/bootstrap.git
+[submodule "mimic"]
+	path = mimic
+	url = https://code.google.com/p/cloud-playground.mimic
