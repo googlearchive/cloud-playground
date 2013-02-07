@@ -22,8 +22,6 @@ going to be tested outside of App Engine.
 
 import cStringIO
 from email import feedparser
-import logging
-import os
 import sys
 import traceback
 
@@ -31,9 +29,6 @@ import traceback
 from __mimic import common
 from __mimic import mimic
 from __mimic import target_env
-
-import settings
-
 
 _SEPARATOR = '-' * 50 + '\n'
 
@@ -52,12 +47,6 @@ class Mimic(object):
     saved_out = sys.stdout
     sys.stdout = output
     try:
-      if common.IsDevMode():
-        logging.warn('\n' * 3)
-      if (os.environ['HTTP_HOST'] in settings.PLAYGROUND_HOSTS
-          and os.environ['PATH_INFO'] == '/'):
-        yield self._RedirectResponse('/playground')
-        return
       mimic.RunMimic(create_tree_func=common.config.CREATE_TREE_FUNC)
     except target_env.TargetAppError, err:
       yield self._ExceptionResponse(err.FormattedException())
@@ -73,13 +62,6 @@ class Mimic(object):
       sys.stdout = saved_out
     response = output.getvalue()
     yield self._NormalResponse(response)
-
-  def _RedirectResponse(self, location):
-    status = '302 Found'
-    response_headers = [('Location', location)]
-    self.start_response(status, response_headers)
-    # empty body
-    return ''
 
   def _ExceptionResponse(self, formatted_exception):
     status = '500 Server Error'

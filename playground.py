@@ -13,9 +13,10 @@ from webapp2_extras import security
 from webapp2_extras import sessions
 
 from __mimic import common
-from __mimic import mimic
+from __mimic import mimic as mm
 
 import error
+import mimic
 import model
 import secret
 import settings
@@ -146,7 +147,7 @@ class PlaygroundHandler(SessionHandler):
 
   @webapp2.cached_property
   def project_id(self):
-    return mimic.GetProjectIdFromPathInfo(self.request.path_info)
+    return mm.GetProjectIdFromPathInfo(self.request.path_info)
 
   @webapp2.cached_property
   def project(self):
@@ -527,6 +528,25 @@ class Nuke(PlaygroundHandler):
       shared.e('You must be an admin for this app')
     model.DeleteTemplates()
     self.redirect('/playground')
+
+
+class MimicIntercept(mimic.Mimic):
+  """WSGI app which handles all requests destined for the target app."""
+
+  def __iter__(self):
+    if common.IsDevMode():
+      logging.warn('\n' * 3)
+    if (os.environ['HTTP_HOST'] in settings.PLAYGROUND_HOSTS
+        and os.environ['PATH_INFO'] == '/'):
+      self._RedirectResponse('/playground')
+      # empty body
+      return ['']
+    return super(MimicIntercept, self).__iter__()
+
+  def _RedirectResponse(self, location):
+    status = '302 Found'
+    response_headers = [('Location', location)]
+    self.start_response(status, response_headers)
 
 
 config = {}

@@ -13,8 +13,7 @@ handlers:
 
 # script handler for everything else / user code
 - url: /.*
-  # This module must be removed from sys.modules in TargetEnvironment.RunScript
-  script: mimic.app
+  script: playground.MimicIntercept
   # This script handler must either not require login, or require admin login
   # (via 'login: admin'). Do not specify 'login: required' since offline
   # requests (Cron, Task Queue, etc.) will fail with this error:
