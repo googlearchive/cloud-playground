@@ -8,12 +8,12 @@ import os
 import re
 import urllib
 
+from __mimic import common
+from __mimic import mimic
+
 import webapp2
 from webapp2_extras import security
 from webapp2_extras import sessions
-
-from __mimic import common
-from __mimic import mimic as mm
 
 import error
 import mimic
