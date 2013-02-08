@@ -5,7 +5,7 @@ import re
 import sys
 
 # append 'mimic' directory to sys.path
-DIRNAME = os.path.dirname(os.path.abspath(__file__)
+DIRNAME = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(DIRNAME, 'mimic'))
 
 from __mimic import common

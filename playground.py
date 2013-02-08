@@ -540,7 +540,7 @@ class MimicIntercept(mimic_wsgi.Mimic):
         and os.environ['PATH_INFO'] == '/'):
       self._RedirectResponse('/playground')
       # empty body
-      return ['']
+      return iter([''])
     return super(MimicIntercept, self).__iter__()
 
   def _RedirectResponse(self, location):
