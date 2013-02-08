@@ -8,6 +8,7 @@ import os
 import re
 import urllib
 
+import mimic_wsgi
 from __mimic import common
 from __mimic import mimic
 
@@ -16,7 +17,6 @@ from webapp2_extras import security
 from webapp2_extras import sessions
 
 import error
-import mimic_wsgi
 import model
 import secret
 import settings
