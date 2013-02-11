@@ -2,6 +2,8 @@
 
 import os
 
+from google.appengine.api import app_identity
+
 
 # whether or not we're running in the dev_appserver
 _DEV_MODE = os.environ['SERVER_SOFTWARE'].startswith('Development/')
@@ -35,7 +37,8 @@ if _APP_ID not in _APP_IDS:
   EXEC_CODE_APP_ID = _APP_ID
 
 if _DEV_MODE:
-  PLAYGROUND_HOSTS = ('localhost:8080', '127.0.0.1:8080')
+  PLAYGROUND_HOSTS = ('localhost:8080', '127.0.0.1:8080',
+                      app_identity.get_default_version_hostname())
   PLAYGROUND_USER_CONTENT_HOST = 'localhost:9100'
   EXEC_CODE_HOST = 'localhost:9200'
 else:
