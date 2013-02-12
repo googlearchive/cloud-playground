@@ -20,7 +20,7 @@
 import httplib
 import json
 
-from __mimic import common
+from mimic.__mimic import common
 
 import shared
 

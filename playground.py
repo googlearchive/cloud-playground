@@ -8,9 +8,9 @@ import os
 import re
 import urllib
 
-import mimic_wsgi
-from __mimic import common
-from __mimic import mimic
+from mimic import mimic_wsgi
+from mimic.__mimic import common
+from mimic.__mimic import mimic
 
 import webapp2
 from webapp2_extras import security

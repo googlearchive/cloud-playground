@@ -4,8 +4,8 @@ import httplib
 import logging
 import mimetypes
 
-from __mimic import common
-from __mimic import mimic
+from mimic.__mimic import common
+from mimic.__mimic import mimic
 
 import model
 import settings

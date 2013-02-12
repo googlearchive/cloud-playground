@@ -6,7 +6,7 @@ import re
 import sys
 import traceback
 
-from __mimic import common
+from mimic.__mimic import common
 import model
 import settings
 import shared

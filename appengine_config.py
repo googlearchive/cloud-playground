@@ -4,13 +4,9 @@ import os
 import re
 import sys
 
-# append 'mimic' directory to sys.path
-DIRNAME = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(DIRNAME, 'mimic'))
-
-from __mimic import common
-from __mimic import datastore_tree
-from __mimic import mimic
+from mimic.__mimic import common
+from mimic.__mimic import datastore_tree
+from mimic.__mimic import mimic
 
 import caching_urlfetch_tree
 import settings
