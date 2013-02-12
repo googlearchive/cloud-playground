@@ -3,6 +3,7 @@
 import os
 
 from google.appengine.api import app_identity
+from google.appengine.api import backends
 
 
 # whether or not we're running in the dev_appserver
@@ -39,8 +40,8 @@ if _APP_ID not in _APP_IDS:
 if _DEV_MODE:
   PLAYGROUND_HOSTS = ('localhost:8080', '127.0.0.1:8080',
                       app_identity.get_default_version_hostname())
-  PLAYGROUND_USER_CONTENT_HOST = 'localhost:9100'
-  EXEC_CODE_HOST = 'localhost:9200'
+  PLAYGROUND_USER_CONTENT_HOST = backends.get_hostname('devappserver-cors-test')
+  EXEC_CODE_HOST = backends.get_hostname('devappserver-playground-test')
 else:
   PLAYGROUND_HOSTS = ('{0}.appspot.com'.format(PLAYGROUND_APP_ID),
                       'cloud-playground.appspot.com')
