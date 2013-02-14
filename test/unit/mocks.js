@@ -1,4 +1,4 @@
-// TODO: replace with an angular-ui/bootstrap based mock
+
 angular.module('mocks.dialog', [])
 
 .provider('$dialog', function() {
@@ -17,6 +17,7 @@ angular.module('mocks.dialog', [])
       };
 
       dialogMock.dialog = function(arg) {
+        // TODO: Check other options
         if (expectation &&
             (expectation.controller != arg.controller ||
                 expectation.templateUrl != arg.templateUrl)) {

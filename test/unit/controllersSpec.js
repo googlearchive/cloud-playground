@@ -483,9 +483,10 @@ describe('ProjectController', function() {
       var dialogMock;
       beforeEach(inject(function($dialog) {
         dialogMock = $dialog;
-        dialogMock.shouldBeCalledWith(
-            {controller: 'NewFileController',
-              templateUrl: '/playground/new_file_modal.html'});
+        dialogMock.shouldBeCalledWith({
+            controller: 'NewFileController',
+            templateUrl: '/playground/new_file_modal.html'
+        });
       }));
 
       it('should call $scope.insert_path(path)', function() {
