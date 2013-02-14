@@ -17,7 +17,7 @@ angular.module('mocks.dialog', [])
       };
 
       dialogMock.dialog = function(arg) {
-        // TODO: Check other options
+        // TODO: Check options other than controller and templateUrl
         if (expectation &&
             (expectation.controller != arg.controller ||
                 expectation.templateUrl != arg.templateUrl)) {
