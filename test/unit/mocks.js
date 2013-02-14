@@ -20,9 +20,9 @@ angular.module('mocks.dialog', [])
         // TODO: Check options other than controller and templateUrl
         if (expectation &&
             (expectation.controller != arg.controller ||
-                expectation.templateUrl != arg.templateUrl)) {
+             expectation.templateUrl != arg.templateUrl)) {
           throw Error('Expected:' + prettyPrint(expectation) + 'Actual:' +
-                          prettyPrint(arg));
+                      prettyPrint(arg));
         }
         return {'open': function() {
           return {'then': function(callBack) {
