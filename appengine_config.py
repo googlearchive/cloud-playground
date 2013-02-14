@@ -26,10 +26,19 @@ else:
 
 mimic_NAMESPACE = '_playground'
 
+# keep in sync with app/js/controllers.js
 mimic_PROJECT_ID_QUERY_PARAM = '_mimic_project'
 
 mimic_PROJECT_ID_FROM_PATH_INFO_RE = re.compile('/playground/p/(.+?)/')
 
+if common.IsDevMode():
+  scheme = 'http'
+else:
+  scheme = 'https'
+mimic_CORS_ALLOWED_ORIGINS = ['{0}://{1}'.format(scheme, h)
+                              for h in settings.PLAYGROUND_HOSTS]
+
+mimic_CORS_ALLOWED_HEADERS = 'Origin, X-XSRF-Token, X-Requested-With, Accept'
 
 # pylint: disable-msg=C6409
 def namespace_manager_default_namespace_for_request():

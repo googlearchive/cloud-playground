@@ -5,6 +5,8 @@ import logging
 import os
 import random
 
+from mimic.__mimic import common
+
 import codesite
 import settings
 import shared
@@ -320,7 +322,7 @@ def _PopulateProjectWithTemplate(tree, template_url):
     for path in os.listdir(os.path.join(template_url, dirname)):
       if path == _PLAYGROUND_JSON:
         continue
-      if shared.GetExtension(path) in settings.SKIP_EXTENSIONS:
+      if common.GetExtension(path) in settings.SKIP_EXTENSIONS:
         continue
       relpath = os.path.join(dirname, path)
       fullpath = os.path.join(template_url, dirname, path)

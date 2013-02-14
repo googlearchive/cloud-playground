@@ -2,7 +2,6 @@
 
 import httplib
 import logging
-import mimetypes
 
 from mimic.__mimic import common
 from mimic.__mimic import mimic
@@ -27,23 +26,6 @@ def w(msg, *args, **kwargs):
   logging.warning('##### {0}'.format(repr(msg)))
 
 
-# TODO: use the MIME Type list at http://codemirror.net/
-_TEXT_MIME_TYPES = {
-    'css': 'text/css',
-    # *.dart uses *.js MIME Type for now
-    'dart': 'text/javascript',
-    'html': 'text/html',
-    'js': 'text/javascript',
-    'jsp': 'application/x-jsp',
-    'json': 'application/json',
-    'php': 'application/x-httpd-php',
-    'sh': 'text/x-sh',
-    'sql': 'text/x-mysql',
-    'xml': 'application/xml',
-    'yaml': 'text/x-yaml',
-}
-
-
 def Fetch(url, follow_redirects=False, async=False):
   """Make an HTTP request using URL Fetch."""
   rpc = urlfetch.create_rpc()
@@ -57,32 +39,6 @@ def Fetch(url, follow_redirects=False, async=False):
     e('Status code {0} fetching {1} {2}', response.status_code, url,
       response.content)
   return response
-
-
-def IsTextMimeType(mime_type):
-  return mime_type.startswith('text/') or mime_type in _TEXT_MIME_TYPES.values()
-
-
-def GetExtension(filename):
-  return filename.lower().split('.')[-1]
-
-
-def GuessMimeType(filename):
-  """Guess the MIME Type based on the provided filename."""
-  extension = GetExtension(filename)
-  if extension in _TEXT_MIME_TYPES:
-    return _TEXT_MIME_TYPES[extension]
-  mime_type, _ = mimetypes.guess_type(filename)
-  if not mime_type:
-    logging.warning('Failed to guess MIME Type for "%s" with extension "%s"',
-                    filename, extension)
-    # TODO: remove once production App Engine does not return (None, None) for
-    # import mimetypes; mimetypes.guess_type('favicon.ico')
-    if extension == 'ico':
-      mime_type = 'image/x-icon'
-  if mime_type:
-    return mime_type
-  return 'text/plain'
 
 
 def ThisIsPlaygroundApp():

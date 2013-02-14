@@ -157,6 +157,9 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
                            $dialog, $log, DoSerial, DomElementById, WrappedElementById,
                            Backoff) {
 
+  // keep in sync with appengine_config.py
+  var MIMIC_PROJECT_ID_QUERY_PARAM = '_mimic_project';
+
   // TODO: remove; don't maintain DOM references
   var _output_window;
 
@@ -167,12 +170,12 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   $scope.no_json_transform = function(data) { return data; };
 
   $scope.url_of = function(file) {
-    return '//' + $scope.config.PLAYGROUND_USER_CONTENT_HOST +
-           // TODO: replace with $location.path()
-           //$location.path() +
-           $window.location.pathname +
-           'getfile/' +
-           encodeURI(file.name);
+   return '//' + $scope.config.PLAYGROUND_USER_CONTENT_HOST +
+          '/_ah/mimic/file' +
+          '?' + MIMIC_PROJECT_ID_QUERY_PARAM +
+          '=' + $scope.project.key +
+          '&path=' +
+          encodeURI(file.name);
   };
 
   $scope.image_url_of = function(file) {

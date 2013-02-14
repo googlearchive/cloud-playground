@@ -7,6 +7,7 @@ import sys
 import traceback
 
 from mimic.__mimic import common
+
 import model
 import settings
 import shared
@@ -102,7 +103,7 @@ def PopulateProjectFromCodesite(tree, template_url):
       logging.info('- %s', dirname)
       tree.SetFile(dirname, page)
     for path in paths:
-      if shared.GetExtension(path) in settings.SKIP_EXTENSIONS:
+      if common.GetExtension(path) in settings.SKIP_EXTENSIONS:
         continue
       relpath = os.path.join(dirname, path)
       add_files(relpath)

@@ -6,7 +6,12 @@ handlers:
   script: mimic.app
   secure: always
 
-# block mimic control requests
+# allow file retrieval
+- url: /_ah/mimic/file
+  script: playground.MimicIntercept
+  secure: always
+
+# block other mimic control requests
 - url: /_ah/mimic/.*
   script: deny.app
   secure: always

@@ -324,61 +324,6 @@ class GetTemplates(PlaygroundHandler):
     self.response.write(tojson(r))
 
 
-class GetFile(PlaygroundHandler):
-  """Get file handler."""
-
-  def _CheckCors(self):
-    origin = self.request.headers.get('Origin')
-    # If not a CORS request, do nothing
-    if not origin:
-      return
-    playground_origins = ['{0}://{1}'.format(self.request.scheme, h)
-                          for h in settings.PLAYGROUND_HOSTS]
-
-    if origin not in playground_origins:
-      self.response.set_status(401)
-      self.response.headers['Content-Type'] = 'text/plain'
-      self.response.write('Unrecognized origin {0}'.format(origin))
-      return
-    if self.request.host != settings.PLAYGROUND_USER_CONTENT_HOST:
-      self.response.set_status(401)
-      self.response.headers['Content-Type'] = 'text/plain'
-      self.response.write('Files may only be fetched from {0}'
-                          .format(settings.PLAYGROUND_USER_CONTENT_HOST))
-      return
-    # OK, CORS access allowed
-    self.response.headers['Access-Control-Allow-Origin'] = origin
-    self.response.headers['Access-Control-Allow-Methods'] = 'GET'
-    self.response.headers['Access-Control-Max-Age'] = '600'
-    allowed_headers = 'Origin, X-XSRF-Token, X-Requested-With, Accept'
-    self.response.headers['Access-Control-Allow-Headers'] = allowed_headers
-    self.response.headers['Access-Control-Allow-Credentials'] = 'true'
-
-  def options(self, project_id, filename):
-    """Handles HTTP OPTIONS requests."""
-    assert project_id
-    assert filename
-    self._CheckCors()
-
-  def get(self, project_id, filename):
-    """Handles HTTP GET requests."""
-    assert project_id
-    assert filename
-    self._CheckCors()
-
-    contents = self.tree.GetFileContents(filename)
-    if contents is None:
-      self.response.set_status(404)
-      self.response.headers['Content-Type'] = 'text/plain'
-      self.response.write('File does not exist: %s' % filename)
-      return
-
-    self.response.headers['Content-Type'] = shared.GuessMimeType(filename)
-    self.response.headers['Content-Disposition'] = 'attachment'
-    self.response.headers['X-Content-Type-Options'] = 'nosniff'
-    self.response.write(contents)
-
-
 class PutFile(PlaygroundHandler):
 
   def put(self, project_id, filename):
@@ -431,7 +376,7 @@ class ListFiles(PlaygroundHandler):
     if not path:
       path = None
     r = self.tree.ListDirectory(path)
-    r = [{'name': name, 'mime_type': shared.GuessMimeType(name)} for name in r]
+    r = [{'name': name, 'mime_type': common.GuessMimeType(name)} for name in r]
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
 
@@ -564,7 +509,6 @@ app = webapp2.WSGIApplication([
 
     # tree actions
     # TODO use handlers in mimic control app instead
-    ('/playground/p/(.*)/getfile/(.*)', GetFile),
     ('/playground/p/(.*)/putfile/(.*)', PutFile),
     ('/playground/p/(.*)/movefile/(.*)', MoveFile),
     ('/playground/p/(.*)/deletepath/(.*)', DeletePath),
