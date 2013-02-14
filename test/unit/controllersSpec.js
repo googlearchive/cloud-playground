@@ -478,25 +478,6 @@ describe('ProjectController', function() {
 
     });
 
-    describe('prompt_new_file function', function() {
-
-      var dialogMock;
-      beforeEach(inject(function($dialog) {
-        dialogMock = $dialog;
-        dialogMock.shouldBeCalledWith(
-            {controller: 'NewFileController',
-              templateUrl: '/playground/new_file_modal.html'});
-      }));
-
-      it('should call $scope.insert_path(path)', function() {
-        doInit();
-        scope.insert_path = jasmine.createSpy();
-        dialogMock.willCloseWith('test_file.py');
-        scope.prompt_new_file();
-        expect(scope.insert_path).toHaveBeenCalledWith('test_file.py');
-      })
-    });
-
   });
 
 });
