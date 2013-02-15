@@ -21,7 +21,8 @@ function HeaderController($scope, $location) {
 
 }
 
-function PageController($scope, $http, DoSerial, $routeParams, $window, $location) {
+function PageController($scope, $http, DoSerial, $routeParams, $window,
+                        $dialog, $location) {
 
   function getconfig() {
     return $http.get('/playground/getconfig')
@@ -77,13 +78,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window, $locatio
   };
 
   // TODO: test
-  $scope.prompt_to_delete_project = function(project) {
-    // TODO: use $dialog instead of prompt()
-    var answer = prompt("Are you sure you want to delete project " +
-                        project.name + "?\nType 'yes' to confirm.", "no");
-    if (!answer || answer.toLowerCase()[0] != 'y') {
-      return;
-    }
+  function delete_project(project) {
     $scope.project = undefined;
     $http.post('/playground/p/' + encodeURI(project.key) + '/delete')
     .success(function(data, status, headers, config) {
@@ -94,6 +89,24 @@ function PageController($scope, $http, DoSerial, $routeParams, $window, $locatio
         }
       }
       $location.path('/playground/');
+    });
+  }
+
+  // TODO: test
+  $scope.prompt_to_delete_project = function(project) {
+    var title = 'Confirm project deletion';
+    var msg = 'Are you sure you want to delete project "' + project.name +
+              '"?';
+    var btns = [{result: false, label: 'Cancel'},
+                {result: true, label: 'DELETE PROJECT',
+                 cssClass: 'btn-primary btn-danger'}];
+    // TODO: autofocus primary button
+    $dialog.messageBox(title, msg, btns)
+    .open()
+    .then(function(result) {
+      if (result) {
+        delete_project(project);
+      }
     });
   };
 
