@@ -26,8 +26,8 @@ function RenameProjectController($scope, $log, dialog, project_name) {
 
   $scope.project_name = project_name;
 
-  $scope.close = function(path) {
-    dialog.close(path);
+  $scope.close = function(project_name) {
+    dialog.close(project_name);
   }
 
 }
@@ -181,6 +181,17 @@ function MainController($scope, $http, $window, $location, DoSerial) {
 
 // TODO: test
 function NewFileController($scope, $log, dialog, path) {
+
+  $scope.path = path;
+
+  $scope.close = function(path) {
+    dialog.close(path);
+  }
+
+}
+
+// TODO: test
+function RenameFileController($scope, $log, dialog, path) {
 
   $scope.path = path;
 
@@ -485,14 +496,17 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   };
 
   // TODO: test
-  $scope.move_file = function(file, newpath) {
+  function file_rename(file, path) {
+    if (!path || path == file.name) {
+      return;
+    }
     DoSerial
     .then(function() {
       var oldpath = file.name;
-      $scope.files[newpath] = file;
-      $scope.files[newpath].name = newpath;
+      $scope.files[path] = file;
+      $scope.files[path].name = path;
       delete $scope.files[oldpath];
-      return $http.post('movefile/' + encodeURI(oldpath), {newpath: newpath})
+      return $http.post('movefile/' + encodeURI(oldpath), {newpath: path})
       .success(function(data, status, headers, config) {
         // TODO: have server send updated MIME type
         $scope.current_file = file;
@@ -501,22 +515,22 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   };
 
   // TODO: test
-  $scope.prompt_file_rename = function() {
-    // TODO: use $dialog instead of prompt()
-    var new_filename = prompt(
-        'New filename?\n(You may specify a full path such as: foo/bar.txt)',
-        $scope.current_file.name);
-    if (!new_filename) {
-      return;
-    }
-    if (new_filename[0] == '/') {
-      new_filename = new_filename.substr(1);
-    }
-    if (!new_filename || new_filename == $scope.current_file.name) {
-      return;
-    }
-    $scope.move_file($scope.current_file, new_filename);
-  }
+  $scope.prompt_file_rename = function(file) {
+    $dialog.dialog({
+        controller: 'RenameFileController',
+        templateUrl: '/playground/rename_file_modal.html',
+        resolve: {path: file.name},
+    })
+    .open().then(function(path) {
+      if (!path) {
+        return;
+      }
+      while (path[0] == '/') {
+        path = path.substr(1);
+      }
+      file_rename(file, path);
+    });
+  };
 
   // TODO: test
   $scope.popout = function() {

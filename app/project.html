@@ -43,7 +43,7 @@
 
   <!-- hidden bits -->
   <div id="file-context-menu" class="context-menu" ng-show="showfilecontextmenu">
-    <div ng-click="prompt_file_rename()"><b>Rename</b> <code>{{current_file.name}}</code></div>
+    <div ng-click="prompt_file_rename(current_file)"><b>Rename</b> <code>{{current_file.name}}</code></div>
     <div ng-click="prompt_delete_file(current_file)"><b>Delete</b> <code>{{current_file.name}}</code></div>
   </div>
   <div id="project-context-menu" class="context-menu" ng-show="showprojectcontextmenu">
