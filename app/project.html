@@ -44,10 +44,10 @@
   <!-- hidden bits -->
   <div id="file-context-menu" class="context-menu" ng-show="showfilecontextmenu">
     <div ng-click="prompt_file_rename()"><b>Rename</b> <code>{{current_file.name}}</code></div>
-    <div ng-click="prompt_file_delete()"><b>Delete</b> <code>{{current_file.name}}</code></div>
+    <div ng-click="prompt_delete_file(current_file)"><b>Delete</b> <code>{{current_file.name}}</code></div>
   </div>
   <div id="project-context-menu" class="context-menu" ng-show="showprojectcontextmenu">
     <div ng-click="prompt_project_rename(project)"><b>Rename</b> {{project.name}}</div>
-    <div ng-click="prompt_to_delete_project(project)"><b>Delete</b> {{project.name}}</div>
+    <div ng-click="prompt_delete_project(project)"><b>Delete</b> {{project.name}}</div>
   </div>
 </div>

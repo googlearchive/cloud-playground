@@ -93,7 +93,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
   }
 
   // TODO: test
-  $scope.prompt_to_delete_project = function(project) {
+  $scope.prompt_delete_project = function(project) {
     var title = 'Confirm project deletion';
     var msg = 'Are you sure you want to delete project "' + project.name +
               '"?';
@@ -433,7 +433,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   };
 
   // TODO: test
-  $scope.delete_file = function(file) {
+  function delete_file(file) {
     DoSerial
     .then(function() {
       return $http.post('deletepath/' + encodeURI(file.name))
@@ -441,6 +441,24 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
         delete $scope.files[file.name];
         $scope._select_first_file();
       });
+    });
+  };
+
+  // TODO: test
+  $scope.prompt_delete_file = function(file) {
+    var title = 'Confirm file deletion';
+    var msg = 'Are you sure you want to delete file "' +
+              $scope.current_file.name + '"?';
+    var btns = [{result: false, label: 'Cancel'},
+                {result: true, label: 'DELETE FILE',
+                 cssClass: 'btn-primary btn-danger'}];
+    // TODO: autofocus primary button
+    $dialog.messageBox(title, msg, btns)
+    .open()
+    .then(function(result) {
+      if (result) {
+        delete_file(file);
+      }
     });
   };
 
@@ -459,18 +477,6 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
       });
     });
   };
-
-  // TODO: test
-  $scope.prompt_file_delete = function() {
-    // TODO: use $dialog instead of prompt()
-    var answer = prompt("Are you sure you want to delete " +
-                        $scope.current_file.name + "?\nType 'yes' to confirm.",
-                        "no");
-    if (!answer || answer.toLowerCase()[0] != 'y') {
-      return;
-    }
-    $scope.delete_file($scope.current_file);
-  }
 
   // TODO: test
   $scope.prompt_file_rename = function() {
