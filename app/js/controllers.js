@@ -21,6 +21,17 @@ function HeaderController($scope, $location) {
 
 }
 
+// TODO: test
+function RenameProjectController($scope, $log, dialog, project_name) {
+
+  $scope.project_name = project_name;
+
+  $scope.close = function(path) {
+    dialog.close(path);
+  }
+
+}
+
 function PageController($scope, $http, DoSerial, $routeParams, $window,
                         $dialog, $location) {
 
@@ -169,7 +180,9 @@ function MainController($scope, $http, $window, $location, DoSerial) {
 }
 
 // TODO: test
-function NewFileController($scope, $log, dialog) {
+function NewFileController($scope, $log, dialog, path) {
+
+  $scope.path = path;
 
   $scope.close = function(path) {
     dialog.close(path);
@@ -364,6 +377,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     $dialog.dialog({
         controller: 'NewFileController',
         templateUrl: '/playground/new_file_modal.html',
+        resolve: {path: ''},
     })
     .open().then(function(path) {
       if (path) {
@@ -399,16 +413,10 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   };
 
   // TODO: test
-  $scope.prompt_project_rename = function(project) {
-    // TODO: user $dialog instead of prompt()
-    var new_project_name = prompt('Enter a new name for this project',
-                                  project.name);
-    if (!new_project_name) {
-      return;
-    }
+  function project_rename(project, name) {
     DoSerial
     .then(function() {
-      return $http.post('rename', {newname: new_project_name})
+      return $http.post('rename', {newname: name})
       .success(function(data, status, headers, config) {
         for (var i in $scope.projects) {
           if ($scope.projects[i] == project) {
@@ -419,6 +427,20 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
       });
     });
   }
+
+  // TODO: test
+  $scope.prompt_project_rename = function(project) {
+    $dialog.dialog({
+        controller: 'RenameProjectController',
+        templateUrl: '/playground/rename_project_modal.html',
+        resolve: {project_name: project.name},
+    })
+    .open().then(function(name) {
+      if (name) {
+        project_rename(project, name);
+      }
+    });
+  };
 
   // TODO: test
   // TODO: avoid DOM access; use directive instead

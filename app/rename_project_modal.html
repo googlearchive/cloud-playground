@@ -1,0 +1,20 @@
+<form>
+  <div class='modal-header'>
+    <button type='button' class='close' ng-click='close()'>&times;</button>
+    <h3>Rename project</h3>
+  </div>
+
+  <div class='modal-body form-horizontal'>
+    <div class='control-group'>
+      <label class='control-label' for='new_project_name'>New project name</label>
+      <div class='controls'>
+        <input class='span4' type='text' id='new_project_name' ng-model='project_name' required autofocus>
+      </div>
+    </div>
+  </div>
+
+  <div class='modal-footer'>
+    <button type='button' class='btn' ng-click='close()'>Close</button>
+    <button type='submit' class='btn btn-primary' ng-click='close(project_name)'>Create file</button>
+  </div>
+</form>
