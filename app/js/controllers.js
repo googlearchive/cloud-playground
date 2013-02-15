@@ -2,17 +2,13 @@
 
 /* Controllers */
 
-function AlertController($scope) {
+// TODO: test
+function AlertController($scope, Alert) {
 
-  $scope.alerts = [{
-      msg: 'Note: This is a shared public playground.' +
-           ' Anyone can read, modify or delete your projects,'+
-           ' files and data at any time. Your private source'+
-           ' code and data are not safe here.'
-  }];
+  $scope.alerts = Alert.alerts;
 
   $scope.closeAlert = function(idx) {
-    $scope.alerts.splice(idx, 1);
+    Alert.remove_alert(idx);
   }
 
 }

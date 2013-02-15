@@ -4,6 +4,92 @@
 
 angular.module('playgroundApp.services', [])
 
+// TODO: test
+.factory('Alert', function() {
+
+  var alert_list = [];
+
+  var Alert = {
+    alert_list: alert_list,
+
+    handle_exception: function(exception, cause) {
+      var msg = '' + exception;
+      if (cause) {
+        msg += ' caused by ' + cause;
+      }
+      alert_list.push({type: 'error', msg: msg});
+    },
+
+    note: function(msg) {
+      alert_list.push({msg: msg});
+    },
+
+    info: function(msg) {
+      alert_list.push({type: 'info', msg: msg});
+    },
+
+    success: function(msg) {
+      alert_list.push({type: 'success', msg: msg});
+    },
+
+    error: function(msg) {
+      alert_list.push({type: 'error', msg: msg});
+    },
+
+    alerts: function() {
+      return alert_list;
+    },
+
+    remove_alert: function(idx) {
+      alert_list.splice(idx, 1);
+    },
+  };
+
+  Alert.note('Note: This is a shared public playground.' +
+             ' Anyone can read, modify or delete your projects,'+
+             ' files and data at any time. Your private source'+
+             ' code and data are not safe here.');
+
+  return Alert;
+
+})
+
+// TODO: test
+.factory('$exceptionHandler', function($log, Alert) {
+
+  // borrowed from app/lib/angular/angular.js
+  function formatError(arg) {
+    if (arg instanceof Error) {
+      if (arg.stack) {
+        arg = (arg.message && arg.stack.indexOf(arg.message) === -1)
+            ? 'Error: ' + arg.message + '\n' + arg.stack
+            : arg.stack;
+      } else if (arg.sourceURL) {
+        arg = arg.message + '\n' + arg.sourceURL + ':' + arg.line;
+      }
+    }
+    return arg;
+  }
+
+  return function(exception, cause) {
+    $log.error.apply($log, arguments);
+
+    // borrowed from app/lib/angular/angular.js
+    var args = [];
+    angular.forEach(arguments, function(arg) {
+      args.push(formatError(arg));
+    });
+
+    var msg = args[0];
+    if (args.length > 1) {
+      msg += '\ncaused by:\n' + args[1];
+    }
+
+    Alert.error(msg);
+  };
+
+})
+
 // TODO: improve upon flushDoSerial(); allow one step to be executed at a time
 .factory('DoSerial', function($timeout, $log, $exceptionHandler) {
 

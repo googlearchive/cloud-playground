@@ -306,3 +306,7 @@ H1 {
 .ghost {
   opacity: 0.5;
 }
+
+.alert {
+  white-space: pre;
+}
