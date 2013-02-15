@@ -22,7 +22,7 @@
         <td><button class="btn btn-small btn-success" ng-class="{disabled: !project.key}" ng-click="select_project(project)"><i class="icon-edit icon-white"></i> Run/Edit</button>
         <td>{{project.name}}</td>
         <td>{{project.description}}</td>
-        <td><button class="btn btn-small btn-danger" ng-class="{disabled: !project.key}" ng-click="prompt_to_delete_project(project)"><i class="icon-remove icon-white"></i> delete</button></td>
+        <td><button class="btn btn-small btn-danger" ng-class="{disabled: !project.key}" ng-click="prompt_delete_project(project)"><i class="icon-remove icon-white"></i> delete</button></td>
       </tr>
 
       <tr class="project" ng-hide="has_projects()">
