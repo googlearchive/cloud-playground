@@ -307,6 +307,6 @@ H1 {
   opacity: 0.5;
 }
 
-.alert {
+.alert DIV {
   white-space: pre;
 }
