@@ -2,6 +2,21 @@
 
 /* Controllers */
 
+function AlertController($scope) {
+
+  $scope.alerts = [{
+      msg: 'Note: This is a shared public playground.' +
+           ' Anyone can read, modify or delete your projects,'+
+           ' files and data at any time. Your private source'+
+           ' code and data are not safe here.'
+  }];
+
+  $scope.closeAlert = function(idx) {
+    $scope.alerts.splice(idx, 1);
+  }
+
+}
+
 function HeaderController($scope, $location) {
 
   $scope.alreadyhome = function() {

@@ -45,11 +45,9 @@
         </div>
       </div>
 
-      <alert class='pagination-centered'>
-        Note: This is a shared public playground.
-        Anyone can read, modify or delete your projects, files and data at any time.
-        Your private source code and data are <em>not</em> safe here.
-      </alert>
+      <div ng-controller="AlertController">
+        <alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
+      </div>
 
       <div id="main">
         <div ng-view></div>
