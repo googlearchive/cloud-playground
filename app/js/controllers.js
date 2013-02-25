@@ -89,7 +89,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
   };
 
   // TODO: test
-  function delete_project(project) {
+  $scope.delete_project = function(project) {
     $scope.project = undefined;
     $http.post('/playground/p/' + encodeURI(project.key) + '/delete')
     .success(function(data, status, headers, config) {
@@ -103,7 +103,6 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     });
   }
 
-  // TODO: test
   $scope.prompt_delete_project = function(project) {
     var title = 'Confirm project deletion';
     var msg = 'Are you sure you want to delete project "' + project.name +
@@ -116,7 +115,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     .open()
     .then(function(result) {
       if (result) {
-        delete_project(project);
+        $scope.delete_project(project);
       }
     });
   };

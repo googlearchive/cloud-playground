@@ -478,24 +478,26 @@ describe('ProjectController', function() {
 
     });
 
-    describe('prompt_new_file function', function() {
-
+    describe('dialog tests', function () {
       var dialogMock;
       beforeEach(inject(function($dialog) {
+        doInit();
         dialogMock = $dialog;
-        dialogMock.shouldBeCalledWith({
+      }))
+
+      describe('prompt_new_file function', function() {
+        it('should call $scope.insert_path(path)', function() {
+          scope.insert_path = jasmine.createSpy();
+          dialogMock.dialogShouldBeCalledWith({
             controller: 'NewFileController',
             templateUrl: '/playground/new_file_modal.html'
-        });
-      }));
+          });
+          dialogMock.willCloseWith('test_file.py');
+          scope.prompt_new_file();
+          expect(scope.insert_path).toHaveBeenCalledWith('test_file.py');
+        })
+      });
 
-      it('should call $scope.insert_path(path)', function() {
-        doInit();
-        scope.insert_path = jasmine.createSpy();
-        dialogMock.willCloseWith('test_file.py');
-        scope.prompt_new_file();
-        expect(scope.insert_path).toHaveBeenCalledWith('test_file.py');
-      })
     });
 
   });
@@ -513,6 +515,8 @@ describe('PageController', function() {
       $httpBackend.flush();
     });
   }
+
+    beforeEach(module('mocks.dialog'));
 
     beforeEach(module('playgroundApp.services'));
 
@@ -641,6 +645,42 @@ describe('PageController', function() {
 
   });
 
+  describe('dialog tests', function() {
+    var dialogMock;
+    beforeEach(inject(function($dialog) {
+      doInit();
+      dialogMock = $dialog;
+    }))
+
+    describe('prompt_delete_project function', function () {
+      var mockProject = {'name': 'test_project'};
+      var title = 'Confirm project deletion';
+      var msg = 'Are you sure you want to delete project "' +
+        mockProject.name + '"?';
+      var btns = [{result: false, label: 'Cancel'},
+        {result: true, label: 'DELETE PROJECT',
+          cssClass: 'btn-primary btn-danger'}];
+
+      it('should call $scope.delete_project()', function() {
+        scope.delete_project = jasmine.createSpy();
+        dialogMock.messageBoxShouldBeCalledWith(title, msg, btns);
+        dialogMock.willCloseWith(true);
+
+        scope.prompt_delete_project(mockProject);
+        expect(scope.delete_project).toHaveBeenCalledWith(mockProject);
+      })
+
+      it('shouldn\'t call $scope.delete_project()', function() {
+        scope.delete_project = jasmine.createSpy();
+        dialogMock.messageBoxShouldBeCalledWith(title, msg, btns);
+        dialogMock.willCloseWith(false);
+
+        scope.prompt_delete_project(mockProject);
+        expect(scope.delete_project).not.toHaveBeenCalled();
+      })
+
+    });
+  })
 });
 
 
