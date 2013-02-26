@@ -516,29 +516,29 @@ describe('PageController', function() {
     });
   }
 
-    beforeEach(module('mocks.dialog'));
+  beforeEach(module('mocks.dialog'));
 
-    beforeEach(module('playgroundApp.services'));
+  beforeEach(module('playgroundApp.services'));
 
-    beforeEach(inject(function($rootScope, $injector) {
-      scope = $rootScope.$new();
-      $httpBackend = $injector.get('$httpBackend');
+  beforeEach(inject(function($rootScope, $injector) {
+    scope = $rootScope.$new();
+    $httpBackend = $injector.get('$httpBackend');
 
-      $httpBackend
-      .whenGET('/playground/getconfig')
-      .respond({
-          'PLAYGROUND_USER_CONTENT_HOST': 'localhost:9100',
-          'email': 'user_q0inuf3vs5',
-          'git_playground_url': 'http://code.google.com/p/cloud-playground/',
-          'is_admin': false,
-          'is_logged_in': false,
-          'playground_namespace': '_playground',
-      });
+    $httpBackend
+    .whenGET('/playground/getconfig')
+    .respond({
+        'PLAYGROUND_USER_CONTENT_HOST': 'localhost:9100',
+        'email': 'user_q0inuf3vs5',
+        'git_playground_url': 'http://code.google.com/p/cloud-playground/',
+        'is_admin': false,
+        'is_logged_in': false,
+        'playground_namespace': '_playground',
+    });
 
-      $httpBackend
-      .whenGET('/playground/getprojects')
-      .respond([]);
-    }));
+    $httpBackend
+    .whenGET('/playground/getprojects')
+    .respond([]);
+  }));
 
 
   describe('initialization', function() {
