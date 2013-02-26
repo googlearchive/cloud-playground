@@ -62,8 +62,9 @@ class UrlFetchTree(common.Tree):
     Returns:
       The URL Fetch response.
     """
-    url = ('https://{0}.appspot.com/playground/p/{1}/getfile/{2}'
+    url = ('https://{0}.appspot.com/_ah/mimic/file?{1}={2}&path={3}'
            .format(_config.SOURCE_CODE_APP_ID,
+                   common.config.PROJECT_ID_QUERY_PARAM,
                    self.namespace,
                    path))
     headers = {}
