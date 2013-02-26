@@ -90,7 +90,7 @@ describe('service', function() {
     }));
 
 
-    it('should not except null argument', inject(function(DoSerial) {
+    it('should not accept null argument', inject(function(DoSerial) {
       expect(DoSerial.then).toThrow();
     }));
 
