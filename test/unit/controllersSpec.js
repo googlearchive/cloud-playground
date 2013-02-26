@@ -91,15 +91,9 @@ describe('ProjectController', function() {
 
 
   beforeEach(module(function($provide) {
-  // TODO: use Browser service to set URL at start of test
-  // Browser.url('/playground/p/76/')
-
-
     // TODO: DETERMINE truth of 'there has to be a better way'
     $provide.factory('$window', function() {
       var $window = {
-        location: { replace: jasmine.createSpy(),
-                    pathname: '/playground/p/76/' },
         document: {
           createElement: jasmine.createSpy('createElement').andCallFake(function(id) {
                            return id + '-elem';
@@ -132,6 +126,10 @@ describe('ProjectController', function() {
     scope.config = {
         'PLAYGROUND_USER_CONTENT_HOST': 'localhost:9100',
     };
+    scope.projects = [
+        make_project(76),
+    ];
+
     $httpBackend = $injector.get('$httpBackend');
 
     // TODO: DETERMINE if there's a better way to test JavaScript functions which are expected to exist thanks to script tags
@@ -144,10 +142,17 @@ describe('ProjectController', function() {
     .respond(make_files_response());
 
     $httpBackend
-    .whenGET('//localhost:9100/playground/p/76/getfile/app.yaml')
+    .whenGET('//localhost:9100/_ah/mimic/file?_mimic_project=42&path=app.yaml')
+    .respond('one: two');
+
+    $httpBackend
+    .whenGET('//localhost:9100/_ah/mimic/file?_mimic_project=76&path=app.yaml')
     .respond('one: two');
   }));
 
+  beforeEach(inject(function($routeParams) {
+    $routeParams.project_id = '76';
+  }));
 
   afterEach(function() {
     flushDoSerial();
@@ -238,11 +243,10 @@ describe('ProjectController', function() {
 
     describe('url_of function', function() {
 
-      it('should return //localhost:9100/p/:project_id/getfile/:filename', inject(function($window) {
-        $window.location.pathname = '/playground/p/42/';
+      it('should return //localhost:9100/_ah/mimic/file?_mimic_project=:project_id&path=:filename', inject(function($window) {
         var png = make_file('logo.png', 'image/png');
         // TODO: DETERMINE how to avoid localhost:9100
-        expect(scope.url_of(png)).toEqual('//localhost:9100/playground/p/42/getfile/logo.png');
+        expect(scope.url_of(png)).toEqual('//localhost:9100/_ah/mimic/file?_mimic_project=76&path=logo.png');
       }));
 
     });
