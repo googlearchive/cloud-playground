@@ -50,6 +50,13 @@ class UrlFetchTree(common.Tree):
       return path + '/'
     return path
 
+  def _ToFileURL(self, path):
+    return ('https://{0}.appspot.com/_ah/mimic/file?{1}={2}&path={3}'
+            .format(_config.SOURCE_CODE_APP_ID,
+                    common.config.PROJECT_ID_QUERY_PARAM,
+                    self.namespace,
+                    path))
+
   def IsMutable(self):
     return True
 
@@ -62,11 +69,7 @@ class UrlFetchTree(common.Tree):
     Returns:
       The URL Fetch response.
     """
-    url = ('https://{0}.appspot.com/_ah/mimic/file?{1}={2}&path={3}'
-           .format(_config.SOURCE_CODE_APP_ID,
-                   common.config.PROJECT_ID_QUERY_PARAM,
-                   self.namespace,
-                   path))
+    url = _ToFileURL(path)
     headers = {}
     if common.IsDevMode():
       cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,
@@ -86,10 +89,7 @@ class UrlFetchTree(common.Tree):
     Returns:
       The URL Fetch response.
     """
-    url = ('https://{0}.appspot.com/playground/p/{1}/putfile/{2}'
-           .format(_config.SOURCE_CODE_APP_ID,
-                   self.namespace,
-                   path))
+    url = _ToFileURL(path)
     headers = {}
     if common.IsDevMode():
       cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,

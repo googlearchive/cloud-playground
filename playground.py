@@ -324,18 +324,6 @@ class GetTemplates(PlaygroundHandler):
     self.response.write(tojson(r))
 
 
-class PutFile(PlaygroundHandler):
-
-  def put(self, project_id, filename):
-    """Handles HTTP PUT requests."""
-    assert project_id
-    assert filename
-    self.tree.SetFile(path=filename, contents=self.request.body)
-
-    self.response.headers['Content-Type'] = 'text/plain'
-    self.response.write('OK')
-
-
 class MoveFile(PlaygroundHandler):
 
   def post(self, project_id, oldpath):
@@ -509,7 +497,6 @@ app = webapp2.WSGIApplication([
 
     # tree actions
     # TODO use handlers in mimic control app instead
-    ('/playground/p/(.*)/putfile/(.*)', PutFile),
     ('/playground/p/(.*)/movefile/(.*)', MoveFile),
     ('/playground/p/(.*)/deletepath/(.*)', DeletePath),
     ('/playground/p/(.*)/listfiles/?(.*)', ListFiles),

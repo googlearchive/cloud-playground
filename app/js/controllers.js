@@ -269,7 +269,8 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     }
     file.dirty = false;
     $scope.filestatus = 'Saving ' + path + ' ...';
-    return $http.put('putfile/' + encodeURI(path), file.contents, {
+    var url = $scope.url_of(file);
+    return $http.put(url, file.contents, {
                      headers: {'Content-Type': 'text/plain; charset=utf-8'}
     })
     .success(function(data, status, headers, config) {
