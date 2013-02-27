@@ -649,6 +649,67 @@ describe('PageController', function() {
 
   });
 
+  describe('big_red_button function', function() {
+    var $httpBackend, $window;
+    beforeEach(inject(function(_$httpBackend_, _$window_) {
+      $httpBackend = _$httpBackend_;
+      $window = _$window_;
+      $window.location = jasmine.createSpyObj('location', ['reload']);
+      doInit();
+      $httpBackend.expectPOST('/playground/nuke').respond();
+    }))
+
+    afterEach(function() {
+      flushDoSerial();
+    });
+
+    it('should post /playground/nuke', function() {
+      scope.big_red_button();
+      $httpBackend.flush();
+      expect(document.body.scrollTop).toBe(0);
+      // TODO: make the test bellow to pass
+      // expect($window.location.reload).toHaveBeenCalled();
+    })
+  })
+
+  describe('has_projects function', function() {
+    beforeEach(function(){doInit();})
+    it('should return false when there is no project', function() {
+      scope.projects = [];
+      expect(scope.has_projects()).toBe(false);
+    })
+    it('should return true when there are projects', function() {
+      scope.projects = [make_project(1, 12)];
+      expect(scope.has_projects()).toBe(true);
+    })
+  })
+
+  describe('delete_project function', function() {
+
+    var $httpBackend, location;
+    var project_to_delete = make_project(1,12);
+    beforeEach(inject(function(_$httpBackend_, $location) {
+      $httpBackend = _$httpBackend_;
+      location = $location;
+      doInit();
+      scope.projects = [project_to_delete, make_project(2,13)];
+      scope.project = project_to_delete;
+      $httpBackend
+	.expectPOST('/playground/p/1/delete')
+	.respond();
+    }))
+
+    it('should delete the project', function() {
+      expect(scope.project).toBe(project_to_delete);
+      scope.delete_project(project_to_delete);
+      expect(scope.projects.length).toBe(2);
+      $httpBackend.flush();
+      expect(scope.project).toBe(undefined);
+      expect(scope.projects.length).toBe(1);
+      expect(location.path()).toBe('/playground/');
+    })
+  })
+  
   describe('dialog tests', function() {
     var dialogMock;
     beforeEach(inject(function($dialog) {

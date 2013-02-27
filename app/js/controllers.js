@@ -58,12 +58,10 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
            ($scope.config && $scope.config.playground_namespace);
   };
 
-  // TODO: use window open service
   $scope.datastore_admin = function() {
     $window.open('/playground/datastore/' + $scope.namespace(), '_blank');
   };
 
-  // TODO: use window open service
   $scope.memcache_admin = function() {
     $window.open('/playground/memcache/' + $scope.namespace(), '_blank');
   };
@@ -80,7 +78,6 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     });
   };
 
-  // TODO: test
   $scope.has_projects = function() {
     for (var i in $scope.projects) {
       return true;
@@ -88,7 +85,6 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     return false;
   };
 
-  // TODO: test
   $scope.delete_project = function(project) {
     $scope.project = undefined;
     $http.post('/playground/p/' + encodeURI(project.key) + '/delete')
