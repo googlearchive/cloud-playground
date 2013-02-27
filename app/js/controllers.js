@@ -216,9 +216,9 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   // TODO: remove once file contents are returned in JSON response
   $scope.no_json_transform = function(data) { return data; };
 
-  $scope.url_of = function(file) {
+  $scope.url_of = function(control_path, file) {
    return '//' + $scope.config.PLAYGROUND_USER_CONTENT_HOST +
-          '/_ah/mimic/file' +
+          '/_ah/mimic/' + control_path +
           '?' + MIMIC_PROJECT_ID_QUERY_PARAM +
           '=' + $scope.project.key +
           '&path=' +
@@ -227,7 +227,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
 
   $scope.image_url_of = function(file) {
     return (file && $scope.is_image_mime_type(file.mime_type)) ?
-        $scope.url_of(file) : '';
+        $scope.url_of('file', file) : '';
   };
 
   // TODO: this.foo = function() {...} // for testability
@@ -236,7 +236,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
       success_cb();
       return;
     }
-    var url = $scope.url_of(file);
+    var url = $scope.url_of('file', file);
     $http.get(url, {transformResponse: $scope.no_json_transform})
     .success(function(data, status, headers, config) {
       file.contents = data;
@@ -269,7 +269,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     }
     file.dirty = false;
     $scope.filestatus = 'Saving ' + path + ' ...';
-    var url = $scope.url_of(file);
+    var url = $scope.url_of('file', file);
     return $http.put(url, file.contents, {
                      headers: {'Content-Type': 'text/plain; charset=utf-8'}
     })
@@ -469,7 +469,8 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   function delete_file(file) {
     DoSerial
     .then(function() {
-      return $http.post('deletepath/' + encodeURI(file.name))
+      var url = $scope.url_of('delete', file);
+      return $http.post(url)
       .success(function(data, status, headers, config) {
         delete $scope.files[file.name];
         $scope._select_first_file();

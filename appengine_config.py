@@ -38,7 +38,7 @@ else:
 mimic_CORS_ALLOWED_ORIGINS = ['{0}://{1}'.format(scheme, h)
                               for h in settings.PLAYGROUND_HOSTS]
 
-mimic_CORS_ALLOWED_HEADERS = 'Origin, X-XSRF-Token, X-Requested-With, Accept'
+mimic_CORS_ALLOWED_HEADERS = 'Origin, X-XSRF-Token, X-Requested-With, Accept, Content-Type'
 
 # pylint: disable-msg=C6409
 def namespace_manager_default_namespace_for_request():

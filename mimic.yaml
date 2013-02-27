@@ -11,6 +11,11 @@ handlers:
   script: playground.MimicIntercept
   secure: always
 
+# allow file deletion
+- url: /_ah/mimic/delete
+  script: playground.MimicIntercept
+  secure: always
+
 # block other mimic control requests
 - url: /_ah/mimic/.*
   script: deny.app

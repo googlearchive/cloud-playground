@@ -341,16 +341,6 @@ class MoveFile(PlaygroundHandler):
     self.tree.MoveFile(oldpath, newpath)
 
 
-class DeletePath(PlaygroundHandler):
-
-  def post(self, project_id, path):
-    """Handles HTTP POST requests."""
-    assert project_id
-    if not model.GetProject(project_id):
-      raise Exception('Project {0} does not exist'.format(project_id))
-    self.tree.DeletePath(path)
-
-
 class ListFiles(PlaygroundHandler):
 
   def get(self, project_id, path):
@@ -498,7 +488,6 @@ app = webapp2.WSGIApplication([
     # tree actions
     # TODO use handlers in mimic control app instead
     ('/playground/p/(.*)/movefile/(.*)', MoveFile),
-    ('/playground/p/(.*)/deletepath/(.*)', DeletePath),
     ('/playground/p/(.*)/listfiles/?(.*)', ListFiles),
 
     # project actions

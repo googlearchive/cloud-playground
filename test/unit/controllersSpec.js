@@ -246,7 +246,7 @@ describe('ProjectController', function() {
       it('should return //localhost:9100/_ah/mimic/file?_mimic_project=:project_id&path=:filename', inject(function($window) {
         var png = make_file('logo.png', 'image/png');
         // TODO: DETERMINE how to avoid localhost:9100
-        expect(scope.url_of(png)).toEqual('//localhost:9100/_ah/mimic/file?_mimic_project=76&path=logo.png');
+        expect(scope.url_of('file', png)).toEqual('//localhost:9100/_ah/mimic/file?_mimic_project=76&path=logo.png');
       }));
 
     });
@@ -265,7 +265,7 @@ describe('ProjectController', function() {
 
       it('should pass through to url_of() for "image/*" MIME types ', function() {
         var png = make_file('filename', 'image/png');
-        var file_url = scope.url_of(png);
+        var file_url = scope.url_of('file', png);
         expect(scope.image_url_of(png)).toBe(file_url);
       });
 
@@ -286,7 +286,7 @@ describe('ProjectController', function() {
         var file = make_file('app.yaml', 'text/x-yaml');
         expect(file.contents).toBeUndefined();
         expect(file.hasOwnProperty('contents')).toBe(false);
-        $httpBackend.expectGET(scope.url_of(file)).respond('foo: bar');
+        $httpBackend.expectGET(scope.url_of('file', file)).respond('foo: bar');
         scope._get(file, success_cb);
         $httpBackend.flush();
         expect(file.contents).toEqual('foo: bar');
@@ -314,7 +314,7 @@ describe('ProjectController', function() {
         expect(file.contents).toBeUndefined();
         expect(file.hasOwnProperty('contents')).toBe(false);
         expect(file.dirty).toBe(undefined);
-        $httpBackend.expectGET(scope.url_of(file)).respond('version: bar');
+        $httpBackend.expectGET(scope.url_of('file', file)).respond('version: bar');
         scope._get(file, success_cb);
         $httpBackend.flush();
         expect(file.contents).toEqual('version: bar');
@@ -324,7 +324,7 @@ describe('ProjectController', function() {
       it('should HTTP GET missing file contents', function() {
         var success_cb = jasmine.createSpy();
         var file = make_file('app.yaml', 'text/x-yaml');
-        $httpBackend.expectGET(scope.url_of(file)).respond('x: y');
+        $httpBackend.expectGET(scope.url_of('file', file)).respond('x: y');
         expect(file.contents).toBeUndefined();
         scope._get(file, success_cb);
         $httpBackend.flush();
