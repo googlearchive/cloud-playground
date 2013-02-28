@@ -441,7 +441,7 @@ class MimicIntercept(mimic_wsgi.Mimic):
 
   def __iter__(self):
     if common.IsDevMode():
-      logging.warn('\n' * 3)
+      logging.info('\n' * 3)
     if (os.environ['HTTP_HOST'] in settings.PLAYGROUND_HOSTS
         and os.environ['PATH_INFO'] == '/'):
       self._RedirectResponse('/playground')
