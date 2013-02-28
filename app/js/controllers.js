@@ -33,7 +33,7 @@ function RenameProjectController($scope, $log, dialog, project_name) {
 }
 
 function PageController($scope, $http, DoSerial, $routeParams, $window,
-                        $dialog, $location) {
+                        $dialog, $location, WindowService) {
 
   function getconfig() {
     return $http.get('/playground/getconfig')
@@ -68,19 +68,16 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     $window.open('/playground/memcache/' + $scope.namespace(), '_blank');
   };
 
-  // TODO: test
   $scope.big_red_button = function() {
     DoSerial
     .then(function() {
       return $http.post('/playground/nuke')
       .success(function(data, status, headers, config) {
-        document.body.scrollTop = 0;
-        $window.location.reload();
+	WindowService.reload();
       });
     });
   };
 
-  // TODO: test
   $scope.has_projects = function() {
     for (var i in $scope.projects) {
       return true;
@@ -88,7 +85,6 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     return false;
   };
 
-  // TODO: test
   $scope.delete_project = function(project) {
     $scope.project = undefined;
     $http.post('/playground/p/' + encodeURI(project.key) + '/delete')

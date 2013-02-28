@@ -16,16 +16,16 @@ function make_project(key, subsecond) {
 
 describe('HeaderController', function() {
 
-  var scope, $httpBackend, location;
+  var scope, $httpBackend, $location;
 
   beforeEach(inject(function($rootScope, $injector) {
     scope = $rootScope.$new();
     //$httpBackend = $injector.get('$httpBackend');
   }));
 
-  beforeEach(inject(function($location) {
+  beforeEach(inject(function(_$location_) {
     doInit();
-    location = $location
+    $location = _$location_
   }));
 
   function doInit() {
@@ -40,13 +40,13 @@ describe('HeaderController', function() {
   it('alreadyhome function should only return true for /playground/', function() {
     expect(typeof scope.alreadyhome).toEqual('function');
 
-    location.path('/');
+    $location.path('/');
     expect(scope.alreadyhome()).toBe(false);
-    location.path('/playground');
+    $location.path('/playground');
     expect(scope.alreadyhome()).toBe(false);
-    location.path('/playground/');
+    $location.path('/playground/');
     expect(scope.alreadyhome()).toBe(true);
-    location.path('/playground/p/42/');
+    $location.path('/playground/p/42/');
     expect(scope.alreadyhome()).toBe(false);
   });
 
@@ -649,14 +649,87 @@ describe('PageController', function() {
 
   });
 
+  describe('big_red_button function', function() {
+
+    var $httpBackend, WindowService;
+
+    beforeEach(inject(function(_$httpBackend_, _WindowService_) {
+      $httpBackend = _$httpBackend_;
+      WindowService = _WindowService_;
+      spyOn(WindowService, 'reload');
+      doInit();
+      $httpBackend.expectPOST('/playground/nuke').respond();
+    }))
+
+    afterEach(function() {
+      flushDoSerial();
+    });
+
+    it('should post /playground/nuke', function() {
+      scope.big_red_button();
+      $httpBackend.flush();
+      expect(WindowService.reload).toHaveBeenCalled();
+    })
+
+  })
+
+  describe('has_projects function', function() {
+
+    beforeEach(function(){
+      doInit();
+    })
+
+    it('should return false when there is no project', function() {
+      scope.projects = [];
+      expect(scope.has_projects()).toBe(false);
+    })
+
+    it('should return true when there are projects', function() {
+      scope.projects = [make_project(1, 12)];
+      expect(scope.has_projects()).toBe(true);
+    })
+
+  })
+
+  describe('delete_project function', function() {
+
+    var $httpBackend, $location;
+    var project_to_delete = make_project(1, 12);
+
+    beforeEach(inject(function(_$httpBackend_, _$location_) {
+      $httpBackend = _$httpBackend_;
+      $location = _$location_;
+      doInit();
+      scope.projects = [project_to_delete, make_project(2, 13)];
+      scope.project = project_to_delete;
+      $httpBackend
+	.expectPOST('/playground/p/1/delete')
+	.respond();
+    }))
+
+    it('should delete the project', function() {
+      expect(scope.project).toBe(project_to_delete);
+      scope.delete_project(project_to_delete);
+      expect(scope.projects.length).toBe(2);
+      $httpBackend.flush();
+      expect(scope.project).toBe(undefined);
+      expect(scope.projects.length).toBe(1);
+      expect($location.path()).toBe('/playground/');
+    })
+
+  })
+  
   describe('dialog tests', function() {
+
     var dialogMock;
+
     beforeEach(inject(function($dialog) {
       doInit();
       dialogMock = $dialog;
     }))
 
     describe('prompt_delete_project function', function () {
+
       var mockProject = {'name': 'test_project'};
       var title = 'Confirm project deletion';
       var msg = 'Are you sure you want to delete project "' +
@@ -684,7 +757,9 @@ describe('PageController', function() {
       })
 
     });
+
   })
+
 });
 
 
@@ -772,11 +847,11 @@ describe('MainController', function() {
 
   describe('runtime behavior', function() {
 
-    var location;
+    var $location;
 
-    beforeEach(inject(function( $location) {
+    beforeEach(inject(function(_$location_) {
       doInit();
-      location = $location;
+      $location = _$location_;
     }));
 
 
@@ -830,13 +905,13 @@ describe('MainController', function() {
         scope.projects = [make_project(14, 1), project, make_project(16, 1),
                           make_project(17, 1)];
         expect(scope.projects[1]).toEqual(make_project(15, 1));
-        expect(location.path()).toEqual('');
+        expect($location.path()).toEqual('');
         scope.select_project(project);
         flushDoSerial();
         $httpBackend.flush();
         expect(scope.projects[1]).not.toEqual(make_project(15, 1));
         expect(scope.projects[1]).toEqual(make_project(15, 2));
-        expect(location.path()).toEqual('/playground/p/15');
+        expect($location.path()).toEqual('/playground/p/15');
       });
 
     });
