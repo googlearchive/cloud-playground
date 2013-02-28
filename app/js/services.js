@@ -214,6 +214,9 @@ angular.module('playgroundApp.services', [])
       document.body.scrollTop = 0;
       $window.location.reload();
     },
+    'open': function(url, name, specs, replace) {
+      $window.open(url, name, specs, replace);
+    },
   };
   return WindowService;
 })

@@ -618,30 +618,37 @@ describe('PageController', function() {
 
     describe('link functions', function() {
 
-      beforeEach(inject(function($routeParams, $window) {
+      var WindowService;
+
+      beforeEach(inject(function($routeParams, _WindowService_) {
         $routeParams.project_id = 'some_namespace';
-        $window.open = jasmine.createSpy();
+	WindowService = _WindowService_;
+	spyOn(WindowService, 'open');
       }));
 
 
       describe('datastore_admin function', function() {
 
-        it('should open new window to /playground/datastore/some_namespace', inject(function($window) {
-          expect($window.open).not.toHaveBeenCalled();
+        it('should open new window to /playground/datastore/some_namespace',
+	   function() {
+          expect(WindowService.open).not.toHaveBeenCalled();
           scope.datastore_admin();
-          expect($window.open).toHaveBeenCalledWith('/playground/datastore/some_namespace', '_blank');
-        }));
+          expect(WindowService.open).toHaveBeenCalledWith(
+	    '/playground/datastore/some_namespace', '_blank');
+        });
 
       });
 
 
       describe('memcache_admin function', function() {
 
-        it('should open new window to /playground/memcache/some_namespace', inject(function($window) {
-          expect($window.open).not.toHaveBeenCalled();
+        it('should open new window to /playground/memcache/some_namespace',
+	   function() {
+          expect(WindowService.open).not.toHaveBeenCalled();
           scope.memcache_admin();
-          expect($window.open).toHaveBeenCalledWith('/playground/memcache/some_namespace', '_blank');
-        }));
+          expect(WindowService.open).toHaveBeenCalledWith(
+	    '/playground/memcache/some_namespace', '_blank');
+        });
 
       });
 

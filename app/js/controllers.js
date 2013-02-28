@@ -58,14 +58,12 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
            ($scope.config && $scope.config.playground_namespace);
   };
 
-  // TODO: use window open service
   $scope.datastore_admin = function() {
-    $window.open('/playground/datastore/' + $scope.namespace(), '_blank');
+    WindowService.open('/playground/datastore/' + $scope.namespace(), '_blank');
   };
 
-  // TODO: use window open service
   $scope.memcache_admin = function() {
-    $window.open('/playground/memcache/' + $scope.namespace(), '_blank');
+    WindowService.open('/playground/memcache/' + $scope.namespace(), '_blank');
   };
 
   $scope.big_red_button = function() {
