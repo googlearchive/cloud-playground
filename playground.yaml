@@ -25,3 +25,7 @@ handlers:
 - url: /playground/.*
   script: playground.app
   secure: always
+
+- url: /_ah/warmup
+  script: playground.app
+  secure: always

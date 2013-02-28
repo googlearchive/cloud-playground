@@ -427,6 +427,12 @@ class TouchProject(PlaygroundHandler):
     self.response.write(tojson(r))
 
 
+class Warmup(PlaygroundHandler):
+
+  def get(self):
+    pass
+
+
 class Nuke(PlaygroundHandler):
 
   def post(self):
@@ -490,4 +496,7 @@ app = webapp2.WSGIApplication([
     ('/playground/logout', Logout),
     ('/playground/datastore/(.*)', DatastoreRedirect),
     ('/playground/memcache/(.*)', MemcacheRedirect),
+
+    # warmup requests
+    ('/_ah/warmup', Warmup),
 ], debug=True, config=config)
