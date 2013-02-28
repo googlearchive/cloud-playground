@@ -207,12 +207,13 @@ angular.module('playgroundApp.services', [])
   return Backoff;
 })
 
-.factory('windowService', function($window) {
-  var windowService = {
+.factory('WindowService', function($window) {
+  var WindowService = {
     'reload': function() {
+      // TODO: don't access 'document' directly
       document.body.scrollTop = 0;
       $window.location.reload();
     },
   };
-  return windowService;
+  return WindowService;
 })

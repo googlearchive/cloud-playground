@@ -33,7 +33,7 @@ function RenameProjectController($scope, $log, dialog, project_name) {
 }
 
 function PageController($scope, $http, DoSerial, $routeParams, $window,
-                        $dialog, $location, windowService) {
+                        $dialog, $location, WindowService) {
 
   function getconfig() {
     return $http.get('/playground/getconfig')
@@ -73,7 +73,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     .then(function() {
       return $http.post('/playground/nuke')
       .success(function(data, status, headers, config) {
-	windowService.reload();
+	WindowService.reload();
       });
     });
   };
