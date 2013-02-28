@@ -42,6 +42,14 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     });
   };
 
+  $scope.getproject = function() {
+      var project_id = $scope.namespace();
+      return $http.get('/playground/p/' + project_id + '/getproject')
+      .success(function(data, status, headers, config) {
+          $scope.projects.push(data);
+      });
+  }
+
   function getprojects() {
     return $http.get('/playground/getprojects')
     .success(function(data, status, headers, config) {
@@ -350,13 +358,22 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     }
   }
 
+  function setcurrentproject() {
+      for (var i in $scope.projects) {
+          if ($scope.projects[i].key == $routeParams.project_id) {
+              $scope.project = $scope.projects[i];
+              return true;
+          }
+      }
+      return false;
+  }
+
   DoSerial
   .then(function() {
-    for (var i in $scope.projects) {
-      if ($scope.projects[i].key == $routeParams.project_id) {
-        $scope.project = $scope.projects[i];
-        break;
-      }
+    if (!setcurrentproject()) {
+        // project_id is not in $scope.projects
+        return $scope.getproject()
+        .then(setcurrentproject);
     }
   })
   .then($scope._list_files)

@@ -109,7 +109,7 @@ def GetProjects(user):
 
 def GetProject(project_id):
   project = PlaygroundProject.get_by_id(long(project_id),
-                                   namespace=settings.PLAYGROUND_NAMESPACE)
+                                        namespace=settings.PLAYGROUND_NAMESPACE)
   return project
 
 

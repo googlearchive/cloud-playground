@@ -295,6 +295,14 @@ class GetConfig(PlaygroundHandler):
     self.response.write(tojson(r))
 
 
+class GetProject(PlaygroundHandler):
+
+  def get(self, project_id):
+    r = self.DictOfProject(model.GetProject(project_id))
+    self.response.headers['Content-Type'] = _JSON_MIME_TYPE
+    self.response.write(tojson(r))
+
+
 class GetProjects(PlaygroundHandler):
 
   def get(self):
@@ -480,6 +488,7 @@ app = webapp2.WSGIApplication([
 
     # project actions
     ('/playground/gettemplates', GetTemplates),
+    ('/playground/p/(.*)/getproject', GetProject),
     ('/playground/getprojects', GetProjects),
     ('/playground/p/(.*)/delete', DeleteProject),
     ('/playground/p/(.*)/rename', RenameProject),
