@@ -700,7 +700,7 @@ describe('PageController', function() {
       $httpBackend = _$httpBackend_;
       $location = _$location_;
       doInit();
-      scope.projects = [project_to_delete, make_project(2,13)];
+      scope.projects = [project_to_delete, make_project(2, 13)];
       scope.project = project_to_delete;
       $httpBackend
 	.expectPOST('/playground/p/1/delete')
