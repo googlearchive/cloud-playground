@@ -650,11 +650,11 @@ describe('PageController', function() {
   });
 
   describe('big_red_button function', function() {
-    var $httpBackend, $window;
-    beforeEach(inject(function(_$httpBackend_, _$window_) {
+    var $httpBackend, windowService;
+    beforeEach(inject(function(_$httpBackend_, _windowService_) {
       $httpBackend = _$httpBackend_;
-      $window = _$window_;
-      $window.location = jasmine.createSpyObj('location', ['reload']);
+      windowService = _windowService_;
+      spyOn(windowService, 'reload');
       doInit();
       $httpBackend.expectPOST('/playground/nuke').respond();
     }))
@@ -666,9 +666,7 @@ describe('PageController', function() {
     it('should post /playground/nuke', function() {
       scope.big_red_button();
       $httpBackend.flush();
-      expect(document.body.scrollTop).toBe(0);
-      // TODO: make the test bellow to pass
-      // expect($window.location.reload).toHaveBeenCalled();
+      expect(windowService.reload).toHaveBeenCalled();
     })
   })
 

@@ -33,7 +33,7 @@ function RenameProjectController($scope, $log, dialog, project_name) {
 }
 
 function PageController($scope, $http, DoSerial, $routeParams, $window,
-                        $dialog, $location) {
+                        $dialog, $location, windowService) {
 
   function getconfig() {
     return $http.get('/playground/getconfig')
@@ -58,22 +58,22 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
            ($scope.config && $scope.config.playground_namespace);
   };
 
+  // TODO: use window open service
   $scope.datastore_admin = function() {
     $window.open('/playground/datastore/' + $scope.namespace(), '_blank');
   };
 
+  // TODO: use window open service
   $scope.memcache_admin = function() {
     $window.open('/playground/memcache/' + $scope.namespace(), '_blank');
   };
 
-  // TODO: test
   $scope.big_red_button = function() {
     DoSerial
     .then(function() {
       return $http.post('/playground/nuke')
       .success(function(data, status, headers, config) {
-        document.body.scrollTop = 0;
-        $window.location.reload();
+	windowService.reload();
       });
     });
   };

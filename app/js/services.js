@@ -206,3 +206,13 @@ angular.module('playgroundApp.services', [])
   Backoff.reset();
   return Backoff;
 })
+
+.factory('windowService', function($window) {
+  var windowService = {
+    'reload': function() {
+      document.body.scrollTop = 0;
+      $window.location.reload();
+    },
+  };
+  return windowService;
+})
