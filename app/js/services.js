@@ -45,11 +45,6 @@ angular.module('playgroundApp.services', [])
     },
   };
 
-  Alert.note('Note: This is a shared public playground.' +
-             ' Anyone can read, modify or delete your projects,'+
-             ' files and data at any time. Your private source'+
-             ' code and data are not safe here.');
-
   return Alert;
 
 })

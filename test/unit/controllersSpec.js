@@ -14,6 +14,28 @@ function make_project(key, subsecond) {
   }
 };
 
+describe('AlertController', function() {
+
+  var scope, ctrl, Alert;
+
+  beforeEach(module('playgroundApp.services'));
+
+  beforeEach(inject(function($rootScope, _Alert_, $controller) {
+    scope = $rootScope.$new();
+    ctrl = $controller(AlertController, {$scope: scope});
+    Alert = _Alert_;
+  }));
+
+  it('should show the common alert at the start', function() {
+    expect(scope.alerts).toBe(Alert.alerts);
+    expect(scope.alerts().length).toBe(1);
+    expect(scope.alerts()[0].msg).toMatch(/Note: This is a shared public/);
+    scope.closeAlert(0);
+    expect(scope.alerts().length).toBe(0);
+  });
+
+})
+
 describe('HeaderController', function() {
 
   var scope, $httpBackend, $location;
