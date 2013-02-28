@@ -324,23 +324,6 @@ class GetTemplates(PlaygroundHandler):
     self.response.write(tojson(r))
 
 
-class MoveFile(PlaygroundHandler):
-
-  def post(self, project_id, oldpath):
-    """Handles HTTP POST requests."""
-    assert project_id
-    assert oldpath
-    if not model.GetProject(project_id):
-      raise Exception('Project {0} does not exist'.format(project_id))
-    data = json.loads(self.request.body)
-    newpath = data.get('newpath')
-    assert newpath
-    if self.tree.HasFile(newpath):
-      raise error.PlaygroundError('Filename {0!r} already exists'
-                             .format(str(newpath)))
-    self.tree.MoveFile(oldpath, newpath)
-
-
 class ListFiles(PlaygroundHandler):
 
   def get(self, project_id, path):
@@ -487,7 +470,6 @@ app = webapp2.WSGIApplication([
 
     # tree actions
     # TODO use handlers in mimic control app instead
-    ('/playground/p/(.*)/movefile/(.*)', MoveFile),
     ('/playground/p/(.*)/listfiles/?(.*)', ListFiles),
 
     # project actions

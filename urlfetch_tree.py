@@ -134,11 +134,7 @@ class UrlFetchTree(common.Tree):
     Returns:
       True if the move succeeded.
     """
-    url = ('https://{0}.appspot.com/playground/p/{1}/movefile/{2}?newpath={3}'
-           .format(_config.SOURCE_CODE_APP_ID,
-                   self.namespace,
-                   path,
-                   newpath))
+    url = _ToFileURL('file', {'path': path, 'newpath': newpath})
     headers = {}
     if common.IsDevMode():
       cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,

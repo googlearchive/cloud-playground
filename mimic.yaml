@@ -16,6 +16,11 @@ handlers:
   script: playground.MimicIntercept
   secure: always
 
+# allow file rename
+- url: /_ah/mimic/move
+  script: playground.MimicIntercept
+  secure: always
+
 # block other mimic control requests
 - url: /_ah/mimic/.*
   script: deny.app

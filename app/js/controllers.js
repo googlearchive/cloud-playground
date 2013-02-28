@@ -504,11 +504,12 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     DoSerial
     .then(function() {
       var oldpath = file.name;
-      $scope.files[path] = file;
-      $scope.files[path].name = path;
       delete $scope.files[oldpath];
-      return $http.post('movefile/' + encodeURI(oldpath), {newpath: path})
+      var url = $scope.url_of('move', file) + '&newpath=' + encodeURI(path);
+      return $http.post(url)
       .success(function(data, status, headers, config) {
+        $scope.files[path] = file;
+        $scope.files[path].name = path;
         // TODO: have server send updated MIME type
         $scope.current_file = file;
       });
