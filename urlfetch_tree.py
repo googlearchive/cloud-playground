@@ -50,13 +50,13 @@ class UrlFetchTree(common.Tree):
       return path + '/'
     return path
 
-  def _ToFileURL(self, control_path, path):
-    return ('https://{0}.appspot.com/_ah/mimic/{1}?{2}={3}&path={4}'
+  def _ToFileURL(self, control_path, params):
+    params = params.copy()
+    params[common.config.PROJECT_ID_QUERY_PARAM] = self.namespace
+    return ('https://{0}.appspot.com/_ah/mimic/{1}?{2}'
             .format(_config.SOURCE_CODE_APP_ID,
                     control_path,
-                    common.config.PROJECT_ID_QUERY_PARAM,
-                    self.namespace,
-                    path))
+                    urllib.urlencode(params)))
 
   def IsMutable(self):
     return True
@@ -70,7 +70,7 @@ class UrlFetchTree(common.Tree):
     Returns:
       The URL Fetch response.
     """
-    url = _ToFileURL('file', path)
+    url = _ToFileURL('file', {'path': path})
     headers = {}
     if common.IsDevMode():
       cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,
@@ -90,7 +90,7 @@ class UrlFetchTree(common.Tree):
     Returns:
       The URL Fetch response.
     """
-    url = _ToFileURL('file', path)
+    url = _ToFileURL('file', {'path': path})
     headers = {}
     if common.IsDevMode():
       cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,
@@ -160,7 +160,7 @@ class UrlFetchTree(common.Tree):
     Returns:
       True if the delete succeeded.
     """
-    url = _ToFileURL('delete', path)
+    url = _ToFileURL('delete', {'path': path})
     headers = {}
     if common.IsDevMode():
       cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,
