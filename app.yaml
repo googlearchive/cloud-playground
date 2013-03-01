@@ -17,7 +17,6 @@ includes:
 
 # https://developers.google.com/appengine/docs/python/config/appconfig#Builtin_Handlers
 builtins:
-- admin_redirect: on
 - appstats: on
 - deferred: on
 - remote_api: on
