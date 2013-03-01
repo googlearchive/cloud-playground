@@ -19,6 +19,7 @@
 
 import httplib
 import json
+import urllib
 
 from mimic.__mimic import common
 
@@ -37,6 +38,7 @@ class UrlFetchTree(common.Tree):
   """An implementation of Tree backed by URL Fetch."""
 
   def __init__(self, namespace=''):
+    super(UrlFetchTree, self).__init__(namespace)
     self.namespace = namespace
 
   def __repr__(self):
@@ -70,7 +72,7 @@ class UrlFetchTree(common.Tree):
     Returns:
       The URL Fetch response.
     """
-    url = _ToFileURL('file', {'path': path})
+    url = self._ToFileURL('file', {'path': path})
     headers = {}
     if common.IsDevMode():
       cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,
@@ -90,7 +92,7 @@ class UrlFetchTree(common.Tree):
     Returns:
       The URL Fetch response.
     """
-    url = _ToFileURL('file', {'path': path})
+    url = self._ToFileURL('file', {'path': path})
     headers = {}
     if common.IsDevMode():
       cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,
@@ -134,7 +136,7 @@ class UrlFetchTree(common.Tree):
     Returns:
       True if the move succeeded.
     """
-    url = _ToFileURL('file', {'path': path, 'newpath': newpath})
+    url = self._ToFileURL('file', {'path': path, 'newpath': newpath})
     headers = {}
     if common.IsDevMode():
       cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,
@@ -156,7 +158,7 @@ class UrlFetchTree(common.Tree):
     Returns:
       True if the delete succeeded.
     """
-    url = _ToFileURL('delete', {'path': path})
+    url = self._ToFileURL('delete', {'path': path})
     headers = {}
     if common.IsDevMode():
       cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,
@@ -189,9 +191,7 @@ class UrlFetchTree(common.Tree):
       A list of files in the specified directory or tree.
     """
     path = self._NormalizeDirectoryPath(path)
-    url = ('https://{0}.appspot.com/playground/p/{1}/listfiles/'
-           .format(_config.SOURCE_CODE_APP_ID,
-                   self.namespace))
+    url = self._ToFileURL('dir', {})
     headers = {}
     if common.IsDevMode():
       cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,

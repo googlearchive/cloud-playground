@@ -16,7 +16,7 @@ class CachingUrlFetchTree(urlfetch_tree.UrlFetchTree):
     self.request_log_id = os.environ['REQUEST_LOG_ID']
 
   def RemoteGetFile(self, path):
-    # cached should not be used across multiple requests
+    # cache should not be used across multiple requests
     assert self.request_log_id == os.environ['REQUEST_LOG_ID']
     f = self.file_cache.get(path)
     if not f:
