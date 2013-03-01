@@ -6,6 +6,54 @@ describe('service', function() {
 
   beforeEach(module('playgroundApp.services'));
 
+  describe('Alert', function() {
+
+    var Alert;
+
+    beforeEach(inject(function(_Alert_) {
+      Alert = _Alert_;
+    }));
+
+    it('should be empty at the start', function() {
+      expect(Alert.alerts().length).toBe(0);
+    });
+
+    describe('Alert.note', function() {
+
+      it('should be able to add an alert', function() {
+	Alert.note('Test alert');
+	expect(Alert.alerts().length).toBe(1);
+	expect(Alert.alerts()[0]).toEqual({msg: 'Test alert'});
+      });
+      
+    });
+
+    describe('Alert methods', function() {
+
+      it('should be able to add and remove some alerts', function() {
+
+	var methods = ['info', 'success', 'error'];
+	var messages = ['info message', 'success message', 'error message'];
+	for (var i=0; i < methods.length; i++) {
+	  Alert[methods[i]](messages[i]);
+	}
+
+	expect(Alert.alerts().length).toBe(3);
+
+	for (var i=0; i < methods.length; i++) {
+	  expect(Alert.alerts()[i]).toEqual(
+	    {msg: messages[i], type: methods[i]});
+	}
+
+	Alert.remove_alert(1);
+	expect(Alert.alerts().length).toBe(2);
+	expect(Alert.alerts()[1]).toEqual({msg: messages[2], type: 'error'});
+
+      });
+
+    });
+
+  });
 
   describe('playgroundHttpInterceptor', function() {
 
