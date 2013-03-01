@@ -26,10 +26,13 @@ describe('AlertController', function() {
     Alert = _Alert_;
   }));
 
-  it('should show the common alert at the start', function() {
-    expect(scope.alerts).toBe(Alert.alerts);
+  it('should always show safety alert', function() {
     expect(scope.alerts().length).toBe(1);
-    expect(scope.alerts()[0].msg).toMatch(/Note: This is a shared public/);
+    expect(scope.alerts()[0].msg)
+      .toMatch(/Your private source code and data are not safe here./);
+  });
+
+  it('should be able to remove an alert', function() {
     scope.closeAlert(0);
     expect(scope.alerts().length).toBe(0);
   });
