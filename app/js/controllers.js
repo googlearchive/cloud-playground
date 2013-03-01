@@ -60,7 +60,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     .success(function(data, status, headers, config) {
       $scope.projects = data;
     });
-  };
+  }
 
   DoSerial
   .then(getconfig)
