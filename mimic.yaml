@@ -16,6 +16,11 @@ handlers:
   script: playground.MimicIntercept
   secure: always
 
+# allow directory listing
+- url: /_ah/mimic/dir
+  script: playground.MimicIntercept
+  secure: always
+
 # allow file rename
 - url: /_ah/mimic/move
   script: playground.MimicIntercept

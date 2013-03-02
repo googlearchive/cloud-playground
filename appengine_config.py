@@ -1,8 +1,7 @@
 """App Engine configuration file."""
 
-import os
+import json
 import re
-import sys
 
 from mimic.__mimic import common
 from mimic.__mimic import datastore_tree
@@ -23,6 +22,10 @@ if common.IsDevMode() or urlfetch_tree_SOURCE_CODE_APP_ID == app_id:
   mimic_CREATE_TREE_FUNC = datastore_tree.DatastoreTree
 else:
   mimic_CREATE_TREE_FUNC = caching_urlfetch_tree.CachingUrlFetchTree
+
+mimic_JSON_ENCODER = json.JSONEncoder()
+mimic_JSON_ENCODER.indent = 4
+mimic_JSON_ENCODER.sort_keys = True
 
 mimic_NAMESPACE = '_playground'
 

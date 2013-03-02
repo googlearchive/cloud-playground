@@ -1,7 +1,6 @@
 """Module containing the playground WSGI handlers."""
 
 import cgi
-import httplib
 import json
 import logging
 import os
@@ -22,7 +21,6 @@ import secret
 import settings
 import shared
 
-from google.appengine.api import app_identity
 from google.appengine.api import namespace_manager
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -298,7 +296,8 @@ class GetConfig(PlaygroundHandler):
 class GetProject(PlaygroundHandler):
 
   def get(self, project_id):
-    r = self.DictOfProject(model.GetProject(project_id))
+    project = model.GetProject(project_id)
+    r = self.DictOfProject(project)
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
 
@@ -328,24 +327,6 @@ class GetTemplates(PlaygroundHandler):
         'template_sources': template_sources,
         'templates': templates,
     }
-    self.response.headers['Content-Type'] = _JSON_MIME_TYPE
-    self.response.write(tojson(r))
-
-
-class ListFiles(PlaygroundHandler):
-
-  def get(self, project_id, path):
-    """Handles HTTP GET requests."""
-    assert project_id
-    project = model.GetProject(project_id)
-    if not project:
-      self.response.set_status(httplib.NOT_FOUND)
-      return
-    # 'path is None' means get all files recursively
-    if not path:
-      path = None
-    r = self.tree.ListDirectory(path)
-    r = [{'name': name, 'mime_type': common.GuessMimeType(name)} for name in r]
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
 
@@ -481,10 +462,6 @@ config['webapp2_extras.sessions'] = {
 app = webapp2.WSGIApplication([
     # config actions
     ('/playground/getconfig', GetConfig),
-
-    # tree actions
-    # TODO use handlers in mimic control app instead
-    ('/playground/p/(.*)/listfiles/?(.*)', ListFiles),
 
     # project actions
     ('/playground/gettemplates', GetTemplates),

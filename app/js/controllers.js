@@ -60,7 +60,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     .success(function(data, status, headers, config) {
       $scope.projects = data;
     });
-  };
+  }
 
   DoSerial
   .then(getconfig)
@@ -223,18 +223,26 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   // TODO: remove once file contents are returned in JSON response
   $scope.no_json_transform = function(data) { return data; };
 
-  $scope.url_of = function(control_path, file) {
-   return '//' + $scope.config.PLAYGROUND_USER_CONTENT_HOST +
-          '/_ah/mimic/' + control_path +
-          '?' + MIMIC_PROJECT_ID_QUERY_PARAM +
-          '=' + $scope.project.key +
-          '&path=' +
-          encodeURI(file.name);
+  function toquerystring(params) {
+      var qs = '';
+      angular.forEach(params, function(value, key) {
+          qs += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(value);
+      });
+      return qs.replace('&', '?')
+  }
+
+  $scope.url_of = function(control_path, params) {
+    var p = {};
+    p[MIMIC_PROJECT_ID_QUERY_PARAM] = $scope.project.key;
+    angular.extend(p, params);
+    var qs = toquerystring(p);
+    return '//' + $scope.config.PLAYGROUND_USER_CONTENT_HOST +
+           '/_ah/mimic/' + control_path + qs;
   };
 
   $scope.image_url_of = function(file) {
     return (file && $scope.is_image_mime_type(file.mime_type)) ?
-        $scope.url_of('file', file) : '';
+        $scope.url_of('file', {path: file.path}) : '';
   };
 
   // TODO: this.foo = function() {...} // for testability
@@ -243,7 +251,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
       success_cb();
       return;
     }
-    var url = $scope.url_of('file', file);
+    var url = $scope.url_of('file', {path: file.path});
     $http.get(url, {transformResponse: $scope.no_json_transform})
     .success(function(data, status, headers, config) {
       file.contents = data;
@@ -257,13 +265,12 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   };
 
   $scope._list_files = function() {
-    // Workaround https://github.com/angular/angular.js/issues/1761
-    var url = $browser.url() + 'listfiles';
+    var url = $scope.url_of('dir', {});
     return $http.get(url)
     .success(function(data, status, headers, config) {
       $scope.files = {};
       angular.forEach(data, function(props, i) {
-        $scope.files[props.name] = props;
+        $scope.files[props.path] = props;
       });
     });
   };
@@ -276,7 +283,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     }
     file.dirty = false;
     $scope.filestatus = 'Saving ' + path + ' ...';
-    var url = $scope.url_of('file', file);
+    var url = $scope.url_of('file', {path: file.path});
     return $http.put(url, file.contents, {
                      headers: {'Content-Type': 'text/plain; charset=utf-8'}
     })
@@ -389,7 +396,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     var file = $scope.files[path];
     if (!file) {
       file = {
-          name: path,
+          path: path,
           mime_type: 'text/plain',
           contents: '',
           dirty: false,
@@ -485,10 +492,10 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   function delete_file(file) {
     DoSerial
     .then(function() {
-      var url = $scope.url_of('delete', file);
+      var url = $scope.url_of('delete', {path: file.path});
       return $http.post(url)
       .success(function(data, status, headers, config) {
-        delete $scope.files[file.name];
+        delete $scope.files[file.path];
         $scope._select_first_file();
       });
     });
@@ -498,7 +505,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   $scope.prompt_delete_file = function(file) {
     var title = 'Confirm file deletion';
     var msg = 'Are you sure you want to delete file "' +
-              $scope.current_file.name + '"?';
+              $scope.current_file.path + '"?';
     var btns = [{result: false, label: 'Cancel'},
                 {result: true, label: 'DELETE FILE',
                  cssClass: 'btn-primary btn-danger'}];
@@ -514,18 +521,18 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
 
   // TODO: test
   function file_rename(file, path) {
-    if (!path || path == file.name) {
+    if (!path || path == file.path) {
       return;
     }
     DoSerial
     .then(function() {
-      var oldpath = file.name;
+      var oldpath = file.path;
       delete $scope.files[oldpath];
-      var url = $scope.url_of('move', file) + '&newpath=' + encodeURI(path);
+      var url = $scope.url_of('move', {path: file.path, newpath: path});
       return $http.post(url)
       .success(function(data, status, headers, config) {
         $scope.files[path] = file;
-        $scope.files[path].name = path;
+        $scope.files[path].path = path;
         // TODO: have server send updated MIME type
         $scope.current_file = file;
       });
@@ -537,7 +544,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     $dialog.dialog({
         controller: 'RenameFileController',
         templateUrl: '/playground/rename_file_modal.html',
-        resolve: {path: file.name},
+        resolve: {path: file.path},
     })
     .open().then(function(path) {
       if (!path) {
