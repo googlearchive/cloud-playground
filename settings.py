@@ -19,10 +19,10 @@ TEMPLATE_PROJECT_DIR = 'templates/'
 SKIP_EXTENSIONS = ('swp', 'pyc', 'svn')
 
 # The application where the playground IDE runs
-PLAYGROUND_APP_ID = 'fredsa-bliss'
+PLAYGROUND_APP_ID = 'try-appengine'
 
 # The application where user code runs
-EXEC_CODE_APP_ID = 'fredsa-hr'
+EXEC_CODE_APP_ID = 'shared-playground'
 
 USER_CONTENT_PREFIX = 'user-content'
 
