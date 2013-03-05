@@ -19,6 +19,7 @@
 
 import httplib
 import json
+import settings
 import urllib
 
 from mimic.__mimic import common
@@ -27,11 +28,6 @@ import shared
 
 from google.appengine.api import lib_config
 from google.appengine.api import urlfetch
-
-
-_config = lib_config.register('urlfetch_tree', {
-    'SOURCE_CODE_APP_ID': None,
-    })
 
 
 class UrlFetchTree(common.Tree):
@@ -55,8 +51,8 @@ class UrlFetchTree(common.Tree):
   def _ToFileURL(self, control_path, params):
     params = params.copy()
     params[common.config.PROJECT_ID_QUERY_PARAM] = self.namespace
-    return ('https://{0}.appspot.com/_ah/mimic/{1}?{2}'
-            .format(_config.SOURCE_CODE_APP_ID,
+    return ('https://{0}/_ah/mimic/{1}?{2}'
+            .format(settings.PLAYGROUND_USER_CONTENT_HOST,
                     control_path,
                     urllib.urlencode(params)))
 
