@@ -341,7 +341,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     });
     //$scope._editor.getScrollerElement().id = 'scroller-element';
     $scope._editor.setValue($scope.current_file.contents);
-    $scope._editor.setOption('onChange', $scope.editor_on_change);
+    $scope._editor.on('change', $scope.editor_on_change);
     $scope._editor.focus();
   }
 

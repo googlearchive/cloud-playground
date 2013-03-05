@@ -5,8 +5,8 @@ handlers:
   expiration: 10m
   secure: always
 
-- url: /codemirror/lib/util/
-  static_dir: codemirror/lib/util
+- url: /codemirror/addon/
+  static_dir: codemirror/addon
   expiration: 10m
   secure: always
 
