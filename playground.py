@@ -288,6 +288,7 @@ class GetConfig(PlaygroundHandler):
         'email': self.user.key.id(),
         'is_logged_in': bool(users.get_current_user()),
         'is_admin': bool(users.is_current_user_admin()),
+        'is_devappserver': bool(_DEV_APPSERVER),
     }
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))

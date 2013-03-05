@@ -60,8 +60,10 @@
 
           <span ng-show="config.is_admin">danger(<span class="link" ng-click="big_red_button()">big-red-button</span>)</span>
 
-          <span ng-show="config.is_admin">admin(<span class="link" ng-click="datastore_admin()" target="_blank">datastore</span>,
-                                                <span class="link" ng-click="memcache_admin()" target="_blank">memcache</span>)</span>
+          <span ng-show="config.is_admin || config.is_devappserver">
+            admin(<span class="link" ng-click="datastore_admin()" target="_blank">datastore</span>,
+                  <span class="link" ng-click="memcache_admin()" target="_blank">memcache</span>)
+          </span>
 
         </div>
       </div>
