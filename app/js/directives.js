@@ -4,6 +4,17 @@
 
 angular.module('playgroundApp.directives', [])
 
+// TODO: test
+.directive('pgVisible', function() {
+  return function(scope, iElement, iAttrs, controller) {
+    scope.$watch(iAttrs.pgVisible, function(value) {
+      iElement.css({
+        visibility: value ? 'visible' : 'hidden',
+      });
+    });
+  };
+})
+
 // TODO: DETERMINE how must of this we should test
 .directive('resizer', function(WrappedElementById) {
 
