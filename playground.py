@@ -257,7 +257,7 @@ class DatastoreRedirect(RedirectHandler):
 
   def get(self, namespace):
     if _DEV_APPSERVER:
-      url = '/_ah/admin/datastore?namespace={0}'.format(namespace)
+      url = '//localhost:8000/datastore?namespace={0}'.format(namespace)
     else:
       url = ('https://appengine.google.com/datastore/explorer'
              '?&app_id={0}&namespace={1}'
@@ -269,7 +269,7 @@ class MemcacheRedirect(RedirectHandler):
 
   def get(self, namespace):
     if _DEV_APPSERVER:
-      url = '/_ah/admin/memcache?namespace={0}'.format(namespace)
+      url = '//localhost:8000/memcache?namespace={0}'.format(namespace)
     else:
       url = ('https://appengine.google.com/memcache'
              '?&app_id={0}&namespace={1}'
