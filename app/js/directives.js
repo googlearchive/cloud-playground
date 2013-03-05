@@ -16,7 +16,7 @@ angular.module('playgroundApp.directives', [])
 })
 
 // TODO: DETERMINE how must of this we should test
-.directive('resizer', function(WrappedElementById) {
+.directive('pgResizer', function(WrappedElementById) {
 
   var downx, downy, isdown, initialheight, elem;
   var dragDiv = WrappedElementById('drag-div');
@@ -49,7 +49,7 @@ angular.module('playgroundApp.directives', [])
       isdown = true;
       downx = evt.pageX;
       downy = evt.pageY;
-      elem = WrappedElementById(attr.resizer);
+      elem = WrappedElementById(attr.pgResizer);
       initialheight = elem.prop('offsetHeight');
       dragDiv.removeClass('hidden');
       dragDiv.bind('mousemove', movefunc);
