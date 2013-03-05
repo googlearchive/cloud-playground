@@ -485,4 +485,7 @@ app = webapp2.WSGIApplication([
 
     # warmup requests
     ('/_ah/warmup', Warmup),
+
+    # backends in the dev_appserver
+    ('/_ah/start', Warmup),
 ], debug=True, config=config)

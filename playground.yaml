@@ -29,3 +29,7 @@ handlers:
 - url: /_ah/warmup
   script: playground.app
   secure: always
+
+- url: /_ah/start
+  script: playground.app
+  secure: always
