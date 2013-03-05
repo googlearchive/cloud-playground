@@ -159,7 +159,7 @@ describe('ProjectController', function() {
 
     // TODO: DETERMINE if there's a better way to test JavaScript functions which are expected to exist thanks to script tags
     $window.CodeMirror = jasmine.createSpy('CodeMirror').andReturn(
-        jasmine.createSpyObj('CodeMirror', ['getWrapperElement', 'setValue', 'setOption', 'focus'])
+      jasmine.createSpyObj('CodeMirror', ['getWrapperElement', 'setValue', 'setOption', 'focus', 'on'])
     );
 
     $httpBackend
@@ -425,7 +425,7 @@ describe('ProjectController', function() {
         scope.editor_on_change = function() {};
         expect(scope._editor).toBeUndefined();
         scope.create_editor('text/x-yaml');
-        expect(scope._editor.setOption).toHaveBeenCalledWith('onChange', scope.editor_on_change);
+        expect(scope._editor.on).toHaveBeenCalledWith('change', scope.editor_on_change);
       });
 
       it('should set editor focus', function() {
