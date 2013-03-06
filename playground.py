@@ -214,7 +214,8 @@ class PlaygroundHandler(SessionHandler):
 
   def DictOfProject(self, project):
     return {
-        'key': project.key.id(),
+        # cast to str since JavaScript doesn't support long
+        'key': str(project.key.id()),
         'name': project.project_name,
         'description': project.project_description,
         'orderby': project.orderby,
