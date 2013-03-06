@@ -5,6 +5,7 @@ angular.module('playgroundApp', [
     'playgroundApp.services',
     'playgroundApp.directives',
     'ui.bootstrap',
+    'ui',
 ])
 
 .config(function($locationProvider, $routeProvider, $httpProvider, $dialogProvider) {
@@ -33,3 +34,13 @@ angular.module('playgroundApp', [
   });
 
 })
+
+.value('ui.config', {
+  codemirror: {
+    lineNumbers: true,
+    matchBrackets: true,
+    autofocus: true,
+    undoDepth: 440, // default = 40
+  }
+});
+    

@@ -84,7 +84,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     .then(function() {
       return $http.post('/playground/nuke')
       .success(function(data, status, headers, config) {
-	WindowService.reload();
+        WindowService.reload();
       });
     });
   };
@@ -223,6 +223,8 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   // TODO: remove once file contents are returned in JSON response
   $scope.no_json_transform = function(data) { return data; };
 
+  $scope.editor_contents = '';
+
   function toquerystring(params) {
       var qs = '';
       angular.forEach(params, function(value, key) {
@@ -316,9 +318,9 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   }
 
   // TODO: test
-  $scope.editor_on_change = function(from, to, text, next) {
+  $scope.editor_on_change = function(instance, changeObj) {
     $scope.$apply(function() {
-      $scope.current_file.contents = $scope._editor.getValue();
+      $scope.current_file.contents = $scope.editor_contents;
       if ($scope.current_file.dirty) {
         return;
       }
@@ -326,25 +328,6 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
       Backoff.schedule(_save_dirty_files);
     });
   };
-
-  // TODO: consider replacing DOM maniupulation here with a directive
-  // TODO: create CodeMirror service (directives can't be injected into controller)
-  $scope.create_editor = function(mime_type) {
-    if ($scope._editor) {
-      angular.element($scope._editor.getWrapperElement()).remove();
-    }
-    $scope._editor = $window.CodeMirror(DomElementById('source-code'), {
-      mode: mime_type,
-      lineNumbers: true,
-      matchBrackets: true,
-      undoDepth: 440, // default = 40
-    });
-    //$scope._editor.getScrollerElement().id = 'scroller-element';
-    $scope._editor.setValue($scope.current_file.contents);
-    $scope._editor.on('change', $scope.editor_on_change);
-    $scope._editor.focus();
-  }
-
 
   $scope.select_file = function(file) {
     if ($scope.is_image_mime_type(file.mime_type)) {
@@ -358,7 +341,14 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
       })
       .tick() // needed when switching from source-image to editor
       .then(function() {
-        $scope.create_editor(file.mime_type);
+        $scope.editor_contents = file.contents;
+        if ($scope.codeMirror) {
+          $scope.codeMirror.focus();
+          // Remove the charset part from the mime type for CodeMirror
+          // mode detection.
+          $scope.codeMirror.setOption(
+            'mode', $scope.current_file.mime_type.split(';')[0]);
+        }
       });
     });
   };

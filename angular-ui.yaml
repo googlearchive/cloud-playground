@@ -1,0 +1,5 @@
+handlers:
+- url: /playground/lib/angular-ui/angular-ui.js
+  static_files: app/lib/angular-ui/angular-ui.js
+  upload: app/lib/angular-ui/angular-ui.js
+  secure: always

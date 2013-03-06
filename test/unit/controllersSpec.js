@@ -380,63 +380,6 @@ describe('ProjectController', function() {
 
     });
 
-
-    describe('create_editor function', function() {
-
-      it('should not not fail if $scope._editor is undefined', function() {
-        scope._editor = undefined;
-        scope.create_editor('text/plain');
-      });
-
-      it('should remove current editor from the DOM', function() {
-        scope._editor = jasmine.createSpyObj('_editor', ['getWrapperElement']);
-        var elem = document.createElement('div');
-        document.body.appendChild(elem);
-        scope._editor.getWrapperElement = jasmine.createSpy('getWrapperElement').andReturn(elem);
-        var angularElementSpy = jasmine.createSpyObj('angularElementSpy', ['remove']);
-        spyOn(angular, 'element').andCallThrough();
-        expect(angular.element).not.toHaveBeenCalled();
-        expect(elem.parentNode).toBe(document.body);
-        scope.create_editor('text/plain');
-        expect(angular.element).toHaveBeenCalledWith(elem);
-        expect(elem.parentNode).toBe(null);
-      });
-
-      it('should instantiate a new CodeMirror editor', inject(function($window) {
-        expect(scope._editor).toBeUndefined();
-        scope.create_editor('text/plain');
-        var expected_config = {
-            mode : 'text/plain',
-            lineNumbers : true,
-            matchBrackets : true,
-            undoDepth : 440
-        };
-        expect($window.CodeMirror).toHaveBeenCalledWith('source-code-elem',
-                                                        expected_config);
-      }));
-
-      it('should set editor contents', function() {
-        expect(scope._editor).toBeUndefined();
-        scope.create_editor('text/x-yaml');
-        expect(scope._editor.setValue).toHaveBeenCalledWith('one: two');
-      });
-
-      it('should set editor onChange handler', function() {
-        scope.editor_on_change = function() {};
-        expect(scope._editor).toBeUndefined();
-        scope.create_editor('text/x-yaml');
-        expect(scope._editor.on).toHaveBeenCalledWith('change', scope.editor_on_change);
-      });
-
-      it('should set editor focus', function() {
-        expect(scope._editor).toBeUndefined();
-        scope.create_editor('text/x-yaml');
-        expect(scope._editor.focus).toHaveBeenCalled();
-      });
-
-    });
-
-
     describe('select_file function', function() {
 
       describe('with "image/*" MIME types', function() {
@@ -464,10 +407,6 @@ describe('ProjectController', function() {
           return make_file('app.yaml', 'text/x-yaml', 'version: 1');
         }
 
-        beforeEach(function() {
-          scope.create_editor = jasmine.createSpy();
-        });
-
         it('should set $scope.current_file', function() {
           scope.current_file = undefined;
           scope.select_file(make_text_file());
@@ -484,10 +423,15 @@ describe('ProjectController', function() {
           expect(DoSerial.tick).toHaveBeenCalled();
         }));
 
-        it('should call $scope.create_editor(:mime_type)', function() {
+        it('should update the $scope.editor_contents and set mode', function() {
+          scope.codeMirror = jasmine.createSpyObj('codeMirror',
+                                                  ['setOption', 'focus']);
           scope.select_file(make_text_file());
           flushDoSerial();
-          expect(scope.create_editor).toHaveBeenCalledWith('text/x-yaml');
+          expect(scope.editor_contents).toBe('version: 1');
+          expect(scope.codeMirror.setOption).toHaveBeenCalledWith(
+            'mode', 'text/x-yaml');
+          expect(scope.codeMirror.focus).toHaveBeenCalled();
         });
 
       });
