@@ -3,6 +3,7 @@
 import json
 import re
 
+
 from mimic.__mimic import common
 from mimic.__mimic import datastore_tree
 from mimic.__mimic import mimic
@@ -21,6 +22,7 @@ if common.IsDevMode() or app_id == settings.PLAYGROUND_APP_ID:
 else:
   mimic_CREATE_TREE_FUNC = caching_urlfetch_tree.CachingUrlFetchTree
 
+# pylint: disable-msg=g-bad-name
 mimic_JSON_ENCODER = json.JSONEncoder()
 mimic_JSON_ENCODER.indent = 4
 mimic_JSON_ENCODER.sort_keys = True

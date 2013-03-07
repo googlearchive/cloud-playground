@@ -6,15 +6,15 @@
 function AlertController($scope, Alert) {
 
   Alert.note('Note: This is a shared public playground.' +
-             ' Anyone can read, modify or delete your projects,'+
-             ' files and data at any time. Your private source'+
+             ' Anyone can read, modify or delete your projects,' +
+             ' files and data at any time. Your private source' +
              ' code and data are not safe here.');
 
   $scope.alerts = Alert.alerts;
 
   $scope.closeAlert = function(idx) {
     Alert.remove_alert(idx);
-  }
+  };
 
 }
 
@@ -53,7 +53,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
       .success(function(data, status, headers, config) {
           $scope.projects.push(data);
       });
-  }
+  };
 
   function getprojects() {
     return $http.get('/playground/getprojects')
@@ -108,7 +108,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
       }
       $location.path('/playground/');
     });
-  }
+  };
 
   $scope.prompt_delete_project = function(project) {
     var title = 'Confirm project deletion';
@@ -230,7 +230,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
       angular.forEach(params, function(value, key) {
           qs += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(value);
       });
-      return qs.replace('&', '?')
+      return qs.replace('&', '?');
   }
 
   $scope.url_of = function(control_path, params) {

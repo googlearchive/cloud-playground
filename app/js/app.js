@@ -43,4 +43,3 @@ angular.module('playgroundApp', [
     undoDepth: 440, // default = 40
   }
 });
-    
