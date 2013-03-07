@@ -37,7 +37,7 @@ describe('AlertController', function() {
     expect(scope.alerts().length).toBe(0);
   });
 
-})
+});
 
 describe('HeaderController', function() {
 
@@ -451,12 +451,13 @@ describe('ProjectController', function() {
 
     });
 
-    describe('dialog tests', function () {
+    describe('dialog tests', function() {
       var dialogMock;
+
       beforeEach(inject(function($dialog) {
         doInit();
         dialogMock = $dialog;
-      }))
+      }));
 
       describe('prompt_new_file function', function() {
         it('should call $scope.insert_path(path)', function() {
@@ -468,7 +469,7 @@ describe('ProjectController', function() {
           dialogMock.willCloseWith('test_file.py');
           scope.prompt_new_file();
           expect(scope.insert_path).toHaveBeenCalledWith('test_file.py');
-        })
+        });
       });
 
     });
@@ -591,19 +592,18 @@ describe('PageController', function() {
 
       beforeEach(inject(function($routeParams, _WindowService_) {
         $routeParams.project_id = 'some_namespace';
-	WindowService = _WindowService_;
-	spyOn(WindowService, 'open');
+        WindowService = _WindowService_;
+        spyOn(WindowService, 'open');
       }));
 
 
       describe('datastore_admin function', function() {
 
-        it('should open new window to /playground/datastore/some_namespace',
-	   function() {
+        it('should open new window to /playground/datastore/some_namespace', function() {
           expect(WindowService.open).not.toHaveBeenCalled();
           scope.datastore_admin();
           expect(WindowService.open).toHaveBeenCalledWith(
-	    '/playground/datastore/some_namespace', '_blank');
+              '/playground/datastore/some_namespace', '_blank');
         });
 
       });
@@ -611,12 +611,11 @@ describe('PageController', function() {
 
       describe('memcache_admin function', function() {
 
-        it('should open new window to /playground/memcache/some_namespace',
-	   function() {
+        it('should open new window to /playground/memcache/some_namespace', function() {
           expect(WindowService.open).not.toHaveBeenCalled();
           scope.memcache_admin();
           expect(WindowService.open).toHaveBeenCalledWith(
-	    '/playground/memcache/some_namespace', '_blank');
+              '/playground/memcache/some_namespace', '_blank');
         });
 
       });
@@ -635,7 +634,7 @@ describe('PageController', function() {
       spyOn(WindowService, 'reload');
       doInit();
       $httpBackend.expectPOST('/playground/nuke').respond();
-    }))
+    }));
 
     afterEach(function() {
       flushDoSerial();
@@ -645,27 +644,27 @@ describe('PageController', function() {
       scope.big_red_button();
       $httpBackend.flush();
       expect(WindowService.reload).toHaveBeenCalled();
-    })
+    });
 
-  })
+  });
 
   describe('has_projects function', function() {
 
     beforeEach(function(){
       doInit();
-    })
+    });
 
     it('should return false when there is no project', function() {
       scope.projects = [];
       expect(scope.has_projects()).toBe(false);
-    })
+    });
 
     it('should return true when there are projects', function() {
       scope.projects = [make_project(1, 12)];
       expect(scope.has_projects()).toBe(true);
-    })
+    });
 
-  })
+  });
 
   describe('delete_project function', function() {
 
@@ -679,9 +678,9 @@ describe('PageController', function() {
       scope.projects = [project_to_delete, make_project(2, 13)];
       scope.project = project_to_delete;
       $httpBackend
-	.expectPOST('/playground/p/1/delete')
-	.respond();
-    }))
+      .expectPOST('/playground/p/1/delete')
+      .respond();
+    }));
 
     it('should delete the project', function() {
       expect(scope.project).toBe(project_to_delete);
@@ -691,9 +690,9 @@ describe('PageController', function() {
       expect(scope.project).toBe(undefined);
       expect(scope.projects.length).toBe(1);
       expect($location.path()).toBe('/playground/');
-    })
+    });
 
-  })
+  });
   
   describe('dialog tests', function() {
 
@@ -702,9 +701,9 @@ describe('PageController', function() {
     beforeEach(inject(function($dialog) {
       doInit();
       dialogMock = $dialog;
-    }))
+    }));
 
-    describe('prompt_delete_project function', function () {
+    describe('prompt_delete_project function', function() {
 
       var mockProject = {'name': 'test_project'};
       var title = 'Confirm project deletion';
@@ -721,7 +720,7 @@ describe('PageController', function() {
 
         scope.prompt_delete_project(mockProject);
         expect(scope.delete_project).toHaveBeenCalledWith(mockProject);
-      })
+      });
 
       it('shouldn\'t call $scope.delete_project()', function() {
         scope.delete_project = jasmine.createSpy();
@@ -730,11 +729,11 @@ describe('PageController', function() {
 
         scope.prompt_delete_project(mockProject);
         expect(scope.delete_project).not.toHaveBeenCalled();
-      })
+      });
 
     });
 
-  })
+  });
 
 });
 

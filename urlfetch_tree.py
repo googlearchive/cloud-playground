@@ -19,14 +19,13 @@
 
 import httplib
 import json
-import settings
 import urllib
 
 from mimic.__mimic import common
 
+import settings
 import shared
 
-from google.appengine.api import lib_config
 from google.appengine.api import urlfetch
 
 

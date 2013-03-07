@@ -18,7 +18,7 @@ angular.module('mocks.dialog', [])
         expected_title = title;
         expected_msg = msg;
         expected_btns = btns;
-      }
+      };
 
       dialogMock.willCloseWith = function(mockInput) {
         userInput = mockInput;
@@ -36,7 +36,7 @@ angular.module('mocks.dialog', [])
           expect(btns).toEqual(expected_btns);
         }
         return createMockDialog(userInput);
-      }
+      };
 
       dialogMock.dialog = function(arg) {
         // TODO: Check options other than controller and templateUrl
@@ -49,7 +49,7 @@ angular.module('mocks.dialog', [])
         return createMockDialog(userInput);
       };
       return dialogMock;
-    }
+    };
   };
 });
 
