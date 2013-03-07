@@ -57,4 +57,4 @@ angular.module('playgroundApp.directives', [])
     });
   };
 
-})
+});

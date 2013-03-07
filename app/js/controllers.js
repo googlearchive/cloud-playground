@@ -22,7 +22,7 @@ function HeaderController($scope, $location) {
 
   $scope.alreadyhome = function() {
     return $location.path() == '/playground/';
-  }
+  };
 
 }
 
@@ -33,7 +33,7 @@ function RenameProjectController($scope, $log, dialog, project_name) {
 
   $scope.close = function(project_name) {
     dialog.close(project_name);
-  }
+  };
 
 }
 
@@ -64,7 +64,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
 
   DoSerial
   .then(getconfig)
-  .then(getprojects)
+  .then(getprojects);
 
   $scope.namespace = function() {
     return $routeParams.project_id ||
@@ -144,7 +144,7 @@ function MainController($scope, $http, $window, $location, DoSerial) {
 
   $scope.login = function() {
     $window.location.replace('/playground/login');
-  }
+  };
 
   $scope.new_project = function(template) {
     DoSerial
@@ -181,7 +181,7 @@ function MainController($scope, $http, $window, $location, DoSerial) {
         $location.path('/playground/p/' + project.key);
       });
     });
-  }
+  };
 
 }
 
@@ -192,7 +192,7 @@ function NewFileController($scope, $log, dialog, path) {
 
   $scope.close = function(path) {
     dialog.close(path);
-  }
+  };
 
 }
 
@@ -203,13 +203,13 @@ function RenameFileController($scope, $log, dialog, path) {
 
   $scope.close = function(path) {
     dialog.close(path);
-  }
+  };
 
 }
 
 function ProjectController($scope, $browser, $http, $routeParams, $window,
-                           $dialog, $log, DoSerial, DomElementById, WrappedElementById,
-                           Backoff) {
+                           $dialog, $log, DoSerial, DomElementById,
+                           WrappedElementById, Backoff) {
 
   // keep in sync with appengine_config.py
   var MIMIC_PROJECT_ID_QUERY_PARAM = '_mimic_project';
@@ -311,7 +311,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
         DoSerial
         .then(function() {
           return _save(dirtypath);
-        })
+        });
         break;
       }
     }
@@ -358,7 +358,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
       $scope.select_file($scope.files[path]);
       break;
     }
-  }
+  };
 
   function setcurrentproject() {
       for (var i in $scope.projects) {
@@ -406,7 +406,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     .open().then(function(path) {
       if (path) {
         // remove leading and trailing slash(es)
-        path = path.replace(/^\/*(.*?)\/*$/, '$1')
+        path = path.replace(/^\/*(.*?)\/*$/, '$1');
         $scope.insert_path(path);
       }
     });
@@ -551,14 +551,14 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   $scope.popout = function() {
     _popout = true;
     _output_window = undefined;
-  }
+  };
 
   // TODO: test
   $scope.select_me = function(evt) {
     var elem = evt.srcElement;
     elem.focus();
     elem.select();
-  }
+  };
 
   // TODO: test
   $scope.run = function() {
@@ -584,6 +584,6 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
         iframe.attr('src', $scope.project.run_url);
       }
     });
-  }
+  };
 
 }

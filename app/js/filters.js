@@ -2,4 +2,4 @@
 
 /* Filters */
 
-angular.module('playgroundApp.filters', [])
+angular.module('playgroundApp.filters', []);

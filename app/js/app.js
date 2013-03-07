@@ -8,7 +8,8 @@ angular.module('playgroundApp', [
     'ui',
 ])
 
-.config(function($locationProvider, $routeProvider, $httpProvider, $dialogProvider) {
+.config(function($locationProvider, $routeProvider, $httpProvider,
+                 $dialogProvider) {
 
   $locationProvider.html5Mode(true);
 
@@ -23,7 +24,7 @@ angular.module('playgroundApp', [
   .when('/playground/p/:project_id/', {
      templateUrl: '/playground/project.html',
      controller: ProjectController,
-  })
+  });
 
   $httpProvider.responseInterceptors.push('playgroundHttpInterceptor');
 

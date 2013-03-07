@@ -97,7 +97,7 @@ angular.module('playgroundApp.services', [])
   var on_promised_satisfied = function() {
     pending_promise = undefined;
     maybe_next();
-  }
+  };
 
   var maybe_next = function() {
     if (pending_promise) return;
@@ -106,7 +106,7 @@ angular.module('playgroundApp.services', [])
     var result;
     try {
       result = work_items.shift()();
-    } catch(err) {
+    } catch (err) {
       $exceptionHandler(err);
     }
 
@@ -173,7 +173,7 @@ angular.module('playgroundApp.services', [])
 // TODO: DETERMINE if there's a better way
 .factory('Backoff', function($timeout) {
 
-  "Exponential backoff service."
+  // Exponential backoff service.
 
   var INIITAL_BACKOFF_MS = 1000;
   var backoff_ms;
@@ -214,4 +214,4 @@ angular.module('playgroundApp.services', [])
     },
   };
   return WindowService;
-})
+});
