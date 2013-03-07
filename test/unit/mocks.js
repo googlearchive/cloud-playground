@@ -49,7 +49,7 @@ angular.module('mocks.dialog', [])
         return createMockDialog(userInput);
       };
       return dialogMock;
-    };
+    }
   };
 });
 
