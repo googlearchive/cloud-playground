@@ -50,7 +50,7 @@ describe('HeaderController', function() {
 
   beforeEach(inject(function(_$location_) {
     doInit();
-    $location = _$location_
+    $location = _$location_;
   }));
 
   function doInit() {
