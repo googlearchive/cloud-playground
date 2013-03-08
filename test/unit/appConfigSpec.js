@@ -13,10 +13,11 @@ describe('app config', function() {
 
     module(function($httpProvider) {
       httpProvider = $httpProvider;
-    });
+    });
 
     inject(function() {
-      expect(httpProvider.responseInterceptors).toEqual(['playgroundHttpInterceptor']);
+      expect(httpProvider.responseInterceptors)
+        .toEqual(['playgroundHttpInterceptor']);
     });
 
   });
@@ -28,7 +29,7 @@ describe('app config', function() {
 
     module(function($locationProvider) {
       locationProvider = $locationProvider;
-    });
+    });
 
     inject(function() {
       expect(locationProvider.html5Mode()).toEqual(true);

@@ -11,8 +11,8 @@ function make_project(key, subsecond) {
       'name': 'New project name',
       'orderby': 'test@example.com-2013-01-03T01:05:32.' + subsecond,
       'run_url': 'http://localhost:9200/?_mimic_project=' + key,
-  }
-};
+  };
+}
 
 describe('AlertController', function() {
 
@@ -61,19 +61,19 @@ describe('HeaderController', function() {
     });
   }
 
+  it('alreadyhome function should only return true for /playground/',
+     function() {
+       expect(typeof scope.alreadyhome).toEqual('function');
 
-  it('alreadyhome function should only return true for /playground/', function() {
-    expect(typeof scope.alreadyhome).toEqual('function');
-
-    $location.path('/');
-    expect(scope.alreadyhome()).toBe(false);
-    $location.path('/playground');
-    expect(scope.alreadyhome()).toBe(false);
-    $location.path('/playground/');
-    expect(scope.alreadyhome()).toBe(true);
-    $location.path('/playground/p/42/');
-    expect(scope.alreadyhome()).toBe(false);
-  });
+       $location.path('/');
+       expect(scope.alreadyhome()).toBe(false);
+       $location.path('/playground');
+       expect(scope.alreadyhome()).toBe(false);
+       $location.path('/playground/');
+       expect(scope.alreadyhome()).toBe(true);
+       $location.path('/playground/p/42/');
+       expect(scope.alreadyhome()).toBe(false);
+     });
 
 });
 
@@ -97,18 +97,18 @@ describe('ProjectController', function() {
 
   function make_files_response() {
     return [
-        make_file('app.yaml',    'text/x-yaml'),
+        make_file('app.yaml', 'text/x-yaml'),
         make_file('favicon.ico', 'image/x-icon'),
-        make_file('main.py',     'text/x-python'),
+        make_file('main.py', 'text/x-python'),
     ];
   }
 
   function make_files_data() {
     return {
         // Contents of first file fetched during controller initialization
-        'app.yaml':    make_file('app.yaml',    'text/x-yaml', 'one: two', false),
+        'app.yaml': make_file('app.yaml', 'text/x-yaml', 'one: two', false),
         'favicon.ico': make_file('favicon.ico', 'image/x-icon'),
-        'main.py':     make_file('main.py',     'text/x-python'),
+        'main.py': make_file('main.py', 'text/x-python'),
     };
   }
 
@@ -120,12 +120,14 @@ describe('ProjectController', function() {
     $provide.factory('$window', function() {
       var $window = {
         document: {
-          createElement: jasmine.createSpy('createElement').andCallFake(function(id) {
-                           return id + '-elem';
-                         }),
-          getElementById: jasmine.createSpy('getElementById').andCallFake(function(id) {
-                            return findable_elements[id];
-                          }),
+          createElement: jasmine.createSpy('createElement').andCallFake(
+            function(id) {
+              return id + '-elem';
+            }),
+          getElementById: jasmine.createSpy('getElementById').andCallFake(
+            function(id) {
+              return findable_elements[id];
+            }),
         },
         navigator: {},
       };
@@ -147,7 +149,8 @@ describe('ProjectController', function() {
   beforeEach(inject(function($rootScope, $injector, $window) {
     scope = $rootScope.$new();
 
-    // TODO: extract config into service and inject into parent and child controllers
+    // TODO: extract config into service and inject into parent and
+    // child controllers
     scope.config = {
         'PLAYGROUND_USER_CONTENT_HOST': 'localhost:9100',
     };
@@ -157,9 +160,12 @@ describe('ProjectController', function() {
 
     $httpBackend = $injector.get('$httpBackend');
 
-    // TODO: DETERMINE if there's a better way to test JavaScript functions which are expected to exist thanks to script tags
+    // TODO: DETERMINE if there's a better way to test JavaScript
+    // functions which are expected to exist thanks to script tags
     $window.CodeMirror = jasmine.createSpy('CodeMirror').andReturn(
-      jasmine.createSpyObj('CodeMirror', ['getWrapperElement', 'setValue', 'setOption', 'focus', 'on'])
+      jasmine.createSpyObj(
+        'CodeMirror',
+        ['getWrapperElement', 'setValue', 'setOption', 'focus', 'on'])
     );
 
     $httpBackend
@@ -197,8 +203,10 @@ describe('ProjectController', function() {
 
   describe('initialization', function() {
 
-    // TODO: DETERMINE if there's a better way to ensure that $routeParams is populated
-    it('should set $scope.project to the project identified by $routeParams.project_id', inject(function($routeParams) {
+    // TODO: DETERMINE if there's a better way to ensure that
+    // $routeParams is populated
+    it('should set $scope.project to the project identified by ' +
+       '$routeParams.project_id', inject(function($routeParams) {
       var project = make_project(76);
       scope.projects = [make_project(17), project, make_project(13)];
       expect(scope.projects[1]).toBe(project);
@@ -207,19 +215,21 @@ describe('ProjectController', function() {
       expect(scope.project).toBe(project);
     }));
 
-    it('should call $scope._list_files()', inject(function($controller, DoSerial) {
-      spyOn(DoSerial, 'then').andCallThrough();
-      expect(DoSerial.then).not.toHaveBeenCalled();
-      doInit();
-      expect(DoSerial.then).toHaveBeenCalledWith(scope._list_files);
-    }));
+    it('should call $scope._list_files()',
+       inject(function($controller, DoSerial) {
+         spyOn(DoSerial, 'then').andCallThrough();
+         expect(DoSerial.then).not.toHaveBeenCalled();
+         doInit();
+         expect(DoSerial.then).toHaveBeenCalledWith(scope._list_files);
+       }));
 
-    it('should call $scope._select_first_file()', inject(function($controller, DoSerial) {
-      spyOn(DoSerial, 'then').andCallThrough();
-      expect(DoSerial.then).not.toHaveBeenCalled();
-      doInit();
-      expect(DoSerial.then).toHaveBeenCalledWith(scope._select_first_file);
-    }));
+    it('should call $scope._select_first_file()',
+       inject(function($controller, DoSerial) {
+         spyOn(DoSerial, 'then').andCallThrough();
+         expect(DoSerial.then).not.toHaveBeenCalled();
+         doInit();
+         expect(DoSerial.then).toHaveBeenCalledWith(scope._select_first_file);
+       }));
 
   });
 
@@ -259,7 +269,8 @@ describe('ProjectController', function() {
         expect(scope.is_image_mime_type('image')).toBe(false);
         expect(scope.is_image_mime_type('text/plain')).toBe(false);
         expect(scope.is_image_mime_type('text/png')).toBe(false);
-        expect(scope.is_image_mime_type('application/octet-stream')).toBe(false);
+        expect(scope.is_image_mime_type('application/octet-stream'))
+          .toBe(false);
       });
 
     });
@@ -267,12 +278,14 @@ describe('ProjectController', function() {
 
     describe('url_of function', function() {
 
-      it('should return //localhost:9100/_ah/mimic/file?_mimic_project=:project_id&path=:filename', inject(function($window) {
-        var png = make_file('logo.png', 'image/png');
-        // TODO: DETERMINE how to avoid localhost:9100
-        expect(scope.url_of('file', {path: png.path}))
-        .toEqual('//localhost:9100/_ah/mimic/file?_mimic_project=76&path=logo.png');
-      }));
+      it('should return //localhost:9100/_ah/mimic/file?_mimic_project=' +
+         ':project_id&path=:filename', inject(function($window) {
+           var png = make_file('logo.png', 'image/png');
+           // TODO: DETERMINE how to avoid localhost:9100
+           expect(scope.url_of('file', {path: png.path}))
+             .toEqual('//localhost:9100/_ah/mimic/file?_mimic_project=76' +
+                      '&path=logo.png');
+         }));
 
     });
 
@@ -284,15 +297,18 @@ describe('ProjectController', function() {
         expect(scope.image_url_of(null)).toEqual('');
       });
 
-      it('should return empty string for none "image/*" MIME types ', function() {
-        expect(scope.image_url_of(make_file('filename', 'text/html'))).toEqual('');
-      });
+      it('should return empty string for none "image/*" MIME types ',
+         function() {
+           expect(scope.image_url_of(make_file('filename', 'text/html')))
+             .toEqual('');
+         });
 
-      it('should pass through to url_of() for "image/*" MIME types ', function() {
-        var png = make_file('filename', 'image/png');
-        var file_url = scope.url_of('file', {path: png.path});
-        expect(scope.image_url_of(png)).toBe(file_url);
-      });
+      it('should pass through to url_of() for "image/*" MIME types ',
+         function() {
+           var png = make_file('filename', 'image/png');
+           var file_url = scope.url_of('file', {path: png.path});
+           expect(scope.image_url_of(png)).toBe(file_url);
+         });
 
     });
 
@@ -311,27 +327,29 @@ describe('ProjectController', function() {
         var file = make_file('app.yaml', 'text/x-yaml');
         expect(file.contents).toBeUndefined();
         expect(file.hasOwnProperty('contents')).toBe(false);
-        $httpBackend.expectGET(scope.url_of('file', {path: file.path})).respond('foo: bar');
+        $httpBackend.expectGET(scope.url_of('file', {path: file.path}))
+          .respond('foo: bar');
         scope._get(file, success_cb);
         $httpBackend.flush();
         expect(file.contents).toEqual('foo: bar');
         expect(success_cb).toHaveBeenCalledWith();
       });
 
-      it('should not overwrite file contents regardless of dirty flag', function() {
-        var noop = function() {};
-        var file = make_file('app.yaml', 'text/x-yaml', 'version: 1');
-        scope._get(file, noop);
-        expect(file.dirty).not.toBeDefined();
-        expect(file.hasOwnProperty('dirty')).toBe(false);
-        expect(file.contents).toEqual('version: 1');
-        file.dirty = true;
-        scope._get(file, noop);
-        expect(file.contents).toEqual('version: 1');
-        file.dirty = false;
-        scope._get(file, noop);
-        expect(file.contents).toEqual('version: 1');
-      });
+      it('should not overwrite file contents regardless of dirty flag',
+         function() {
+           var noop = function() {};
+           var file = make_file('app.yaml', 'text/x-yaml', 'version: 1');
+           scope._get(file, noop);
+           expect(file.dirty).not.toBeDefined();
+           expect(file.hasOwnProperty('dirty')).toBe(false);
+           expect(file.contents).toEqual('version: 1');
+           file.dirty = true;
+           scope._get(file, noop);
+           expect(file.contents).toEqual('version: 1');
+           file.dirty = false;
+           scope._get(file, noop);
+           expect(file.contents).toEqual('version: 1');
+         });
 
       it('should set file.dirty=false after fetching contents', function() {
         var success_cb = jasmine.createSpy();
@@ -339,7 +357,8 @@ describe('ProjectController', function() {
         expect(file.contents).toBeUndefined();
         expect(file.hasOwnProperty('contents')).toBe(false);
         expect(file.dirty).toBe(undefined);
-        $httpBackend.expectGET(scope.url_of('file', {path: file.path})).respond('version: bar');
+        $httpBackend.expectGET(scope.url_of('file', {path: file.path}))
+          .respond('version: bar');
         scope._get(file, success_cb);
         $httpBackend.flush();
         expect(file.contents).toEqual('version: bar');
@@ -349,7 +368,8 @@ describe('ProjectController', function() {
       it('should HTTP GET missing file contents', function() {
         var success_cb = jasmine.createSpy();
         var file = make_file('app.yaml', 'text/x-yaml');
-        $httpBackend.expectGET(scope.url_of('file', {path: file.path})).respond('x: y');
+        $httpBackend.expectGET(scope.url_of('file', {path: file.path}))
+          .respond('x: y');
         expect(file.contents).toBeUndefined();
         scope._get(file, success_cb);
         $httpBackend.flush();
@@ -365,18 +385,19 @@ describe('ProjectController', function() {
         return make_file('foo.txt', 'text/plain');
       }
 
-      it('should call //localhost:9100/_ah/mimic/dir?_mimic_project=:project_id', function() {
-        $httpBackend.verifyNoOutstandingRequest();
-        $httpBackend.verifyNoOutstandingExpectation();
-        expect(scope.files).toEqual(make_files_data());
-        $httpBackend
-        .expectGET('//localhost:9100/_ah/mimic/dir?_mimic_project=76')
-        .respond([make_plain_file()]);
-        scope.files = null;
-        scope._list_files();
-        $httpBackend.flush();
-        expect(scope.files).toEqual({'foo.txt': make_plain_file()});
-      });
+      it('should call //localhost:9100/_ah/mimic/dir?_mimic_project=' +
+         ':project_id', function() {
+           $httpBackend.verifyNoOutstandingRequest();
+           $httpBackend.verifyNoOutstandingExpectation();
+           expect(scope.files).toEqual(make_files_data());
+           $httpBackend
+             .expectGET('//localhost:9100/_ah/mimic/dir?_mimic_project=76')
+             .respond([make_plain_file()]);
+           scope.files = null;
+           scope._list_files();
+           $httpBackend.flush();
+           expect(scope.files).toEqual({'foo.txt': make_plain_file()});
+         });
 
     });
 
@@ -415,13 +436,14 @@ describe('ProjectController', function() {
         });
 
         // TODO: test order of calls to DoSerial functions
-        it('should call DoSerial.then() and DoSerial.tick()', inject(function(DoSerial) {
-          spyOn(DoSerial, 'then').andCallThrough();
-          spyOn(DoSerial, 'tick').andCallThrough();
-          scope.select_file(make_text_file());
-          expect(DoSerial.then).toHaveBeenCalled();
-          expect(DoSerial.tick).toHaveBeenCalled();
-        }));
+        it('should call DoSerial.then() and DoSerial.tick()',
+           inject(function(DoSerial) {
+             spyOn(DoSerial, 'then').andCallThrough();
+             spyOn(DoSerial, 'tick').andCallThrough();
+             scope.select_file(make_text_file());
+             expect(DoSerial.then).toHaveBeenCalled();
+             expect(DoSerial.tick).toHaveBeenCalled();
+           }));
 
         it('should update the $scope.editor_contents and set mode', function() {
           scope.codeMirror = jasmine.createSpyObj('codeMirror',
@@ -443,7 +465,8 @@ describe('ProjectController', function() {
       it('should call $scope.select_file(:first_file)', function() {
         doInit();
         scope.select_file = jasmine.createSpy();
-        var expected_file = make_file('app.yaml', 'text/x-yaml', 'one: two', false);
+        var expected_file = make_file('app.yaml', 'text/x-yaml', 'one: two',
+                                      false);
         expect(scope.select_file).not.toHaveBeenCalled();
         scope._select_first_file();
         expect(scope.select_file).toHaveBeenCalledWith(expected_file);
@@ -524,18 +547,19 @@ describe('PageController', function() {
     });
 
 
-    it('should, when instantiated, get configuration, then project data', function() {
-      expect(scope.config).toBeUndefined();
-      expect(scope.projects).toBeUndefined();
-      $httpBackend.expectGET('/playground/getconfig');
-      $httpBackend.expectGET('/playground/getprojects');
-      doInit();
-      expect(scope.config).toBeDefined();
-      expect(scope.config.email).toBeDefined();
-      expect(scope.config.playground_namespace).toBe('_playground');
-      expect(scope.projects).toBeDefined();
-      expect(scope.projects.length).toBe(0);
-    });
+    it('should, when instantiated, get configuration, then project data',
+       function() {
+         expect(scope.config).toBeUndefined();
+         expect(scope.projects).toBeUndefined();
+         $httpBackend.expectGET('/playground/getconfig');
+         $httpBackend.expectGET('/playground/getprojects');
+         doInit();
+         expect(scope.config).toBeDefined();
+         expect(scope.config.email).toBeDefined();
+         expect(scope.config.playground_namespace).toBe('_playground');
+         expect(scope.projects).toBeDefined();
+         expect(scope.projects.length).toBe(0);
+       });
 
   });
 
@@ -599,24 +623,26 @@ describe('PageController', function() {
 
       describe('datastore_admin function', function() {
 
-        it('should open new window to /playground/datastore/some_namespace', function() {
-          expect(WindowService.open).not.toHaveBeenCalled();
-          scope.datastore_admin();
-          expect(WindowService.open).toHaveBeenCalledWith(
-              '/playground/datastore/some_namespace', '_blank');
-        });
+        it('should open new window to /playground/datastore/some_namespace',
+           function() {
+             expect(WindowService.open).not.toHaveBeenCalled();
+             scope.datastore_admin();
+             expect(WindowService.open).toHaveBeenCalledWith(
+               '/playground/datastore/some_namespace', '_blank');
+           });
 
       });
 
 
       describe('memcache_admin function', function() {
 
-        it('should open new window to /playground/memcache/some_namespace', function() {
-          expect(WindowService.open).not.toHaveBeenCalled();
-          scope.memcache_admin();
-          expect(WindowService.open).toHaveBeenCalledWith(
-              '/playground/memcache/some_namespace', '_blank');
-        });
+        it('should open new window to /playground/memcache/some_namespace',
+           function() {
+             expect(WindowService.open).not.toHaveBeenCalled();
+             scope.memcache_admin();
+             expect(WindowService.open).toHaveBeenCalledWith(
+               '/playground/memcache/some_namespace', '_blank');
+           });
 
       });
 
@@ -650,7 +676,7 @@ describe('PageController', function() {
 
   describe('has_projects function', function() {
 
-    beforeEach(function(){
+    beforeEach(function() {
       doInit();
     });
 
@@ -693,7 +719,7 @@ describe('PageController', function() {
     });
 
   });
-  
+
   describe('dialog tests', function() {
 
     var dialogMock;
@@ -806,9 +832,11 @@ describe('MainController', function() {
       expect(scope.templates).toBeDefined();
       expect(scope.templates.template_sources.length).toBe(2);
       expect(scope.templates.template_sources[0].key).toBe('foo_key');
-      expect(scope.templates.template_sources[0].description).toBe('foo_description');
+      expect(scope.templates.template_sources[0].description)
+        .toBe('foo_description');
       expect(scope.templates.template_sources[1].key).toBe('bar_key');
-      expect(scope.templates.template_sources[1].description).toBe('bar_description');
+      expect(scope.templates.template_sources[1].description)
+        .toBe('bar_description');
       expect(scope.templates.templates).toBeDefined();
       expect(scope.templates.templates.length).toBe(1);
       expect(scope.templates.templates[0].key).toBe('boo_key');
@@ -835,7 +863,8 @@ describe('MainController', function() {
       it('should navigate to /playground/login', inject(function($window) {
         expect($window.location.replace).not.toHaveBeenCalled();
         scope.login();
-        expect($window.location.replace).toHaveBeenCalledWith('/playground/login');
+        expect($window.location.replace)
+          .toHaveBeenCalledWith('/playground/login');
         // TODO: expect(Browser.url()).toEqual(....)
       }));
 

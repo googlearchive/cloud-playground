@@ -62,7 +62,7 @@ function createMockDialog(userInput) {
 }
 
 function prettyPrint(data) {
-  return (angular.isString(data) || angular.isFunction(data) || data instanceof RegExp)
-    ? data
-    : angular.toJson(data);
+  return (angular.isString(data) ||
+          angular.isFunction(data) ||
+          data instanceof RegExp) ? data : angular.toJson(data);
 }

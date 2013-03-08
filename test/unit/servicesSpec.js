@@ -34,13 +34,13 @@ describe('service', function() {
 
         var methods = ['info', 'success', 'error'];
         var messages = ['info message', 'success message', 'error message'];
-        for (var i=0; i < methods.length; i++) {
+        for (var i = 0; i < methods.length; i++) {
           Alert[methods[i]](messages[i]);
         }
 
         expect(Alert.alerts().length).toBe(3);
 
-        for (var i=0; i < methods.length; i++) {
+        for (var i = 0; i < methods.length; i++) {
           expect(Alert.alerts()[i]).toEqual(
             {msg: messages[i], type: methods[i]});
         }
@@ -57,73 +57,79 @@ describe('service', function() {
 
   describe('playgroundHttpInterceptor', function() {
 
-    it('should return HTTP normal responses unmodified', inject(function(playgroundHttpInterceptor) {
-      // TODO: use jasmine spy instead
-      var called = false;
-      var http_promise = {
-        then: function(success_fn, error_fn) {
-          called = true;
-          // normal HTTP response
-          return success_fn('original http response');
-        }
-      };
-      expect(called).toBe(false);
-      var response = playgroundHttpInterceptor(http_promise);
-      expect(response).toEqual('original http response');
-      expect(called).toBe(true);
-    }));
+    it('should return HTTP normal responses unmodified',
+       inject(function(playgroundHttpInterceptor) {
+         // TODO: use jasmine spy instead
+         var called = false;
+         var http_promise = {
+           then: function(success_fn, error_fn) {
+             called = true;
+             // normal HTTP response
+             return success_fn('original http response');
+           }
+         };
+         expect(called).toBe(false);
+         var response = playgroundHttpInterceptor(http_promise);
+         expect(response).toEqual('original http response');
+         expect(called).toBe(true);
+       }));
 
 
-    it('should recognize and log X-Cloud-Playground-Error error repsonses', inject(function(playgroundHttpInterceptor, $log) {
-      var error_response = {
-        config: {},
-        data: 'error response body',
-        headers: function(name) { return name == 'X-Cloud-Playground-Error' ? 'True' : undefined; },
-        status: 500,
-      };
-      var http_promise = {
-        then: function(success_fn, error_fn) {
-          error_fn(error_response);
-        }
-      };
-      var response = playgroundHttpInterceptor(http_promise);
-      expect(response).toBeUndefined();
-      expect($log.error.logs.pop()).toEqual(['Error:\nerror response body']);
-      $log.assertEmpty();
-    }));
+    it('should recognize and log X-Cloud-Playground-Error error repsonses',
+       inject(function(playgroundHttpInterceptor, $log) {
+         var error_response = {
+           config: {},
+           data: 'error response body',
+           headers: function(name) {
+             return name == 'X-Cloud-Playground-Error' ? 'True' : undefined;
+           },
+           status: 500,
+         };
+         var http_promise = {
+           then: function(success_fn, error_fn) {
+             error_fn(error_response);
+           }
+         };
+         var response = playgroundHttpInterceptor(http_promise);
+         expect(response).toBeUndefined();
+         expect($log.error.logs.pop()).toEqual(['Error:\nerror response body']);
+         $log.assertEmpty();
+       }));
 
 
-    it('should log generic HTTP error repsonses', inject(function(playgroundHttpInterceptor, $log) {
-      var error_response = {
-        config: {},
-        data: 'error response body',
-        headers: function(name) { return undefined; },
-        status: 500,
-      };
-      var http_promise = {
-        then: function(success_fn, error_fn) {
-          error_fn(error_response);
-        }
-      };
-      var response = playgroundHttpInterceptor(http_promise);
-      expect(response).toBeUndefined();
-      expect($log.error.logs.pop()).toEqual(['HTTP ERROR', error_response]);
-      $log.assertEmpty();
-    }));
+    it('should log generic HTTP error repsonses',
+       inject(function(playgroundHttpInterceptor, $log) {
+         var error_response = {
+           config: {},
+           data: 'error response body',
+           headers: function(name) { return undefined; },
+           status: 500,
+         };
+         var http_promise = {
+           then: function(success_fn, error_fn) {
+             error_fn(error_response);
+           }
+         };
+         var response = playgroundHttpInterceptor(http_promise);
+         expect(response).toBeUndefined();
+         expect($log.error.logs.pop()).toEqual(['HTTP ERROR', error_response]);
+         $log.assertEmpty();
+       }));
 
 
-    it('should log raised errors', inject(function(playgroundHttpInterceptor, $log) {
-      var error_response = Error('raised error');
-      var http_promise = {
-        then: function(success_fn, error_fn) {
-          error_fn(error_response);
-        }
-      };
-      var response = playgroundHttpInterceptor(http_promise);
-      expect(response).toBeUndefined();
-      expect($log.error.logs.pop()).toEqual([error_response]);
-      $log.assertEmpty();
-    }));
+    it('should log raised errors',
+       inject(function(playgroundHttpInterceptor, $log) {
+         var error_response = Error('raised error');
+         var http_promise = {
+           then: function(success_fn, error_fn) {
+             error_fn(error_response);
+           }
+         };
+         var response = playgroundHttpInterceptor(http_promise);
+         expect(response).toBeUndefined();
+         expect($log.error.logs.pop()).toEqual([error_response]);
+         $log.assertEmpty();
+       }));
 
   });
 
@@ -150,29 +156,31 @@ describe('service', function() {
     }));
 
 
-    it('should execute tasks in order', inject(function(DoSerial, $log, $timeout) {
-      DoSerial.then(function() { $log.log(1); });
-      DoSerial.tick();
-      DoSerial
-      .then(function() { $log.log(2); })
-      .then(function() { $log.log(3); })
-      .tick()
-      .then(function() { $log.log(4); })
-      DoSerial.tick();
-      expect($log.log.logs).toEqual([[1]]);
-      $timeout.flush();
-      expect($log.log.logs).toEqual([[1], [2], [3], [4]]);
-    }));
+    it('should execute tasks in order',
+       inject(function(DoSerial, $log, $timeout) {
+         DoSerial.then(function() { $log.log(1); });
+         DoSerial.tick();
+         DoSerial
+           .then(function() { $log.log(2); })
+           .then(function() { $log.log(3); })
+           .tick()
+           .then(function() { $log.log(4); });
+         DoSerial.tick();
+         expect($log.log.logs).toEqual([[1]]);
+         $timeout.flush();
+         expect($log.log.logs).toEqual([[1], [2], [3], [4]]);
+       }));
 
 
-    it('should wait for promise to be satisfied before continuing', inject(function(DoSerial, $log, $timeout) {
-      DoSerial
-      .then(function() { return $timeout(function() { $log.log(1); }); })
-      .then(function() { $log.log(2); })
-      expect($log.log.logs).toEqual([]);
-      $timeout.flush();
-      expect($log.log.logs).toEqual([[1], [2]]);
-    }));
+    it('should wait for promise to be satisfied before continuing',
+       inject(function(DoSerial, $log, $timeout) {
+         DoSerial
+           .then(function() { return $timeout(function() { $log.log(1); }); })
+           .then(function() { $log.log(2); });
+         expect($log.log.logs).toEqual([]);
+         $timeout.flush();
+         expect($log.log.logs).toEqual([[1], [2]]);
+       }));
 
 
     xit('should accept both promises and functions', inject(function(DoSerial) {
@@ -183,15 +191,15 @@ describe('service', function() {
     it('should log and continue after synchronous exception', function() {
 
       module(function($exceptionHandlerProvider) {
-        $exceptionHandlerProvider.mode('log');
-      });
+        $exceptionHandlerProvider.mode('log');
+      });
 
       inject(function(DoSerial, $log, $exceptionHandler, $timeout) {
         expect($log.assertEmpty());
         DoSerial
-        .then(function() { $log.log(1); })
-        .then(function() { throw 'banana peel'; })
-        .then(function() { $log.log(2); })
+          .then(function() { $log.log(1); })
+          .then(function() { throw 'banana peel'; })
+          .then(function() { $log.log(2); });
         expect($exceptionHandler.errors).toEqual(['banana peel']);
         expect($log.log.logs).toEqual([[1], [2]]);
       });
@@ -201,16 +209,17 @@ describe('service', function() {
     it('should log and continue after exception in promise', function() {
 
       module(function($exceptionHandlerProvider) {
-        $exceptionHandlerProvider.mode('log');
-      });
+        $exceptionHandlerProvider.mode('log');
+      });
 
       inject(function(DoSerial, $log, $exceptionHandler, $timeout) {
         expect($log.assertEmpty());
         DoSerial
-        .then(function() { $log.log(1); })
-        .then(function() { return $timeout(function() { $log.log(2); }); })
-        .then(function() { return $timeout(function() { throw 'apple core'; }); })
-        .then(function() { $log.log(3); })
+          .then(function() { $log.log(1); })
+          .then(function() { return $timeout(function() { $log.log(2); }); })
+          .then(function() {
+            return $timeout(function() { throw 'apple core'; }); })
+          .then(function() { $log.log(3); });
         $timeout.flush();
         expect($exceptionHandler.errors).toEqual(['apple core']);
         expect($log.log.logs).toEqual([[1], [2], [3]]);
@@ -223,27 +232,31 @@ describe('service', function() {
   // TODO: DETERMINE if there's a better way to test window / document stuff
   describe('DomElementById', function() {
 
-    it('should call $window.document.getElementById(:id)', inject(function($window, DomElementById) {
-      var elem = $window.document.createElement('div');
-      elem.id = 'myid';
-      $window.document.getElementById = jasmine.createSpy('getElementById').andReturn(elem);
-      var result = DomElementById('myid');
-      expect($window.document.getElementById).toHaveBeenCalledWith('myid');
-      expect(result).toBe(elem);
-    }));
+    it('should call $window.document.getElementById(:id)',
+       inject(function($window, DomElementById) {
+         var elem = $window.document.createElement('div');
+         elem.id = 'myid';
+         $window.document.getElementById = jasmine.createSpy('getElementById')
+           .andReturn(elem);
+         var result = DomElementById('myid');
+         expect($window.document.getElementById).toHaveBeenCalledWith('myid');
+         expect(result).toBe(elem);
+       }));
 
   });
 
   describe('WrappedElementById', function() {
 
-    it('should return angular.element(:elem)', inject(function($window, WrappedElementById) {
-      var elem = $window.document.createElement('div');
-      var wrappedElem = angular.element(elem);
-      $window.document.getElementById = jasmine.createSpy('getElementById').andReturn(elem);
-      var result = WrappedElementById('myid');
-      expect($window.document.getElementById).toHaveBeenCalledWith('myid');
-      expect(result).toEqual(wrappedElem);
-    }));
+    it('should return angular.element(:elem)',
+       inject(function($window, WrappedElementById) {
+         var elem = $window.document.createElement('div');
+         var wrappedElem = angular.element(elem);
+         $window.document.getElementById = jasmine.createSpy('getElementById')
+           .andReturn(elem);
+         var result = WrappedElementById('myid');
+         expect($window.document.getElementById).toHaveBeenCalledWith('myid');
+         expect(result).toEqual(wrappedElem);
+       }));
 
   });
 
