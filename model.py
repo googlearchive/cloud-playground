@@ -8,6 +8,7 @@ import random
 from mimic.__mimic import common
 
 import codesite
+import github
 import settings
 import shared
 
@@ -29,6 +30,8 @@ _TEMPLATE_SOURCES = [
      'Python App Engine Samples'),
     ('https://google-app-engine-samples.googlecode.com/svn/trunk/python27/',
      'Python 2.7 App Engine Samples'),
+    ('https://api.github.com/users/GoogleCloudPlatform/repos',
+     'Google Cloud Platform samples on github'),
 ]
 
 
@@ -305,8 +308,11 @@ def PopulateProject(tree, template_url):
     tree: A tree object to use to retrieve files.
     template_url: The template URL to populate the project files.
   """
+  # TODO: common interface for codesite/github/filesystem
   if codesite.IsCodesiteURL(template_url):
     codesite.PopulateProjectFromCodesite(tree, template_url)
+  elif github.IsGithubURL(template_url):
+    github.PopulateProjectFromGithub(tree, template_url)
   else:
     _PopulateProjectWithTemplate(tree, template_url)
 

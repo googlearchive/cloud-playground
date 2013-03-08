@@ -3,6 +3,7 @@
 import webapp2
 
 import codesite
+import github
 import model
 import settings
 import shared
@@ -18,6 +19,8 @@ class PopulateTemplateSource(webapp2.RequestHandler):
       return model.PopulateFileSystemTemplates(template_source)
     elif codesite.IsCodesiteURL(url):
       return codesite.PopulateTemplates(template_source)
+    elif github.IsGithubURL(url):
+      return github.PopulateTemplates(template_source)
     else:
       shared.e('Unknown URL template %s' % url)
 
