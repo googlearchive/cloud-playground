@@ -49,45 +49,6 @@ angular.module('playgroundApp.services', [])
 
 })
 
-// TODO: test
-/* temporarily commented out due to failing tests
-// TODO: extend built-in $exceptionHandler rather than reimplementing our own
-.factory('$exceptionHandler', function($log, Alert) {
-
-  // borrowed from app/lib/angular/angular.js
-  function formatError(arg) {
-    if (arg instanceof Error) {
-      if (arg.stack) {
-        arg = (arg.message && arg.stack.indexOf(arg.message) === -1)
-            ? 'Error: ' + arg.message + '\n' + arg.stack
-            : arg.stack;
-      } else if (arg.sourceURL) {
-        arg = arg.message + '\n' + arg.sourceURL + ':' + arg.line;
-      }
-    }
-    return arg;
-  }
-
-  return function(exception, cause) {
-    $log.error.apply($log, arguments);
-
-    // borrowed from app/lib/angular/angular.js
-    var args = [];
-    angular.forEach(arguments, function(arg) {
-      args.push(formatError(arg));
-    });
-
-    var msg = args[0];
-    if (args.length > 1) {
-      msg += '\ncaused by:\n' + args[1];
-    }
-
-    Alert.error(msg);
-  };
-
-})
-*/
-
 // TODO: improve upon flushDoSerial(); allow one step to be executed at a time
 .factory('DoSerial', function($timeout, $log, $exceptionHandler) {
 
