@@ -15,7 +15,7 @@ import shared
 from google.appengine.api import urlfetch_errors
 
 
-_CODESITE_RE = re.compile('^https?://[^/]+.googlecode.com/.+$')
+_CODESITE_URL_RE = re.compile('^https?://[^/]+.googlecode.com/.+$')
 
 _CODESITE_DIR_FOOTER = ('<em><a href="http://code.google.com/">'
                         'Google Code</a> powered by ')
@@ -23,7 +23,7 @@ _CODESITE_DIR_PATH_RE = re.compile('<li><a href="([^"/]+/?)">[^<]+</a></li>')
 
 
 def IsCodesiteURL(url):
-  return _CODESITE_RE.match(url)
+  return _CODESITE_URL_RE.match(url)
 
 
 def _GetChildPaths(page):
