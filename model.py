@@ -84,6 +84,7 @@ class Template(ndb.Model):
   the template url as the entity key id.
   """
   name = ndb.StringProperty(indexed=False)
+  url = ndb.StringProperty(indexed=False)
   description = ndb.StringProperty(indexed=False)
   created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
   updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
@@ -247,6 +248,7 @@ def PopulateFileSystemTemplates(template_source):
     t = Template(parent=template_source.key,
                  id=os.path.join(template_dir, dirname),  # url
                  name=name,
+                 url='https://code.google.com/p/cloud-playground/source/browse?repo=bliss#git%2Ftemplates%2F' + dirname,
                  description=description)
     templates.append(t)
     ndb.put_multi(templates)

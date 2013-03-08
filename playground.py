@@ -323,6 +323,7 @@ class GetTemplates(PlaygroundHandler):
         'key': t.key.id(),
         'source_key': t.key.parent().id(),
         'name': t.name,
+        'url': t.url,
         'description': t.description,
     } for t in model.GetTemplates()]
     r = {

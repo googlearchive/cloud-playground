@@ -74,7 +74,8 @@ def PopulateTemplates(template_source):
       description = 'Sample code from {0}'.format(project_url)
       s = model.Template(parent=template_source.key,
                          id=project_url,
-                         name=c or project_url,
+                         name=c.rstrip('/') or project_url,
+                         url=project_url,
                          description=description)
       samples.append(s)
     except urlfetch_errors.Error:
