@@ -319,14 +319,12 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
 
   // TODO: test
   $scope.editor_on_change = function(instance, changeObj) {
-    $scope.$apply(function() {
-      $scope.current_file.contents = $scope.editor_contents;
-      if ($scope.current_file.dirty) {
-        return;
-      }
-      $scope.current_file.dirty = true;
-      Backoff.schedule(_save_dirty_files);
-    });
+    $scope.current_file.contents = $scope.editor_contents;
+    if ($scope.current_file.dirty) {
+      return;
+    }
+    $scope.current_file.dirty = true;
+    Backoff.schedule(_save_dirty_files);
   };
 
   $scope.select_file = function(file) {
