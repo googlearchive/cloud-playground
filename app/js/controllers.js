@@ -324,6 +324,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
       return;
     }
     $scope.current_file.dirty = true;
+    $scope.$apply(); // need to apply here for dirty mark
     Backoff.schedule(_save_dirty_files);
   };
 

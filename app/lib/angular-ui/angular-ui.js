@@ -53,9 +53,11 @@ angular.module('ui.directives')
         };
       };
 
+      var onChangeCallback = onChange(opts.onChange);
+
       deferCodeMirror = function() {
         codeMirror = CodeMirror(elm[0], opts);
-        codeMirror.on('change', onChange(opts.onChange));
+        codeMirror.on('change', onChangeCallback);
 
         for (var i = 0, n = events.length, aEvent; i < n; ++i) {
           aEvent = opts['on' + events[i].charAt(0).toUpperCase() +
@@ -84,7 +86,11 @@ angular.module('ui.directives')
         // underlying model, in the case that it is changed by
         // something else.
         ngModel.$render = function() {
+          // Temporary remove the onChange handler, and restore it back.
+          // 'Something else' here should know about the change.
+          codeMirror.off('change', onChangeCallback);
           codeMirror.setValue(ngModel.$viewValue);
+          codeMirror.on('change', onChangeCallback);
         };
         // pass codeMirror object to the scope.
         scope.codeMirror = codeMirror;
