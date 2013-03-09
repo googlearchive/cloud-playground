@@ -83,7 +83,7 @@ class GithubTemplateCollection(template_collection.TemplateCollection):
       The list files.
     """
     r = json.loads(page)
-    files = [(f['path'], f['git_url']) for f in r]
+    files = [(f['path'], f['type'], f['git_url']) for f in r]
     return files
 
   def PopulateTemplates(self):
@@ -128,7 +128,10 @@ class GithubTemplateCollection(template_collection.TemplateCollection):
       files = files[:1]
 
     rpcs = []
-    for (path, file_git_url) in files:
+    for (path, entry_type, file_git_url) in files:
+      # skip 'dir' entries
+      if entry_type != 'file':
+        continue
       rpc = shared.Fetch(file_git_url, follow_redirects=True, async=True)
       rpcs.append((file_git_url, path, rpc))
 
