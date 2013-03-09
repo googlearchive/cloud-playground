@@ -19,8 +19,11 @@ PASSWORD = None #'password'
 
 
 def get_connection():
-    return rdbms.connect(instance=CLOUDSQL_INSTANCE, database=DATABASE_NAME,
-                         user=USER_NAME, password=PASSWORD, charset='utf8')
+    if os.environ['SERVER_SOFTWARE'].startswith('Development/'):
+      return rdbms.connect(instance=CLOUDSQL_INSTANCE, database=DATABASE_NAME)
+    else:
+      return rdbms.connect(instance=CLOUDSQL_INSTANCE, database=DATABASE_NAME,
+                           user=USER_NAME, password=PASSWORD, charset='utf8')
 
 
 class MainHandler(webapp.RequestHandler):
