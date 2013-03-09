@@ -14,6 +14,10 @@ from google.appengine.api import namespace_manager
 from google.appengine.api import urlfetch
 
 
+# 10 minutes
+MEMCACHE_TIME = 3600
+
+
 def e(msg, *args, **kwargs):
   if isinstance(msg, basestring):
     msg = msg.format(*args, **kwargs)
