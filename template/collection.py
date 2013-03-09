@@ -17,7 +17,7 @@ class TemplateCollection(object):
     return False
 
   def PopulateTemplates(self):
-    """Populate gitgub templates."""
+    """Populate templates for this collection."""
     raise NotImplementedError
 
   def PopulateProjectFromTemplate(self, tree, template):
