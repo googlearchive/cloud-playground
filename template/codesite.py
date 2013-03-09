@@ -42,6 +42,8 @@ class CodesiteTemplateCollection(template_collection.TemplateCollection):
     return paths
 
   def PopulateTemplates(self):
+    # running in a task gives us automatic retries
+    assert 'HTTP_X_APPENGINE_TASKNAME' in os.environ
     baseurl = self.template_source.key.id()
     page = shared.Fetch(baseurl, follow_redirects=True).content
     candidates = self._GetChildPaths(page)

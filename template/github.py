@@ -87,6 +87,8 @@ class GithubTemplateCollection(template_collection.TemplateCollection):
     return files
 
   def PopulateTemplates(self):
+    # running in a task gives us automatic retries
+    assert 'HTTP_X_APPENGINE_TASKNAME' in os.environ
     template_source_url = self.template_source.key.id()
     matcher = _GITHUB_URL_RE.match(template_source_url)
     github_user = matcher.group(1)

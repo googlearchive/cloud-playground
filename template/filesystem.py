@@ -28,6 +28,8 @@ class FilesystemTemplateCollection(template_collection.TemplateCollection):
     super(FilesystemTemplateCollection, self).__init__(template_source)
 
   def PopulateTemplates(self):
+    # running in a task gives us automatic retries
+    assert 'HTTP_X_APPENGINE_TASKNAME' in os.environ
     templates = []
     template_dir = self.template_source.key.id()
     for dirname in os.listdir(template_dir):
