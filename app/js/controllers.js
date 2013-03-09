@@ -430,9 +430,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     evt.stopPropagation();
     hide_context_menus();
     $scope.showprojectcontextmenu = true;
-    var menuDiv = WrappedElementById('project-context-menu');
-    menuDiv.css('left', evt.pageX + 'px');
-    menuDiv.css('top', evt.pageY + 'px');
+    $scope.project_context_menu_pos = [evt.pageX, evt.pageY];
   };
 
   // TODO: test
@@ -466,15 +464,12 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   };
 
   // TODO: test
-  // TODO: avoid DOM access; use directive instead
   $scope.file_context_menu = function(evt, file) {
     evt.stopPropagation();
     hide_context_menus();
     $scope.select_file(file);
     $scope.showfilecontextmenu = true;
-    var menuDiv = WrappedElementById('file-context-menu');
-    menuDiv.css('left', evt.pageX + 'px');
-    menuDiv.css('top', evt.pageY + 'px');
+    $scope.file_context_menu_pos = [evt.pageX, evt.pageY];
   };
 
   // TODO: test

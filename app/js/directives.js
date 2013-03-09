@@ -5,6 +5,18 @@
 angular.module('playgroundApp.directives', [])
 
 // TODO: test
+.directive('pgMovable', function() {
+  return function(scope, elm, attrs, controller) {
+    scope.$watch(attrs.pgMovable, function(value) {
+      if (value) {
+        elm.css('left', value[0] + 'px');
+        elm.css('top', value[1] + 'px');
+      }
+    })
+  }
+})
+
+// TODO: test
 .directive('pgVisible', function() {
   return function(scope, iElement, iAttrs, controller) {
     scope.$watch(iAttrs.pgVisible, function(value) {
