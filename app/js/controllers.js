@@ -426,7 +426,6 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   // TODO: test
   // TODO: replace with $dialog
   $scope.project_context_menu = function(evt) {
-    // TODO: avoid DOM access; use directive instead
     evt.stopPropagation();
     hide_context_menus();
     $scope.showprojectcontextmenu = true;
