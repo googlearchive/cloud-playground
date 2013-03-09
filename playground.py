@@ -21,6 +21,8 @@ import secret
 import settings
 import shared
 
+from template import templates
+
 from google.appengine.api import namespace_manager
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -318,17 +320,17 @@ class GetTemplates(PlaygroundHandler):
     template_sources = [{
         'key': s.key.id(),
         'description': s.description,
-    } for s in model.GetTemplateSources()]
-    templates = [{
+    } for s in templates.GetTemplateSources()]
+    project_templates = [{
         'key': t.key.id(),
         'source_key': t.key.parent().id(),
         'name': t.name,
         'url': t.url,
         'description': t.description,
-    } for t in model.GetTemplates()]
+    } for t in templates.GetTemplates()]
     r = {
         'template_sources': template_sources,
-        'templates': templates,
+        'project_templates': project_templates,
     }
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
@@ -363,7 +365,7 @@ class CreateProject(PlaygroundHandler):
     namespace_manager.set_namespace(str(self.project_id))
     # set self.project so we can access self.tree
     self.project = project
-    model.PopulateProject(self.tree, template_url)
+    templates.PopulateProjectFromTemplateUrl(self.tree, template_url)
     return project
 
   def get(self):
@@ -422,7 +424,7 @@ class TouchProject(PlaygroundHandler):
 class Warmup(PlaygroundHandler):
 
   def get(self):
-    pass
+    templates.GetTemplateSources()
 
 
 class Nuke(PlaygroundHandler):

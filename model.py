@@ -1,38 +1,18 @@
 """Module containing the datastore mode and associated functions."""
 
 import json
-import logging
 import os
 import random
 
 from mimic.__mimic import common
 
-import codesite
-import github
 import settings
 import shared
 
+from template import template_collection
+
 from google.appengine.api import memcache
-from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
-
-
-_PLAYGROUND_JSON = '__playground.json'
-
-# 10 minutes
-_MEMCACHE_TIME = 3600
-
-# tuples containing templates (uri, description)
-_TEMPLATE_SOURCES = [
-    (settings.TEMPLATE_PROJECT_DIR,
-     'Playground Templates'),
-    ('https://google-app-engine-samples.googlecode.com/svn/trunk/',
-     'Python App Engine Samples'),
-    ('https://google-app-engine-samples.googlecode.com/svn/trunk/python27/',
-     'Python 2.7 App Engine Samples'),
-    ('https://api.github.com/users/GoogleCloudPlatform/repos',
-     'Google Cloud Platform samples on github'),
-]
 
 
 class Global(ndb.Model):
@@ -99,7 +79,7 @@ class Template(ndb.Model):
 
 def GetOrCreateUser(user_id):
   return PlaygroundUser.get_or_insert(user_id,
-                                 namespace=settings.PLAYGROUND_NAMESPACE)
+                                      namespace=settings.PLAYGROUND_NAMESPACE)
 
 
 def GetProjects(user):
@@ -118,10 +98,10 @@ def GetProject(project_id):
 
 
 def RenameProject(project_id, project_name):
-   project = GetProject(project_id)
-   project.project_name = project_name
-   project.put()
-   return project
+  project = GetProject(project_id)
+  project.project_name = project_name
+  project.put()
+  return project
 
 
 def TouchProject(project_id):
@@ -160,101 +140,6 @@ def GetGlobalRootEntity():
 
 def GetTemplateSource(url):
   return TemplateSource.get_by_id(url, parent=GetGlobalRootEntity().key)
-
-
-def GetTemplateSources():
-  """Get template sources."""
-  _MEMCACHE_KEY = TemplateSource.__name__
-  sources = memcache.get(_MEMCACHE_KEY, namespace=settings.PLAYGROUND_NAMESPACE)
-  if sources:
-    return sources
-  sources = TemplateSource.query(ancestor=GetGlobalRootEntity().key).fetch()
-  if not sources:
-    sources = _GetTemplateSources()
-  sources.sort(key=lambda source: source.description)
-  memcache.set(_MEMCACHE_KEY, sources, namespace=settings.PLAYGROUND_NAMESPACE,
-               time=_MEMCACHE_TIME)
-  return sources
-
-
-@ndb.transactional(xg=True)
-def _GetTemplateSources():
-  sources = []
-  for uri, description in _TEMPLATE_SOURCES:
-    key = ndb.Key(TemplateSource, uri, parent=GetGlobalRootEntity().key)
-    source = key.get()
-    # avoid race condition when multiple requests call into this method
-    if source:
-      continue
-    source = TemplateSource(key=key, description=description)
-    shared.w('adding task to populate template source {0!r}'.format(uri))
-    taskqueue.add(url='/_playground_tasks/template_source/populate',
-                  params={'key': source.key.id()})
-    sources.append(source)
-  ndb.put_multi(sources)
-  return sources
-
-
-def GetTemplates():
-  """Get templates from a given template source."""
-  _MEMCACHE_KEY = '{0}'.format(Template.__name__)
-  templates = memcache.get(_MEMCACHE_KEY,
-                           namespace=settings.PLAYGROUND_NAMESPACE)
-  if templates:
-    return templates
-  templates = (Template.query(namespace=settings.PLAYGROUND_NAMESPACE)
-               .order(Template.key).fetch())
-  templates.sort(key=lambda template: template.name.lower())
-  memcache.set(_MEMCACHE_KEY, templates,
-               namespace=settings.PLAYGROUND_NAMESPACE, time=_MEMCACHE_TIME)
-  return templates
-
-
-def GetTemplatesBySource(template_source):
-  """Get templates from a given template source."""
-  _MEMCACHE_KEY = '{0}-{1}'.format(Template.__name__,
-                                   template_source.key.id())
-  templates = memcache.get(_MEMCACHE_KEY,
-                           namespace=settings.PLAYGROUND_NAMESPACE)
-  if templates:
-    return templates
-  templates = (Template.query(ancestor=template_source.key)
-               .order(Template.key).fetch())
-  templates.sort(key=lambda template: template.name.lower())
-  memcache.set(_MEMCACHE_KEY, templates,
-               namespace=settings.PLAYGROUND_NAMESPACE, time=_MEMCACHE_TIME)
-  return templates
-
-
-def PopulateFileSystemTemplates(template_source):
-  """Populate file system templates.
-
-  Creates one template project for each top level directory in template dir.
-
-  Args:
-    template_source: The template source entity.
-  """
-  templates = []
-  template_dir = template_source.key.id()
-  for dirname in os.listdir(template_dir):
-    dirpath = os.path.join(template_dir, dirname)
-    if not os.path.isdir(dirpath):
-      continue
-    try:
-      f = open(os.path.join(dirpath, _PLAYGROUND_JSON))
-      data = json.loads(f.read())
-      name = data.get('template_name')
-      description = data.get('template_description')
-    except IOError:
-      name = dirname
-      description = dirname
-    t = Template(parent=template_source.key,
-                 id=os.path.join(template_dir, dirname),  # url
-                 name=name,
-                 url='https://code.google.com/p/cloud-playground/source/browse?repo=bliss#git%2Ftemplates%2F' + dirname,
-                 description=description)
-    templates.append(t)
-    ndb.put_multi(templates)
 
 
 def DeleteTemplates():
@@ -299,49 +184,6 @@ def CreateProject(user, template_url, project_name, project_description):
   user.projects.append(prj.key)
   user.put()
   return prj
-
-
-def PopulateProject(tree, template_url):
-  """Populate project from a template.
-
-  Args:
-    tree: A tree object to use to retrieve files.
-    template_url: The template URL to populate the project files.
-  """
-  # TODO: common interface for codesite/github/filesystem
-  if codesite.IsCodesiteURL(template_url):
-    codesite.PopulateProjectFromCodesite(tree, template_url)
-  elif github.IsGithubURL(template_url):
-    github.PopulateProjectFromGithub(tree, template_url)
-  else:
-    _PopulateProjectWithTemplate(tree, template_url)
-
-
-def _PopulateProjectWithTemplate(tree, template_url):
-  """Populate a project from a template.
-
-  Args:
-    tree: A tree object to use to retrieve files.
-    template_url: The template URL to populate the project files or None.
-  """
-  tree.Clear()
-
-  def add_files(dirname):
-    for path in os.listdir(os.path.join(template_url, dirname)):
-      if path == _PLAYGROUND_JSON:
-        continue
-      if common.GetExtension(path) in settings.SKIP_EXTENSIONS:
-        continue
-      relpath = os.path.join(dirname, path)
-      fullpath = os.path.join(template_url, dirname, path)
-      if os.path.isdir(fullpath):
-        add_files(relpath)
-      else:
-        with open(fullpath, 'rb') as f:
-          logging.info('- %s', relpath)
-          tree.SetFile(relpath, f.read())
-
-  add_files('')
 
 
 def DeleteProject(user, tree, project_id):
