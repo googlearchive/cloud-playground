@@ -9,7 +9,7 @@ from mimic.__mimic import common
 import settings
 import shared
 
-from template import template_collection
+from template import collection
 
 from google.appengine.api import memcache
 from google.appengine.ext import ndb

@@ -12,7 +12,7 @@ import model
 import settings
 import shared
 
-from . import template_collection
+from . import collection
 
 from google.appengine.api import urlfetch_errors
 
@@ -28,7 +28,7 @@ def IsValidUrl(url):
   return _CODESITE_URL_RE.match(url)
 
 
-class CodesiteTemplateCollection(template_collection.TemplateCollection):
+class CodesiteTemplateCollection(collection.TemplateCollection):
   """A class for accessing googlecode repos."""
 
   def __init__(self, template_source):

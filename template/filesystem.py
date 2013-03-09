@@ -9,7 +9,7 @@ from mimic.__mimic import common
 import model
 import settings
 
-from . import template_collection
+from . import collection
 
 from google.appengine.ext import ndb
 
@@ -21,7 +21,7 @@ def IsValidUrl(url):
   return url.startswith(settings.TEMPLATE_PROJECT_DIR)
 
 
-class FilesystemTemplateCollection(template_collection.TemplateCollection):
+class FilesystemTemplateCollection(collection.TemplateCollection):
   """A class for accessing github repos."""
 
   def __init__(self, template_source):

@@ -11,7 +11,7 @@ from mimic.__mimic import common
 import model
 import shared
 
-from . import template_collection
+from . import collection
 
 from google.appengine.api import urlfetch_errors
 
@@ -25,7 +25,7 @@ def IsValidUrl(url):
   return _GITHUB_URL_RE.match(url)
 
 
-class GithubTemplateCollection(template_collection.TemplateCollection):
+class GithubTemplateCollection(collection.TemplateCollection):
   """A class for accessing github repos."""
 
   def __init__(self, template_source):
