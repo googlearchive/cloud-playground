@@ -135,7 +135,7 @@ function MainController($scope, $http, $window, $location, DoSerial) {
   .then(function() {
     return $http.get('/playground/gettemplateprojects')
     .success(function(data, status, headers, config) {
-      $scope.templates = data;
+      $scope.template_projects = data;
     });
   })
   .then(function() {

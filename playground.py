@@ -318,21 +318,8 @@ class GetProjects(PlaygroundHandler):
 class GetTemplateProjects(PlaygroundHandler):
 
   def get(self):
-    repo_collections = [{
-        'key': s.key.id(),
-        'description': s.description,
-    } for s in templates.GetRepoCollections()]
-    template_projects = [{
-        'key': t.key.id(),
-        'repo_collection_key': t.key.parent().id(),
-        'name': t.name,
-        'url': t.url,
-        'description': t.description,
-    } for t in templates.GetTemplateProjects()]
-    r = {
-        'repo_collections': repo_collections,
-        'template_projects': template_projects,
-    }
+    r = [self.DictOfProject(p)
+         for p in templates.GetTemplateProjects()]
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
 

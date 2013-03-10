@@ -57,18 +57,9 @@ def GetRepoCollections():
 
 def GetTemplateProjects():
   """Get template projects from a given repo collection."""
-  templates = memcache.get(_MEMCACHE_KEY_TEMPLATES,
-                           namespace=settings.PLAYGROUND_NAMESPACE)
-  if templates:
-    return templates
-  templates = (model.Repo.query(namespace=settings.PLAYGROUND_NAMESPACE)
-               .order(model.Repo.key).fetch())
-  templates.sort(key=lambda template: template.name.lower())
-  memcache.set(_MEMCACHE_KEY_TEMPLATES,
-               templates,
-               namespace=settings.PLAYGROUND_NAMESPACE,
-               time=shared.MEMCACHE_TIME)
-  return templates
+  user = model.GetAnonymousUser()
+  projects = model.GetProjects(user)
+  return projects
 
 
 @ndb.transactional(xg=True)

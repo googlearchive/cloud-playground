@@ -786,16 +786,7 @@ describe('MainController', function() {
 
     $httpBackend
     .whenGET('/playground/gettemplateprojects')
-    .respond({
-        'repo_collections': [
-          { 'key': 'foo_key', 'description': 'foo_description' },
-          { 'key': 'bar_key', 'description': 'bar_description' },
-        ],
-        'templates': [
-          { 'key': 'boo_key', 'description': 'boo_description',
-            'name': 'boo_name', 'repo_collection_key': 'boo_source_key' },
-        ]
-    });
+    .respond([make_project(89), make_project(91)]);
 
     $httpBackend
     .whenGET('/playground/getprojects')
@@ -825,25 +816,14 @@ describe('MainController', function() {
       expect(scope.loaded).toBe(true);
     });
 
-    it('should get templates', function() {
-      expect(scope.templates).toBeUndefined();
+    it('should get template projects', function() {
+      expect(scope.template_projects).toBeUndefined();
       $httpBackend.expectGET('/playground/gettemplateprojects');
       doInit();
-      expect(scope.templates).toBeDefined();
-      expect(scope.templates.repo_collections.length).toBe(2);
-      expect(scope.templates.repo_collections[0].key).toBe('foo_key');
-      expect(scope.templates.repo_collections[0].description)
-        .toBe('foo_description');
-      expect(scope.templates.repo_collections[1].key).toBe('bar_key');
-      expect(scope.templates.repo_collections[1].description)
-        .toBe('bar_description');
-      expect(scope.templates.templates).toBeDefined();
-      expect(scope.templates.templates.length).toBe(1);
-      expect(scope.templates.templates[0].key).toBe('boo_key');
-      expect(scope.templates.templates[0].description).toBe('boo_description');
-      expect(scope.templates.templates[0].name).toBe('boo_name');
-      expect(scope.templates.templates[0].repo_collection_key)
-        .toBe('boo_source_key');
+      expect(scope.template_projects).toBeDefined();
+      expect(scope.template_projects.length).toBe(2);
+      expect(scope.template_projects[0]).toEqual(make_project(89))
+      expect(scope.template_projects[1]).toEqual(make_project(91))
     });
 
   });
@@ -882,10 +862,10 @@ describe('MainController', function() {
 
       it('should call /playground/createproject', inject(function() {
         expect(scope.projects).toBeDefined();
-        expect(scope.templates.templates).toBeDefined();
-        expect(scope.templates.templates.length).toBeGreaterThan(0);
+        expect(scope.template_projects).toBeDefined();
+        expect(scope.template_projects.length).toBeGreaterThan(0);
         $httpBackend.expectPOST('/playground/createproject');
-        scope.new_project(scope.templates.templates[0]);
+        scope.new_project(scope.template_projects[0]);
         flushDoSerial();
         $httpBackend.flush();
         expect(scope.projects.length).toBe(1);
