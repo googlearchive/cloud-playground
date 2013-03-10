@@ -2,7 +2,6 @@
 
 import base64
 import json
-import os
 import re
 import sys
 import traceback
@@ -88,8 +87,7 @@ class GithubRepoCollection(collection.RepoCollection):
     return files
 
   def PopulateTemplates(self):
-    # running in a task gives us automatic retries
-    assert 'HTTP_X_APPENGINE_TASKNAME' in os.environ
+    shared.EnsureRunningInTask()  # gives us automatic retries
     repo_collection_url = self.repo_collection.key.id()
     matcher = _GITHUB_URL_RE.match(repo_collection_url)
     github_user = matcher.group(1)

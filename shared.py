@@ -2,6 +2,7 @@
 
 import httplib
 import logging
+import os
 
 from mimic.__mimic import common
 from mimic.__mimic import mimic
@@ -28,6 +29,16 @@ def w(msg, *args, **kwargs):
   if isinstance(msg, basestring):
     msg = msg.format(*args, **kwargs)
   logging.warning('##### {0}'.format(repr(msg)))
+
+
+def EnsureRunningInTask():
+  """Ensures that we're currently executing inside a task.
+
+  If not, raise a RuntimeError.
+  """
+  if 'HTTP_X_APPENGINE_TASKNAME' in os.environ:
+    return
+  raise RuntimeError('Not executing in a task queue')
 
 
 def Fetch(url, follow_redirects=False, async=False):

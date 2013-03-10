@@ -8,6 +8,7 @@ from mimic.__mimic import common
 
 import model
 import settings
+import shared
 
 from . import collection
 
@@ -28,8 +29,7 @@ class FilesystemRepoCollection(collection.RepoCollection):
     super(FilesystemRepoCollection, self).__init__(repo_collection)
 
   def PopulateTemplates(self):
-    # running in a task gives us automatic retries
-    assert 'HTTP_X_APPENGINE_TASKNAME' in os.environ
+    shared.EnsureRunningInTask()  # gives us automatic retries
     templates = []
     template_dir = self.repo_collection.key.id()  # repo_collection_url
     for dirname in os.listdir(template_dir):

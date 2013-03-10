@@ -1,5 +1,7 @@
 """Class representing a code repository."""
 
+import os
+
 
 class RepoCollection(object):
   """An abstract base class for accessing a collection of code repositories."""
