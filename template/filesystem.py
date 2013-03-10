@@ -21,11 +21,11 @@ def IsValidUrl(url):
   return url.startswith(settings.TEMPLATE_PROJECT_DIR)
 
 
-class FilesystemTemplateCollection(collection.TemplateCollection):
-  """A class for accessing github repos."""
+class FilesystemRepoCollection(collection.RepoCollection):
+  """A class for accessing file system code repositories."""
 
   def __init__(self, repo_collection):
-    super(FilesystemTemplateCollection, self).__init__(repo_collection)
+    super(FilesystemRepoCollection, self).__init__(repo_collection)
 
   def PopulateTemplates(self):
     # running in a task gives us automatic retries

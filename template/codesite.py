@@ -28,11 +28,11 @@ def IsValidUrl(url):
   return _CODESITE_URL_RE.match(url)
 
 
-class CodesiteTemplateCollection(collection.TemplateCollection):
-  """A class for accessing googlecode repos."""
+class CodesiteRepoCollection(collection.RepoCollection):
+  """A class for accessing googlecode code repositories."""
 
   def __init__(self, repo_collection):
-    super(CodesiteTemplateCollection, self).__init__(repo_collection)
+    super(CodesiteRepoCollection, self).__init__(repo_collection)
 
   def _GetChildPaths(self, page):
     if _CODESITE_DIR_FOOTER not in page:

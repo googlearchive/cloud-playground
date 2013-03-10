@@ -1,8 +1,8 @@
 """Class representing a code repository."""
 
 
-class TemplateCollection(object):
-  """An abstract base class for accessing a tree of files."""
+class RepoCollection(object):
+  """An abstract base class for accessing a collection of code repositories."""
 
   def __init__(self, repo_collection):
     """Constructor.

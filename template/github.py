@@ -26,11 +26,11 @@ def IsValidUrl(url):
   return _GITHUB_URL_RE.match(url)
 
 
-class GithubTemplateCollection(collection.TemplateCollection):
-  """A class for accessing github repos."""
+class GithubRepoCollection(collection.RepoCollection):
+  """A class for accessing github code repositories."""
 
   def __init__(self, repo_collection):
-    super(GithubTemplateCollection, self).__init__(repo_collection)
+    super(GithubRepoCollection, self).__init__(repo_collection)
 
   def _IsAppEnginePythonRepo(self, name):
     """Determine whether the given repo name is an App Engine Python project.

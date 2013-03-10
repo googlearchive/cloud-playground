@@ -94,11 +94,11 @@ def _GetRepoCollections():
 def GetCollection(repo_collection_url):
   repo_collection = model.GetRepoCollection(repo_collection_url)
   if filesystem.IsValidUrl(repo_collection_url):
-    return filesystem.FilesystemTemplateCollection(repo_collection)
+    return filesystem.FilesystemRepoCollection(repo_collection)
   elif codesite.IsValidUrl(repo_collection_url):
-    return codesite.CodesiteTemplateCollection(repo_collection)
+    return codesite.CodesiteRepoCollection(repo_collection)
   elif github.IsValidUrl(repo_collection_url):
-    return github.GithubTemplateCollection(repo_collection)
+    return github.GithubRepoCollection(repo_collection)
   else:
     raise ValueError('Unknown repo collection URL {0}'
                      .format(repo_collection_url))
