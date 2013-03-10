@@ -14,7 +14,7 @@ from . import github
 
 
 # tuples containing templates (uri, description)
-TEMPLATE_SOURCES = [
+REPO_COLLECTIONS = [
     (settings.TEMPLATE_PROJECT_DIR,
      'Playground Templates'),
     ('https://google-app-engine-samples.googlecode.com/svn/trunk/',
@@ -25,30 +25,30 @@ TEMPLATE_SOURCES = [
      'Google Cloud Platform samples on github'),
 ]
 
-_MEMCACHE_KEY_TEMPLATE_SOURCES = '{0}'.format(model.TemplateSource.__name__)
+_MEMCACHE_KEY_REPO_COLLECTIONS = '{0}'.format(model.RepoCollection.__name__)
 
 _MEMCACHE_KEY_TEMPLATES = '{0}'.format(model.Template.__name__)
 
 
 def ClearCache():
   # TODO: determine why the just deleting our keys is insufficient:
-  # memcache.delete_multi(keys=[_MEMCACHE_KEY_TEMPLATE_SOURCES,
+  # memcache.delete_multi(keys=[_MEMCACHE_KEY_REPO_COLLECTIONS,
   #                       _MEMCACHE_KEY_TEMPLATES])
   memcache.flush_all()
 
 
-def GetTemplateSources():
-  """Get template sources."""
-  sources = memcache.get(_MEMCACHE_KEY_TEMPLATE_SOURCES,
+def GetRepoCollections():
+  """Get repo collections."""
+  sources = memcache.get(_MEMCACHE_KEY_REPO_COLLECTIONS,
                          namespace=settings.PLAYGROUND_NAMESPACE)
   if sources:
     return sources
-  query = model.TemplateSource.query(ancestor=model.GetGlobalRootEntity().key)
+  query = model.RepoCollection.query(ancestor=model.GetGlobalRootEntity().key)
   sources = query.fetch()
   if not sources:
-    sources = _GetTemplateSources()
+    sources = _GetRepoCollections()
   sources.sort(key=lambda source: source.description)
-  memcache.set(_MEMCACHE_KEY_TEMPLATE_SOURCES,
+  memcache.set(_MEMCACHE_KEY_REPO_COLLECTIONS,
                sources,
                namespace=settings.PLAYGROUND_NAMESPACE,
                time=shared.MEMCACHE_TIME)
@@ -56,7 +56,7 @@ def GetTemplateSources():
 
 
 def GetTemplates():
-  """Get templates from a given template source."""
+  """Get templates from a given repo collection."""
   templates = memcache.get(_MEMCACHE_KEY_TEMPLATES,
                            namespace=settings.PLAYGROUND_NAMESPACE)
   if templates:
@@ -72,35 +72,36 @@ def GetTemplates():
 
 
 @ndb.transactional(xg=True)
-def _GetTemplateSources():
+def _GetRepoCollections():
   sources = []
-  for uri, description in TEMPLATE_SOURCES:
-    key = ndb.Key(model.TemplateSource,
+  for uri, description in REPO_COLLECTIONS:
+    key = ndb.Key(model.RepoCollection,
                   uri,
                   parent=model.GetGlobalRootEntity().key)
     source = key.get()
     # avoid race condition when multiple requests call into this method
     if source:
       continue
-    source = model.TemplateSource(key=key, description=description)
-    shared.w('adding task to populate template source {0!r}'.format(uri))
-    taskqueue.add(url='/_playground_tasks/template_source/populate',
-                  params={'key': source.key.id()})
+    source = model.RepoCollection(key=key, description=description)
+    shared.w('adding task to populate repo collection {0!r}'.format(uri))
+    taskqueue.add(url='/_playground_tasks/populate_repo_collection',
+                  params={'repo_collection_url': source.key.id()})
     sources.append(source)
   ndb.put_multi(sources)
   return sources
 
 
-def GetCollection(url):
-  template_source = model.GetTemplateSource(url)
-  if filesystem.IsValidUrl(url):
-    return filesystem.FilesystemTemplateCollection(template_source)
-  elif codesite.IsValidUrl(url):
-    return codesite.CodesiteTemplateCollection(template_source)
-  elif github.IsValidUrl(url):
-    return github.GithubTemplateCollection(template_source)
+def GetCollection(repo_collection_url):
+  repo_collection = model.GetRepoCollection(repo_collection_url)
+  if filesystem.IsValidUrl(repo_collection_url):
+    return filesystem.FilesystemTemplateCollection(repo_collection)
+  elif codesite.IsValidUrl(repo_collection_url):
+    return codesite.CodesiteTemplateCollection(repo_collection)
+  elif github.IsValidUrl(repo_collection_url):
+    return github.GithubTemplateCollection(repo_collection)
   else:
-    raise ValueError('Unknown URL template {0}'.format(url))
+    raise ValueError('Unknown repo collection URL {0}'
+                     .format(repo_collection_url))
 
 
 def PopulateProjectFromTemplateUrl(tree, template_url):

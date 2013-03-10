@@ -29,8 +29,8 @@ def IsValidUrl(url):
 class GithubTemplateCollection(collection.TemplateCollection):
   """A class for accessing github repos."""
 
-  def __init__(self, template_source):
-    super(GithubTemplateCollection, self).__init__(template_source)
+  def __init__(self, repo_collection):
+    super(GithubTemplateCollection, self).__init__(repo_collection)
 
   def _IsAppEnginePythonRepo(self, name):
     """Determine whether the given repo name is an App Engine Python project.
@@ -90,8 +90,8 @@ class GithubTemplateCollection(collection.TemplateCollection):
   def PopulateTemplates(self):
     # running in a task gives us automatic retries
     assert 'HTTP_X_APPENGINE_TASKNAME' in os.environ
-    template_source_url = self.template_source.key.id()
-    matcher = _GITHUB_URL_RE.match(template_source_url)
+    repo_collection_url = self.repo_collection.key.id()
+    matcher = _GITHUB_URL_RE.match(repo_collection_url)
     github_user = matcher.group(1)
     # e.g. https://api.github.com/users/GoogleCloudPlatform/repos
     url = 'https://api.github.com/users/{0}/repos'.format(github_user)
@@ -110,7 +110,7 @@ class GithubTemplateCollection(collection.TemplateCollection):
       # e.g. https://api.github.com/repos/GoogleCloudPlatform/appengine-crowdguru-python/contents/
       repo_contents_url = ('https://api.github.com/repos/{0}/{1}/contents/'
                            .format(github_user, repo_name))
-      s = model.Template(parent=self.template_source.key,
+      s = model.Template(parent=self.repo_collection.key,
                          id=repo_contents_url,
                          name=repo_name,
                          url=end_user_repo_url,

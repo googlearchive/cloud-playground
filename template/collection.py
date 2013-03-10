@@ -4,13 +4,13 @@
 class TemplateCollection(object):
   """An abstract base class for accessing a tree of files."""
 
-  def __init__(self, template_source):
+  def __init__(self, repo_collection):
     """Constructor.
 
     Args:
-      template_source: The template source entity.
+      repo_collection: The repo collection entity.
     """
-    self.template_source = template_source
+    self.repo_collection = repo_collection
 
   def IsValidUrl(self, url):
     """Determines whether the given URL is valid for this code repository."""

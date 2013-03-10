@@ -46,8 +46,8 @@ class PlaygroundProject(ndb.Model):
     return '{0}-{1}'.format(self.owner, self.updated.isoformat())
 
 
-class TemplateSource(ndb.Model):
-  """A Model to represent a project template source.
+class RepoCollection(ndb.Model):
+  """A Model to represent a collection of code repositories.
 
   The base url is used as the entity key id.
   """
@@ -63,8 +63,8 @@ class TemplateSource(ndb.Model):
 class Template(ndb.Model):
   """A Model to store project templates and metadata.
 
-  This Model has TemplateSource as its parent and uses
-  the template url as the entity key id.
+  This Model has RepoCollection as its parent and uses
+  the repo url as the entity key id.
   """
   name = ndb.StringProperty(indexed=False)
   url = ndb.StringProperty(indexed=False)
@@ -138,12 +138,12 @@ def GetGlobalRootEntity():
   return Global.get_or_insert('config', namespace=settings.PLAYGROUND_NAMESPACE)
 
 
-def GetTemplateSource(url):
-  return TemplateSource.get_by_id(url, parent=GetGlobalRootEntity().key)
+def GetRepoCollection(url):
+  return RepoCollection.get_by_id(url, parent=GetGlobalRootEntity().key)
 
 
 def DeleteTemplates():
-  query = TemplateSource.query(ancestor=GetGlobalRootEntity().key)
+  query = RepoCollection.query(ancestor=GetGlobalRootEntity().key)
   source_keys = query.fetch(keys_only=True)
   keys = []
   for k in source_keys:

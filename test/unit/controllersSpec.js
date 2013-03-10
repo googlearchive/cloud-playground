@@ -787,13 +787,13 @@ describe('MainController', function() {
     $httpBackend
     .whenGET('/playground/gettemplates')
     .respond({
-        'template_sources': [
+        'repo_collections': [
           { 'key': 'foo_key', 'description': 'foo_description' },
           { 'key': 'bar_key', 'description': 'bar_description' },
         ],
         'templates': [
           { 'key': 'boo_key', 'description': 'boo_description',
-            'name': 'boo_name', 'source_key': 'boo_source_key' },
+            'name': 'boo_name', 'repo_collection_key': 'boo_source_key' },
         ]
     });
 
@@ -830,19 +830,20 @@ describe('MainController', function() {
       $httpBackend.expectGET('/playground/gettemplates');
       doInit();
       expect(scope.templates).toBeDefined();
-      expect(scope.templates.template_sources.length).toBe(2);
-      expect(scope.templates.template_sources[0].key).toBe('foo_key');
-      expect(scope.templates.template_sources[0].description)
+      expect(scope.templates.repo_collections.length).toBe(2);
+      expect(scope.templates.repo_collections[0].key).toBe('foo_key');
+      expect(scope.templates.repo_collections[0].description)
         .toBe('foo_description');
-      expect(scope.templates.template_sources[1].key).toBe('bar_key');
-      expect(scope.templates.template_sources[1].description)
+      expect(scope.templates.repo_collections[1].key).toBe('bar_key');
+      expect(scope.templates.repo_collections[1].description)
         .toBe('bar_description');
       expect(scope.templates.templates).toBeDefined();
       expect(scope.templates.templates.length).toBe(1);
       expect(scope.templates.templates[0].key).toBe('boo_key');
       expect(scope.templates.templates[0].description).toBe('boo_description');
       expect(scope.templates.templates[0].name).toBe('boo_name');
-      expect(scope.templates.templates[0].source_key).toBe('boo_source_key');
+      expect(scope.templates.templates[0].repo_collection_key)
+        .toBe('boo_source_key');
     });
 
   });

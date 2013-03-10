@@ -41,9 +41,9 @@
     </tbody>
 
   </table>
-  <div ng-repeat="source in templates.template_sources">
-    <h1>{{source.description}}</h1>
-    <div ng-repeat="template in templates.project_templates | filter:{source_key: source.key}">
+  <div ng-repeat="repo_collection in templates.repo_collections">
+    <h1>{{repo_collection.description}}</h1>
+    <div ng-repeat="template in templates.project_templates | filter:{repo_collection_key: repo_collection.key}">
         <div class="template" style="margin: .5em;">
           <button class="btn" style="float: left;" ng-click="new_project(template)"><i class="icon-plus"></i> New Project</button>
           <div stlye="clear: both;">

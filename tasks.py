@@ -3,22 +3,21 @@
 import webapp2
 
 import model
+import shared
 
 from template import templates
 
 
-class PopulateTemplateSource(webapp2.RequestHandler):
+class PopulateRepoCollection(webapp2.RequestHandler):
 
   def post(self):
-    key = self.request.get('key')
-    template_source = model.GetTemplateSource(key)
-    url = template_source.key.id()
-    collection = templates.GetCollection(url)
+    repo_collection_url = self.request.get('repo_collection_url')
+    shared.w('Populating repo collection {0}'.format(repo_collection_url))
+    collection = templates.GetCollection(repo_collection_url)
     collection.PopulateTemplates()
     templates.ClearCache()
 
 
 app = webapp2.WSGIApplication([
-    # templates
-    ('/_playground_tasks/template_source/populate', PopulateTemplateSource),
+    ('/_playground_tasks/populate_repo_collection', PopulateRepoCollection),
 ], debug=True)

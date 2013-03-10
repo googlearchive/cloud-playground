@@ -31,8 +31,8 @@ def IsValidUrl(url):
 class CodesiteTemplateCollection(collection.TemplateCollection):
   """A class for accessing googlecode repos."""
 
-  def __init__(self, template_source):
-    super(CodesiteTemplateCollection, self).__init__(template_source)
+  def __init__(self, repo_collection):
+    super(CodesiteTemplateCollection, self).__init__(repo_collection)
 
   def _GetChildPaths(self, page):
     if _CODESITE_DIR_FOOTER not in page:
@@ -44,7 +44,7 @@ class CodesiteTemplateCollection(collection.TemplateCollection):
   def PopulateTemplates(self):
     # running in a task gives us automatic retries
     assert 'HTTP_X_APPENGINE_TASKNAME' in os.environ
-    baseurl = self.template_source.key.id()
+    baseurl = self.repo_collection.key.id()
     page = shared.Fetch(baseurl, follow_redirects=True).content
     candidates = self._GetChildPaths(page)
     rpcs = []
@@ -73,7 +73,7 @@ class CodesiteTemplateCollection(collection.TemplateCollection):
         if result.status_code != 200:
           continue
         description = 'Sample code from {0}'.format(project_url)
-        s = model.Template(parent=self.template_source.key,
+        s = model.Template(parent=self.repo_collection.key,
                            id=project_url,
                            name=c.rstrip('/') or project_url,
                            url=project_url,

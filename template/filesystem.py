@@ -24,14 +24,14 @@ def IsValidUrl(url):
 class FilesystemTemplateCollection(collection.TemplateCollection):
   """A class for accessing github repos."""
 
-  def __init__(self, template_source):
-    super(FilesystemTemplateCollection, self).__init__(template_source)
+  def __init__(self, repo_collection):
+    super(FilesystemTemplateCollection, self).__init__(repo_collection)
 
   def PopulateTemplates(self):
     # running in a task gives us automatic retries
     assert 'HTTP_X_APPENGINE_TASKNAME' in os.environ
     templates = []
-    template_dir = self.template_source.key.id()
+    template_dir = self.repo_collection.key.id()  # repo_collection_url
     for dirname in os.listdir(template_dir):
       dirpath = os.path.join(template_dir, dirname)
       if not os.path.isdir(dirpath):
@@ -46,7 +46,7 @@ class FilesystemTemplateCollection(collection.TemplateCollection):
         description = dirname
       url = ('https://code.google.com/p/cloud-playground/source/browse'
              '?repo=bliss#git%2Ftemplates%2F' + dirname)
-      t = model.Template(parent=self.template_source.key,
+      t = model.Template(parent=self.repo_collection.key,
                          id=os.path.join(template_dir, dirname),  # url
                          name=name,
                          url=url,

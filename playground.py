@@ -317,19 +317,19 @@ class GetProjects(PlaygroundHandler):
 class GetTemplates(PlaygroundHandler):
 
   def get(self):
-    template_sources = [{
+    repo_collections = [{
         'key': s.key.id(),
         'description': s.description,
-    } for s in templates.GetTemplateSources()]
+    } for s in templates.GetRepoCollections()]
     project_templates = [{
         'key': t.key.id(),
-        'source_key': t.key.parent().id(),
+        'repo_collection_key': t.key.parent().id(),
         'name': t.name,
         'url': t.url,
         'description': t.description,
     } for t in templates.GetTemplates()]
     r = {
-        'template_sources': template_sources,
+        'repo_collections': repo_collections,
         'project_templates': project_templates,
     }
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
@@ -424,7 +424,7 @@ class TouchProject(PlaygroundHandler):
 class Warmup(PlaygroundHandler):
 
   def get(self):
-    templates.GetTemplateSources()
+    templates.GetRepoCollections()
 
 
 class Nuke(PlaygroundHandler):
