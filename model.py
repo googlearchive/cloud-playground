@@ -60,8 +60,8 @@ class RepoCollection(ndb.Model):
     return self.key.id()
 
 
-class Template(ndb.Model):
-  """A Model to store project templates and metadata.
+class Repo(ndb.Model):
+  """A Model to represent code repositories.
 
   This Model has RepoCollection as its parent and uses
   the repo url as the entity key id.
@@ -148,7 +148,7 @@ def DeleteTemplates():
   keys = []
   for k in source_keys:
     keys.append(k)
-    template_keys = Template.query(ancestor=k).fetch(keys_only=True)
+    template_keys = Repo.query(ancestor=k).fetch(keys_only=True)
     keys.extend(template_keys)
   ndb.delete_multi(keys)
   memcache.flush_all()

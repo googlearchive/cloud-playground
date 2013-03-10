@@ -73,11 +73,11 @@ class CodesiteTemplateCollection(collection.TemplateCollection):
         if result.status_code != 200:
           continue
         description = 'Sample code from {0}'.format(project_url)
-        s = model.Template(parent=self.repo_collection.key,
-                           id=project_url,
-                           name=c.rstrip('/') or project_url,
-                           url=project_url,
-                           description=description)
+        s = model.Repo(parent=self.repo_collection.key,
+                       id=project_url,
+                       name=c.rstrip('/') or project_url,
+                       url=project_url,
+                       description=description)
         templates.append(s)
       except urlfetch_errors.Error:
         exc_info = sys.exc_info()

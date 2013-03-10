@@ -27,7 +27,7 @@ REPO_COLLECTIONS = [
 
 _MEMCACHE_KEY_REPO_COLLECTIONS = '{0}'.format(model.RepoCollection.__name__)
 
-_MEMCACHE_KEY_TEMPLATES = '{0}'.format(model.Template.__name__)
+_MEMCACHE_KEY_TEMPLATES = '{0}'.format(model.Repo.__name__)
 
 
 def ClearCache():
@@ -61,8 +61,8 @@ def GetTemplateProjects():
                            namespace=settings.PLAYGROUND_NAMESPACE)
   if templates:
     return templates
-  templates = (model.Template.query(namespace=settings.PLAYGROUND_NAMESPACE)
-               .order(model.Template.key).fetch())
+  templates = (model.Repo.query(namespace=settings.PLAYGROUND_NAMESPACE)
+               .order(model.Repo.key).fetch())
   templates.sort(key=lambda template: template.name.lower())
   memcache.set(_MEMCACHE_KEY_TEMPLATES,
                templates,

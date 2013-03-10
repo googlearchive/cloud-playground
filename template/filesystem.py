@@ -46,11 +46,11 @@ class FilesystemTemplateCollection(collection.TemplateCollection):
         description = dirname
       url = ('https://code.google.com/p/cloud-playground/source/browse'
              '?repo=bliss#git%2Ftemplates%2F' + dirname)
-      t = model.Template(parent=self.repo_collection.key,
-                         id=os.path.join(template_dir, dirname),  # url
-                         name=name,
-                         url=url,
-                         description=description)
+      t = model.Repo(parent=self.repo_collection.key,
+                     id=os.path.join(template_dir, dirname),  # url
+                     name=name,
+                     url=url,
+                     description=description)
       templates.append(t)
       ndb.put_multi(templates)
 

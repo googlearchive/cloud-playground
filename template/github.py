@@ -110,11 +110,11 @@ class GithubTemplateCollection(collection.TemplateCollection):
       # e.g. https://api.github.com/repos/GoogleCloudPlatform/appengine-crowdguru-python/contents/
       repo_contents_url = ('https://api.github.com/repos/{0}/{1}/contents/'
                            .format(github_user, repo_name))
-      s = model.Template(parent=self.repo_collection.key,
-                         id=repo_contents_url,
-                         name=repo_name,
-                         url=end_user_repo_url,
-                         description=repo_description or end_user_repo_url)
+      s = model.Repo(parent=self.repo_collection.key,
+                     id=repo_contents_url,
+                     name=repo_name,
+                     url=end_user_repo_url,
+                     description=repo_description or end_user_repo_url)
       samples.append(s)
     model.ndb.put_multi(samples)
 
