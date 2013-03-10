@@ -84,10 +84,11 @@ def GetOrCreateUser(user_id):
 
 def GetProjects(user):
   projects = ndb.get_multi(user.projects)
-  # assert users.projects does not reference projects which do not exist
-  assert None not in projects, (
-      'Missing project(s): %s' %
-      [key for (key, prj) in zip(user.projects, projects) if prj is None])
+  if None in projects:
+    # users.projects references projects which do not exist
+    missing_projects = [key for (key, prj) in zip(user.projects, projects)
+                        if prj is None]
+    raise RuntimeError('Missing project(s): {0}'.format(missing_projects))
   return projects
 
 
