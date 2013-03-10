@@ -458,14 +458,12 @@ app = webapp2.WSGIApplication([
 
     # project actions
     ('/playground/gettemplateprojects', GetTemplateProjects),
-    ('/playground/p/(.*)/getproject', GetProject),
     ('/playground/getprojects', GetProjects),
+    ('/playground/createproject', CreateProject),
+    ('/playground/p/(.*)/getproject', GetProject),
     ('/playground/p/(.*)/delete', DeleteProject),
     ('/playground/p/(.*)/rename', RenameProject),
     ('/playground/p/(.*)/touch', TouchProject),
-
-    # playground actions
-    ('/playground/createproject', CreateProject),
 
     # admin tools
     ('/playground/nuke', Nuke),
