@@ -314,23 +314,23 @@ class GetProjects(PlaygroundHandler):
     self.response.write(tojson(r))
 
 
-class GetTemplates(PlaygroundHandler):
+class GetTemplateProjects(PlaygroundHandler):
 
   def get(self):
     repo_collections = [{
         'key': s.key.id(),
         'description': s.description,
     } for s in templates.GetRepoCollections()]
-    project_templates = [{
+    template_projects = [{
         'key': t.key.id(),
         'repo_collection_key': t.key.parent().id(),
         'name': t.name,
         'url': t.url,
         'description': t.description,
-    } for t in templates.GetTemplates()]
+    } for t in templates.GetTemplateProjects()]
     r = {
         'repo_collections': repo_collections,
-        'project_templates': project_templates,
+        'template_projects': template_projects,
     }
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
@@ -469,7 +469,7 @@ app = webapp2.WSGIApplication([
     ('/playground/getconfig', GetConfig),
 
     # project actions
-    ('/playground/gettemplates', GetTemplates),
+    ('/playground/gettemplates', GetTemplateProjects),
     ('/playground/p/(.*)/getproject', GetProject),
     ('/playground/getprojects', GetProjects),
     ('/playground/p/(.*)/delete', DeleteProject),

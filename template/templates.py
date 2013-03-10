@@ -55,8 +55,8 @@ def GetRepoCollections():
   return sources
 
 
-def GetTemplates():
-  """Get templates from a given repo collection."""
+def GetTemplateProjects():
+  """Get template projects from a given repo collection."""
   templates = memcache.get(_MEMCACHE_KEY_TEMPLATES,
                            namespace=settings.PLAYGROUND_NAMESPACE)
   if templates:
