@@ -15,10 +15,6 @@ class RepoCollection(object):
     """
     self.repo_collection = repo_collection
 
-  def IsValidUrl(self, url):
-    """Determines whether the given URL is valid for this code repository."""
-    return False
-
   def CreateTemplateProject(self, repo_key):
     repo = repo_key.get()
     user = model.GetAnonymousUser()
