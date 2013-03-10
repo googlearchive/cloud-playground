@@ -22,7 +22,7 @@ MEMCACHE_TIME = 3600
 def e(msg, *args, **kwargs):
   if isinstance(msg, basestring):
     msg = msg.format(*args, **kwargs)
-  raise Exception(repr(msg))
+  raise RuntimeError(repr(msg))
 
 
 def w(msg, *args, **kwargs):
