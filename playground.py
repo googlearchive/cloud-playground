@@ -353,7 +353,8 @@ class CreateProject(PlaygroundHandler):
     namespace_manager.set_namespace(str(self.project_id))
     # set self.project so we can access self.tree
     self.project = project
-    templates.PopulateProjectFromTemplateUrl(self.tree, template_url)
+    collection = templates.GetCollection(template_url)
+    collection.PopulateProjectFromTemplateUrl(self.tree, template_url)
     return project
 
   def get(self):

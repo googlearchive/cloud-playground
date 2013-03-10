@@ -93,14 +93,3 @@ def GetCollection(repo_collection_url):
   else:
     raise ValueError('Unknown repo collection URL {0}'
                      .format(repo_collection_url))
-
-
-def PopulateProjectFromTemplateUrl(tree, template_url):
-  """Populate project from a template URL.
-
-  Args:
-    tree: A tree object to use to retrieve files.
-    template_url: The template URL to populate the project files.
-  """
-  collection = GetCollection(template_url)
-  collection.PopulateProjectFromTemplateUrl(tree, template_url)
