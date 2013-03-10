@@ -39,20 +39,20 @@ def ClearCache():
 
 def GetRepoCollections():
   """Get repo collections."""
-  sources = memcache.get(_MEMCACHE_KEY_REPO_COLLECTIONS,
+  repo_collections = memcache.get(_MEMCACHE_KEY_REPO_COLLECTIONS,
                          namespace=settings.PLAYGROUND_NAMESPACE)
-  if sources:
-    return sources
+  if repo_collections:
+    return repo_collections
   query = model.RepoCollection.query(ancestor=model.GetGlobalRootEntity().key)
-  sources = query.fetch()
-  if not sources:
-    sources = _GetRepoCollections()
-  sources.sort(key=lambda source: source.description)
+  repo_collections = query.fetch()
+  if not repo_collections:
+    repo_collections = _GetRepoCollections()
+  repo_collections.sort(key=lambda repo_collection: repo_collection.description)
   memcache.set(_MEMCACHE_KEY_REPO_COLLECTIONS,
-               sources,
+               repo_collections,
                namespace=settings.PLAYGROUND_NAMESPACE,
                time=shared.MEMCACHE_TIME)
-  return sources
+  return repo_collections
 
 
 def GetTemplateProjects():
@@ -64,22 +64,22 @@ def GetTemplateProjects():
 
 @ndb.transactional(xg=True)
 def _GetRepoCollections():
-  sources = []
+  repo_collections = []
   for uri, description in REPO_COLLECTIONS:
     key = ndb.Key(model.RepoCollection,
                   uri,
                   parent=model.GetGlobalRootEntity().key)
-    source = key.get()
+    repo_collection = key.get()
     # avoid race condition when multiple requests call into this method
-    if source:
+    if repo_collection:
       continue
-    source = model.RepoCollection(key=key, description=description)
+    repo_collection = model.RepoCollection(key=key, description=description)
     shared.w('adding task to populate repo collection {0!r}'.format(uri))
     taskqueue.add(url='/_playground_tasks/populate_repo_collection',
-                  params={'repo_collection_url': source.key.id()})
-    sources.append(source)
-  ndb.put_multi(sources)
-  return sources
+                  params={'repo_collection_url': repo_collection.key.id()})
+    repo_collections.append(repo_collection)
+  ndb.put_multi(repo_collections)
+  return repo_collections
 
 
 def GetCollection(repo_collection_url):
