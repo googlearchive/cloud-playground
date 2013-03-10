@@ -29,7 +29,7 @@ class FilesystemRepoCollection(collection.RepoCollection):
   def __init__(self, repo_collection):
     super(FilesystemRepoCollection, self).__init__(repo_collection)
 
-  def PopulateTemplates(self):
+  def PopulateRepos(self):
     shared.EnsureRunningInTask()  # gives us automatic retries
     repos = []
     template_dir = self.repo_collection.key.id()  # repo_collection_url
@@ -45,29 +45,25 @@ class FilesystemRepoCollection(collection.RepoCollection):
       except IOError:
         name = dirname
         description = dirname
-      url = ('https://code.google.com/p/cloud-playground/source/browse'
-             '?repo=bliss#git%2Ftemplates%2F' + dirname)
-      repo = model.Repo(parent=self.repo_collection.key,
-                        id=os.path.join(template_dir, dirname),  # url
-                        name=name,
-                        url=url,
-                        description=description)
+      url = os.path.join(template_dir, dirname)
+      repo = model.CreateRepo(url, name=name, description=description)
       repos.append(repo)
     ndb.put_multi(repos)
     for repo in repos:
       deferred.defer(self.CreateTemplateProject, repo.key)
 
-  def PopulateProjectFromTemplateUrl(self, tree, template_url):
+  def PopulateProjectFromRepo(self, tree, repo):
+    repo_url = repo.key.id()
     tree.Clear()
 
     def add_files(dirname):
-      for path in os.listdir(os.path.join(template_url, dirname)):
+      for path in os.listdir(os.path.join(repo_url, dirname)):
         if path == _PLAYGROUND_JSON:
           continue
         if common.GetExtension(path) in settings.SKIP_EXTENSIONS:
           continue
         relpath = os.path.join(dirname, path)
-        fullpath = os.path.join(template_url, dirname, path)
+        fullpath = os.path.join(repo_url, dirname, path)
         if os.path.isdir(fullpath):
           add_files(relpath)
         else:

@@ -146,7 +146,7 @@ function MainController($scope, $http, $window, $location, DoSerial) {
     $window.location.replace('/playground/login');
   };
 
-  $scope.new_project = function(template) {
+  $scope.new_project = function(template_project) {
     DoSerial
     .then(function() {
       var data = {
@@ -156,10 +156,9 @@ function MainController($scope, $http, $window, $location, DoSerial) {
       $scope.projects.push(data);
     })
     .then(function() {
-      return $http.post('/playground/createproject', {
-          template_url: template.key,
-          project_name: template.name,
-          project_description: template.description})
+      return $http.post('/playground/copyproject', {
+          project_id: template_project.key,
+      })
       .success(function(data, status, headers, config) {
         $scope.projects.pop();
         $scope.projects.push(data);

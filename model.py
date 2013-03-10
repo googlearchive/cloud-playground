@@ -55,26 +55,27 @@ class RepoCollection(ndb.Model):
   created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
   updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
-  @property
-  def base_url(self):
-    return self.key.id()
-
 
 class Repo(ndb.Model):
   """A Model to represent code repositories.
 
-  This Model has RepoCollection as its parent and uses
-  the repo url as the entity key id.
+  This Model uses the repo url as the entity key id.
   """
   name = ndb.StringProperty(indexed=False)
-  url = ndb.StringProperty(indexed=False)
   description = ndb.StringProperty(indexed=False)
   created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
   updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
-  @property
-  def template_url(self):
-    return self.key.id()
+
+def CreateRepo(repo_url, name, description):
+  repo = Repo(id=repo_url, name=name, description=description,
+              namespace=settings.PLAYGROUND_NAMESPACE)
+  repo.put()
+  return repo
+
+
+def GetRepo(repo_url):
+  return Repo.get_by_id(repo_url, namespace=settings.PLAYGROUND_NAMESPACE)
 
 
 def GetOrCreateUser(user_id):
@@ -95,6 +96,24 @@ def GetProjects(user):
 def GetProject(project_id):
   project = PlaygroundProject.get_by_id(long(project_id),
                                         namespace=settings.PLAYGROUND_NAMESPACE)
+  return project
+
+
+@ndb.transactional(xg=True)
+def CopyProject(user, project_id):
+  tp = GetProject(project_id)
+  project = CreateProject(user,
+                          template_url=tp.template_url,
+                          project_name=tp.project_name,
+                          project_description=tp.project_description)
+  src_tree = common.config.CREATE_TREE_FUNC(str(tp.key.id()))
+  dst_tree = common.config.CREATE_TREE_FUNC(str(project.key.id()))
+  paths = src_tree.ListDirectory(None)
+  for path in paths:
+    if path.endswith('/'):
+      continue
+    contents = src_tree.GetFileContents(path)
+    dst_tree.SetFile(path, contents)
   return project
 
 
@@ -133,6 +152,7 @@ def AdoptProjects(dest_user_key, source_user_key):
   dest_user.projects.extend(source_user.projects)
   dest_user.put()
   source_user.key.delete()
+  memcache.flush_all()
 
 
 def GetGlobalRootEntity():
@@ -147,15 +167,27 @@ def GetRepoCollection(url):
   return RepoCollection.get_by_id(url, parent=GetGlobalRootEntity().key)
 
 
-def DeleteTemplates():
-  query = RepoCollection.query(ancestor=GetGlobalRootEntity().key)
-  source_keys = query.fetch(keys_only=True)
-  keys = []
-  for k in source_keys:
-    keys.append(k)
-    template_keys = Repo.query(ancestor=k).fetch(keys_only=True)
-    keys.extend(template_keys)
+def DeleteReposAndTemplateProjects():
+  user = GetAnonymousUser()
+
+  # delete template projects
+  keys = user.projects
   ndb.delete_multi(keys)
+
+  # delete ANONYMOUS user
+  user.key.delete()
+
+  # delete code repositories
+  query = Repo.query(namespace=settings.PLAYGROUND_NAMESPACE)
+  keys = query.fetch(keys_only=True)
+  ndb.delete_multi(keys)
+
+  # delete repo collections
+  query = RepoCollection.query(ancestor=GetGlobalRootEntity().key)
+  keys = query.fetch(keys_only=True)
+  ndb.delete_multi(keys)
+
+  # flush memcache
   memcache.flush_all()
 
 

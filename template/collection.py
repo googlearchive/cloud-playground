@@ -3,6 +3,10 @@
 import os
 
 import model
+import shared
+
+from mimic.__mimic import common
+
 
 class RepoCollection(object):
   """An abstract base class for accessing a collection of code repositories."""
@@ -16,22 +20,26 @@ class RepoCollection(object):
     self.repo_collection = repo_collection
 
   def CreateTemplateProject(self, repo_key):
+    shared.EnsureRunningInTask()  # gives us automatic retries
     repo = repo_key.get()
     user = model.GetAnonymousUser()
     template_url = repo.key.id()
     name = repo.name
     description = repo.description
-    project = model.CreateProject(user, template_url, name, description)
+    tp = model.CreateProject(user, template_url, name, description)
+    tree = common.config.CREATE_TREE_FUNC(str(tp.key.id()))
+    self.PopulateProjectFromRepo(tree, repo)
 
-  def PopulateTemplates(self):
-    """Populate templates for this collection."""
+
+  def PopulateRepos(self):
+    """Populate repos for this collection."""
     raise NotImplementedError
 
-  def PopulateProjectFromTemplate(self, tree, template):
-    """Populate project from template.
+  def PopulateProjectFromRepo(self, tree, repo):
+    """Populate project from code repository.
 
     Args:
-      tree: The file tree to populate.
-      template: The template entity.
+      tree: The Tree to populate.
+      repo: The Repo entity.
     """
     raise NotImplementedError

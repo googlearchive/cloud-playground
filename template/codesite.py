@@ -42,7 +42,7 @@ class CodesiteRepoCollection(collection.RepoCollection):
     paths = [d for d in paths if not d.startswith('.')]
     return paths
 
-  def PopulateTemplates(self):
+  def PopulateRepos(self):
     shared.EnsureRunningInTask()  # gives us automatic retries
     baseurl = self.repo_collection.key.id()
     page = shared.Fetch(baseurl, follow_redirects=True).content
@@ -55,7 +55,7 @@ class CodesiteRepoCollection(collection.RepoCollection):
 
     if common.IsDevMode():
       # fetch fewer repos during development
-      candidate_repos = candidate_repos[:3]
+      candidate_repos = candidate_repos[:1]
 
     for c in candidate_repos:
       if c and not c.endswith('/'):
@@ -72,12 +72,9 @@ class CodesiteRepoCollection(collection.RepoCollection):
         shared.w('{0} {1}'.format(result.status_code, app_yaml_url))
         if result.status_code != 200:
           continue
+        name = c.rstrip('/') or project_url
         description = 'Sample code from {0}'.format(project_url)
-        repo = model.Repo(parent=self.repo_collection.key,
-                          id=project_url,
-                          name=c.rstrip('/') or project_url,
-                          url=project_url,
-                          description=description)
+        repo = model.CreateRepo(project_url, name=name, description=description)
         repos.append(repo)
       except urlfetch_errors.Error:
         exc_info = sys.exc_info()
@@ -91,12 +88,12 @@ class CodesiteRepoCollection(collection.RepoCollection):
     for repo in repos:
       deferred.defer(self.CreateTemplateProject, repo.key)
 
-  # TODO: fetch remote files once in a task, not on every project creation
-  def PopulateProjectFromTemplateUrl(self, tree, base_url):
+  def PopulateProjectFromRepo(self, tree, repo):
+    repo_url = repo.key.id()
     tree.Clear()
 
     def add_files(dirname):
-      url = os.path.join(base_url, dirname)
+      url = os.path.join(repo_url, dirname)
       page = shared.Fetch(url, follow_redirects=True).content
       paths = self._GetChildPaths(page)
       shared.w('{0} -> {1}', url, paths)

@@ -14,7 +14,7 @@ class PopulateRepoCollection(webapp2.RequestHandler):
     repo_collection_url = self.request.get('repo_collection_url')
     shared.w('Populating repo collection {0}'.format(repo_collection_url))
     collection = templates.GetCollection(repo_collection_url)
-    collection.PopulateTemplates()
+    collection.PopulateRepos()
     templates.ClearCache()
 
 

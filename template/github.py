@@ -17,6 +17,9 @@ from google.appengine.api import urlfetch_errors
 from google.appengine.ext import deferred
 
 
+# TODO: use OAuth2
+_AUTH_HEADERS = {}
+
 _GITHUB_URL_RE = re.compile(
     '^https?://(?:[^/]+.)?github.com/(?:users/)?([^/]+).*$'
 )
@@ -84,17 +87,22 @@ class GithubRepoCollection(collection.RepoCollection):
       The list files.
     """
     r = json.loads(page)
-    files = [(f['path'], f['type'], f['git_url']) for f in r]
+    try:
+      files = [(f['path'], f['type'], f['git_url']) for f in r]
+    except Exception, e:
+      shared.e('page={}'.format(page))
+      raise e
     return files
 
-  def PopulateTemplates(self):
+  def PopulateRepos(self):
     shared.EnsureRunningInTask()  # gives us automatic retries
     repo_collection_url = self.repo_collection.key.id()
     matcher = _GITHUB_URL_RE.match(repo_collection_url)
     github_user = matcher.group(1)
     # e.g. https://api.github.com/users/GoogleCloudPlatform/repos
     url = 'https://api.github.com/users/{0}/repos'.format(github_user)
-    page = shared.Fetch(url, follow_redirects=True).content
+    rpc_result = shared.Fetch(url, follow_redirects=True, headers=_AUTH_HEADERS)
+    page = rpc_result.content
     candidate_repos = self._GetAppEnginePythonRepos(page)
 
     if common.IsDevMode():
@@ -109,22 +117,22 @@ class GithubRepoCollection(collection.RepoCollection):
       # e.g. https://api.github.com/repos/GoogleCloudPlatform/appengine-crowdguru-python/contents/
       repo_contents_url = ('https://api.github.com/repos/{0}/{1}/contents/'
                            .format(github_user, repo_name))
-      repo = model.Repo(parent=self.repo_collection.key,
-                        id=repo_contents_url,
-                        name=repo_name,
-                        url=end_user_repo_url,
-                        description=repo_description or end_user_repo_url)
+      name = repo_name
+      description = repo_description or end_user_repo_url
+      repo = model.CreateRepo(repo_contents_url, name=name,
+                              description=description)
       repos.append(repo)
     model.ndb.put_multi(repos)
     for repo in repos:
       deferred.defer(self.CreateTemplateProject, repo.key)
 
-  # TODO: fetch remote files once in a task, not on every project creation
-  def PopulateProjectFromTemplateUrl(self, tree, repo_contents_url):
+  def PopulateProjectFromRepo(self, tree, repo):
+    repo_contents_url = repo.key.id()
     tree.Clear()
 
     # e.g. https://api.github.com/repos/GoogleCloudPlatform/appengine-24hrsinsf-python/contents/
-    page = shared.Fetch(repo_contents_url, follow_redirects=True).content
+    page = shared.Fetch(repo_contents_url, follow_redirects=True,
+                        headers=_AUTH_HEADERS).content
     files = self._GetRepoFiles(page)
 
     if common.IsDevMode():
@@ -136,7 +144,8 @@ class GithubRepoCollection(collection.RepoCollection):
       # skip 'dir' entries
       if entry_type != 'file':
         continue
-      rpc = shared.Fetch(file_git_url, follow_redirects=True, async=True)
+      rpc = shared.Fetch(file_git_url, follow_redirects=True, async=True,
+                         headers=_AUTH_HEADERS)
       rpcs.append((file_git_url, path, rpc))
 
     files = []

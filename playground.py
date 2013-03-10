@@ -219,6 +219,7 @@ class PlaygroundHandler(SessionHandler):
     return {
         # cast to str since JavaScript doesn't support long
         'key': str(project.key.id()),
+        'template_url': project.template_url,
         'name': project.project_name,
         'description': project.project_description,
         'orderby': project.orderby,
@@ -338,7 +339,7 @@ class Logout(PlaygroundHandler):
     self.redirect(users.create_logout_url('/playground'))
 
 
-class CreateProject(PlaygroundHandler):
+class CopyProject(PlaygroundHandler):
   """Request handler for creating projects via an HTML link."""
 
   @ndb.transactional(xg=True)
@@ -363,16 +364,10 @@ class CreateProject(PlaygroundHandler):
     self.post()
 
   def post(self):
-    project_name = self.request.data['project_name']
-    if not project_name:
-      raise error.PlaygroundError('project_name required')
-    project_description = (self.request.data['project_description']
-                           or project_name)
-    template_url = self.request.data['template_url']
-    if not template_url:
-      raise error.PlaygroundError('template_url required')
-    project = self._MakeTemplateProject(template_url, project_name,
-                                        project_description)
+    project_id = self.request.data['project_id']
+    if not project_id:
+      raise error.PlaygroundError('project_id required')
+    project = model.CopyProject(self.user, project_id)
     r = self.DictOfProject(project)
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
@@ -421,7 +416,9 @@ class Nuke(PlaygroundHandler):
   def post(self):
     if not users.is_current_user_admin():
       shared.e('You must be an admin for this app')
-    model.DeleteTemplates()
+    model.DeleteReposAndTemplateProjects()
+    # force reinitialization
+    templates.GetRepoCollections()
     self.redirect('/playground')
 
 
@@ -460,7 +457,7 @@ app = webapp2.WSGIApplication([
     # project actions
     ('/playground/gettemplateprojects', GetTemplateProjects),
     ('/playground/getprojects', GetProjects),
-    ('/playground/createproject', CreateProject),
+    ('/playground/copyproject', CopyProject),
     ('/playground/p/(.*)/getproject', GetProject),
     ('/playground/p/(.*)/delete', DeleteProject),
     ('/playground/p/(.*)/rename', RenameProject),

@@ -41,10 +41,10 @@ def EnsureRunningInTask():
   raise RuntimeError('Not executing in a task queue')
 
 
-def Fetch(url, follow_redirects=False, async=False):
+def Fetch(url, follow_redirects=False, async=False, headers={}):
   """Make an HTTP request using URL Fetch."""
   rpc = urlfetch.create_rpc()
-  urlfetch.make_fetch_call(rpc, url,
+  urlfetch.make_fetch_call(rpc, url, headers=headers,
                            follow_redirects=follow_redirects,
                            validate_certificate=True)
   if async:
