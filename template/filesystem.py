@@ -52,7 +52,7 @@ class FilesystemRepoCollection(collection.RepoCollection):
                         url=url,
                         description=description)
       repos.append(repo)
-      ndb.put_multi(repos)
+    ndb.put_multi(repos)
 
   def PopulateProjectFromTemplateUrl(self, tree, template_url):
     tree.Clear()
