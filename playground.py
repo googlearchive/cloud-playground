@@ -200,7 +200,8 @@ class PlaygroundHandler(SessionHandler):
     self.response.headers['X-Frame-Options'] = 'SAMEORIGIN'
     self.response.headers['Content-Type'] = 'text/plain'
     self.response.headers['X-Cloud-Playground-Error'] = 'True'
-    self.response.out.write('%s' % (cgi.escape(exception.message, quote=True)))
+    self.response.out.write('{0}'.format(cgi.escape(exception.message,
+                                                    quote=True)))
 
   def handle_exception(self, exception, debug_mode):
     """Called if this handler throws an exception during execution.

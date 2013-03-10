@@ -83,7 +83,7 @@ class CodesiteRepoCollection(collection.RepoCollection):
         formatted_exception = traceback.format_exception(exc_info[0],
                                                          exc_info[1],
                                                          exc_info[2])
-        shared.w('Skipping %s' % project_url)
+        shared.w('Skipping {0}'.format(project_url))
         for line in [line for line in formatted_exception if line]:
           shared.w(line)
     model.ndb.put_multi(templates)
@@ -98,7 +98,7 @@ class CodesiteRepoCollection(collection.RepoCollection):
       paths = self._GetChildPaths(page)
       shared.w('{0} -> {1}', url, paths)
       if not paths:
-        logging.info('- %s', dirname)
+        logging.info('- {0}'.format(dirname))
         tree.SetFile(dirname, page)
       for path in paths:
         if common.GetExtension(path) in settings.SKIP_EXTENSIONS:

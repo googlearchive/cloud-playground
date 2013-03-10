@@ -69,7 +69,7 @@ class FilesystemRepoCollection(collection.RepoCollection):
           add_files(relpath)
         else:
           with open(fullpath, 'rb') as f:
-            logging.info('- %s', relpath)
+            logging.info('- {0}'.format(relpath))
             tree.SetFile(relpath, f.read())
 
     add_files('')
