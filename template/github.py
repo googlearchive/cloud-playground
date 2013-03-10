@@ -14,6 +14,7 @@ import shared
 from . import collection
 
 from google.appengine.api import urlfetch_errors
+from google.appengine.ext import deferred
 
 
 _GITHUB_URL_RE = re.compile(
@@ -115,6 +116,8 @@ class GithubRepoCollection(collection.RepoCollection):
                         description=repo_description or end_user_repo_url)
       repos.append(repo)
     model.ndb.put_multi(repos)
+    for repo in repos:
+      deferred.defer(self.CreateTemplateProject, repo.key)
 
   # TODO: fetch remote files once in a task, not on every project creation
   def PopulateProjectFromTemplateUrl(self, tree, repo_contents_url):

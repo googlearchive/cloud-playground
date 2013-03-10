@@ -12,6 +12,7 @@ import shared
 
 from . import collection
 
+from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 
 
@@ -53,6 +54,8 @@ class FilesystemRepoCollection(collection.RepoCollection):
                         description=description)
       repos.append(repo)
     ndb.put_multi(repos)
+    for repo in repos:
+      deferred.defer(self.CreateTemplateProject, repo.key)
 
   def PopulateProjectFromTemplateUrl(self, tree, template_url):
     tree.Clear()

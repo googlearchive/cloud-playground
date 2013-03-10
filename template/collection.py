@@ -2,6 +2,7 @@
 
 import os
 
+import model
 
 class RepoCollection(object):
   """An abstract base class for accessing a collection of code repositories."""
@@ -17,6 +18,14 @@ class RepoCollection(object):
   def IsValidUrl(self, url):
     """Determines whether the given URL is valid for this code repository."""
     return False
+
+  def CreateTemplateProject(self, repo_key):
+    repo = repo_key.get()
+    user = model.GetAnonymousUser()
+    template_url = repo.key.id()
+    name = repo.name
+    description = repo.description
+    project = model.CreateProject(user, template_url, name, description)
 
   def PopulateTemplates(self):
     """Populate templates for this collection."""

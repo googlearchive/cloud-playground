@@ -139,6 +139,10 @@ def GetGlobalRootEntity():
   return Global.get_or_insert('config', namespace=settings.PLAYGROUND_NAMESPACE)
 
 
+def GetAnonymousUser():
+  return GetOrCreateUser('ANONYMOUS')
+
+
 def GetRepoCollection(url):
   return RepoCollection.get_by_id(url, parent=GetGlobalRootEntity().key)
 

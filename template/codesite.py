@@ -15,6 +15,7 @@ import shared
 from . import collection
 
 from google.appengine.api import urlfetch_errors
+from google.appengine.ext import deferred
 
 
 _CODESITE_URL_RE = re.compile('^https?://[^/]+.googlecode.com/.+$')
@@ -87,6 +88,8 @@ class CodesiteRepoCollection(collection.RepoCollection):
         for line in [line for line in formatted_exception if line]:
           shared.w(line)
     model.ndb.put_multi(repos)
+    for repo in repos:
+      deferred.defer(self.CreateTemplateProject, repo.key)
 
   # TODO: fetch remote files once in a task, not on every project creation
   def PopulateProjectFromTemplateUrl(self, tree, base_url):
