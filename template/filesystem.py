@@ -30,7 +30,7 @@ class FilesystemRepoCollection(collection.RepoCollection):
 
   def PopulateTemplates(self):
     shared.EnsureRunningInTask()  # gives us automatic retries
-    templates = []
+    repos = []
     template_dir = self.repo_collection.key.id()  # repo_collection_url
     for dirname in os.listdir(template_dir):
       dirpath = os.path.join(template_dir, dirname)
@@ -46,13 +46,13 @@ class FilesystemRepoCollection(collection.RepoCollection):
         description = dirname
       url = ('https://code.google.com/p/cloud-playground/source/browse'
              '?repo=bliss#git%2Ftemplates%2F' + dirname)
-      t = model.Repo(parent=self.repo_collection.key,
-                     id=os.path.join(template_dir, dirname),  # url
-                     name=name,
-                     url=url,
-                     description=description)
-      templates.append(t)
-      ndb.put_multi(templates)
+      repo = model.Repo(parent=self.repo_collection.key,
+                        id=os.path.join(template_dir, dirname),  # url
+                        name=name,
+                        url=url,
+                        description=description)
+      repos.append(repo)
+      ndb.put_multi(repos)
 
   def PopulateProjectFromTemplateUrl(self, tree, template_url):
     tree.Clear()

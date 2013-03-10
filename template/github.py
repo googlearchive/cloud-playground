@@ -97,10 +97,10 @@ class GithubRepoCollection(collection.RepoCollection):
     candidate_repos = self._GetAppEnginePythonRepos(page)
 
     if common.IsDevMode():
-      # fetch fewer templates during development
+      # fetch fewer repo during development
       candidate_repos = candidate_repos[:1]
 
-    samples = []
+    repos = []
     for (repo_name, repo_description) in candidate_repos:
       # e.g. https://github.com/GoogleCloudPlatform/appengine-crowdguru-python
       end_user_repo_url = ('https://github.com/{0}/{1}'
@@ -108,13 +108,13 @@ class GithubRepoCollection(collection.RepoCollection):
       # e.g. https://api.github.com/repos/GoogleCloudPlatform/appengine-crowdguru-python/contents/
       repo_contents_url = ('https://api.github.com/repos/{0}/{1}/contents/'
                            .format(github_user, repo_name))
-      s = model.Repo(parent=self.repo_collection.key,
-                     id=repo_contents_url,
-                     name=repo_name,
-                     url=end_user_repo_url,
-                     description=repo_description or end_user_repo_url)
-      samples.append(s)
-    model.ndb.put_multi(samples)
+      repo = model.Repo(parent=self.repo_collection.key,
+                        id=repo_contents_url,
+                        name=repo_name,
+                        url=end_user_repo_url,
+                        description=repo_description or end_user_repo_url)
+      repos.append(repo)
+    model.ndb.put_multi(repos)
 
   # TODO: fetch remote files once in a task, not on every project creation
   def PopulateProjectFromTemplateUrl(self, tree, repo_contents_url):

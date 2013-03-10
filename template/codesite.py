@@ -45,18 +45,18 @@ class CodesiteRepoCollection(collection.RepoCollection):
     shared.EnsureRunningInTask()  # gives us automatic retries
     baseurl = self.repo_collection.key.id()
     page = shared.Fetch(baseurl, follow_redirects=True).content
-    candidates = self._GetChildPaths(page)
+    candidate_repos = self._GetChildPaths(page)
     rpcs = []
 
     # we found a project in the root directory
-    if 'app.yaml' in candidates:
-      candidates.insert(0, '')
+    if 'app.yaml' in candidate_repos:
+      candidate_repos.insert(0, '')
 
     if common.IsDevMode():
-      # fetch fewer templates during development
-      candidates = candidates[:3]
+      # fetch fewer repos during development
+      candidate_repos = candidate_repos[:3]
 
-    for c in candidates:
+    for c in candidate_repos:
       if c and not c.endswith('/'):
         continue
       project_url = '{0}{1}'.format(baseurl, c)
@@ -64,7 +64,7 @@ class CodesiteRepoCollection(collection.RepoCollection):
       rpc = shared.Fetch(app_yaml_url, follow_redirects=True, async=True)
       rpcs.append((c, project_url, app_yaml_url, rpc))
 
-    templates = []
+    repos = []
     for c, project_url, app_yaml_url, rpc in rpcs:
       try:
         result = rpc.get_result()
@@ -72,12 +72,12 @@ class CodesiteRepoCollection(collection.RepoCollection):
         if result.status_code != 200:
           continue
         description = 'Sample code from {0}'.format(project_url)
-        s = model.Repo(parent=self.repo_collection.key,
-                       id=project_url,
-                       name=c.rstrip('/') or project_url,
-                       url=project_url,
-                       description=description)
-        templates.append(s)
+        repo = model.Repo(parent=self.repo_collection.key,
+                          id=project_url,
+                          name=c.rstrip('/') or project_url,
+                          url=project_url,
+                          description=description)
+        repos.append(repo)
       except urlfetch_errors.Error:
         exc_info = sys.exc_info()
         formatted_exception = traceback.format_exception(exc_info[0],
@@ -86,7 +86,7 @@ class CodesiteRepoCollection(collection.RepoCollection):
         shared.w('Skipping {0}'.format(project_url))
         for line in [line for line in formatted_exception if line]:
           shared.w(line)
-    model.ndb.put_multi(templates)
+    model.ndb.put_multi(repos)
 
   # TODO: fetch remote files once in a task, not on every project creation
   def PopulateProjectFromTemplateUrl(self, tree, base_url):
