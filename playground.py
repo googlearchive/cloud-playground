@@ -469,7 +469,7 @@ app = webapp2.WSGIApplication([
     ('/playground/getconfig', GetConfig),
 
     # project actions
-    ('/playground/gettemplates', GetTemplateProjects),
+    ('/playground/gettemplateprojects', GetTemplateProjects),
     ('/playground/p/(.*)/getproject', GetProject),
     ('/playground/getprojects', GetProjects),
     ('/playground/p/(.*)/delete', DeleteProject),

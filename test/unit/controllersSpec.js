@@ -785,7 +785,7 @@ describe('MainController', function() {
     $httpBackend = $injector.get('$httpBackend');
 
     $httpBackend
-    .whenGET('/playground/gettemplates')
+    .whenGET('/playground/gettemplateprojects')
     .respond({
         'repo_collections': [
           { 'key': 'foo_key', 'description': 'foo_description' },
@@ -827,7 +827,7 @@ describe('MainController', function() {
 
     it('should get templates', function() {
       expect(scope.templates).toBeUndefined();
-      $httpBackend.expectGET('/playground/gettemplates');
+      $httpBackend.expectGET('/playground/gettemplateprojects');
       doInit();
       expect(scope.templates).toBeDefined();
       expect(scope.templates.repo_collections.length).toBe(2);

@@ -133,7 +133,7 @@ function MainController($scope, $http, $window, $location, DoSerial) {
 
   DoSerial
   .then(function() {
-    return $http.get('/playground/gettemplates')
+    return $http.get('/playground/gettemplateprojects')
     .success(function(data, status, headers, config) {
       $scope.templates = data;
     });
