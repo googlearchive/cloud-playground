@@ -17,9 +17,6 @@ from google.appengine.api import urlfetch_errors
 from google.appengine.ext import deferred
 
 
-# TODO: use OAuth2
-_AUTH_HEADERS = {}
-
 _GITHUB_URL_RE = re.compile(
     '^https?://(?:[^/]+.)?github.com/(?:users/)?([^/]+).*$'
 )
@@ -27,6 +24,18 @@ _GITHUB_URL_RE = re.compile(
 
 def IsValidUrl(url):
   return _GITHUB_URL_RE.match(url)
+
+
+def FetchWithAuth(*args, **kwargs):
+  credential = model.GetOAuth2Credential('github')
+  if credential:
+    query_str = ('?client_id={0}&client_secret={1}'
+                 .format(credential.client_id,
+                         credential.client_secret))
+    # tuple is immutable
+    args = list(args)
+    args[0] += query_str
+  return shared.Fetch(*args, **kwargs)
 
 
 class GithubRepoCollection(collection.RepoCollection):
@@ -101,7 +110,7 @@ class GithubRepoCollection(collection.RepoCollection):
     github_user = matcher.group(1)
     # e.g. https://api.github.com/users/GoogleCloudPlatform/repos
     url = 'https://api.github.com/users/{0}/repos'.format(github_user)
-    rpc_result = shared.Fetch(url, follow_redirects=True, headers=_AUTH_HEADERS)
+    rpc_result = FetchWithAuth(url, follow_redirects=True)
     page = rpc_result.content
     candidate_repos = self._GetAppEnginePythonRepos(page)
 
@@ -131,8 +140,7 @@ class GithubRepoCollection(collection.RepoCollection):
     tree.Clear()
 
     # e.g. https://api.github.com/repos/GoogleCloudPlatform/appengine-24hrsinsf-python/contents/
-    page = shared.Fetch(repo_contents_url, follow_redirects=True,
-                        headers=_AUTH_HEADERS).content
+    page = FetchWithAuth(repo_contents_url, follow_redirects=True).content
     files = self._GetRepoFiles(page)
 
     if common.IsDevMode():
@@ -144,8 +152,7 @@ class GithubRepoCollection(collection.RepoCollection):
       # skip 'dir' entries
       if entry_type != 'file':
         continue
-      rpc = shared.Fetch(file_git_url, follow_redirects=True, async=True,
-                         headers=_AUTH_HEADERS)
+      rpc = FetchWithAuth(file_git_url, follow_redirects=True, async=True)
       rpcs.append((file_git_url, path, rpc))
 
     files = []
