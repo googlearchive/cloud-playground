@@ -1,6 +1,7 @@
 """Module containing the playground WSGI handlers."""
 
 import cgi
+import httplib
 import json
 import logging
 import os
@@ -299,6 +300,29 @@ class GetConfig(PlaygroundHandler):
     self.response.write(tojson(r))
 
 
+class OAuth2Admin(PlaygroundHandler):
+
+  def post(self):
+    if not users.is_current_user_admin():
+      self.response.set_status(httplib.UNAUTHORIZED)
+      return
+    data = json.loads(self.request.body)
+    key = data['key']
+    client_id = data.get('client_id')
+    client_secret = data.get('client_secret')
+    if client_id and client_secret:
+      credential = model.SetOAuth2Credential(key, client_id, client_secret)
+    else:
+      credential = model.GetOAuth2Credential(key) or model.OAuth2Credential()
+    r = {
+        'key': key,
+        'client_id': credential.client_id,
+        'client_secret': credential.client_secret,
+    }
+    self.response.headers['Content-Type'] = _JSON_MIME_TYPE
+    self.response.write(tojson(r))
+
+
 class GetProject(PlaygroundHandler):
 
   def get(self, project_id):
@@ -453,6 +477,7 @@ config['webapp2_extras.sessions'] = {
 app = webapp2.WSGIApplication([
     # config actions
     ('/playground/getconfig', GetConfig),
+    ('/playground/oauth2_admin', OAuth2Admin),
 
     # project actions
     ('/playground/gettemplateprojects', GetTemplateProjects),

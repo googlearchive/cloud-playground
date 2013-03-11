@@ -24,6 +24,12 @@ class Global(ndb.Model):
   updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
 
+class OAuth2Credential(ndb.Model):
+  """A Model to store OAuth2 credentials."""
+  client_id = ndb.StringProperty(indexed=False)
+  client_secret = ndb.StringProperty(indexed=False)
+
+
 class PlaygroundUser(ndb.Model):
   """A Model to store playground users."""
   projects = ndb.KeyProperty(repeated=True, indexed=False)
@@ -65,6 +71,19 @@ class Repo(ndb.Model):
   description = ndb.StringProperty(indexed=False)
   created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
   updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+
+
+def GetOAuth2Credential(key):
+  return OAuth2Credential.get_by_id(key,
+                                    namespace=settings.PLAYGROUND_NAMESPACE)
+
+
+def SetOAuth2Credential(key, client_id, client_secret):
+  credential = OAuth2Credential(id=key, client_id=client_id,
+                                client_secret=client_secret,
+                                namespace=settings.PLAYGROUND_NAMESPACE)
+  credential.put()
+  return credential
 
 
 def CreateRepo(repo_url, name, description):

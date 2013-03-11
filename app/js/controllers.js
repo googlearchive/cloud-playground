@@ -38,7 +38,7 @@ function RenameProjectController($scope, $log, dialog, project_name) {
 }
 
 function PageController($scope, $http, DoSerial, $routeParams, $window,
-                        $dialog, $location, WindowService) {
+                        $dialog, $location, $log, WindowService) {
 
   function getconfig() {
     return $http.get('/playground/getconfig')
@@ -86,6 +86,30 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
       .success(function(data, status, headers, config) {
         WindowService.reload();
       });
+    });
+  };
+
+  // TODO: test
+  function prompt_oauth2_admin(credential) {
+    $dialog.dialog({
+        controller: 'OAuth2AdminController',
+        templateUrl: '/playground/oauth2_admin.html',
+        resolve: {
+            key: credential.key,
+            client_id: credential.client_id,
+            client_secret: credential.client_secret,
+        },
+    })
+    .open().then(function(credential) {
+      $http.post('/playground/oauth2_admin', credential);
+    });
+  }
+
+  // TODO: test
+  $scope.oauth2_admin = function(key) {
+    $http.post('/playground/oauth2_admin', {key: key})
+    .success(function(data, status, headers, config) {
+      prompt_oauth2_admin(data);
     });
   };
 
@@ -202,6 +226,21 @@ function RenameFileController($scope, $log, dialog, path) {
 
   $scope.close = function(path) {
     dialog.close(path);
+  };
+
+}
+
+// TODO: test
+function OAuth2AdminController($scope, $log, dialog, key, client_id,
+                               client_secret) {
+
+  $scope.key = key;
+  $scope.client_id = client_id;
+  $scope.client_secret = client_secret;
+
+  $scope.close = function(client_id, client_secret) {
+    dialog.close({key: key, client_id: client_id,
+                  client_secret: client_secret});
   };
 
 }

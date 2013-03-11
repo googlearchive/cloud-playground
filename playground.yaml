@@ -12,7 +12,7 @@ handlers:
   secure: always
 
 # Do not be over inclusive
-- url: /playground/(([-_a-z]*)\.html)
+- url: /playground/(([-_a-z0-9]*)\.html)
   static_files: app/\1
   upload: app/.*\.html
   secure: always
