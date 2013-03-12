@@ -856,15 +856,15 @@ describe('MainController', function() {
 
       beforeEach(function() {
         $httpBackend
-        .when('POST', '/playground/createproject')
+        .when('POST', '/playground/copyproject')
         .respond(make_project(42, 1));
       });
 
-      it('should call /playground/createproject', inject(function() {
+      it('should call /playground/copyproject', inject(function() {
         expect(scope.projects).toBeDefined();
         expect(scope.template_projects).toBeDefined();
         expect(scope.template_projects.length).toBeGreaterThan(0);
-        $httpBackend.expectPOST('/playground/createproject');
+        $httpBackend.expectPOST('/playground/copyproject');
         scope.new_project(scope.template_projects[0]);
         flushDoSerial();
         $httpBackend.flush();
