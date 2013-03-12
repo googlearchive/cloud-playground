@@ -20,25 +20,27 @@ class Global(ndb.Model):
 
   A single root entity allows us to use ancestor queries for consistency.
   """
-  created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
-  updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+  created = ndb.DateTimeProperty(required=True, auto_now_add=True,
+                                 indexed=False)
+  updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
 
 
 class OAuth2Credential(ndb.Model):
   """A Model to store OAuth2 credentials."""
-  client_id = ndb.StringProperty(indexed=False)
-  client_secret = ndb.StringProperty(indexed=False)
+  client_id = ndb.StringProperty(required=True, indexed=False)
+  client_secret = ndb.StringProperty(required=True, indexed=False)
 
 
 class PlaygroundProject(ndb.Model):
   """A Model to store playground projects."""
-  project_name = ndb.StringProperty(indexed=False)
-  project_description = ndb.StringProperty(indexed=False)
-  template_url = ndb.StringProperty(indexed=False)
+  project_name = ndb.StringProperty(required=True, indexed=False)
+  project_description = ndb.StringProperty(required=True, indexed=False)
+  template_url = ndb.StringProperty(required=True, indexed=False)
   owner = ndb.StringProperty(required=True)
   writers = ndb.StringProperty(repeated=True)
-  created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
-  updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+  created = ndb.DateTimeProperty(required=True, auto_now_add=True,
+                                 indexed=False)
+  updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
 
   @property
   def orderby(self):
@@ -47,10 +49,11 @@ class PlaygroundProject(ndb.Model):
 
 class PlaygroundUser(ndb.Model):
   """A Model to store playground users."""
-  projects = ndb.KeyProperty(kind=PlaygroundProject, repeated=True,
+  projects = ndb.KeyProperty(repeated=True, kind=PlaygroundProject,
 			     indexed=False)
-  created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
-  updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+  created = ndb.DateTimeProperty(required=True, auto_now_add=True,
+                                 indexed=False)
+  updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
 
 
 class RepoCollection(ndb.Model):
@@ -58,9 +61,10 @@ class RepoCollection(ndb.Model):
 
   The base url is used as the entity key id.
   """
-  description = ndb.StringProperty(indexed=False)
-  created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
-  updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+  description = ndb.StringProperty(required=True, indexed=False)
+  created = ndb.DateTimeProperty(required=True, auto_now_add=True,
+                                 indexed=False)
+  updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
 
 
 class Repo(ndb.Model):
@@ -68,10 +72,11 @@ class Repo(ndb.Model):
 
   This Model uses the repo url as the entity key id.
   """
-  name = ndb.StringProperty(indexed=False)
-  description = ndb.StringProperty(indexed=False)
-  created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
-  updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
+  name = ndb.StringProperty(required=True, indexed=False)
+  description = ndb.StringProperty(required=True, indexed=False)
+  created = ndb.DateTimeProperty(required=True, auto_now_add=True,
+                                 indexed=False)
+  updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
 
 
 def GetOAuth2Credential(key):
