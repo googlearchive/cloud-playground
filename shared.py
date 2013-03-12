@@ -21,13 +21,15 @@ MEMCACHE_TIME = 3600
 
 def e(msg, *args, **kwargs):
   if isinstance(msg, basestring):
-    msg = msg.format(*args, **kwargs)
+    if args or kwargs:
+      msg = msg.format(*args, **kwargs)
   raise RuntimeError(repr(msg))
 
 
 def w(msg, *args, **kwargs):
   if isinstance(msg, basestring):
-    msg = msg.format(*args, **kwargs)
+    if args or kwargs:
+      msg = msg.format(*args, **kwargs)
   logging.warning('##### {0}'.format(repr(msg)))
 
 
