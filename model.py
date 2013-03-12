@@ -30,13 +30,6 @@ class OAuth2Credential(ndb.Model):
   client_secret = ndb.StringProperty(indexed=False)
 
 
-class PlaygroundUser(ndb.Model):
-  """A Model to store playground users."""
-  projects = ndb.KeyProperty(repeated=True, indexed=False)
-  created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
-  updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
-
-
 class PlaygroundProject(ndb.Model):
   """A Model to store playground projects."""
   project_name = ndb.StringProperty(indexed=False)
@@ -50,6 +43,14 @@ class PlaygroundProject(ndb.Model):
   @property
   def orderby(self):
     return '{0}-{1}'.format(self.owner, self.updated.isoformat())
+
+
+class PlaygroundUser(ndb.Model):
+  """A Model to store playground users."""
+  projects = ndb.KeyProperty(kind=PlaygroundProject, repeated=True,
+			     indexed=False)
+  created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
+  updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
 
 class RepoCollection(ndb.Model):
