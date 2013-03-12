@@ -237,6 +237,8 @@ def CreateProject(user, template_url, project_name, project_description):
                           template_url=template_url,
                           namespace=settings.PLAYGROUND_NAMESPACE)
   prj.put()
+  # transactional get before update
+  user = user.key.get()
   user.projects.append(prj.key)
   user.put()
   return prj
