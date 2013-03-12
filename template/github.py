@@ -86,22 +86,24 @@ class GithubRepoCollection(collection.RepoCollection):
              for p in r if self._IsAppEnginePythonRepo(p['name'])]
     return repos
 
-  def _GetRepoFiles(self, page):
-    """Get list of files in the given repo.
+  def _GetRepoContents(self, repo_contents_url):
+    """Get list of files/directories in the given repo.
 
     Args:
       page: the JSON response returned by /repos/:owner/:repo/contents
 
     Returns:
-      The list files.
+      The list of files/directories.
     """
+    page = FetchWithAuth(repo_contents_url, follow_redirects=True).content
     r = json.loads(page)
-    try:
-      files = [(f['path'], f['type'], f['git_url']) for f in r]
-    except Exception, e:
-      shared.w('page={}'.format(page))
-      raise e
-    return files
+    entries = []
+    for entry in r:
+      if entry['type'] == 'dir':
+        entries.extend(self._GetRepoContents(entry['url']))
+      elif entry['type'] == 'file':
+        entries.append((entry['path'], entry['git_url']))
+    return entries
 
   def PopulateRepos(self):
     shared.EnsureRunningInTask()  # gives us automatic retries
@@ -143,18 +145,10 @@ class GithubRepoCollection(collection.RepoCollection):
                          .format(github_user, repo_name))
 
     # e.g. https://api.github.com/repos/GoogleCloudPlatform/appengine-24hrsinsf-python/contents/
-    page = FetchWithAuth(repo_contents_url, follow_redirects=True).content
-    files = self._GetRepoFiles(page)
-
-    if common.IsDevMode():
-      # fetch fewer files during development
-      files = files[:1]
+    entries = self._GetRepoContents(repo_contents_url)
 
     rpcs = []
-    for (path, entry_type, file_git_url) in files:
-      # skip 'dir' entries
-      if entry_type != 'file':
-        continue
+    for (path, file_git_url) in entries:
       rpc = FetchWithAuth(file_git_url, follow_redirects=True, async=True)
       rpcs.append((file_git_url, path, rpc))
 
