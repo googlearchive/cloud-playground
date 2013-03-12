@@ -158,7 +158,6 @@ class GithubRepoCollection(collection.RepoCollection):
       rpc = FetchWithAuth(file_git_url, follow_redirects=True, async=True)
       rpcs.append((file_git_url, path, rpc))
 
-    files = []
     for file_git_url, path, rpc in rpcs:
       try:
         result = rpc.get_result()
