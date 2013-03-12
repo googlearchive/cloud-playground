@@ -62,7 +62,7 @@ def GetRepoCollections():
 
 def GetTemplateProjects():
   """Get template projects from a given repo collection."""
-  user = model.GetAnonymousUser()
+  user = model.GetTemplateOwner()
   projects = model.GetProjects(user)
   return projects
 

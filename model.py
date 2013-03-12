@@ -95,7 +95,7 @@ def SetOAuth2Credential(key, client_id, client_secret):
 
 
 def CreateRepo(repo_url, name, description):
-  user = GetAnonymousUser()
+  user = GetTemplateOwner()
   project = CreateProject(user, repo_url, name, description)
   repo = Repo(id=repo_url, name=name, description=description,
               project=project.key, namespace=settings.PLAYGROUND_NAMESPACE)
@@ -188,8 +188,8 @@ def GetGlobalRootEntity():
   return Global.get_or_insert('config', namespace=settings.PLAYGROUND_NAMESPACE)
 
 
-def GetAnonymousUser():
-  return GetOrCreateUser('ANONYMOUS')
+def GetTemplateOwner():
+  return GetOrCreateUser('TEMPLATE')
 
 
 def GetRepoCollection(url):
@@ -197,7 +197,7 @@ def GetRepoCollection(url):
 
 
 def DeleteReposAndTemplateProjects():
-  user = GetAnonymousUser()
+  user = GetTemplateOwner()
 
   # delete template projects
   keys = user.projects

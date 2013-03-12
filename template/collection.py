@@ -22,7 +22,7 @@ class RepoCollection(object):
   def CreateTemplateProject(self, repo_key):
     shared.EnsureRunningInTask()  # gives us automatic retries
     repo = repo_key.get()
-    user = model.GetAnonymousUser()
+    user = model.GetTemplateOwner()
     template_url = repo.key.id()
     name = repo.name
     description = repo.description
