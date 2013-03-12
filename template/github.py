@@ -18,7 +18,7 @@ from google.appengine.ext import deferred
 
 
 _GITHUB_URL_RE = re.compile(
-    '^https?://(?:[^/]+.)?github.com/(?:users/)?([^/]+).*$'
+    '^https?://(?:[^/]+.)?github.com/(?:users/)?([^/]+)/?([^/]+)?.*$'
 )
 
 
@@ -123,12 +123,9 @@ class GithubRepoCollection(collection.RepoCollection):
       # e.g. https://github.com/GoogleCloudPlatform/appengine-crowdguru-python
       end_user_repo_url = ('https://github.com/{0}/{1}'
                            .format(github_user, repo_name))
-      # e.g. https://api.github.com/repos/GoogleCloudPlatform/appengine-crowdguru-python/contents/
-      repo_contents_url = ('https://api.github.com/repos/{0}/{1}/contents/'
-                           .format(github_user, repo_name))
       name = repo_name
       description = repo_description or end_user_repo_url
-      repo = model.CreateRepo(repo_contents_url, name=name,
+      repo = model.CreateRepo(end_user_repo_url, name=name,
                               description=description)
       repos.append(repo)
     model.ndb.put_multi(repos)
@@ -136,7 +133,14 @@ class GithubRepoCollection(collection.RepoCollection):
       deferred.defer(self.CreateTemplateProject, repo.key)
 
   def PopulateProjectFromRepo(self, tree, repo):
-    repo_contents_url = repo.key.id()
+    # e.g. https://github.com/GoogleCloudPlatform/appengine-crowdguru-python
+    end_user_repo_url = repo.key.id()
+    matcher = _GITHUB_URL_RE.match(end_user_repo_url)
+    github_user = matcher.group(1)
+    repo_name = matcher.group(2)
+    # e.g. https://api.github.com/repos/GoogleCloudPlatform/appengine-crowdguru-python/contents/
+    repo_contents_url = ('https://api.github.com/repos/{0}/{1}/contents/'
+                         .format(github_user, repo_name))
     tree.Clear()
 
     # e.g. https://api.github.com/repos/GoogleCloudPlatform/appengine-24hrsinsf-python/contents/
