@@ -74,6 +74,8 @@ class Repo(ndb.Model):
   """
   name = ndb.StringProperty(required=True, indexed=False)
   description = ndb.StringProperty(required=True, indexed=False)
+  project = ndb.KeyProperty(required=True, kind=PlaygroundProject,
+                            indexed=False)
   created = ndb.DateTimeProperty(required=True, auto_now_add=True,
                                  indexed=False)
   updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
@@ -93,8 +95,10 @@ def SetOAuth2Credential(key, client_id, client_secret):
 
 
 def CreateRepo(repo_url, name, description):
+  user = GetAnonymousUser()
+  project = CreateProject(user, repo_url, name, description)
   repo = Repo(id=repo_url, name=name, description=description,
-              namespace=settings.PLAYGROUND_NAMESPACE)
+              project=project.key, namespace=settings.PLAYGROUND_NAMESPACE)
   repo.put()
   return repo
 

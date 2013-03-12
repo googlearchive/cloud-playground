@@ -26,8 +26,8 @@ class RepoCollection(object):
     template_url = repo.key.id()
     name = repo.name
     description = repo.description
-    tp = model.CreateProject(user, template_url, name, description)
-    tree = common.config.CREATE_TREE_FUNC(str(tp.key.id()))
+    template_project = repo.project.get()
+    tree = common.config.CREATE_TREE_FUNC(str(template_project.key.id()))
     self.CreateProjectTreeFromRepo(tree, repo)
 
 
