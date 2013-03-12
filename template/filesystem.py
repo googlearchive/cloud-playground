@@ -52,7 +52,7 @@ class FilesystemRepoCollection(collection.RepoCollection):
     for repo in repos:
       deferred.defer(self.CreateTemplateProject, repo.key)
 
-  def PopulateProjectFromRepo(self, tree, repo):
+  def CreateProjectTreeFromRepo(self, tree, repo):
     repo_url = repo.key.id()
     tree.Clear()
 

@@ -132,7 +132,7 @@ class GithubRepoCollection(collection.RepoCollection):
     for repo in repos:
       deferred.defer(self.CreateTemplateProject, repo.key)
 
-  def PopulateProjectFromRepo(self, tree, repo):
+  def CreateProjectTreeFromRepo(self, tree, repo):
     # e.g. https://github.com/GoogleCloudPlatform/appengine-crowdguru-python
     end_user_repo_url = repo.key.id()
     matcher = _GITHUB_URL_RE.match(end_user_repo_url)

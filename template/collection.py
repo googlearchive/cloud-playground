@@ -28,14 +28,14 @@ class RepoCollection(object):
     description = repo.description
     tp = model.CreateProject(user, template_url, name, description)
     tree = common.config.CREATE_TREE_FUNC(str(tp.key.id()))
-    self.PopulateProjectFromRepo(tree, repo)
+    self.CreateProjectTreeFromRepo(tree, repo)
 
 
   def PopulateRepos(self):
     """Populate repos for this collection."""
     raise NotImplementedError
 
-  def PopulateProjectFromRepo(self, tree, repo):
+  def CreateProjectTreeFromRepo(self, tree, repo):
     """Populate project from code repository.
 
     Args:
