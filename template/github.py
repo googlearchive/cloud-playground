@@ -141,7 +141,6 @@ class GithubRepoCollection(collection.RepoCollection):
     # e.g. https://api.github.com/repos/GoogleCloudPlatform/appengine-crowdguru-python/contents/
     repo_contents_url = ('https://api.github.com/repos/{0}/{1}/contents/'
                          .format(github_user, repo_name))
-    tree.Clear()
 
     # e.g. https://api.github.com/repos/GoogleCloudPlatform/appengine-24hrsinsf-python/contents/
     page = FetchWithAuth(repo_contents_url, follow_redirects=True).content

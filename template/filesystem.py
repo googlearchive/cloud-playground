@@ -54,7 +54,6 @@ class FilesystemRepoCollection(collection.RepoCollection):
 
   def CreateProjectTreeFromRepo(self, tree, repo):
     repo_url = repo.key.id()
-    tree.Clear()
 
     def add_files(dirname):
       for path in os.listdir(os.path.join(repo_url, dirname)):

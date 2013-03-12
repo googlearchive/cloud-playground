@@ -90,7 +90,6 @@ class CodesiteRepoCollection(collection.RepoCollection):
 
   def CreateProjectTreeFromRepo(self, tree, repo):
     repo_url = repo.key.id()
-    tree.Clear()
 
     def add_files(dirname):
       url = os.path.join(repo_url, dirname)
