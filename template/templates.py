@@ -66,14 +66,7 @@ def GetTemplateProjects():
 def _GetRepoCollections():
   repo_collections = []
   for uri, description in REPO_COLLECTIONS:
-    key = ndb.Key(model.RepoCollection,
-                  uri,
-                  parent=model.GetGlobalRootEntity().key)
-    repo_collection = key.get()
-    # avoid race condition when multiple requests call into this method
-    if repo_collection:
-      continue
-    repo_collection = model.RepoCollection(key=key, description=description)
+    repo_collection = model.GetOrInsertRepoCollection(uri, description)
     shared.w('adding task to populate repo collection {0!r}'.format(uri))
     taskqueue.add(url='/_playground_tasks/populate_repo_collection',
                   params={'repo_collection_url': repo_collection.key.id()})

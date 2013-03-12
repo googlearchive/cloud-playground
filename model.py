@@ -244,6 +244,11 @@ def CreateProject(user, template_url, project_name, project_description):
   return prj
 
 
+def GetOrInsertRepoCollection(uri, description):
+  return RepoCollection.get_or_insert(uri, description=description,
+                                      parent=GetGlobalRootEntity().key)
+
+
 def DeleteProject(user, tree, project_id):
   """Delete an existing project."""
   assert tree
