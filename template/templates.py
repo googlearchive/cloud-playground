@@ -8,6 +8,8 @@ import model
 import settings
 import shared
 
+from mimic.__mimic import common
+
 from . import codesite
 from . import filesystem
 from . import github
@@ -15,15 +17,18 @@ from . import github
 
 # tuples containing templates (uri, description)
 REPO_COLLECTIONS = [
-    (settings.TEMPLATE_PROJECT_DIR,
-     'Playground Templates'),
-    ('https://google-app-engine-samples.googlecode.com/svn/trunk/',
-     'Python App Engine Samples'),
-    ('https://google-app-engine-samples.googlecode.com/svn/trunk/python27/',
-     'Python 2.7 App Engine Samples'),
     ('https://api.github.com/users/GoogleCloudPlatform/repos',
      'Google Cloud Platform samples on github'),
 ]
+if common.IsDevMode():
+  REPO_COLLECTIONS.extend([
+      (settings.TEMPLATE_PROJECT_DIR,
+       'Playground Templates'),
+      ('https://google-app-engine-samples.googlecode.com/svn/trunk/',
+       'Python App Engine Samples'),
+      ('https://google-app-engine-samples.googlecode.com/svn/trunk/python27/',
+       'Python 2.7 App Engine Samples'),
+  ])
 
 _MEMCACHE_KEY_REPO_COLLECTIONS = '{0}'.format(model.RepoCollection.__name__)
 
