@@ -99,7 +99,7 @@ class GithubRepoCollection(collection.RepoCollection):
     try:
       files = [(f['path'], f['type'], f['git_url']) for f in r]
     except Exception, e:
-      shared.e('page={}'.format(page))
+      shared.w('page={}'.format(page))
       raise e
     return files
 
