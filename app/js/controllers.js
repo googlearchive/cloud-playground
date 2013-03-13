@@ -431,7 +431,12 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
         $scope.select_file(data);
       })
       .error(function(data, status, header, config) {
-        throw Error('Failed to create a new file.');
+        // Note: If the mimic encounters an unhandled exception like
+        // DeadlineExceededError, the response doesn't have a CORS
+        // header under the current implementation, so that the status
+        // here just becomes 0.
+        throw Error('Failed to create a new file with a status code: ' +
+                    status + '.');
       });
     } else {
       $scope.select_file(file);
