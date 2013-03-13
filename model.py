@@ -149,33 +149,33 @@ def RenameProject(project_id, project_name):
 
 
 def TouchProject(project_id):
-   project = GetProject(project_id)
-   project.put()
-   return project
+  project = GetProject(project_id)
+  project.put()
+  return project
 
 
-def _UpdateProjectUserKeys(dest_user, source_user):
-  projects = GetProjects(source_user)
-  dest_user_key = dest_user.key.id()
-  source_user_key = source_user.key.id()
+def _UpdateProjectUserKeys(dst_user, src_user):
+  projects = GetProjects(src_user)
+  dst_user_key = dst_user.key.id()
+  src_user_key = src_user.key.id()
   for p in projects:
-    if source_user_key not in p.writers:
+    if src_user_key not in p.writers:
       continue
-    p.writers.remove(source_user_key)
-    if dest_user_key in p.writers:
+    p.writers.remove(src_user_key)
+    if dst_user_key in p.writers:
       continue
-    p.owner = dest_user_key
-    p.writers.append(dest_user_key)
+    p.owner = dst_user_key
+    p.writers.append(dst_user_key)
   ndb.put_multi(projects)
 
 
-def AdoptProjects(dest_user_key, source_user_key):
-  dest_user = GetOrCreateUser(dest_user_key)
-  source_user = GetOrCreateUser(source_user_key)
-  _UpdateProjectUserKeys(dest_user, source_user)
-  dest_user.projects.extend(source_user.projects)
-  dest_user.put()
-  source_user.key.delete()
+def AdoptProjects(dst_user_key, src_user_key):
+  dst_user = GetOrCreateUser(dst_user_key)
+  src_user = GetOrCreateUser(src_user_key)
+  _UpdateProjectUserKeys(dst_user, src_user)
+  dst_user.projects.extend(src_user.projects)
+  dst_user.put()
+  src_user.key.delete()
   memcache.flush_all()
 
 
