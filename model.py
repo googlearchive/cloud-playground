@@ -1,15 +1,10 @@
 """Module containing the datastore mode and associated functions."""
 
-import json
-import os
 import random
 
 from mimic.__mimic import common
 
 import settings
-import shared
-
-from template import collection
 
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
@@ -50,7 +45,7 @@ class PlaygroundProject(ndb.Model):
 class PlaygroundUser(ndb.Model):
   """A Model to store playground users."""
   projects = ndb.KeyProperty(repeated=True, kind=PlaygroundProject,
-			     indexed=False)
+                             indexed=False)
   created = ndb.DateTimeProperty(required=True, auto_now_add=True,
                                  indexed=False)
   updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
