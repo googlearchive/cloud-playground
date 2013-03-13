@@ -1,10 +1,12 @@
 """Module for accessing github.com projects."""
 
 import base64
+import httplib
 import json
 import re
 import sys
 import traceback
+import yaml
 
 from mimic.__mimic import common
 
@@ -82,8 +84,49 @@ class GithubRepoCollection(collection.RepoCollection):
       A list of repos.
     """
     r = json.loads(page)
-    repos = [(p['name'], p['description'])
-             for p in r if self._IsAppEnginePythonRepo(p['name'])]
+    # keys we care about: html_url, contents_url, name, description
+    repos = [entry for entry in r if self._IsAppEnginePythonRepo(entry['name'])]
+
+    candidates1 = []
+    for repo in repos:
+      # only proceed with repos which look like App Engine Python projects
+      if not self._IsAppEnginePythonRepo(repo['name']):
+        continue
+
+      # e.g. https://api.github.com/repos/GoogleCloudPlatform/appengine-crowdguru-python/contents/app.yaml
+      app_yaml_contents_url = repo['contents_url'].replace('{+path}',
+                                                           'app.yaml')
+      rpc = FetchWithAuth(app_yaml_contents_url, async=True)
+      candidates1.append((rpc, app_yaml_contents_url, repo))
+
+    # filter repos with no app.yaml
+    candidates2 = []
+    for rpc, app_yaml_contents_url, repo in candidates1:
+      result = rpc.get_result()
+      if result.status_code != httplib.OK:
+        shared.w('Skipping repo due to {} fetching {}'
+                 .format(result.status_code, app_yaml_contents_url))
+        continue
+      r = json.loads(result.content)
+      app_yaml_git_url = r['git_url']
+      rpc = FetchWithAuth(app_yaml_git_url, async=True)
+      candidates2.append((rpc, app_yaml_contents_url, app_yaml_git_url, repo))
+
+    # filter repos whose app.yaml does not contain 'runtime: python27'
+    repos = []
+    for rpc, app_yaml_contents_url, app_yaml_git_url, repo in candidates2:
+      result = rpc.get_result()
+      r = json.loads(result.content)
+      base64_content = r['content']
+      decoded_content = base64.b64decode(base64_content)
+      config = yaml.safe_load(decoded_content)
+      runtime = config.get('runtime')
+      if runtime != 'python27':
+        shared.w('Skipping "runtime: {}" app {}'.format(runtime,
+                                                        app_yaml_contents_url))
+        continue
+      repos.append(repo)
+
     return repos
 
   def _GetRepoContents(self, repo_contents_url):
@@ -114,25 +157,20 @@ class GithubRepoCollection(collection.RepoCollection):
     url = 'https://api.github.com/users/{0}/repos'.format(github_user)
     rpc_result = FetchWithAuth(url, follow_redirects=True)
     page = rpc_result.content
-    candidate_repos = self._GetAppEnginePythonRepos(page)
+    repos = self._GetAppEnginePythonRepos(page)
 
     if common.IsDevMode():
       # fetch fewer repo during development
-      candidate_repos = candidate_repos[:1]
+      repos = repos[:1]
 
-    repos = []
-    for (repo_name, repo_description) in candidate_repos:
-      # e.g. https://github.com/GoogleCloudPlatform/appengine-crowdguru-python
-      end_user_repo_url = ('https://github.com/{0}/{1}'
-                           .format(github_user, repo_name))
-      name = repo_name
-      description = repo_description or end_user_repo_url
-      repo = model.CreateRepo(end_user_repo_url, name=name,
-                              description=description)
-      repos.append(repo)
-    model.ndb.put_multi(repos)
+    repo_entities = []
     for repo in repos:
-      deferred.defer(self.CreateTemplateProject, repo.key)
+      r = model.CreateRepo(repo['html_url'], name=repo['name'],
+                           description=repo['description'] or repo['html_url'])
+      repo_entities.append(r)
+    model.ndb.put_multi(repo_entities)
+    for repo_entity in repo_entities:
+      deferred.defer(self.CreateTemplateProject, repo_entity.key)
 
   def CreateProjectTreeFromRepo(self, tree, repo):
     # e.g. https://github.com/GoogleCloudPlatform/appengine-crowdguru-python
@@ -144,7 +182,6 @@ class GithubRepoCollection(collection.RepoCollection):
     repo_contents_url = ('https://api.github.com/repos/{0}/{1}/contents/'
                          .format(github_user, repo_name))
 
-    # e.g. https://api.github.com/repos/GoogleCloudPlatform/appengine-24hrsinsf-python/contents/
     entries = self._GetRepoContents(repo_contents_url)
 
     rpcs = []
