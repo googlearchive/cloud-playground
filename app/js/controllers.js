@@ -422,25 +422,25 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   $scope.insert_path = function(path) {
     var file = $scope.files[path];
     if (!file) {
+      var _update_scope = function(data) {
+        $scope.files[path] = data;
+        $scope.select_file(data);
+      };
+
       // Try to create a file on the server side, falling back to the
       // old way on failure.
-      var http_callback = function(data, status, header, config) {
-        if (status == 200) {
-          file = data;
-        } else {
-          file = {
-            path: path,
-            mime_type: 'text/plain',
-            contents: '',
-            dirty: false,
-          };
-        }
-        $scope.files[path] = file;
-        $scope.select_file(file);
-      };
       $http.put($scope.url_of('file', {path: path}), '', {
         headers: {'Content-Type': 'text/plain; charset=utf-8'}
-      }).success(http_callback).error(http_callback);
+      })
+      .success(function(data, status, header, config) {
+        _update_scope(data);
+      })
+      .error(function(data, status, header, config) {
+        _update_scope({path: path,
+                       mime_type: 'text/plain',
+                       contents: '',
+                       dirty: false,});
+      });
     } else {
       $scope.select_file(file);
     }
