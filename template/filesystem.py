@@ -3,6 +3,7 @@
 import json
 import logging
 import os
+import urllib
 
 from mimic.__mimic import common
 
@@ -46,7 +47,10 @@ class FilesystemRepoCollection(collection.RepoCollection):
         name = dirname
         description = dirname
       url = os.path.join(template_dir, dirname)
-      repo = model.CreateRepo(url, name=name, description=description)
+      end_user_url = ('https://code.google.com/p/cloud-playground/source/browse/'
+                      '?repo=bliss#git%2F{}'.format(urllib.quote(url)))
+      repo = model.CreateRepo(url, end_user_url=end_user_url, name=name,
+                              description=description)
       repos.append(repo)
     ndb.put_multi(repos)
     for repo in repos:

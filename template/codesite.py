@@ -74,7 +74,8 @@ class CodesiteRepoCollection(collection.RepoCollection):
           continue
         name = c.rstrip('/') or project_url
         description = 'Sample code from {0}'.format(project_url)
-        repo = model.CreateRepo(project_url, name=name, description=description)
+        repo = model.CreateRepo(project_url, end_user_url=project_url,
+                                name=name, description=description)
         repos.append(repo)
       except urlfetch_errors.Error:
         exc_info = sys.exc_info()

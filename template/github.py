@@ -165,7 +165,8 @@ class GithubRepoCollection(collection.RepoCollection):
 
     repo_entities = []
     for repo in repos:
-      r = model.CreateRepo(repo['html_url'], name=repo['name'],
+      r = model.CreateRepo(repo['html_url'], end_user_url=repo['html_url'],
+                           name=repo['name'],
                            description=repo['description'] or repo['html_url'])
       repo_entities.append(r)
     model.ndb.put_multi(repo_entities)

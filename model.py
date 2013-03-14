@@ -69,6 +69,7 @@ class Repo(ndb.Model):
   """
   name = ndb.StringProperty(required=True, indexed=False)
   description = ndb.StringProperty(required=True, indexed=False)
+  end_user_url = ndb.StringProperty(required=True, indexed=False)
   project = ndb.KeyProperty(required=True, kind=PlaygroundProject,
                             indexed=False)
   created = ndb.DateTimeProperty(required=True, auto_now_add=True,
@@ -89,10 +90,11 @@ def SetOAuth2Credential(key, client_id, client_secret):
   return credential
 
 
-def CreateRepo(repo_url, name, description):
+def CreateRepo(repo_url, end_user_url, name, description):
   user = GetTemplateOwner()
-  project = CreateProject(user, repo_url, name, description)
-  repo = Repo(id=repo_url, name=name, description=description,
+  project = CreateProject(user, end_user_url, name, description)
+  repo = Repo(id=repo_url, end_user_url=end_user_url, name=name,
+              description=description,
               project=project.key, namespace=settings.PLAYGROUND_NAMESPACE)
   repo.put()
   return repo
