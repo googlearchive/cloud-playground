@@ -1,8 +1,5 @@
 """Class representing a code repository."""
 
-import os
-
-import model
 import shared
 
 from mimic.__mimic import common
@@ -22,10 +19,6 @@ class RepoCollection(object):
   def CreateTemplateProject(self, repo_key):
     shared.EnsureRunningInTask()  # gives us automatic retries
     repo = repo_key.get()
-    user = model.GetTemplateOwner()
-    template_url = repo.key.id()
-    name = repo.name
-    description = repo.description
     template_project = repo.project.get()
     tree = common.config.CREATE_TREE_FUNC(str(template_project.key.id()))
     self.CreateProjectTreeFromRepo(tree, repo)
