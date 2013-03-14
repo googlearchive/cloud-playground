@@ -159,8 +159,9 @@ class GithubRepoCollection(collection.RepoCollection):
     page = rpc_result.content
     repos = self._GetAppEnginePythonRepos(page)
 
-    if common.IsDevMode():
-      # fetch fewer repo during development
+    credential = model.GetOAuth2Credential('github')
+    if not credential.client_id or not credential.client_secret:
+      # fetch fewer when we're not authenticated
       repos = repos[:1]
 
     repo_entities = []
