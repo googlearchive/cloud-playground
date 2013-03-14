@@ -366,22 +366,6 @@ class Logout(PlaygroundHandler):
 class CopyProject(PlaygroundHandler):
   """Request handler for creating projects via an HTML link."""
 
-  @ndb.transactional(xg=True)
-  def _MakeTemplateProject(self, template_url, project_name,
-                           project_description):
-    project = model.CreateProject(self.user,
-                                  template_url=template_url,
-                                  project_name=project_name,
-                                  project_description=project_description)
-    # set self.project_id and default namespace which cannot be set from url
-    self.project_id = project.key.id()
-    namespace_manager.set_namespace(str(self.project_id))
-    # set self.project so we can access self.tree
-    self.project = project
-    collection = templates.GetCollection(template_url)
-    collection.PopulateProjectFromTemplateUrl(self.tree, template_url)
-    return project
-
   def get(self):
     # allow project creation via:
     # https://appid.appspot.com/playground/c?template_url=...
