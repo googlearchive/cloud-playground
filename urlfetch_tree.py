@@ -174,7 +174,7 @@ class UrlFetchTree(common.Tree):
     assert resp.status_code == httplib.OK
 
   def HasDirectory(self, path):
-    raise NotImplementedError
+    return bool(self.ListDirectory(path))
 
   def ListDirectory(self, path):
     """List the current directory or tree contents.
