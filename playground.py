@@ -366,11 +366,6 @@ class Logout(PlaygroundHandler):
 class CopyProject(PlaygroundHandler):
   """Request handler for copying projects."""
 
-  def get(self):
-    # allow project creation via:
-    # https://appid.appspot.com/playground/c?template_url=...
-    self.post()
-
   def post(self):
     project_id = self.request.data['project_id']
     if not project_id:
@@ -379,6 +374,24 @@ class CopyProject(PlaygroundHandler):
     r = self.DictOfProject(project)
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
+
+
+class NewProject(PlaygroundHandler):
+  """Request handler for creating new projects via an HTML link."""
+
+  # allow project creation via:
+  # https://appid.appspot.com/playground/newproject?template_url=...
+  def get(self):
+    template_url = self.request.get('template_url')
+    if not template_url:
+      raise error.PlaygroundError('template_url required')
+    for p in model.GetTemplateProjects():
+      shared.w(p.template_url)
+      if p.template_url ==  template_url:
+        project = model.CopyProject(self.user, p.key.id())
+        self.redirect('/playground/p/{}'.format(project.key.id()))
+        return
+    raise error.PlaygroundError('No such template_url: {}'.format(template_url))
 
 
 class DeleteProject(PlaygroundHandler):
@@ -467,6 +480,7 @@ app = webapp2.WSGIApplication([
     ('/playground/gettemplateprojects', GetTemplateProjects),
     ('/playground/getprojects', GetProjects),
     ('/playground/copyproject', CopyProject),
+    ('/playground/newproject', NewProject),
     ('/playground/p/(.*)/getproject', GetProject),
     ('/playground/p/(.*)/delete', DeleteProject),
     ('/playground/p/(.*)/rename', RenameProject),
