@@ -364,7 +364,7 @@ class Logout(PlaygroundHandler):
 
 
 class CopyProject(PlaygroundHandler):
-  """Request handler for creating projects via an HTML link."""
+  """Request handler for copying projects."""
 
   def get(self):
     # allow project creation via:
