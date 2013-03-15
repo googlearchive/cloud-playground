@@ -60,13 +60,6 @@ def GetRepoCollections():
   return repo_collections
 
 
-def GetTemplateProjects():
-  """Get template projects from a given repo collection."""
-  user = model.GetTemplateOwner()
-  projects = model.GetProjects(user)
-  return projects
-
-
 @ndb.transactional(xg=True)
 def _GetRepoCollections():
   repo_collections = []

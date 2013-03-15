@@ -125,6 +125,13 @@ def GetProject(project_id):
   return project
 
 
+def GetTemplateProjects():
+  """Get template projects."""
+  user = GetTemplateOwner()
+  projects = GetProjects(user)
+  return projects
+
+
 @ndb.transactional(xg=True)
 def CopyProject(user, project_id):
   tp = GetProject(project_id)

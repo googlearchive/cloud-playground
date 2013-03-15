@@ -344,7 +344,7 @@ class GetTemplateProjects(PlaygroundHandler):
 
   def get(self):
     r = [self.DictOfProject(p)
-         for p in templates.GetTemplateProjects()]
+         for p in model.GetTemplateProjects()]
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
 
