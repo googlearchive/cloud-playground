@@ -29,6 +29,9 @@ import shared
 from google.appengine.api import urlfetch
 
 
+_URL_FETCH_DEADLINE = 6
+
+
 class UrlFetchTree(common.Tree):
   """An implementation of Tree backed by URL Fetch."""
 
@@ -74,7 +77,7 @@ class UrlFetchTree(common.Tree):
                                 self.namespace)
       headers['Cookie'] = cookie
     resp = urlfetch.fetch(url, headers=headers, method='GET',
-                          follow_redirects=False, deadline=3)
+                          follow_redirects=False, deadline=_URL_FETCH_DEADLINE)
     return resp
 
   def RemotePutFile(self, path, content):
@@ -94,7 +97,8 @@ class UrlFetchTree(common.Tree):
                                 self.namespace)
       headers['Cookie'] = cookie
     resp = urlfetch.fetch(url, headers=headers, method='PUT', payload=content,
-                          follow_redirects=False, deadline=3)
+                          follow_redirects=False,
+                          deadline=_URL_FETCH_DEADLINE)
     if resp.status_code != httplib.OK:
       shared.e('{0} status code during HTTP PUT on {1}'
                .format(resp.status_code, url))
@@ -138,7 +142,7 @@ class UrlFetchTree(common.Tree):
                                 self.namespace)
       headers['Cookie'] = cookie
     resp = urlfetch.fetch(url, headers=headers, method='POST',
-                          follow_redirects=False, deadline=3)
+                          follow_redirects=False, deadline=_URL_FETCH_DEADLINE)
     if resp.status_code != httplib.OK:
       shared.e('{0} status code during HTTP POST on {1}'
                .format(resp.status_code, url))
@@ -160,7 +164,7 @@ class UrlFetchTree(common.Tree):
                                 self.namespace)
       headers['Cookie'] = cookie
     resp = urlfetch.fetch(url, headers=headers, method='POST',
-                          follow_redirects=False, deadline=3)
+                          follow_redirects=False, deadline=_URL_FETCH_DEADLINE)
     if resp.status_code != httplib.OK:
       shared.e('{0} status code during HTTP POST on {1}'
                .format(resp.status_code, url))
@@ -193,7 +197,7 @@ class UrlFetchTree(common.Tree):
                                 self.namespace)
       headers['Cookie'] = cookie
     resp = urlfetch.fetch(url, headers=headers, method='GET',
-                          follow_redirects=False, deadline=3)
+                          follow_redirects=False, deadline=_URL_FETCH_DEADLINE)
     if resp.status_code != httplib.OK:
       shared.e('{0} status code during HTTP GET on {1}'
                .format(resp.status_code, url))
