@@ -199,14 +199,15 @@ class UrlFetchTree(common.Tree):
                .format(resp.status_code, url))
     files = json.loads(resp.content)
     paths = set()
-    for p in files:
+    for f in files:
+      candidate_path = f['path']
       # 'path is None' means get all files recursively
       if path is None:
-        paths.add(p)
+        paths.add(candidate_path)
         continue
-      if not p.startswith(path):
+      if not candidate_path.startswith(path):
         continue
-      tail = p[len(path):]
+      tail = candidate_path[len(path):]
       # return tail if tail is a file otherwise return dir name (=first segment)
       subpath = tail.split('/', 1)[0]
       paths.add(subpath)
