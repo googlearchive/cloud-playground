@@ -20,15 +20,15 @@ REPO_COLLECTIONS = [
     ('https://api.github.com/users/GoogleCloudPlatform/repos',
      'Google Cloud Platform samples on github'),
 ]
-if common.IsDevMode():
-  REPO_COLLECTIONS.extend([
-      (settings.TEMPLATE_PROJECT_DIR,
-       'Playground Templates'),
-      ('https://google-app-engine-samples.googlecode.com/svn/trunk/',
-       'Python App Engine Samples'),
-      ('https://google-app-engine-samples.googlecode.com/svn/trunk/python27/',
-       'Python 2.7 App Engine Samples'),
-  ])
+#if common.IsDevMode():
+#  REPO_COLLECTIONS.extend([
+#      (settings.TEMPLATE_PROJECT_DIR,
+#       'Playground Templates'),
+#      ('https://google-app-engine-samples.googlecode.com/svn/trunk/',
+#       'Python App Engine Samples'),
+#      ('https://google-app-engine-samples.googlecode.com/svn/trunk/python27/',
+#       'Python 2.7 App Engine Samples'),
+#  ])
 
 _MEMCACHE_KEY_REPO_COLLECTIONS = '{0}'.format(model.RepoCollection.__name__)
 
