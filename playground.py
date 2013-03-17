@@ -379,19 +379,29 @@ class CopyProject(PlaygroundHandler):
 class NewProject(PlaygroundHandler):
   """Request handler for creating new projects via an HTML link."""
 
+  def FindMatch(self, template_url, projects):
+    for p in projects:
+      if p.template_url == template_url:
+        return p
+    return None
+
+  def Redirect(self, project):
+    self.redirect('/playground/p/{}'.format(project.key.id()))
+
   # allow project creation via:
   # https://appid.appspot.com/playground/newproject?template_url=...
   def get(self):
     template_url = self.request.get('template_url')
     if not template_url:
       raise error.PlaygroundError('template_url required')
-    for p in model.GetTemplateProjects():
-      shared.w(p.template_url)
-      if p.template_url ==  template_url:
-        project = model.CopyProject(self.user, p.key.id())
-        self.redirect('/playground/p/{}'.format(project.key.id()))
-        return
-    raise error.PlaygroundError('No such template_url: {}'.format(template_url))
+    project = self.FindMatch(template_url, model.GetProjects(self.user))
+    if project:
+      return self.Redirect(project)
+    project = self.FindMatch(template_url, model.GetTemplateProjects())
+    if project:
+      project = model.CopyProject(self.user, project.key.id())
+      return self.Redirect(project)
+    raise error.PlaygroundError('Unknown template_url {}'.format(template_url))
 
 
 class DeleteProject(PlaygroundHandler):
