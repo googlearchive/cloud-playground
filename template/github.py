@@ -160,7 +160,8 @@ class GithubRepoCollection(collection.RepoCollection):
     repos = self._GetAppEnginePythonRepos(page)
 
     credential = model.GetOAuth2Credential('github')
-    if not credential.client_id or not credential.client_secret:
+    if (not credential or not credential.client_id
+        or not credential.client_secret):
       # fetch fewer when we're not authenticated
       repos = repos[:1]
 
