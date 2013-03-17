@@ -103,14 +103,18 @@ angular.module('playgroundApp.services', [])
     return promise.then(function(response) {
       return response;
     }, function(err) {
+      // TODO: use 'return $q.reject(err)' instead of throwing errors,
+      // while still showing errors in Alert service and $log
       if (err instanceof Error) {
-        $log.error(err);
+        throw err;
       } else if (err.headers('X-Cloud-Playground-Error')) {
-        $log.error('Error:\n' + err.data);
+        throw 'Cloud Playground error:\n' + err.data;
       } else {
-        $log.error('HTTP ERROR', err);
+        // err properties: data, status, headers, config
+        throw 'HTTP ERROR ' + err.status + ': ' +
+              err.config.method + ' ' + err.config.url + '\n' +
+              err.data;
       }
-      return $q.reject(err);
     });
   };
 })
