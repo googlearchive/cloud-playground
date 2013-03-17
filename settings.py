@@ -13,7 +13,7 @@ _DEV_MODE = os.environ['SERVER_SOFTWARE'].startswith('Development/')
 PLAYGROUND_NAMESPACE = '_playground'
 
 # template projects location
-TEMPLATE_PROJECT_DIR = 'templates/'
+TEMPLATE_PROJECT_DIR = 'repos/'
 
 # Extensions to exclude when creating template projects
 SKIP_EXTENSIONS = ('swp', 'pyc', 'svn')
