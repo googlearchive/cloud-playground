@@ -1,3 +1,9 @@
 indexes:
 
-# intentionally empty
+# This index required by
+# https://github.com/GoogleCloudPlatform/appengine-guestbook-python
+- kind: Greeting
+  ancestor: yes
+  properties:
+  - name: date
+    direction: desc
