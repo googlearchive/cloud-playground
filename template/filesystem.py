@@ -70,8 +70,12 @@ class FilesystemRepoCollection(collection.RepoCollection):
         if os.path.isdir(fullpath):
           add_files(relpath)
         else:
-          with open(fullpath, 'rb') as f:
-            logging.info('- {0}'.format(relpath))
-            tree.SetFile(relpath, f.read())
+          try:
+            with open(fullpath, 'rb') as f:
+              logging.info('- {0}'.format(relpath))
+              tree.SetFile(relpath, f.read())
+          except IOError:
+            # file access may be disallowed due to app.yaml skip_files
+            logging.info('SKIPPING: {}'.format(relpath))
 
     add_files('')
