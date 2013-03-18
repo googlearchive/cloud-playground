@@ -23,6 +23,14 @@ _GITHUB_URL_RE = re.compile(
     '^https?://(?:[^/]+.)?github.com/(?:users/)?([^/]+)/?([^/]+)?.*$'
 )
 
+# projects which should not be shown in the cloud playground by default
+_PROJECT_URL_SKIP_LIST = [
+    # Java users only
+    'https://github.com/GoogleCloudPlatform/appengine-enable-remote-api-python',
+    # (deprecated) master/slave apps only
+    'https://github.com/GoogleCloudPlatform/appengine-recover-unapplied-writes-python',
+]
+
 
 def IsValidUrl(url):
   return _GITHUB_URL_RE.match(url)
@@ -74,7 +82,8 @@ class GithubRepoCollection(collection.RepoCollection):
     """Get list of App Engine Python repos.
 
     Given a JSON list of repos, return those repo names which appear to be
-    Python App Engine repos. This function can parse the contents of:
+    Python App Engine repos, and which are not in _PROJECT_URL_SKIP_LIST.
+    This function can parse the contents of:
     https://api.github.com/users/GoogleCloudPlatform/repos
 
     Args:
@@ -85,7 +94,9 @@ class GithubRepoCollection(collection.RepoCollection):
     """
     r = json.loads(page)
     # keys we care about: html_url, contents_url, name, description
-    repos = [entry for entry in r if self._IsAppEnginePythonRepo(entry['name'])]
+    repos = [entry for entry in r
+             if self._IsAppEnginePythonRepo(entry['name'])
+                and entry['html_url'] not in _PROJECT_URL_SKIP_LIST]
 
     candidates1 = []
     for repo in repos:
