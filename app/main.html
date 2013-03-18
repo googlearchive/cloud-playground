@@ -21,7 +21,7 @@
         <td class="key">{{project.key}}</div>
         <td><button class="btn btn-small btn-success" ng-class="{disabled: !project.key}" ng-click="select_project(project)"><i class="icon-edit icon-white"></i> Run/Edit</button>
         <td>{{project.name}}</td>
-        <td>{{project.description}}</td>
+        <td class="description">{{project.description}}</td>
         <td><button class="btn btn-small btn-danger" ng-class="{disabled: !project.key}" ng-click="prompt_delete_project(project)"><i class="icon-remove icon-white"></i> delete</button></td>
       </tr>
 
@@ -46,7 +46,7 @@
     <div ng-repeat="tp in template_projects">
         <div class="tp" style="margin: .5em;">
           <button class="btn" style="float: left;" ng-click="new_project(tp)"><i class="icon-plus"></i> New Project</button>
-          <div stlye="clear: both;">
+          <div style="display: inline-block;">
              <div class="name"><a ng-href="{{tp.template_url}}" target="{{tp.name}}">{{tp.name}}</a></div>
              <div class="description">{{tp.description}}</div>
           </div>

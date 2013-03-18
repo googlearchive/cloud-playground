@@ -310,3 +310,7 @@ H1 {
 .alert DIV {
   white-space: pre;
 }
+
+.description {
+  max-width: 50em;
+}
