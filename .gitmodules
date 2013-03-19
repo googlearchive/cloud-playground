@@ -3,10 +3,16 @@
 	url = http://marijnhaverbeke.nl/git/codemirror
 [submodule "bootstrap"]
 	path = bootstrap
-	url = https://github.com/twitter/bootstrap.git
+	url = https://github.com/twitter/bootstrap
 [submodule "mimic"]
 	path = mimic
 	url = https://code.google.com/p/cloud-playground.mimic
 [submodule "repos/appengine-guestbook-python"]
 	path = repos/appengine-guestbook-python
 	url = https://github.com/GoogleCloudPlatform/appengine-guestbook-python
+[submodule "repos/appengine-i18n-sample-python"]
+	path = repos/appengine-i18n-sample-python
+	url = https://github.com/GoogleCloudPlatform/appengine-i18n-sample-python
+[submodule "repos/appengine-mandelbrot-python"]
+	path = repos/appengine-mandelbrot-python
+	url = https://github.com/GoogleCloudPlatform/appengine-mandelbrot-python
