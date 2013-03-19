@@ -50,7 +50,7 @@
              <div class="name">
                <a ng-href="{{tp.template_url}}" target="{{tp.name}}">{{tp.name}}</a>
                <span ng-show="config.is_admin || config.is_devappserver">
-                 <button class="btn btn-mini btn-link" ng-click="recreate_template_project(tp)"><i class="icon-refresh"></i></button>
+                 <button class="admin btn btn-mini btn-link" ng-click="recreate_template_project(tp)"><i class="icon-refresh"></i></button>
                </span>
              </div>
              <div class="description">{{tp.description}}</div>

@@ -221,15 +221,20 @@ H1 {
       display: inline-block;
     }
 
-    #footer #adminlinks {
-      color: #999;
-      display: inline-block;
-      float: right;
-    }
+.adminlinks {
+  color: #999;
+  display: inline-block;
+  float: right;
+}
 
-      #footer #adminlinks > SPAN {
-        margin: 0.4em;
-      }
+  .adminlinks > SPAN {
+    margin: 0.4em;
+  }
+
+BUTTON.admin > I[class^="icon-"],
+BUTTON.admin > I[class*=" icon-"] {
+  opacity: 0.3 !important;
+}
 
 #source-container {
   height: 400px;
