@@ -13,7 +13,7 @@
           <div class="filename">{{file.path}} <i class="icon-asterisk dirtymarker" ng-show="file.dirty"></i></div>
           <div class="dropdown"><a ng-click="file_context_menu($event, file)">…</a></div>
         </div>
-        <div class='newthing' ng-click='prompt_new_file()'>+ new file</div>
+        <div><a class='link newthing' ng-click='prompt_new_file()'>+ new file</a></div>
       </div>
     </div>
 

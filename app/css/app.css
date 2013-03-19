@@ -5,26 +5,9 @@ BODY {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-A, .link, .newthing {
-  cursor: pointer;
+A:hover {
   text-decoration: none;
 }
-
-  A:hover {
-    text-decoration: none;
-  }
-
-  .newthing:hover, .link {
-    color: #0000ee;
-  }
-
-  .newthing:active, .link:active {
-    color: #ee0000;
-  }
-
-  .newthing:visited, .link A:visited {
-    color: #800080;
-  }
 
 .btn {
   margin-right: 10px;
@@ -196,7 +179,6 @@ H1 {
 
 .newthing {
   color: #bbb;
-  padding-top: .5em;
 }
 
 .template {
