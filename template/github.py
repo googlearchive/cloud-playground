@@ -93,7 +93,7 @@ class GithubRepoCollection(collection.RepoCollection):
       A list of repos.
     """
     r = json.loads(page)
-    # keys we care about: html_url, contents_url, name, description
+    # keys we care about: html_url, contents_url, name, description, owner.login
     repos = [entry for entry in r
              if self._IsAppEnginePythonRepo(entry['name'])
                 and entry['html_url'] not in _PROJECT_URL_SKIP_LIST]
@@ -178,9 +178,10 @@ class GithubRepoCollection(collection.RepoCollection):
 
     repo_entities = []
     for repo in repos:
+      name = repo['name']
+      description=repo['description'] or repo['html_url']
       r = model.CreateRepo(repo['html_url'], end_user_url=repo['html_url'],
-                           name=repo['name'],
-                           description=repo['description'] or repo['html_url'])
+                           name=name, description=description)
       repo_entities.append(r)
     model.ndb.put_multi(repo_entities)
     for repo_entity in repo_entities:
