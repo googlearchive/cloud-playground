@@ -15,7 +15,7 @@ from . import filesystem
 from . import github
 
 
-# tuples containing templates (url, description)
+# tuples containing templates (uri, description)
 REPO_COLLECTIONS = [
     ('https://api.github.com/users/GoogleCloudPlatform/repos',
      'Google Cloud Platform samples on github'),
@@ -61,18 +61,14 @@ def GetRepoCollections():
   return repo_collections
 
 
-def _AddTaskPopulateRepoCollection(url):
-  shared.w('adding task to populate repo collection {0!r}'.format(url))
-  taskqueue.add(url='/_playground_tasks/populate_repo_collection',
-                params={'repo_collection_url': repo_collection.key.id()})
-
-
 @ndb.transactional(xg=True)
 def _GetRepoCollections():
   repo_collections = []
-  for url, description in REPO_COLLECTIONS:
-    repo_collection = model.GetOrInsertRepoCollection(url, description)
-    _AddTaskPopulateRepoCollection(url)
+  for uri, description in REPO_COLLECTIONS:
+    repo_collection = model.GetOrInsertRepoCollection(uri, description)
+    shared.w('adding task to populate repo collection {0!r}'.format(uri))
+    taskqueue.add(url='/_playground_tasks/populate_repo_collection',
+                  params={'repo_collection_url': repo_collection.key.id()})
     repo_collections.append(repo_collection)
   ndb.put_multi(repo_collections)
   return repo_collections
