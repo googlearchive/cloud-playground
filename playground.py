@@ -24,9 +24,11 @@ import shared
 
 from template import templates
 
+from google.appengine.ext import deferred
 from google.appengine.api import namespace_manager
 from google.appengine.api import users
 from google.appengine.ext import ndb
+
 
 
 _JSON_MIME_TYPE = 'application/json'
@@ -376,6 +378,23 @@ class CopyProject(PlaygroundHandler):
     self.response.write(tojson(r))
 
 
+class RecreateTemplateProject(PlaygroundHandler):
+  """Request handler for recreating template projects."""
+
+  def post(self):
+    project_id = self.request.data['project_id']
+    if not project_id:
+      raise error.PlaygroundError('project_id required')
+    project = model.GetProject(project_id)
+    if not project:
+      raise error.PlaygroundError('failed to retrieve project {}'
+                                  .format(project_id))
+    repo_url = project.template_url
+    repo = model.GetRepo(repo_url)
+    collection = templates.GetCollection(repo_url)
+    deferred.defer(collection.CreateTemplateProject, repo.key)
+
+
 class NewProject(PlaygroundHandler):
   """Request handler for creating new projects via an HTML link."""
 
@@ -487,6 +506,7 @@ app = webapp2.WSGIApplication([
     ('/playground/oauth2_admin', OAuth2Admin),
 
     # project actions
+    ('/playground/recreate_template_project', RecreateTemplateProject),
     ('/playground/gettemplateprojects', GetTemplateProjects),
     ('/playground/getprojects', GetProjects),
     ('/playground/copyproject', CopyProject),

@@ -47,7 +47,12 @@
         <div class="tp" style="margin: .5em;">
           <button class="btn" style="float: left;" ng-click="new_project(tp)"><i class="icon-plus"></i> New Project</button>
           <div style="display: inline-block;">
-             <div class="name"><a ng-href="{{tp.template_url}}" target="{{tp.name}}">{{tp.name}}</a></div>
+             <div class="name">
+               <a ng-href="{{tp.template_url}}" target="{{tp.name}}">{{tp.name}}</a>
+               <span ng-show="config.is_admin || config.is_devappserver">
+                 <button class="btn btn-mini btn-link" ng-click="recreate_template_project(tp)"><i class="icon-refresh"></i></button>
+               </span>
+             </div>
              <div class="description">{{tp.description}}</div>
           </div>
         </div>

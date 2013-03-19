@@ -153,7 +153,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
 
 }
 
-function MainController($scope, $http, $window, $location, DoSerial) {
+function MainController($scope, $http, $window, $location, $log, DoSerial) {
 
   DoSerial
   .then(function() {
@@ -168,6 +168,24 @@ function MainController($scope, $http, $window, $location, DoSerial) {
 
   $scope.login = function() {
     $window.location.replace('/playground/login');
+  };
+
+  // TODO: test
+  $scope.recreate_template_project = function(template_project) {
+    DoSerial
+    .then(function() {
+      for (var i in $scope.template_projects) {
+        if ($scope.template_projects[i] == template_project) {
+          $scope.template_projects.splice(i, 1);
+          break;
+        }
+      }
+    })
+    .then(function() {
+      return $http.post('/playground/recreate_template_project', {
+          project_id: template_project.key,
+      });
+    });
   };
 
   $scope.new_project = function(template_project) {
