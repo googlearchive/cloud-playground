@@ -23,7 +23,6 @@ class RepoCollection(object):
     tree = common.config.CREATE_TREE_FUNC(str(template_project.key.id()))
     self.CreateProjectTreeFromRepo(tree, repo)
 
-
   def PopulateRepos(self):
     """Populate repos for this collection."""
     raise NotImplementedError
