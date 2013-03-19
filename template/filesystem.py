@@ -44,7 +44,7 @@ class FilesystemRepoCollection(collection.RepoCollection):
         name = data.get('template_name')
         description = data.get('template_description')
       except IOError:
-        name = dirname
+        name = dirpath
         description = dirname
       url = os.path.join(template_dir, dirname)
       end_user_url = ('https://code.google.com/p/cloud-playground/source/browse/'
