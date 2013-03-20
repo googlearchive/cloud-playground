@@ -461,6 +461,15 @@ class Warmup(PlaygroundHandler):
     templates.GetRepoCollections()
 
 
+class Fixit(PlaygroundHandler):
+
+  def get(self):
+    if not users.is_current_user_admin():
+      shared.e('You must be an admin for this app')
+    model.fixit()
+    self.response.write('done')
+
+
 class Nuke(PlaygroundHandler):
 
   def post(self):
@@ -518,6 +527,7 @@ app = webapp2.WSGIApplication([
 
     # admin tools
     ('/playground/nuke', Nuke),
+    ('/playground/fixit', Fixit),
 
     # /playground
     ('/playground/login', Login),

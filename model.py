@@ -43,6 +43,11 @@ class PlaygroundProject(ndb.Model):
     return '{0}-{1}'.format(self.owner, self.updated.isoformat())
 
 
+def fixit():
+  """Method to hold temporary code for data model migrations."""
+  pass
+
+
 class PlaygroundUser(ndb.Model):
   """A Model to store playground users."""
   projects = ndb.KeyProperty(repeated=True, kind=PlaygroundProject,
