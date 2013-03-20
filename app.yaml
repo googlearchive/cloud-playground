@@ -57,3 +57,20 @@ libraries:
   version: latest
 - name: yaml
   version: latest
+
+# https://developers.google.com/appengine/docs/python/config/appconfig#Skipping_Files
+skip_files:
+# built-in defaults
+- ^(.*/)?app\.yaml
+- ^(.*/)?app\.yml
+- ^(.*/)?index\.yaml
+- ^(.*/)?index\.yml
+- ^(.*/)?#.*#
+- ^(.*/)?.*~
+- ^(.*/)?.*\.py[co]
+- ^(.*/)?.*/RCS/.*
+- ^(.*/)?\..*
+- ^(.*/)?.*\.bak$
+# cloud playground entries
+- ^repos/.*
+- ^codemirror/.*LICENSE
