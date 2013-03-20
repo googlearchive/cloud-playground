@@ -430,9 +430,9 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   DoSerial
   .then(function() {
     if (!setcurrentproject()) {
-        // project_id is not in $scope.projects
-        return $scope.getproject()
-        .then(setcurrentproject);
+      // project_id is not in $scope.projects
+      return $scope.getproject()
+      .then(setcurrentproject);
     }
   })
   .then($scope._list_files)
