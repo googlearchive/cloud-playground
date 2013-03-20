@@ -21,7 +21,7 @@ function AlertController($scope, Alert) {
 function HeaderController($scope, $location) {
 
   $scope.alreadyhome = function() {
-    return $location.path() == '/playground/';
+    return $location.url() == '/playground/';
   };
 
 }
@@ -139,7 +139,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
             break;
           }
         }
-        $location.path('/playground/p/' + project.key);
+        $location.url('/playground/p/' + project.key);
       });
     });
   };
@@ -154,7 +154,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
           break;
         }
       }
-      $location.path('/playground/');
+      $location.url('/playground/');
     });
   };
 
