@@ -707,6 +707,35 @@ describe('PageController', function() {
 
   });
 
+  describe('select_project function', function() {
+
+    var $location;
+
+    beforeEach(inject(function(_$location_) {
+      $location = _$location_;
+      doInit();
+      $httpBackend
+      .when('POST', '/playground/p/15/touch')
+      .respond(make_project(15, 2));
+    }));
+
+
+    it('should call /playground/p/:project_id/touch', function() {
+      var project = make_project(15, 1);
+      scope.projects = [make_project(14, 1), project, make_project(16, 1),
+                        make_project(17, 1)];
+      expect(scope.projects[1]).toEqual(make_project(15, 1));
+      expect($location.path()).toEqual('');
+      scope.select_project(project);
+      flushDoSerial();
+      $httpBackend.flush();
+      expect(scope.projects[1]).not.toEqual(make_project(15, 1));
+      expect(scope.projects[1]).toEqual(make_project(15, 2));
+      expect($location.path()).toEqual('/playground/p/15');
+    });
+
+  });
+
   describe('delete_project function', function() {
 
     var $httpBackend, $location;
@@ -874,32 +903,6 @@ describe('MainController', function() {
         expect(scope.projects[0].key).toBe(42);
         expect(scope.projects[0].name).toBe('New project name');
       }));
-
-    });
-
-
-    describe('select_project function', function() {
-
-      beforeEach(function() {
-        $httpBackend
-        .when('POST', '/playground/p/15/touch')
-        .respond(make_project(15, 2));
-      });
-
-
-      it('should call /playground/p/:project_id/touch', function() {
-        var project = make_project(15, 1);
-        scope.projects = [make_project(14, 1), project, make_project(16, 1),
-                          make_project(17, 1)];
-        expect(scope.projects[1]).toEqual(make_project(15, 1));
-        expect($location.path()).toEqual('');
-        scope.select_project(project);
-        flushDoSerial();
-        $httpBackend.flush();
-        expect(scope.projects[1]).not.toEqual(make_project(15, 1));
-        expect(scope.projects[1]).toEqual(make_project(15, 2));
-        expect($location.path()).toEqual('/playground/p/15');
-      });
 
     });
 

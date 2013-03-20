@@ -128,6 +128,22 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     return false;
   };
 
+  $scope.select_project = function(project) {
+    DoSerial
+    .then(function() {
+      return $http.post('/playground/p/' + project.key + '/touch')
+      .success(function(data, status, headers, config) {
+        for (var i in $scope.projects) {
+          if ($scope.projects[i] == project) {
+            $scope.projects[i] = project = data;
+            break;
+          }
+        }
+        $location.path('/playground/p/' + project.key);
+      });
+    });
+  };
+
   $scope.delete_project = function(project) {
     $scope.project = undefined;
     $http.post('/playground/p/' + encodeURI(project.key) + '/delete')
@@ -206,22 +222,6 @@ function MainController($scope, $http, $window, $location, $log, DoSerial) {
       .success(function(data, status, headers, config) {
         $scope.projects.pop();
         $scope.projects.push(data);
-      });
-    });
-  };
-
-  $scope.select_project = function(project) {
-    DoSerial
-    .then(function() {
-      return $http.post('/playground/p/' + project.key + '/touch')
-      .success(function(data, status, headers, config) {
-        for (var i in $scope.projects) {
-          if ($scope.projects[i] == project) {
-            $scope.projects[i] = project = data;
-            break;
-          }
-        }
-        $location.path('/playground/p/' + project.key);
       });
     });
   };
