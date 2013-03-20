@@ -62,8 +62,16 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     });
   }
 
+  function get_template_projects() {
+    return $http.get('/playground/gettemplateprojects')
+    .success(function(data, status, headers, config) {
+      $scope.template_projects = data;
+    });
+  }
+
   DoSerial
   .then(getconfig)
+  .then(get_template_projects)
   .then(getprojects);
 
   $scope.namespace = function() {
@@ -156,12 +164,6 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
 function MainController($scope, $http, $window, $location, $log, DoSerial) {
 
   DoSerial
-  .then(function() {
-    return $http.get('/playground/gettemplateprojects')
-    .success(function(data, status, headers, config) {
-      $scope.template_projects = data;
-    });
-  })
   .then(function() {
     $scope.loaded = true;
   });

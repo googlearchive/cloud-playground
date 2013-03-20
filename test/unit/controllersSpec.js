@@ -535,6 +535,10 @@ describe('PageController', function() {
     $httpBackend
     .whenGET('/playground/getprojects')
     .respond([]);
+
+    $httpBackend
+    .whenGET('/playground/gettemplateprojects')
+    .respond([make_project(89), make_project(91)]);
   }));
 
 
@@ -560,6 +564,17 @@ describe('PageController', function() {
          expect(scope.projects).toBeDefined();
          expect(scope.projects.length).toBe(0);
        });
+
+
+    it('should get template projects', function() {
+      expect(scope.template_projects).toBeUndefined();
+      $httpBackend.expectGET('/playground/gettemplateprojects');
+      doInit();
+      expect(scope.template_projects).toBeDefined();
+      expect(scope.template_projects.length).toBe(2);
+      expect(scope.template_projects[0]).toEqual(make_project(89))
+      expect(scope.template_projects[1]).toEqual(make_project(91))
+    });
 
   });
 
@@ -782,11 +797,8 @@ describe('MainController', function() {
   beforeEach(inject(function($rootScope, $injector) {
     scope = $rootScope.$new();
     scope.projects = [];
+    scope.template_projects = [make_project(12)];
     $httpBackend = $injector.get('$httpBackend');
-
-    $httpBackend
-    .whenGET('/playground/gettemplateprojects')
-    .respond([make_project(89), make_project(91)]);
 
     $httpBackend
     .whenGET('/playground/getprojects')
@@ -803,7 +815,7 @@ describe('MainController', function() {
     inject(function($controller) {
       $controller(MainController, {$scope: scope});
       flushDoSerial();
-      $httpBackend.flush();
+      //$httpBackend.flush();
     });
   }
 
@@ -814,16 +826,6 @@ describe('MainController', function() {
       expect(scope.loaded).toBeUndefined();
       doInit();
       expect(scope.loaded).toBe(true);
-    });
-
-    it('should get template projects', function() {
-      expect(scope.template_projects).toBeUndefined();
-      $httpBackend.expectGET('/playground/gettemplateprojects');
-      doInit();
-      expect(scope.template_projects).toBeDefined();
-      expect(scope.template_projects.length).toBe(2);
-      expect(scope.template_projects[0]).toEqual(make_project(89))
-      expect(scope.template_projects[1]).toEqual(make_project(91))
     });
 
   });
