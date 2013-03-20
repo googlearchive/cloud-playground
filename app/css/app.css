@@ -301,3 +301,7 @@ BUTTON.admin > I[class*=" icon-"] {
 .description {
   max-width: 50em;
 }
+
+.loading {
+  font-size: 200%;
+}
