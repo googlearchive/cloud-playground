@@ -31,6 +31,7 @@ class PlaygroundProject(ndb.Model):
   project_name = ndb.StringProperty(required=True, indexed=False)
   project_description = ndb.StringProperty(required=True, indexed=False)
   template_url = ndb.StringProperty(required=True, indexed=False)
+  end_user_url = ndb.StringProperty(required=True, indexed=False)
   owner = ndb.StringProperty(required=True)
   writers = ndb.StringProperty(repeated=True)
   created = ndb.DateTimeProperty(required=True, auto_now_add=True,
@@ -92,7 +93,7 @@ def SetOAuth2Credential(key, client_id, client_secret):
 
 def CreateRepo(repo_url, end_user_url, name, description):
   user = GetTemplateOwner()
-  project = CreateProject(user, end_user_url, name, description)
+  project = CreateProject(user, repo_url, end_user_url, name, description)
   repo = Repo(id=repo_url, end_user_url=end_user_url, name=name,
               description=description,
               project=project.key, namespace=settings.PLAYGROUND_NAMESPACE)
@@ -137,6 +138,7 @@ def CopyProject(user, project_id):
   tp = GetProject(project_id)
   project = CreateProject(user,
                           template_url=tp.template_url,
+                          end_user_url=tp.end_user_url,
                           project_name=tp.project_name,
                           project_description=tp.project_description)
   src_tree = common.config.CREATE_TREE_FUNC(str(tp.key.id()))
@@ -229,12 +231,14 @@ def NewProjectName():
 
 
 @ndb.transactional(xg=True)
-def CreateProject(user, template_url, project_name, project_description):
+def CreateProject(user, template_url, end_user_url, project_name,
+                  project_description):
   """Create a new user project.
 
   Args:
     user: The user for which the project is to be created.
     template_url: The template URL to populate the project files or None.
+    end_user_url: The end user URL to populate the project files or None.
     project_name: The project name.
     project_description: The project description.
 
@@ -249,6 +253,7 @@ def CreateProject(user, template_url, project_name, project_description):
                           owner=user.key.id(),
                           writers=[user.key.id()],
                           template_url=template_url,
+                          end_user_url=end_user_url,
                           namespace=settings.PLAYGROUND_NAMESPACE)
   prj.put()
   # transactional get before update
