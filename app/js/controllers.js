@@ -179,6 +179,10 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     });
   };
 
+  $scope.set_loaded = function() {
+    $scope.loaded = true;
+  }
+
 }
 
 function MainController($scope, $http, $window, $location, $log, $routeParams,
@@ -247,7 +251,7 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
   }
   DoSerial
   .then(function() {
-    $scope.loaded = true;
+    $scope.set_loaded();
   });
 
   $scope.login = function() {
