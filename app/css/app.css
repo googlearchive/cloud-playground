@@ -304,5 +304,5 @@ BUTTON.admin > I[class*=" icon-"] {
 
 .loading {
   font-size: 200%;
-  padding: 2em;
+  line-height: 2em;
 }

@@ -41,6 +41,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
                         $dialog, $location, $log, WindowService) {
 
   function getconfig() {
+    $scope.status = 'Retrieving configuration';
     return $http.get('/playground/getconfig')
     .success(function(data, status, headers, config) {
        $scope.config = data;
@@ -48,6 +49,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
   };
 
   $scope.getproject = function() {
+      $scope.status = 'Retrieving project ' + project_id;
       var project_id = $scope.namespace();
       return $http.get('/playground/p/' + project_id + '/getproject')
       .success(function(data, status, headers, config) {
@@ -56,6 +58,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
   };
 
   function getprojects() {
+    $scope.status = 'Retrieving user projects';
     return $http.get('/playground/getprojects')
     .success(function(data, status, headers, config) {
       $scope.projects = data;
@@ -63,6 +66,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
   }
 
   function get_template_projects() {
+    $scope.status = 'Retrieving template projects';
     return $http.get('/playground/gettemplateprojects')
     .success(function(data, status, headers, config) {
       $scope.template_projects = data;
