@@ -208,7 +208,8 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
     }
 
     if (user_projects.length > 1) {
-      Alert.info('You have multiple projects based on the selected template');
+      Alert.info('You have multiple projects with the specified template ' +
+                 template_url);
       $scope.projects = user_projects;
       $scope.template_projects = template_projects;
       return;
