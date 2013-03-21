@@ -186,7 +186,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
 }
 
 function MainController($scope, $http, $window, $location, $log, $routeParams,
-                        Alert, DoSerial) {
+                        $q, Alert, DoSerial) {
 
   // TODO: test
   function by_template_url(template_url, projects) {
@@ -201,6 +201,13 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
 
   // TODO: test
   function maybe_create_project(template_url) {
+    var deferred = $q.defer();
+
+    if (!template_url) {
+      deferred.resolve();
+      return deferred.promise;
+    }
+
     var user_projects = by_template_url(template_url, $scope.projects);
     var template_projects = by_template_url(template_url,
                                             $scope.template_projects);
@@ -208,7 +215,8 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
     if (user_projects.length == 1) {
       $scope.status = 'Opening project';
       $scope.select_project(user_projects[0]);
-      return;
+      deferred.resolve();
+      return deferred.promise;
     }
 
     if (user_projects.length > 1) {
@@ -216,21 +224,26 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
                  template_url);
       $scope.projects = user_projects;
       $scope.template_projects = template_projects;
-      return;
+      deferred.resolve();
+      return deferred.promise;
     }
 
     if (template_projects.length == 0) {
+      // TODO: investigate using deferred.reject() instead of 'throw'
       throw 'Unknown template URL ' + template_url;
     }
 
     if (template_projects.length > 1) {
+      // TODO: investigate using deferred.reject() instead of 'throw'
       throw 'Found ' + template_projects.length +
             ' template projects with template URL ' + template_url;
     }
 
     $scope.status = 'Cloning project from template ' + template_url;
     $scope.new_project(template_projects[0]);
-    DoSerial
+
+    deferred.resolve();
+    deferred.promise
     .then(function() {
       var user_projects = by_template_url(template_url, $scope.projects);
       if (user_projects.length != 1) {
@@ -239,20 +252,15 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
       }
       $scope.select_project(user_projects[0]);
     });
+    return deferred.promise;
   }
 
   // TODO: test
-  var template_url = $routeParams.template_url;
-  if (template_url) {
-    DoSerial
-    .then(function() {
-      maybe_create_project(template_url);
-    });
-  }
   DoSerial
   .then(function() {
-    $scope.set_loaded();
-  });
+    maybe_create_project($routeParams.template_url);
+  })
+  .then($scope.set_loaded);
 
   $scope.login = function() {
     $window.location.replace('/playground/login');
