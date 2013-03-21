@@ -61,10 +61,11 @@ libraries:
 # https://developers.google.com/appengine/docs/python/config/appconfig#Skipping_Files
 skip_files:
 # built-in defaults
-- ^(.*/)?app\.yaml
-- ^(.*/)?app\.yml
-- ^(.*/)?index\.yaml
-- ^(.*/)?index\.yml
+# don't skip yaml files from template projects in 'repos/' dir
+##- ^(.*/)?app\.yaml
+##- ^(.*/)?app\.yml
+##- ^(.*/)?index\.yaml
+##- ^(.*/)?index\.yml
 - ^(.*/)?#.*#
 - ^(.*/)?.*~
 - ^(.*/)?.*\.py[co]
