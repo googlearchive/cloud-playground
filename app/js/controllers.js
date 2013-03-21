@@ -181,8 +181,69 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
 
 }
 
-function MainController($scope, $http, $window, $location, $log, DoSerial) {
+function MainController($scope, $http, $window, $location, $log, $routeParams,
+                        Alert, DoSerial) {
 
+  // TODO: test
+  function by_template_url(template_url, projects) {
+    var results = [];
+    for (var i in projects) {
+      if (projects[i].template_url == template_url) {
+        results.push(projects[i]);
+      }
+    }
+    return results;
+  }
+
+  // TODO: test
+  function maybe_create_project(template_url) {
+    var user_projects = by_template_url(template_url, $scope.projects);
+    var template_projects = by_template_url(template_url,
+                                            $scope.template_projects);
+
+    if (user_projects.length == 1) {
+      $scope.status = 'Opening project';
+      $scope.select_project(user_projects[0]);
+      return;
+    }
+
+    if (user_projects.length > 1) {
+      Alert.info('You have multiple projects based on the selected template');
+      $scope.projects = user_projects;
+      $scope.template_projects = template_projects;
+      return;
+    }
+
+    if (template_projects.length == 0) {
+      throw 'Unknown template URL ' + template_url;
+    }
+
+    if (template_projects.length > 1) {
+      throw 'Found ' + template_projects.length +
+            ' template projects with template URL ' + template_url;
+    }
+
+    $scope.status = 'Cloning project from template ' + template_url;
+    $scope.new_project(template_projects[0]);
+    DoSerial
+    .then(function() {
+      var user_projects = by_template_url(template_url, $scope.projects);
+      if (user_projects.length != 1) {
+        throw 'Unexpectedly found ' + user_projects.length +
+              ' projects with template URL ' + template_url;
+      }
+      $scope.select_project(user_projects[0]);
+    });
+  }
+
+  // TODO: test
+  var template_url = $routeParams.template_url;
+  if (template_url) {
+    DoSerial
+    .then(function() {
+      maybe_create_project(template_url);
+    });
+  }
   DoSerial
   .then(function() {
     $scope.loaded = true;
