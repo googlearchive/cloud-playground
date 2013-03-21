@@ -17,23 +17,23 @@ angular.module('playgroundApp.services', [])
       if (cause) {
         msg += ' caused by ' + cause;
       }
-      alert_list.push({type: 'error', msg: msg});
+      alert_list.push({type: 'error', icon: 'icon-exclamation-sign', msg: msg});
     },
 
     note: function(msg) {
-      alert_list.push({msg: msg});
+      alert_list.push({icon: 'icon-hand-right', msg: msg});
     },
 
     info: function(msg) {
-      alert_list.push({type: 'info', msg: msg});
+      alert_list.push({type: 'info', icon: 'icon-info-sign', msg: msg});
     },
 
     success: function(msg) {
-      alert_list.push({type: 'success', msg: msg});
+      alert_list.push({type: 'success', icon: 'icon-ok', msg: msg});
     },
 
     error: function(msg) {
-      alert_list.push({type: 'error', msg: msg});
+      alert_list.push({type: 'error', icon: 'icon-exclamation-sign', msg: msg});
     },
 
     alerts: function() {
