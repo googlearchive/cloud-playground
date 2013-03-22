@@ -310,6 +310,7 @@ class OAuth2Admin(PlaygroundHandler):
       return
     data = json.loads(self.request.body)
     key = data['key']
+    url = data['url']
     client_id = data.get('client_id')
     client_secret = data.get('client_secret')
     if client_id and client_secret:
@@ -318,6 +319,7 @@ class OAuth2Admin(PlaygroundHandler):
       credential = model.GetOAuth2Credential(key) or model.OAuth2Credential()
     r = {
         'key': key,
+        'url': url,
         'client_id': credential.client_id,
         'client_secret': credential.client_secret,
     }

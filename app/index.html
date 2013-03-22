@@ -62,7 +62,7 @@
 
           <span ng-show="config.is_admin">danger(<a class="link" ng-click="big_red_button()">big-red-button</a>)</span>
 
-          <span ng-show="config.is_admin">oauth2(<a class="link" ng-click="oauth2_admin('github')">github</a>)</span>
+          <span ng-show="config.is_admin">oauth2(<a class="link" ng-click="oauth2_admin('github', 'https://github.com/settings/applications/38287')">github</a>)</span>
 
           <span ng-show="config.is_admin || config.is_devappserver">
             admin(<a class="link" ng-click="datastore_admin()" target="_blank">datastore</a>,

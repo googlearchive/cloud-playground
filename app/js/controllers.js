@@ -108,6 +108,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
         templateUrl: '/playground/oauth2_admin.html',
         resolve: {
             key: credential.key,
+            url: credential.url,
             client_id: credential.client_id,
             client_secret: credential.client_secret,
         },
@@ -118,8 +119,8 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
   }
 
   // TODO: test
-  $scope.oauth2_admin = function(key) {
-    $http.post('/playground/oauth2_admin', {key: key})
+  $scope.oauth2_admin = function(key, url) {
+    $http.post('/playground/oauth2_admin', {key: key, url: url})
     .success(function(data, status, headers, config) {
       prompt_oauth2_admin(data);
     });
@@ -329,15 +330,16 @@ function RenameFileController($scope, $log, dialog, path) {
 }
 
 // TODO: test
-function OAuth2AdminController($scope, $log, dialog, key, client_id,
+function OAuth2AdminController($scope, $log, dialog, key, url, client_id,
                                client_secret) {
 
   $scope.key = key;
+  $scope.url = url;
   $scope.client_id = client_id;
   $scope.client_secret = client_secret;
 
   $scope.close = function(client_id, client_secret) {
-    dialog.close({key: key, client_id: client_id,
+    dialog.close({key: key, url: url, client_id: client_id,
                   client_secret: client_secret});
   };
 
