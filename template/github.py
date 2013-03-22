@@ -16,7 +16,6 @@ import shared
 from . import collection
 
 from google.appengine.api import urlfetch_errors
-from google.appengine.ext import deferred
 
 
 _GITHUB_URL_RE = re.compile(
@@ -115,7 +114,7 @@ class GithubRepoCollection(collection.RepoCollection):
     for rpc, app_yaml_contents_url, repo in candidates1:
       result = rpc.get_result()
       if result.status_code != httplib.OK:
-        shared.w('Skipping repo due to {} fetching {}'
+        shared.w('skipping repo due to {} fetching {}'
                  .format(result.status_code, app_yaml_contents_url))
         continue
       r = json.loads(result.content)
@@ -133,7 +132,7 @@ class GithubRepoCollection(collection.RepoCollection):
       config = yaml.safe_load(decoded_content)
       runtime = config.get('runtime')
       if runtime != 'python27':
-        shared.w('Skipping "runtime: {}" app {}'.format(runtime,
+        shared.w('skipping "runtime: {}" app {}'.format(runtime,
                                                         app_yaml_contents_url))
         continue
       repos.append(repo)
@@ -180,12 +179,8 @@ class GithubRepoCollection(collection.RepoCollection):
     for repo in repos:
       name = repo['name']
       description=repo['description'] or repo['html_url']
-      r = model.CreateRepo(repo['html_url'], end_user_url=repo['html_url'],
-                           name=name, description=description)
-      repo_entities.append(r)
-    model.ndb.put_multi(repo_entities)
-    for repo_entity in repo_entities:
-      deferred.defer(self.CreateTemplateProject, repo_entity.key)
+      model.CreateRepoAsync(repo['html_url'], end_user_url=repo['html_url'],
+                            name=name, description=description)
 
   def CreateProjectTreeFromRepo(self, tree, repo):
     # e.g. https://github.com/GoogleCloudPlatform/appengine-crowdguru-python
@@ -219,6 +214,6 @@ class GithubRepoCollection(collection.RepoCollection):
         formatted_exception = traceback.format_exception(exc_info[0],
                                                          exc_info[1],
                                                          exc_info[2])
-        shared.w('Skipping {0} {1}'.format(path, file_git_url))
+        shared.w('skipping {0} {1}'.format(path, file_git_url))
         for line in [line for line in formatted_exception if line]:
           shared.w(line)

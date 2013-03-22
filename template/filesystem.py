@@ -13,7 +13,6 @@ import shared
 
 from . import collection
 
-from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 
 
@@ -49,12 +48,8 @@ class FilesystemRepoCollection(collection.RepoCollection):
       url = os.path.join(template_dir, dirname)
       end_user_url = ('https://code.google.com/p/cloud-playground/source/browse/'
                       '?repo=bliss#git%2F{}'.format(urllib.quote(url)))
-      repo = model.CreateRepo(url, end_user_url=end_user_url, name=name,
-                              description=description)
-      repos.append(repo)
-    ndb.put_multi(repos)
-    for repo in repos:
-      deferred.defer(self.CreateTemplateProject, repo.key)
+      model.CreateRepoAsync(url, end_user_url=end_user_url, name=name,
+                            description=description)
 
   def CreateProjectTreeFromRepo(self, tree, repo):
     repo_url = repo.key.id()

@@ -5,8 +5,10 @@ import random
 from mimic.__mimic import common
 
 import settings
+import shared
 
 from google.appengine.api import memcache
+from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 
 
@@ -81,6 +83,7 @@ class Repo(ndb.Model):
   created = ndb.DateTimeProperty(required=True, auto_now_add=True,
                                  indexed=False)
   updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
+  task_is_running = ndb.BooleanProperty(indexed=False)
 
 
 def GetOAuth2Credential(key):
@@ -96,15 +99,28 @@ def SetOAuth2Credential(key, client_id, client_secret):
   return credential
 
 
-def CreateRepo(repo_url, end_user_url, name, description):
+@ndb.transactional(xg=True)
+def RecreateRepo(repo):
+  repo_url = repo.key.id()
+  if repo.task_is_running:
+    shared.w('skipping already in progress repo recreation {}'.format(repo_url))
+    return
+  repo.task_is_running = True
+  repo.put()
+  shared.w('adding task to populate repo {}'.format(repo_url))
+  taskqueue.add(url='/_playground_tasks/populate_repo',
+                params={'repo_url': repo_url})
+
+
+@ndb.transactional(xg=True)
+def CreateRepoAsync(repo_url, end_user_url, name, description):
   user = GetTemplateOwner()
   project = CreateProject(user, repo_url, end_user_url, name, description)
   repo = Repo(id=repo_url, end_user_url=end_user_url, name=name,
               description=description,
               project=project.key, namespace=settings.PLAYGROUND_NAMESPACE)
-  repo.put()
+  RecreateRepo(repo)
   return repo
-
 
 def GetRepo(repo_url):
   return Repo.get_by_id(repo_url, namespace=settings.PLAYGROUND_NAMESPACE)

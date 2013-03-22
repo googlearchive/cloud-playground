@@ -16,12 +16,13 @@ class RepoCollection(object):
     """
     self.repo_collection = repo_collection
 
-  def CreateTemplateProject(self, repo_key):
+  def CreateTemplateProject(self, repo):
     shared.EnsureRunningInTask()  # gives us automatic retries
-    repo = repo_key.get()
     template_project = repo.project.get()
     tree = common.config.CREATE_TREE_FUNC(str(template_project.key.id()))
     self.CreateProjectTreeFromRepo(tree, repo)
+    repo.task_is_running = False
+    repo.put()
 
   def PopulateRepos(self):
     """Populate repos for this collection."""

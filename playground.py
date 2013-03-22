@@ -24,7 +24,6 @@ import shared
 
 from template import templates
 
-from google.appengine.ext import deferred
 from google.appengine.api import namespace_manager
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -393,8 +392,7 @@ class RecreateTemplateProject(PlaygroundHandler):
                                   .format(project_id))
     repo_url = project.template_url
     repo = model.GetRepo(repo_url)
-    collection = templates.GetCollection(repo_url)
-    deferred.defer(collection.CreateTemplateProject, repo.key)
+    model.RecreateRepo(repo)
 
 
 class NewProject(PlaygroundHandler):

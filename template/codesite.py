@@ -15,7 +15,6 @@ import shared
 from . import collection
 
 from google.appengine.api import urlfetch_errors
-from google.appengine.ext import deferred
 
 
 _CODESITE_URL_RE = re.compile('^https?://[^/]+.googlecode.com/.+$')
@@ -74,20 +73,16 @@ class CodesiteRepoCollection(collection.RepoCollection):
           continue
         name = c.rstrip('/') or project_url
         description = 'Sample code from {0}'.format(project_url)
-        repo = model.CreateRepo(project_url, end_user_url=project_url,
-                                name=name, description=description)
-        repos.append(repo)
+        model.CreateRepoAsync(project_url, end_user_url=project_url,
+                              name=name, description=description)
       except urlfetch_errors.Error:
         exc_info = sys.exc_info()
         formatted_exception = traceback.format_exception(exc_info[0],
                                                          exc_info[1],
                                                          exc_info[2])
-        shared.w('Skipping {0}'.format(project_url))
+        shared.w('skipping {0}'.format(project_url))
         for line in [line for line in formatted_exception if line]:
           shared.w(line)
-    model.ndb.put_multi(repos)
-    for repo in repos:
-      deferred.defer(self.CreateTemplateProject, repo.key)
 
   def CreateProjectTreeFromRepo(self, tree, repo):
     repo_url = repo.key.id()
