@@ -1,7 +1,19 @@
+# PyCharm
 /.idea/
+
+# Eclispe with pydev
+/.project
+/.pydevproject
+
+# from scripts/sdkapi.sh
 /sdkapi/
-*.pyc
+
+# Testacular
 /test_out/
 /.chrome-test/
 /.chrome-e2e/
 /.chrome-app/
+
+# compiled Python files
+*.pyc
+
