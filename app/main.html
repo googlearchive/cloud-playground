@@ -11,20 +11,20 @@
 
     <thead>
       <tr>
+        <th class="key">id</th>
         <th></th>
-        <th></th>
-        <th>Project</th>
-        <th>Description</th>
+        <th class="project_name">Name</th>
+        <th class="project_description">Description</th>
         <th></th>
       </tr>
     </thead>
 
     <tbody>
-      <tr ng-repeat="project in projects | orderBy:'orderby':true" ng-class="{ghost: !project.key}">
+      <tr class="project_row" ng-repeat="project in projects | orderBy:'orderby':true" ng-class="{ghost: !project.key}">
         <td class="key">{{project.key}}</div>
-        <td><button class="btn btn-small btn-success" ng-class="{disabled: !project.key}" ng-click="select_project(project)"><i class="icon-edit icon-white"></i> Run/Edit</button>
-        <td>{{project.name}}</td>
-        <td class="description">{{project.description}}</td>
+        <td><button class="btn btn-small btn-success" ng-class="{disabled: !project.key}" ng-click="select_project(project)"><i class="icon-share-alt icon-white"></i> open project</button>
+        <td class="project_name">{{project.name}}</td>
+        <td class="project_description">{{project.description}}</td>
         <td><button class="btn btn-small btn-danger" ng-class="{disabled: !project.key}" ng-click="prompt_delete_project(project)"><i class="icon-remove icon-white"></i> delete</button></td>
       </tr>
 
@@ -48,18 +48,18 @@
     <h1>Project Templates</h1>
     <div ng-repeat="tp in template_projects">
         <div class="tp" style="margin: .5em;">
-          <button class="btn" style="float: left;" ng-click="new_project(tp)"><i class="icon-plus"></i> New Project</button>
+          <button class="btn" style="float: left;" ng-click="new_project(tp)"><i class="icon-plus"></i> copy me</button>
           <div style="display: inline-block;">
-             <div class="name">
+             <div class="template_name">
                <a ng-href="{{tp.template_url}}" target="{{tp.name}}">{{tp.name}}</a>
                <span ng-show="config.is_admin || config.is_devappserver">
                  <button class="admin btn btn-mini btn-link" ng-click="recreate_template_project(tp)"><i class="icon-refresh"></i></button>
                </span>
              </div>
-             <div class="description">{{tp.description}}</div>
+             <div class="template_description">{{tp.description}}</div>
           </div>
         </div>
     </div>
-  <div>
+  </div>
 
 </div>

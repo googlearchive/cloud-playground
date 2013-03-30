@@ -2,7 +2,7 @@
   <div id="source-container">
     <div id="nav">
       <div id="navheader">
-        <div id="projectname" title="{{project.description}}">{{project.name}}</div>
+        <div class="project_name" title="{{project.description}}">{{project.name}}</div>
         <div class="dropdown"><a ng-click="project_context_menu($event)">…</a></div>
       </div>
       <div id="filelist">
@@ -18,7 +18,7 @@
     </div>
 
     <div id="source-filename">
-      <button ng-click='run()' title='run {{project.name}}' class='btn btn-success'>&nbsp;<i class="icon-play"></i>&nbsp;</button>
+      <button ng-click='run()' title='run {{project.name}}' class='btn btn-success'><i class="icon-play"></i></button>
       {{current_file.path}}
       <span class="filestatus" ng-bind="filestatus"></span>
     </div>

@@ -11,6 +11,7 @@ A:hover {
 
 .btn {
   margin-right: 10px;
+  margin-left: 10px;
 }
 
 .context-menu {
@@ -142,7 +143,7 @@ H1 {
       background-color: #ccf;
     }
 
-      #nav #filelist .fileentry .filename , #nav #navheader #projectname {
+      #nav #filelist .fileentry .filename , #nav #navheader .project_name {
         display: inline-block;
         width: 155px;
         overflow: hidden;
@@ -181,10 +182,23 @@ H1 {
   color: #bbb;
 }
 
+.project_row {
+ vertical-align: top;
+}
+
+.project_name {
+  font-weight: bold;
+  width: 30em;
+}
+
+.project_description {
+  width: 30em;
+}
+
 .template {
   padding-bottom: 0.4em;
 }
-  .template .name {
+  .template_name {
     font-weight: bold;
   }
 
@@ -296,10 +310,6 @@ BUTTON.admin > I[class*=" icon-"] {
 
 .alert DIV {
   white-space: pre;
-}
-
-.description {
-  max-width: 50em;
 }
 
 .loading {
