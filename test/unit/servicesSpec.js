@@ -23,7 +23,8 @@ describe('service', function() {
       it('should be able to add an alert', function() {
         Alert.note('Test alert');
         expect(Alert.alerts().length).toBe(1);
-        expect(Alert.alerts()[0]).toEqual({msg: 'Test alert'});
+        expect(Alert.alerts()[0]).toEqual({icon: 'icon-hand-right',
+                                           msg: 'Test alert'});
       });
 
     });
@@ -34,6 +35,7 @@ describe('service', function() {
 
         var methods = ['info', 'success', 'error'];
         var messages = ['info message', 'success message', 'error message'];
+        var icons = ['icon-info-sign', 'icon-ok', 'icon-exclamation-sign'];
         for (var i = 0; i < methods.length; i++) {
           Alert[methods[i]](messages[i]);
         }
@@ -42,12 +44,14 @@ describe('service', function() {
 
         for (var i = 0; i < methods.length; i++) {
           expect(Alert.alerts()[i]).toEqual(
-            {msg: messages[i], type: methods[i]});
+            {msg: messages[i], icon: icons[i], type: methods[i]});
         }
 
         Alert.remove_alert(1);
         expect(Alert.alerts().length).toBe(2);
-        expect(Alert.alerts()[1]).toEqual({msg: messages[2], type: 'error'});
+        expect(Alert.alerts()[1]).toEqual({msg: messages[2],
+                                           icon: 'icon-exclamation-sign',
+                                           type: 'error'});
 
       });
 
