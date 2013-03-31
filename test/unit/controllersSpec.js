@@ -825,6 +825,7 @@ describe('MainController', function() {
 
   beforeEach(inject(function($rootScope, $injector) {
     scope = $rootScope.$new();
+    scope.set_loaded = jasmine.createSpy('set_loaded');
     scope.projects = [];
     scope.template_projects = [make_project(12)];
     $httpBackend = $injector.get('$httpBackend');
@@ -851,10 +852,9 @@ describe('MainController', function() {
 
   describe('initialization', function() {
 
-    it('should transition $scope.loaded state to true', function() {
-      expect(scope.loaded).toBeUndefined();
+    it('should call $scope.set_loaded()', function() {
       doInit();
-      expect(scope.loaded).toBe(true);
+      expect(scope.set_loaded).toHaveBeenCalled();
     });
 
   });
