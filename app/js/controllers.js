@@ -288,6 +288,13 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
   $scope.new_project = function(template_project) {
     DoSerial
     .then(function() {
+      $location.hash('');
+    })
+    .tick()
+    .then(function() {
+      $location.hash('my_projects');
+    })
+    .then(function() {
       var data = {
         'name': '(Creating project...)',
         'description': '(Please wait...)',
