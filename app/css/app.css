@@ -200,6 +200,11 @@ H1 {
 }
   .template_name {
     font-weight: bold;
+    width: 30em;
+  }
+
+  .template_description {
+    width: 30em;
   }
 
 #container {
