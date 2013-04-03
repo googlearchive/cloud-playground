@@ -62,9 +62,12 @@ def _GetRepoCollections():
   repo_collections = []
   for uri, description in REPO_COLLECTIONS:
     repo_collection = model.GetOrInsertRepoCollection(uri, description)
-    shared.w('adding task to populate repo collection {0!r}'.format(uri))
-    taskqueue.add(url='/_playground_tasks/populate_repo_collection',
-                  params={'repo_collection_url': repo_collection.key.id()})
+    task = taskqueue.add(url='/_playground_tasks/populate_repo_collection',
+                         params={
+                             'repo_collection_url': repo_collection.key.id(),
+                         })
+    shared.w('adding task {} to populate repo collection {!r}'.format(task.name,
+                                                                      uri))
     repo_collections.append(repo_collection)
   ndb.put_multi(repo_collections)
   return repo_collections

@@ -1,5 +1,6 @@
 """Class representing a code repository."""
 
+import model
 import shared
 
 from mimic.__mimic import common
@@ -18,10 +19,13 @@ class RepoCollection(object):
 
   def CreateTemplateProject(self, repo):
     shared.EnsureRunningInTask()  # gives us automatic retries
-    template_project = repo.project.get()
+    task_name = shared.GetCurrentTaskName()
+    template_project = model.SetProjectOwningTask(repo.project, task_name)
     tree = common.config.CREATE_TREE_FUNC(str(template_project.key.id()))
+    tree.Clear()
     self.CreateProjectTreeFromRepo(tree, repo)
-    repo.task_is_running = False
+    template_project = model.SetProjectOwningTask(repo.project, None)
+    repo.in_progress_task_name = None
     repo.put()
 
   def PopulateRepos(self):

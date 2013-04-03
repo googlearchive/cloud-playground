@@ -39,6 +39,7 @@ class PlaygroundProject(ndb.Model):
   created = ndb.DateTimeProperty(required=True, auto_now_add=True,
                                  indexed=False)
   updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
+  in_progress_task_name = ndb.StringProperty(indexed=False)
 
   @property
   def orderby(self):
@@ -83,7 +84,7 @@ class Repo(ndb.Model):
   created = ndb.DateTimeProperty(required=True, auto_now_add=True,
                                  indexed=False)
   updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
-  task_is_running = ndb.BooleanProperty(indexed=False)
+  in_progress_task_name = ndb.StringProperty(indexed=False)
 
 
 def GetOAuth2Credential(key):
@@ -99,31 +100,33 @@ def SetOAuth2Credential(key, client_id, client_secret):
   return credential
 
 
-@ndb.transactional(xg=True)
-def RecreateRepo(repo):
-  repo_url = repo.key.id()
-  if repo.task_is_running:
-    shared.w('skipping already in progress repo recreation {}'.format(repo_url))
-    return
-  repo.task_is_running = True
-  repo.put()
-  shared.w('adding task to populate repo {}'.format(repo_url))
-  taskqueue.add(url='/_playground_tasks/populate_repo',
-                params={'repo_url': repo_url})
+def GetRepo(repo_url):
+  return Repo.get_by_id(repo_url, namespace=settings.PLAYGROUND_NAMESPACE)
 
 
 @ndb.transactional(xg=True)
 def CreateRepoAsync(repo_url, end_user_url, name, description):
-  user = GetTemplateOwner()
-  project = CreateProject(user, repo_url, end_user_url, name, description)
-  repo = Repo(id=repo_url, end_user_url=end_user_url, name=name,
-              description=description,
-              project=project.key, namespace=settings.PLAYGROUND_NAMESPACE)
-  RecreateRepo(repo)
+  repo = GetRepo(repo_url)
+  if not repo:
+    user = GetTemplateOwner()
+    repo = Repo(id=repo_url, end_user_url=end_user_url, name=name,
+                description=description,
+                namespace=settings.PLAYGROUND_NAMESPACE)
+  elif repo.in_progress_task_name:
+    raise RuntimeError('repo recreation for {} already executing in task {}'
+                       .format(repo_url, repo.in_progress_task_name))
+  task = taskqueue.add(url='/_playground_tasks/populate_repo',
+                       params={'repo_url': repo_url})
+  shared.w('task {} added to populate repo {}'.format(task.name, repo_url))
+  repo.in_progress_task_name = task.name
+  if repo.project:
+    SetProjectOwningTask(repo.project, task.name)
+  else:
+    project = CreateProject(user, repo_url, end_user_url, name, description,
+                            in_progress_task_name=task.name)
+    repo.project = project.key
+  repo.put()
   return repo
-
-def GetRepo(repo_url):
-  return Repo.get_by_id(repo_url, namespace=settings.PLAYGROUND_NAMESPACE)
 
 
 def GetOrCreateUser(user_id):
@@ -253,7 +256,7 @@ def NewProjectName():
 
 @ndb.transactional(xg=True)
 def CreateProject(user, template_url, end_user_url, project_name,
-                  project_description):
+                  project_description, in_progress_task_name=None):
   """Create a new user project.
 
   Args:
@@ -275,13 +278,28 @@ def CreateProject(user, template_url, end_user_url, project_name,
                           writers=[user.key.id()],
                           template_url=template_url,
                           end_user_url=end_user_url,
-                          namespace=settings.PLAYGROUND_NAMESPACE)
+                          namespace=settings.PLAYGROUND_NAMESPACE,
+                          in_progress_task_name=in_progress_task_name,
+                          )
   prj.put()
   # transactional get before update
   user = user.key.get()
   user.projects.append(prj.key)
   user.put()
   return prj
+
+
+@ndb.transactional()
+def SetProjectOwningTask(project_key, in_progress_task_name):
+  project = project_key.get()
+  if (None not in (in_progress_task_name, project.in_progress_task_name)
+      and in_progress_task_name != project.in_progress_task_name):
+    raise RuntimeError('illegal project task move {} -> {}'
+                       .format(project.in_progress_task_name,
+                               in_progress_task_name))
+  project.in_progress_task_name = in_progress_task_name
+  project.put()
+  return project
 
 
 def GetOrInsertRepoCollection(uri, description):

@@ -47,16 +47,24 @@
   <div>
     <h1>Project Templates</h1>
     <div ng-repeat="tp in template_projects">
-        <div class="tp" style="margin: .5em;">
-          <button class="btn" style="float: left;" ng-click="new_project(tp)"><i class="icon-plus"></i> copy me</button>
+        <div class="tp" style="margin: .5em;"
+             ng-hide="!!tp.in_progress_task_name && ! config.is_admin && ! config.is_devappserver">
+          <button class="btn" style="float: left;" ng-click="new_project(tp)"
+                  ng-disabled="!!tp.in_progress_task_name">
+            <i class="icon-plus"></i> copy me
+          </button>
           <div style="display: inline-block;">
-             <div class="template_name">
-               <a ng-href="{{tp.template_url}}" target="{{tp.name}}">{{tp.name}}</a>
-               <span ng-show="config.is_admin || config.is_devappserver">
-                 <button class="admin btn btn-mini btn-link" ng-click="recreate_template_project(tp)"><i class="icon-refresh"></i></button>
-               </span>
-             </div>
-             <div class="template_description">{{tp.description}}</div>
+            <div class="template_name">
+              <a ng-href="{{tp.template_url}}" target="{{tp.name}}">{{tp.name}}</a>
+              <span ng-show="config.is_admin || config.is_devappserver">
+                <button class="admin btn btn-mini btn-link"
+                        ng-click="recreate_template_project(tp)"
+                        ng-disabled="!!tp.in_progress_task_name">
+                  <i class="icon-refresh"></i>
+                </button>
+              </span>
+            </div>
+            <div class="template_description">{{tp.description}}</div>
           </div>
         </div>
     </div>

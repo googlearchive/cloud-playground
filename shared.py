@@ -33,12 +33,16 @@ def w(msg, *args, **kwargs):
   logging.warning('##### {0}'.format(repr(msg)))
 
 
+def GetCurrentTaskName():
+  return os.environ.get('HTTP_X_APPENGINE_TASKNAME')
+
+
 def EnsureRunningInTask():
   """Ensures that we're currently executing inside a task.
 
   If not, raise a RuntimeError.
   """
-  if 'HTTP_X_APPENGINE_TASKNAME' in os.environ:
+  if GetCurrentTaskName():
     return
   raise RuntimeError('Not executing in a task queue')
 

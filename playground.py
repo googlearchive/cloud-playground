@@ -226,6 +226,7 @@ class PlaygroundHandler(SessionHandler):
         'description': project.project_description,
         'orderby': project.orderby,
         'run_url': self._GetPlaygroundRunUrl(project.key.id()),
+        'in_progress_task_name': project.in_progress_task_name,
     }
 
 
@@ -393,7 +394,8 @@ class RecreateTemplateProject(PlaygroundHandler):
                                   .format(project_id))
     repo_url = project.template_url
     repo = model.GetRepo(repo_url)
-    model.RecreateRepo(repo)
+    model.CreateRepoAsync(repo.key.id(), repo.end_user_url, repo.name,
+                          repo.description)
 
 
 class NewProject(PlaygroundHandler):
