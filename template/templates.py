@@ -19,6 +19,8 @@ from . import github
 REPO_COLLECTIONS = [
     # TEMPLATE_PROJECT_DIR here so we populate filesystem templates first
     (settings.TEMPLATE_PROJECT_DIR, 'Cloud Playground Built-In Templates'),
+    ('https://api.github.com/users/fredsa/repos',
+     'Fred''s samples on github'),
     ('https://api.github.com/users/GoogleCloudPlatform/repos',
      'Google Cloud Platform samples on github'),
     #('https://google-app-engine-samples.googlecode.com/svn/trunk/',
