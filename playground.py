@@ -398,6 +398,23 @@ class RecreateTemplateProject(PlaygroundHandler):
                           repo.description)
 
 
+class CreateTemplateProjectByUrl(PlaygroundHandler):
+  """Request handler for (re)creating template projects."""
+
+  def post(self):
+    repo_url = self.request.data.get('repo_url')
+    if not repo_url:
+      raise error.PlaygroundError('repo_id required')
+    repo = model.GetRepo(repo_url)
+    if not repo:
+      end_user_url = name = description = repo_url
+      repo = model.CreateRepoAsync(repo_url, end_user_url, name, description)
+    project = repo.project.get()
+    r = self.DictOfProject(project)
+    self.response.headers['Content-Type'] = _JSON_MIME_TYPE
+    self.response.write(tojson(r))
+
+
 class NewProject(PlaygroundHandler):
   """Request handler for creating new projects via an HTML link."""
 
@@ -504,6 +521,7 @@ app = webapp2.WSGIApplication([
 
     # project actions
     ('/playground/recreate_template_project', RecreateTemplateProject),
+    ('/playground/create_template_project_by_url', CreateTemplateProjectByUrl),
     ('/playground/gettemplateprojects', GetTemplateProjects),
     ('/playground/getprojects', GetProjects),
     ('/playground/copyproject', CopyProject),

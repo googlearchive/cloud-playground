@@ -45,14 +45,19 @@
 
   </table>
   <div>
-    <h1>Project Templates</h1>
-    <div ng-repeat="tp in template_projects">
+    <h1><a id="my_templates"></a>Project Templates</h1>
+    <div ng-repeat="tp in template_projects | orderBy:'name'">
         <div class="tp" style="margin: .5em;"
              ng-hide="!!tp.in_progress_task_name && ! config.is_admin && ! config.is_devappserver">
-          <button class="btn" style="float: left;" ng-click="new_project(tp)"
-                  ng-disabled="!!tp.in_progress_task_name">
-            <i class="icon-plus"></i> copy me
-          </button>
+          <div class="pull-left span2">
+            <button class="btn" ng-click="new_project(tp)"
+                    ng-disabled="!!tp.in_progress_task_name">
+              <span ng-hide="!!tp.in_progress_task_name">
+                <i class="icon-plus"></i> copy me
+              </span>
+              <span ng-show="!!tp.in_progress_task_name">(Fetching...)</span>
+            </button>
+          </div>
           <div style="display: inline-block;">
             <div class="template_name">
               <a ng-href="{{tp.template_url}}" target="{{tp.name}}">{{tp.name}}</a>
@@ -68,6 +73,23 @@
           </div>
         </div>
     </div>
+  </div>
+
+  <div>
+    <h1>Import new templates</h1>
+    <form class="form-horizontal">
+      <div class="control-group">
+        <label class='control-label' for='import_url'>Github project URL</label>
+        <div class="controls">
+          <div class="input-append">
+            <input class='span6' type='url' id='import_url'
+                   ng-model='import_url' required
+                   placeholder="https://github.com/github_user_id/repo_name">
+            <button class="btn" type="button" ng-click="new_project_by_url(import_url)">Import</button>
+          </div>
+        </div>
+      </div>
+    </form>
   </div>
 
 </div>

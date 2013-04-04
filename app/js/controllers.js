@@ -269,15 +269,8 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
 
   // TODO: test
   $scope.recreate_template_project = function(template_project) {
+    template_project.in_progress_task_name = 'foo'
     DoSerial
-    .then(function() {
-      for (var i in $scope.template_projects) {
-        if ($scope.template_projects[i] == template_project) {
-          $scope.template_projects.splice(i, 1);
-          break;
-        }
-      }
-    })
     .then(function() {
       return $http.post('/playground/recreate_template_project', {
           project_id: template_project.key,
@@ -285,15 +278,21 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
     });
   };
 
-  $scope.new_project = function(template_project) {
+  // TODO: test
+  $scope.force_location_hash = function(hash) {
     DoSerial
     .then(function() {
       $location.hash('');
     })
     .tick()
     .then(function() {
-      $location.hash('my_projects');
-    })
+      $location.hash(hash);
+    });
+  }
+
+  $scope.new_project = function(template_project) {
+    $scope.force_location_hash('my_projects');
+    DoSerial
     .then(function() {
       var data = {
         'name': '(Creating project...)',
@@ -308,6 +307,35 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
       .success(function(data, status, headers, config) {
         $scope.projects.pop();
         $scope.projects.push(data);
+      });
+    });
+  };
+
+  // TODO: test
+  $scope.new_project_by_url = function(repo_url) {
+    $scope.force_location_hash('my_templates');
+    for (var i in $scope.template_projects) {
+      if ($scope.template_projects[i].template_url == repo_url) {
+        throw 'template already exists ' + repo_url;
+      }
+    }
+    DoSerial
+    .then(function() {
+      var data = {
+        'name': '(Creating template project...)',
+        'description': '(Please wait...)',
+        'in_pogress_task_name': 'foo',
+      };
+      $scope.template_projects.push(data);
+    })
+    DoSerial
+    .then(function() {
+      return $http.post('/playground/create_template_project_by_url', {
+          repo_url: repo_url,
+      })
+      .success(function(data, status, headers, config) {
+        $scope.template_projects.pop();
+        $scope.template_projects.push(data);
       });
     });
   };
