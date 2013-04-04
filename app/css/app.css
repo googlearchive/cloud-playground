@@ -115,7 +115,7 @@ H1 {
 }
 
 #nav {
-  width: 180px;
+  width: 200px;
   height: 100%;
   float: left;
 }
@@ -125,7 +125,7 @@ H1 {
     width: 100%;
     height: 100%;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: show;
   }
 
     #nav #filelist .fileentry {
@@ -145,7 +145,7 @@ H1 {
 
       #nav #filelist .fileentry .filename , #nav #navheader .project_name {
         display: inline-block;
-        width: 155px;
+        width: 160px;
         overflow: hidden;
         white-space: nowrap;
       }
