@@ -520,6 +520,11 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
           // mode detection.
           $scope.codeMirror.setOption(
             'mode', $scope.current_file.mime_type.split(';')[0]);
+          $scope.codeMirror.setOption('extraKeys', {
+              'Ctrl-Enter': function(cm) {
+                $scope.run();
+              }
+          });
         }
       });
     });
