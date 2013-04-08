@@ -159,6 +159,12 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
           break;
         }
       }
+      for (var i in $scope.template_projects) {
+        if ($scope.template_projects[i] == project) {
+          $scope.template_projects.splice(i, 1);
+          break;
+        }
+      }
       $location.url('/playground/');
     });
   };

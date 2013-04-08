@@ -175,7 +175,8 @@ class PlaygroundHandler(SessionHandler):
     if not self.project:
       # TODO: better approach which allows the creation of new projects
       return
-    if user_key not in self.project.writers:
+    if (user_key not in self.project.writers
+        and not users.is_current_user_admin()):
       raise error.PlaygroundError('You are not authorized to edit this project')
 
   def PerformValidation(self):
@@ -435,9 +436,13 @@ class DeleteProject(PlaygroundHandler):
 
   def post(self, project_id):
     assert project_id
-    if not model.GetProject(project_id):
+    project = model.GetProject(project_id)
+    if not project:
       raise Exception('Project {0} does not exist'.format(project_id))
-    model.DeleteProject(self.user, tree=self.tree, project_id=project_id)
+    user = self.user
+    if users.is_current_user_admin():
+      user = model.GetOrCreateUser(project.owner)
+    model.DeleteProject(user, tree=self.tree, project_id=project_id)
 
 
 class RenameProject(PlaygroundHandler):

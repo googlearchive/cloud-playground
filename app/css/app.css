@@ -9,11 +9,6 @@ A:hover {
   text-decoration: none;
 }
 
-.btn {
-  margin-right: 10px;
-  margin-left: 10px;
-}
-
 .context-menu {
   position: absolute;
   margin-left: -2em;
@@ -249,6 +244,10 @@ H1 {
   .adminlinks > SPAN {
     margin: 0.4em;
   }
+
+.admin {
+  color: gray;
+}
 
 BUTTON.admin > I[class^="icon-"],
 BUTTON.admin > I[class*=" icon-"] {

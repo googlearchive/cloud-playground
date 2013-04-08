@@ -59,16 +59,21 @@
             </button>
           </div>
           <div style="display: inline-block;">
-            <div class="template_name">
+            <span class="template_name">
               <a ng-href="{{tp.template_url}}" target="{{tp.name}}">{{tp.name}}</a>
-              <span ng-show="config.is_admin || config.is_devappserver">
-                <button class="admin btn btn-mini btn-link"
-                        ng-click="recreate_template_project(tp)"
-                        ng-disabled="!!tp.in_progress_task_name">
-                  <i class="icon-refresh"></i>
-                </button>
-              </span>
-            </div>
+            </span>
+            <span ng-show="config.is_admin || config.is_devappserver">
+              <button class="admin btn btn-mini btn-link "
+                      ng-click="recreate_template_project(tp)"
+                      ng-disabled="!!tp.in_progress_task_name">
+                <i class="icon-refresh"></i> refresh
+              </button>
+              <button class="admin btn btn-danger btn-mini btn-link "
+                      ng-click="prompt_delete_project(tp)"
+                      ng-disabled="!!tp.in_progress_task_name">
+                <i class="icon-remove"></i> delete
+              </button>
+            </span>
             <div class="template_description">{{tp.description}}</div>
           </div>
         </div>
