@@ -385,6 +385,9 @@ class RecreateTemplateProject(PlaygroundHandler):
   """Request handler for recreating template projects."""
 
   def post(self):
+    if not users.is_current_user_admin():
+      self.response.set_status(httplib.UNAUTHORIZED)
+      return
     project_id = self.request.data['project_id']
     if not project_id:
       raise error.PlaygroundError('project_id required')
