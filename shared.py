@@ -6,7 +6,6 @@ import os
 from mimic.__mimic import common
 from mimic.__mimic import mimic
 
-import model
 import settings
 
 from google.appengine.api import app_identity
@@ -57,17 +56,3 @@ def ThisIsPlaygroundApp():
   if common.IsDevMode():
     return True
   return app_identity.get_application_id() == settings.PLAYGROUND_APP_ID
-
-
-def DoesCurrentProjectExist():
-  """Checks whether the curent project exists."""
-  project_id = mimic.GetProjectId()
-  if not project_id:
-    return None
-  prj = model.GetProject(project_id)
-  if not prj:
-    return None
-  assert namespace_manager.get_namespace() == project_id, (
-      'namespace_manager.get_namespace()={0!r}, project_id={1!r}'
-      .format(namespace_manager.get_namespace(), project_id))
-  return True
