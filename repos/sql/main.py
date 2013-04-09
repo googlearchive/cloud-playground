@@ -1,8 +1,8 @@
 import os
 import logging
+import webapp2
 
 from google.appengine.api import rdbms
-from google.appengine.ext import webapp
 
 import jinja2
 
@@ -26,7 +26,7 @@ def get_connection():
                            user=USER_NAME, password=PASSWORD, charset='utf8')
 
 
-class MainHandler(webapp.RequestHandler):
+class MainHandler(webapp2.RequestHandler):
     def get(self):
         # Viewing guestbook
         conn = get_connection()
@@ -40,7 +40,7 @@ class MainHandler(webapp.RequestHandler):
         self.response.out.write(template.render(template_values))
 
 
-class GuestBook(webapp.RequestHandler):
+class GuestBook(webapp2.RequestHandler):
     def post(self):
         # Posting a new guestbook entry
         conn = get_connection()
@@ -54,7 +54,7 @@ class GuestBook(webapp.RequestHandler):
         self.redirect("/")
 
 
-application = webapp.WSGIApplication([
+application = webapp2.WSGIApplication([
     ("/", MainHandler),
     ("/sign", GuestBook),
 ], debug=True)
