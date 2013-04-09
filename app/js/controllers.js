@@ -531,8 +531,6 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
                 $scope.run();
               }
           });
-          // clear undo history
-          $scope.codeMirror.getDoc().clearHistory();
         }
       });
     });

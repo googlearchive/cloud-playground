@@ -32,6 +32,7 @@ angular.module('ui.directives')
 
   var events = ['cursorActivity', 'viewportChange', 'gutterClick', 'focus',
                 'blur', 'scroll', 'update'];
+
   return {
     restrict: 'A',
     require: 'ngModel',
@@ -90,6 +91,7 @@ angular.module('ui.directives')
           // 'Something else' here should know about the change.
           codeMirror.off('change', onChangeCallback);
           codeMirror.setValue(ngModel.$viewValue);
+          codeMirror.getDoc().clearHistory();
           codeMirror.on('change', onChangeCallback);
         };
         // pass codeMirror object to the scope.
