@@ -402,8 +402,6 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   // TODO: remove once file contents are returned in JSON response
   $scope.no_json_transform = function(data) { return data; };
 
-  $scope.editor_contents = '';
-
   function toquerystring(params) {
       var qs = '';
       angular.forEach(params, function(value, key) {
@@ -497,15 +495,16 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   }
 
   // TODO: test
-  $scope.editor_on_change = function(instance, changeObj) {
-    $scope.current_file.contents = $scope.editor_contents;
-    if ($scope.current_file.dirty) {
-      return;
-    }
-    $scope.current_file.dirty = true;
-    $scope.$apply(); // need to apply here for dirty mark
-    Backoff.schedule(_save_dirty_files);
-  };
+  $scope.create_on_change_closure = function(file) {
+    return function(instance, changeObj) {
+      if (file.dirty) {
+        return;
+      }
+      file.dirty = true;
+      $scope.$apply(); // need to apply here for dirty mark
+      Backoff.schedule(_save_dirty_files);
+    };
+  }
 
   $scope.select_file = function(file) {
     if ($scope.is_image_mime_type(file.mime_type)) {
@@ -513,26 +512,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
       return;
     }
     $scope._get(file, function() {
-      return DoSerial
-      .then(function() {
-        $scope.current_file = file;
-      })
-      .tick() // needed when switching from source-image to editor
-      .then(function() {
-        $scope.editor_contents = file.contents;
-        if ($scope.codeMirror) {
-          $scope.codeMirror.focus();
-          // Remove the charset part from the mime type for CodeMirror
-          // mode detection.
-          $scope.codeMirror.setOption(
-            'mode', $scope.current_file.mime_type.split(';')[0]);
-          $scope.codeMirror.setOption('extraKeys', {
-              'Ctrl-Enter': function(cm) {
-                $scope.run();
-              }
-          });
-        }
-      });
+      $scope.current_file = file;
     });
   };
 
@@ -704,12 +684,12 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     DoSerial
     .then(function() {
       var oldpath = file.path;
-      delete $scope.files[oldpath];
       var url = $scope.url_of('move', {path: file.path, newpath: path});
       return $http.post(url)
       .success(function(data, status, headers, config) {
+        delete $scope.files[oldpath];
+        file.path = path;
         $scope.files[path] = file;
-        $scope.files[path].path = path;
         // TODO: have server send updated MIME type
         $scope.current_file = file;
       });

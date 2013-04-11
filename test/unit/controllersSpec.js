@@ -112,27 +112,12 @@ describe('ProjectController', function() {
     };
   }
 
-  var findable_elements;
-
-
   beforeEach(module(function($provide) {
     // TODO: DETERMINE truth of 'there has to be a better way'
     $provide.factory('$window', function() {
       var $window = {
-        document: {
-          createElement: jasmine.createSpy('createElement').andCallFake(
-            function(id) {
-              return id + '-elem';
-            }),
-          getElementById: jasmine.createSpy('getElementById').andCallFake(
-            function(id) {
-              return findable_elements[id];
-            }),
-        },
+        document: {},
         navigator: {},
-      };
-      findable_elements = {
-        'source-code': $window.document.createElement('source-code'),
       };
       return $window;
     });
@@ -433,27 +418,6 @@ describe('ProjectController', function() {
           scope.select_file(make_text_file());
           flushDoSerial();
           expect(scope.current_file).toEqual(make_text_file());
-        });
-
-        // TODO: test order of calls to DoSerial functions
-        it('should call DoSerial.then() and DoSerial.tick()',
-           inject(function(DoSerial) {
-             spyOn(DoSerial, 'then').andCallThrough();
-             spyOn(DoSerial, 'tick').andCallThrough();
-             scope.select_file(make_text_file());
-             expect(DoSerial.then).toHaveBeenCalled();
-             expect(DoSerial.tick).toHaveBeenCalled();
-           }));
-
-        it('should update the $scope.editor_contents and set mode', function() {
-          scope.codeMirror = jasmine.createSpyObj('codeMirror',
-                                                  ['setOption', 'focus']);
-          scope.select_file(make_text_file());
-          flushDoSerial();
-          expect(scope.editor_contents).toBe('version: 1');
-          expect(scope.codeMirror.setOption).toHaveBeenCalledWith(
-            'mode', 'text/x-yaml');
-          expect(scope.codeMirror.focus).toHaveBeenCalled();
         });
 
       });

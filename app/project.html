@@ -22,8 +22,10 @@
       {{current_file.path}}
       <span class="filestatus" ng-bind="filestatus"></span>
     </div>
-    <div ng-hide="is_image_mime_type(current_file.mime_type)" id="source-code" ui-codeMirror="{onChange: editor_on_change}" ng-model="editor_contents"></div>
-    <img ng-show="is_image_mime_type(current_file.mime_type)" ng-src="{{image_url_of(current_file)}}">
+    <span ng-show="file == current_file" ng-repeat="file in files">
+      <div ng-hide="is_image_mime_type(file.mime_type)" class="source-code" ui-codeMirror="{onChange: create_on_change_closure(file), file: file}" ng-model="file.contents"></div>
+      <img ng-show="is_image_mime_type(file.mime_type)" ng-src="{{image_url_of(file)}}">
+    </span>
   </div>
 
 <br>

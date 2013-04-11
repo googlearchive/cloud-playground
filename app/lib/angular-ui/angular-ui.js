@@ -22,7 +22,7 @@ angular.module('ui', ['ui.filters', 'ui.directives', 'ui.config']);
  *
  * The local changes are:
  * 1. Allow elements other than textarea.
- * 2. Add codeMirror object to the scope.
+ * 2. Set application specific options and watches.
  *
  */
 angular.module('ui.directives')
@@ -91,11 +91,34 @@ angular.module('ui.directives')
           // 'Something else' here should know about the change.
           codeMirror.off('change', onChangeCallback);
           codeMirror.setValue(ngModel.$viewValue);
-          codeMirror.getDoc().clearHistory();
           codeMirror.on('change', onChangeCallback);
+          // The codeMirror object is created when the controller fetches the
+          // file list, with empty contents. So we need to clear the history
+          // here, in order to prevent the editor from undo to an empty state.
+          codeMirror.getDoc().clearHistory();
+          codeMirror.focus();
+
+          // Defer the setOption call, since otherwise an empty editor shown
+          $timeout(function() {
+            codeMirror.setOption('mode', opts.file.mime_type.split(';')[0]);
+          });
         };
-        // pass codeMirror object to the scope.
-        scope.codeMirror = codeMirror;
+
+        codeMirror.setOption('extraKeys', {
+          'Ctrl-Enter': function(cm) {
+            scope.run();
+          }
+        });
+
+        scope.$watch('file.path', function() {
+          // The file renamed, need to focus.
+          codeMirror.focus();
+        });
+
+        scope.$watch('file.mime_type', function() {
+          // This could be called upon renaming the file.
+          codeMirror.setOption('mode', opts.file.mime_type.split(';')[0]);
+        })
       };
 
       $timeout(deferCodeMirror);

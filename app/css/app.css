@@ -258,7 +258,7 @@ BUTTON.admin > I[class*=" icon-"] {
   height: 400px;
 }
 
-  #source-container #source-code {
+  #source-container .source-code {
     background-color: #f8fafc;
     height: 100%;
   }
