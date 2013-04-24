@@ -39,7 +39,7 @@ if _APP_ID not in _APP_IDS:
 
 if _DEV_MODE:
   PLAYGROUND_HOSTS = ('localhost:8080', '127.0.0.1:8080',
-                      # port 7070 for testacular e2e test
+                      # port 7070 for karma e2e test
                       'localhost:7070', '127.0.0.1:7070',
                       app_identity.get_default_version_hostname())
   PLAYGROUND_USER_CONTENT_HOST = backends.get_hostname('devappserver-cors-test')

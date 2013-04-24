@@ -63,7 +63,7 @@ pids="$$ $pids"
   --window-size=520,300 \
   --window-position=100,250 \
   --user-data-dir=.chrome-e2e \
-  http://localhost:7070/testacular/ &
+  http://localhost:7070/karma/ &
 pids="$$ $pids"
 
 "$CHROME" $CHROME_ARGS \

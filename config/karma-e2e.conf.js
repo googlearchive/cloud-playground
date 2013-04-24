@@ -62,7 +62,7 @@ captureTimeout = 5000;
 singleRun = false;
 
 // use a subpath here, so we can test the full playground uri space
-urlRoot = '/testacular/';
+urlRoot = '/karma/';
 
 proxies = {
   '/': 'http://localhost:8080/'
