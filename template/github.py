@@ -137,7 +137,7 @@ def FetchWithAuth(*args, **kwargs):
     query_str = ('?client_id={0}&client_secret={1}'
                  .format(credential.client_id,
                          credential.client_secret))
-    # tuple is immutable
+    # convert immutable tuple to mutable list
     args = list(args)
     args[0] += query_str
   return shared.Fetch(*args, **kwargs)
@@ -182,7 +182,8 @@ class GithubRepoCollection(collection.RepoCollection):
     https://api.github.com/users/GoogleCloudPlatform/repos
 
     Args:
-      page: the JSON response returned by /users/:user/repos
+      page: the JSON response returned by
+            https://api.github.com/users/{user}/repos
 
     Returns:
       A list of repos.
