@@ -94,7 +94,7 @@ class Info(object):
   def repository_url(self):
     return 'https://api.github.com/repos/{owner}/{repo}'.format(**self.__dict__)
 
-  def branch_url(self):
+  def branches_url(self):
     return ('https://api.github.com/repos/{owner}/{repo}/branches/{branch}'
             .format(**self.__dict__))
 
@@ -189,48 +189,75 @@ class GithubRepoCollection(collection.RepoCollection):
       A list of repos.
     """
     r = json.loads(page)
-    # keys we care about: html_url, contents_url, name, description, owner.login
+    # keys we care about:
+    # - html_url, branches_url, name, description, master_branch, owner.login
     repos = [entry for entry in r
              if self._IsAppEnginePythonRepo(entry['name'])
                 and entry['html_url'] not in _PROJECT_URL_SKIP_LIST]
 
+    # fetch master_branch url for each repo
     candidates1 = []
     for repo in repos:
       # only proceed with repos which look like App Engine Python projects
       if not self._IsAppEnginePythonRepo(repo['name']):
+        shared.w('skipping non App Engine Python repo {}'
+                 .format(repo['html_url']))
         continue
 
-      # e.g. https://api.github.com/repos/GoogleCloudPlatform/appengine-guestbook-python/contents/app.yaml
-      app_yaml_contents_url = repo['contents_url'].replace('{+path}',
-                                                           'app.yaml')
-      rpc = FetchWithAuth(app_yaml_contents_url, async=True)
-      candidates1.append((rpc, app_yaml_contents_url, repo))
+      info = Info(user=repo['owner']['login'], repo=repo['name'],
+                  branch=entry['master_branch'])
+      branches_url = info.branches_url()
+      rpc = FetchWithAuth(branches_url, async=True)
+      candidates1.append((repo, rpc))
 
-    # filter repos with no app.yaml
+    # fetch tree url for each repo
     candidates2 = []
-    for rpc, app_yaml_contents_url, repo in candidates1:
+    for repo, rpc in candidates1:
       result = rpc.get_result()
-      if result.status_code != httplib.OK:
-        shared.w('skipping repo due to {} fetching {}'
-                 .format(result.status_code, app_yaml_contents_url))
+      if result.status_code != 200:
         continue
       r = json.loads(result.content)
-      app_yaml_git_url = r['git_url']
-      rpc = FetchWithAuth(app_yaml_git_url, async=True)
-      candidates2.append((rpc, app_yaml_contents_url, app_yaml_git_url, repo))
+
+      # see http://developer.github.com/v3/git/trees/
+      tree_url = r['commit']['commit']['tree']['url'] + '?recursive=1'
+
+      rpc = FetchWithAuth(tree_url, async=True)
+      candidates2.append((repo, rpc))
+
+    # filter for trees containing 'app.yaml'
+    candidates3 = []
+    for repo, rpc in candidates2:
+      result = rpc.get_result()
+      if result.status_code != 200:
+        continue
+      r = json.loads(result.content)
+
+      contains_app_yaml = False
+      app_yaml_urls = [
+          entry['url'] for entry in r['tree']
+          if entry['path'] == 'app.yaml' and entry['type'] == 'blob'
+      ]
+      if not app_yaml_urls:
+        shared.w('skipping repo due to missing app.yaml: {}'
+                 .format(repo['html_url']))
+        continue
+      rpc = FetchWithAuth(app_yaml_git_urls[0], async=True)
+      candidates3.append((repo, rpc))
 
     # filter repos whose app.yaml does not contain 'runtime: python27'
-    repos = []
-    for rpc, app_yaml_contents_url, app_yaml_git_url, repo in candidates2:
+    candidates4 = []
+    for repo, rpc in candidates2:
       result = rpc.get_result()
+      if result.status_code != 200:
+        continue
       r = json.loads(result.content)
       base64_content = r['content']
       decoded_content = base64.b64decode(base64_content)
       config = yaml.safe_load(decoded_content)
       runtime = config.get('runtime')
       if runtime != 'python27':
-        shared.w('skipping "runtime: {}" app {}'.format(runtime,
-                                                        app_yaml_contents_url))
+        shared.w('skipping repo due to "runtime: {}" app {}'
+                 .format(runtime, repo['html_url']))
         continue
       repos.append(repo)
 
