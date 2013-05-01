@@ -95,15 +95,15 @@ class Info(object):
     return 'https://api.github.com/repos/{owner}/{repo}'.format(**self.__dict__)
 
   def branches_url(self):
+    if self.branch == None:
+      result = FetchWithAuth(self.repository_url(), async=False)
+      r = json.loads(result.content)
+      self.branch = r['master_branch']
     return ('https://api.github.com/repos/{owner}/{repo}/branches/{branch}'
             .format(**self.__dict__))
 
-  def contents_url(self):
-    return ('https://api.github.com/repos/{user}/{repo}/contents/{path}'
-            .format(**self.__dict__))
 
-
-def GetNormalizedInfo(html_url):
+def GetInfo(html_url):
   """Get Info object based on the provided HTML URL.
 
   For example:
@@ -241,12 +241,12 @@ class GithubRepoCollection(collection.RepoCollection):
         shared.w('skipping repo due to missing app.yaml: {}'
                  .format(repo['html_url']))
         continue
-      rpc = FetchWithAuth(app_yaml_git_urls[0], async=True)
+      rpc = FetchWithAuth(app_yaml_urls[0], async=True)
       candidates3.append((repo, rpc))
 
     # filter repos whose app.yaml does not contain 'runtime: python27'
     candidates4 = []
-    for repo, rpc in candidates2:
+    for repo, rpc in candidates3:
       result = rpc.get_result()
       if result.status_code != 200:
         continue
@@ -263,29 +263,10 @@ class GithubRepoCollection(collection.RepoCollection):
 
     return repos
 
-  def _GetRepoContents(self, repo_contents_url):
-    """Get list of files/directories in the given repo.
-
-    Args:
-      page: the JSON response returned by /repos/:owner/:repo/contents
-
-    Returns:
-      The list of files/directories.
-    """
-    page = FetchWithAuth(repo_contents_url, follow_redirects=True).content
-    r = json.loads(page)
-    entries = []
-    for entry in r:
-      if entry['type'] == 'dir':
-        entries.extend(self._GetRepoContents(entry['url']))
-      elif entry['type'] == 'file':
-        entries.append((entry['path'], entry['git_url']))
-    return entries
-
   def PopulateRepos(self):
     shared.EnsureRunningInTask()  # gives us automatic retries
     repo_collection_url = self.repo_collection.key.id()
-    info = GetNormalizedInfo(repo_collection_url)
+    info = GetInfo(repo_collection_url)
     # e.g. https://api.github.com/users/GoogleCloudPlatform/repos
     url = 'https://api.github.com/users/{0}/repos'.format(info.user)
     rpc_result = FetchWithAuth(url, follow_redirects=True)
@@ -308,32 +289,49 @@ class GithubRepoCollection(collection.RepoCollection):
   def CreateProjectTreeFromRepo(self, tree, repo):
     # e.g. https://github.com/GoogleCloudPlatform/appengine-guestbook-python
     # e.g. https://github.com/GoogleCloudPlatform/appengine-guestbook-python/tree/part6-staticfiles
-    end_user_repo_url = repo.key.id()
-    info = GetNormalizedInfo(end_user_repo_url)
-    # e.g. https://api.github.com/repos/GoogleCloudPlatform/appengine-guestbook-python/contents/
-    repo_contents_url = info.contents_url()
-    entries = self._GetRepoContents(repo_contents_url)
+    html_url = repo.key.id()
+    info = GetInfo(html_url)
 
+    # e.g. https://api.github.com/repos/GoogleCloudPlatform/appengine-guestbook-python/branches/part6-staticfiles
+    branches_url = info.branches_url()
+    #rpc = FetchWithAuth(branches_url, async=False)
+    #result = rpc.get_result()
+    #if result.status_code != 200:
+    #  raise RuntimeError('http error {}'.format(result.status_code))
+    result = FetchWithAuth(branches_url, async=False)
+    r = json.loads(result.content)
+
+    # see http://developer.github.com/v3/git/trees/
+    tree_url = r['commit']['commit']['tree']['url'] + '?recursive=1'
+    #rpc = FetchWithAuth(tree_url, async=False)
+    #result = rpc.get_result()
+    #if result.status_code != 200:
+    #  raise RuntimeError('http error {}'.format(result.status_code))
+    #r = json.loads(result.content)
+    result = FetchWithAuth(tree_url, async=False)
+    r = json.loads(result.content)
+
+    entries = [entry for entry in r['tree'] if entry['type'] == 'blob']
     rpcs = []
-    for (path, file_git_url) in entries:
-      rpc = FetchWithAuth(file_git_url, follow_redirects=True, async=True)
-      rpcs.append((file_git_url, path, rpc))
+    for entry in entries:
+      rpc = FetchWithAuth(entry['url'], async=True)
+      rpcs.append((entry, rpc))
 
-    for file_git_url, path, rpc in rpcs:
+    for entry, rpc in rpcs:
       try:
         result = rpc.get_result()
-        shared.w('{0} {1} {2}'.format(result.status_code, path, file_git_url))
+        shared.w('{0} {1} {2}'.format(result.status_code, entry['path'], entry['url']))
         if result.status_code != 200:
           continue
         r = json.loads(result.content)
         base64_content = r['content']
         decoded_content = base64.b64decode(base64_content)
-        tree.SetFile(path, decoded_content)
+        tree.SetFile(entry['path'], decoded_content)
       except urlfetch_errors.Error:
         exc_info = sys.exc_info()
         formatted_exception = traceback.format_exception(exc_info[0],
                                                          exc_info[1],
                                                          exc_info[2])
-        shared.w('skipping {0} {1}'.format(path, file_git_url))
+        shared.w('skipping {0} {1}'.format(entry['path'], entry['url']))
         for line in [line for line in formatted_exception if line]:
           shared.w(line)
