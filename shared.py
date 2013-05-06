@@ -33,6 +33,18 @@ def w(msg, *args, **kwargs):
   logging.warning('##### {0}'.format(repr(msg)))
 
 
+class FetchError(urlfetch.Error):
+  """URL Fetch error for response code != 200."""
+
+  def __init__(self, url, response):
+    self.url = url
+    self.response = response
+
+  def __str__(self):
+    return 'Status code {0} fetching {1} {2}'.format(self.response.status_code,
+                                                     self.url,
+                                                     self.response.content)
+
 def GetCurrentTaskName():
   return os.environ.get('HTTP_X_APPENGINE_TASKNAME')
 
@@ -57,8 +69,7 @@ def Fetch(url, follow_redirects=False, async=False, headers={}):
     return rpc
   response = rpc.get_result()
   if response.status_code != httplib.OK:
-    e('Status code {0} fetching {1} {2}', response.status_code, url,
-      response.content)
+    raise FetchError(url, response)
   return response
 
 
