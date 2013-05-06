@@ -123,7 +123,11 @@ def CreateRepoAsync(repo_url, end_user_url, name, description):
   if repo.project:
     SetProjectOwningTask(repo.project, task.name)
   else:
-    project = CreateProject(user, repo_url, end_user_url, name, description,
+    project = CreateProject(user=user,
+                            template_url=repo_url,
+                            end_user_url=end_user_url,
+                            project_name=name,
+                            project_description=description,
                             in_progress_task_name=task.name)
     repo.project = project.key
   repo.put()
@@ -161,7 +165,7 @@ def GetTemplateProjects():
 @ndb.transactional(xg=True)
 def CopyProject(user, project_id):
   tp = GetProject(project_id)
-  project = CreateProject(user,
+  project = CreateProject(user=user,
                           template_url=tp.template_url,
                           end_user_url=tp.end_user_url,
                           project_name=tp.project_name,

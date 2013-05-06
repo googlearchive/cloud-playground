@@ -222,12 +222,13 @@ class PlaygroundHandler(SessionHandler):
     return {
         # cast to str since JavaScript doesn't support long
         'key': str(project.key.id()),
-        'template_url': project.template_url,
         'name': project.project_name,
         'description': project.project_description,
-        'orderby': project.orderby,
+        'template_url': project.template_url,
+        'end_user_url': project.end_user_url,
         'run_url': self._GetPlaygroundRunUrl(project.key.id()),
         'in_progress_task_name': project.in_progress_task_name,
+        'orderby': project.orderby,
     }
 
 
