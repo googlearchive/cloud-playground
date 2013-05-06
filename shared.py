@@ -26,6 +26,13 @@ def e(msg, *args, **kwargs):
   raise RuntimeError(repr(msg))
 
 
+def i(msg, *args, **kwargs):
+  if isinstance(msg, basestring):
+    if args or kwargs:
+      msg = msg.format(*args, **kwargs)
+  logging.info('@@@@@ {0}'.format(repr(msg)))
+
+
 def w(msg, *args, **kwargs):
   if isinstance(msg, basestring):
     if args or kwargs:
