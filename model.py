@@ -33,7 +33,7 @@ class PlaygroundProject(ndb.Model):
   project_name = ndb.StringProperty(required=True, indexed=False)
   project_description = ndb.StringProperty(required=True, indexed=False)
   template_url = ndb.StringProperty(required=True, indexed=False)
-  end_user_url = ndb.StringProperty(required=True, indexed=False)
+  html_url = ndb.StringProperty(required=True, indexed=False)
   owner = ndb.StringProperty(required=True)
   writers = ndb.StringProperty(repeated=True)
   created = ndb.DateTimeProperty(required=True, auto_now_add=True,
@@ -78,7 +78,7 @@ class Repo(ndb.Model):
   """
   name = ndb.StringProperty(required=True, indexed=False)
   description = ndb.StringProperty(required=True, indexed=False)
-  end_user_url = ndb.StringProperty(required=True, indexed=False)
+  html_url = ndb.StringProperty(required=True, indexed=False)
   project = ndb.KeyProperty(required=True, kind=PlaygroundProject,
                             indexed=False)
   created = ndb.DateTimeProperty(required=True, auto_now_add=True,
@@ -105,11 +105,11 @@ def GetRepo(repo_url):
 
 
 @ndb.transactional(xg=True)
-def CreateRepoAsync(repo_url, end_user_url, name, description):
+def CreateRepoAsync(repo_url, html_url, name, description):
   repo = GetRepo(repo_url)
   if not repo:
     user = GetTemplateOwner()
-    repo = Repo(id=repo_url, end_user_url=end_user_url, name=name,
+    repo = Repo(id=repo_url, html_url=html_url, name=name,
                 description=description,
                 namespace=settings.PLAYGROUND_NAMESPACE)
   elif repo.in_progress_task_name:
@@ -125,7 +125,7 @@ def CreateRepoAsync(repo_url, end_user_url, name, description):
   else:
     project = CreateProject(user=user,
                             template_url=repo_url,
-                            end_user_url=end_user_url,
+                            html_url=html_url,
                             project_name=name,
                             project_description=description,
                             in_progress_task_name=task.name)
@@ -167,7 +167,7 @@ def CopyProject(user, project_id):
   tp = GetProject(project_id)
   project = CreateProject(user=user,
                           template_url=tp.template_url,
-                          end_user_url=tp.end_user_url,
+                          html_url=tp.html_url,
                           project_name=tp.project_name,
                           project_description=tp.project_description)
   src_tree = common.config.CREATE_TREE_FUNC(str(tp.key.id()))
@@ -260,14 +260,14 @@ def NewProjectName():
 
 
 @ndb.transactional(xg=True)
-def CreateProject(user, template_url, end_user_url, project_name,
+def CreateProject(user, template_url, html_url, project_name,
                   project_description, in_progress_task_name=None):
   """Create a new user project.
 
   Args:
     user: The user for which the project is to be created.
     template_url: The template URL to populate the project files or None.
-    end_user_url: The end user URL to populate the project files or None.
+    html_url: The end user URL to populate the project files or None.
     project_name: The project name.
     project_description: The project description.
 
@@ -282,7 +282,7 @@ def CreateProject(user, template_url, end_user_url, project_name,
                           owner=user.key.id(),
                           writers=[user.key.id()],
                           template_url=template_url,
-                          end_user_url=end_user_url,
+                          html_url=html_url,
                           namespace=settings.PLAYGROUND_NAMESPACE,
                           in_progress_task_name=in_progress_task_name,
                           )

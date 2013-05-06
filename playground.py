@@ -225,7 +225,7 @@ class PlaygroundHandler(SessionHandler):
         'name': project.project_name,
         'description': project.project_description,
         'template_url': project.template_url,
-        'end_user_url': project.end_user_url,
+        'html_url': project.html_url,
         'run_url': self._GetPlaygroundRunUrl(project.key.id()),
         'in_progress_task_name': project.in_progress_task_name,
         'orderby': project.orderby,
@@ -399,7 +399,7 @@ class RecreateTemplateProject(PlaygroundHandler):
                                   .format(project_id))
     repo_url = project.template_url
     repo = model.GetRepo(repo_url)
-    model.CreateRepoAsync(repo.key.id(), repo.end_user_url, repo.name,
+    model.CreateRepoAsync(repo.key.id(), repo.html_url, repo.name,
                           repo.description)
 
 
@@ -412,8 +412,8 @@ class CreateTemplateProjectByUrl(PlaygroundHandler):
       raise error.PlaygroundError('repo_id required')
     repo = model.GetRepo(repo_url)
     if not repo:
-      end_user_url = name = description = repo_url
-      repo = model.CreateRepoAsync(repo_url, end_user_url, name, description)
+      html_url = name = description = repo_url
+      repo = model.CreateRepoAsync(repo_url, html_url, name, description)
     project = repo.project.get()
     r = self.DictOfProject(project)
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE

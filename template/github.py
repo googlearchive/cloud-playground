@@ -283,7 +283,7 @@ class GithubRepoCollection(collection.RepoCollection):
     for repo in repos:
       name = repo['name']
       description=repo['description'] or repo['html_url']
-      model.CreateRepoAsync(repo['html_url'], end_user_url=repo['html_url'],
+      model.CreateRepoAsync(repo['html_url'], html_url=repo['html_url'],
                             name=name, description=description)
 
   def CreateProjectTreeFromRepo(self, tree, repo):

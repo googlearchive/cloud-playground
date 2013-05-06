@@ -73,7 +73,7 @@ class CodesiteRepoCollection(collection.RepoCollection):
           continue
         name = c.rstrip('/') or project_url
         description = 'Sample code from {0}'.format(project_url)
-        model.CreateRepoAsync(project_url, end_user_url=project_url,
+        model.CreateRepoAsync(project_url, html_url=project_url,
                               name=name, description=description)
       except urlfetch_errors.Error:
         exc_info = sys.exc_info()
