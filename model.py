@@ -46,9 +46,20 @@ class PlaygroundProject(ndb.Model):
     return '{0}-{1}'.format(self.owner, self.updated.isoformat())
 
 
+def fix(project):
+  if project._properties.has_key('end_user_url'):
+    project._properties.pop('end_user_url', None)
+    project.put()
+    shared.w('fixed {}'.format(project.key))
+
+
 def fixit():
   """Method to hold temporary code for data model migrations."""
-  pass
+
+  query = PlaygroundProject.query(namespace=settings.PLAYGROUND_NAMESPACE)
+  for project in query:
+    fix(project)
+  shared.i('fixed')
 
 
 class PlaygroundUser(ndb.Model):
