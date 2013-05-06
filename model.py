@@ -115,7 +115,8 @@ def CreateRepoAsync(repo_url, end_user_url, name, description):
   elif repo.in_progress_task_name:
     raise RuntimeError('repo recreation for {} already executing in task {}'
                        .format(repo_url, repo.in_progress_task_name))
-  task = taskqueue.add(url='/_playground_tasks/populate_repo',
+  task = taskqueue.add(queue_name='repo',
+                       url='/_playground_tasks/populate_repo',
                        params={'repo_url': repo_url})
   shared.w('task {} added to populate repo {}'.format(task.name, repo_url))
   repo.in_progress_task_name = task.name

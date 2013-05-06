@@ -64,7 +64,8 @@ def _GetRepoCollections():
   repo_collections = []
   for uri, description in REPO_COLLECTIONS:
     repo_collection = model.GetOrInsertRepoCollection(uri, description)
-    task = taskqueue.add(url='/_playground_tasks/populate_repo_collection',
+    task = taskqueue.add(queue_name='repo',
+                         url='/_playground_tasks/populate_repo_collection',
                          params={
                              'repo_collection_url': repo_collection.key.id(),
                          })
