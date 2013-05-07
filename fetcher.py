@@ -42,15 +42,20 @@ class Fetcher(object):
       return
     self.response = self.rpc.get_result()
     shared.i('{} {}'.format(self.response.status_code, self.url))
-    if self.response.status_code == httplib.NOT_MODIFIED:
-      return
-    if self.response.status_code != httplib.OK:
-      raise FetchError(self.url, self.response)
     if self.response.content_was_truncated:
       raise FetchError(self.url, self.response)
-    self.response_content = self.response.content
-    self.etag = self.response.headers['ETag']
-    model.PutResource(self.url, self.etag, self.response_content)
+    if self.response.status_code == httplib.NOT_MODIFIED:
+      return
+    if self.response.status_code == httplib.OK:
+      self.response_content = self.response.content
+      self.etag = self.response.headers['ETag']
+      model.PutResource(self.url, self.etag, self.response_content)
+      return
+    if self.etag and self.response_content:
+      shared.w('Using existing content etag={}, url={}'
+               .format(self.etag, self.url))
+      return
+    raise FetchError(self.url, self.response)
 
   @property
   def content(self):
