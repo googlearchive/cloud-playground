@@ -2,7 +2,6 @@
 
 import base64
 import httplib
-import json
 import re
 import sys
 import traceback
@@ -10,6 +9,7 @@ import yaml
 
 from mimic.__mimic import common
 
+import fetcher
 import model
 import shared
 
@@ -96,9 +96,9 @@ class Info(object):
 
   def branches_url(self):
     if self.branch == None:
-      result = FetchWithAuth(self.repository_url(), async=False)
-      r = json.loads(result.content)
-      self.branch = r['master_branch']
+      fetched = FetchAsyncWithAuth(self.repository_url())
+      data = fetched.json_content
+      self.branch = data['master_branch']
     return ('https://api.github.com/repos/{owner}/{repo}/branches/{branch}'
             .format(**self.__dict__))
 
@@ -131,16 +131,15 @@ def IsValidUrl(url):
   return _GITHUB_URL_RE.match(url)
 
 
-def FetchWithAuth(*args, **kwargs):
+def FetchAsyncWithAuth(*args, **kwargs):
   credential = model.GetOAuth2Credential('github')
   if credential:
-    query_str = ('?client_id={0}&client_secret={1}'
-                 .format(credential.client_id,
-                         credential.client_secret))
-    # convert immutable tuple to mutable list
-    args = list(args)
-    args[0] += query_str
-  return shared.Fetch(*args, **kwargs)
+    url_auth_suffix = ('?client_id={0}&client_secret={1}'
+                       .format(credential.client_id,
+                               credential.client_secret))
+  else:
+    url_auth_suffix = ''
+  return fetcher.Fetcher(*args, url_auth_suffix=url_auth_suffix, **kwargs)
 
 
 class GithubRepoCollection(collection.RepoCollection):
@@ -173,12 +172,12 @@ class GithubRepoCollection(collection.RepoCollection):
       return False
     return True
 
-  def _GetAppEnginePythonRepos(self, page):
+  def _GetAppEnginePythonRepos(self, data):
     """Get list of App Engine Python repos.
 
-    Given a JSON list of repos, return those repo names which appear to be
+    Given a list of repos, return those repo names which appear to be
     Python App Engine repos, and which are not in _PROJECT_URL_SKIP_LIST.
-    This function can parse the contents of:
+    This function can parse the JSON parsed contents of:
     https://api.github.com/users/GoogleCloudPlatform/repos
 
     Args:
@@ -188,10 +187,9 @@ class GithubRepoCollection(collection.RepoCollection):
     Returns:
       A list of repos.
     """
-    r = json.loads(page)
     # keys we care about:
     # - html_url, branches_url, name, description, master_branch, owner.login
-    repos = [entry for entry in r
+    repos = [entry for entry in data
              if self._IsAppEnginePythonRepo(entry['name'])
                 and entry['html_url'] not in _PROJECT_URL_SKIP_LIST]
 
@@ -205,53 +203,47 @@ class GithubRepoCollection(collection.RepoCollection):
         continue
 
       info = Info(user=repo['owner']['login'], repo=repo['name'],
-                  branch=entry['master_branch'])
+                  branch=repo['master_branch'])
       branches_url = info.branches_url()
-      rpc = FetchWithAuth(branches_url, async=True)
-      candidates1.append((repo, rpc))
+      fetched = FetchAsyncWithAuth(branches_url)
+      candidates1.append((repo, fetched))
 
     # fetch tree url for each repo
     candidates2 = []
-    for repo, rpc in candidates1:
-      result = rpc.get_result()
-      if result.status_code != 200:
+    for repo, fetched in candidates1:
+      try:
+        data = fetched.json_content
+      except fetcher.FetchError:
         continue
-      r = json.loads(result.content)
 
       # see http://developer.github.com/v3/git/trees/
-      tree_url = r['commit']['commit']['tree']['url'] + '?recursive=1'
+      tree_url = data['commit']['commit']['tree']['url'] + '?recursive=1'
 
-      rpc = FetchWithAuth(tree_url, async=True)
-      candidates2.append((repo, rpc))
+      fetched = FetchAsyncWithAuth(tree_url)
+      candidates2.append((repo, fetched))
 
     # filter for trees containing 'app.yaml'
     candidates3 = []
-    for repo, rpc in candidates2:
-      result = rpc.get_result()
-      if result.status_code != 200:
-        continue
-      r = json.loads(result.content)
+    for repo, fetched in candidates2:
+      data = fetched.json_content
 
       contains_app_yaml = False
       app_yaml_urls = [
-          entry['url'] for entry in r['tree']
+          entry['url'] for entry in data['tree']
           if entry['path'] == 'app.yaml' and entry['type'] == 'blob'
       ]
       if not app_yaml_urls:
         shared.w('skipping repo due to missing app.yaml: {}'
                  .format(repo['html_url']))
         continue
-      rpc = FetchWithAuth(app_yaml_urls[0], async=True)
-      candidates3.append((repo, rpc))
+      fetched = FetchAsyncWithAuth(app_yaml_urls[0])
+      candidates3.append((repo, fetched))
 
     # filter repos whose app.yaml does not contain 'runtime: python27'
     candidates4 = []
-    for repo, rpc in candidates3:
-      result = rpc.get_result()
-      if result.status_code != 200:
-        continue
-      r = json.loads(result.content)
-      base64_content = r['content']
+    for repo, fetched in candidates3:
+      data = fetched.json_content
+      base64_content = data['content']
       decoded_content = base64.b64decode(base64_content)
       config = yaml.safe_load(decoded_content)
       runtime = config.get('runtime')
@@ -269,9 +261,8 @@ class GithubRepoCollection(collection.RepoCollection):
     info = GetInfo(repo_collection_url)
     # e.g. https://api.github.com/users/GoogleCloudPlatform/repos
     url = 'https://api.github.com/users/{0}/repos'.format(info.user)
-    rpc_result = FetchWithAuth(url, follow_redirects=True)
-    page = rpc_result.content
-    repos = self._GetAppEnginePythonRepos(page)
+    fetched = FetchAsyncWithAuth(url, follow_redirects=True)
+    repos = self._GetAppEnginePythonRepos(fetched.json_content)
 
     credential = model.GetOAuth2Credential('github')
     if (not credential or not credential.client_id
@@ -294,37 +285,24 @@ class GithubRepoCollection(collection.RepoCollection):
 
     # e.g. https://api.github.com/repos/GoogleCloudPlatform/appengine-guestbook-python/branches/part6-staticfiles
     branches_url = info.branches_url()
-    #rpc = FetchWithAuth(branches_url, async=False)
-    #result = rpc.get_result()
-    #if result.status_code != 200:
-    #  raise RuntimeError('http error {}'.format(result.status_code))
-    result = FetchWithAuth(branches_url, async=False)
-    r = json.loads(result.content)
+    fetched = FetchAsyncWithAuth(branches_url)
+    data = fetched.json_content
 
     # see http://developer.github.com/v3/git/trees/
-    tree_url = r['commit']['commit']['tree']['url'] + '?recursive=1'
-    #rpc = FetchWithAuth(tree_url, async=False)
-    #result = rpc.get_result()
-    #if result.status_code != 200:
-    #  raise RuntimeError('http error {}'.format(result.status_code))
-    #r = json.loads(result.content)
-    result = FetchWithAuth(tree_url, async=False)
-    r = json.loads(result.content)
+    tree_url = data['commit']['commit']['tree']['url'] + '?recursive=1'
+    fetched = FetchAsyncWithAuth(tree_url)
+    data = fetched.json_content
 
-    entries = [entry for entry in r['tree'] if entry['type'] == 'blob']
-    rpcs = []
+    entries = [entry for entry in data['tree'] if entry['type'] == 'blob']
+    fetches = []
     for entry in entries:
-      rpc = FetchWithAuth(entry['url'], async=True)
-      rpcs.append((entry, rpc))
+      fetched = FetchAsyncWithAuth(entry['url'])
+      fetches.append((entry, fetched))
 
-    for entry, rpc in rpcs:
+    for entry, fetched in fetches:
       try:
-        result = rpc.get_result()
-        shared.w('{0} {1} {2}'.format(result.status_code, entry['path'], entry['url']))
-        if result.status_code != 200:
-          continue
-        r = json.loads(result.content)
-        base64_content = r['content']
+        data = fetched.json_content
+        base64_content = data['content']
         decoded_content = base64.b64decode(base64_content)
         tree.SetFile(entry['path'], decoded_content)
       except urlfetch_errors.Error:

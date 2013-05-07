@@ -46,6 +46,24 @@ class PlaygroundProject(ndb.Model):
     return '{0}-{1}'.format(self.owner, self.updated.isoformat())
 
 
+class Resource(ndb.Model):
+  """A cache for web content.
+
+  The url is used as the entity key."""
+  etag = ndb.StringProperty(required=True, indexed=False)
+  content = ndb.BlobProperty(required=True)
+
+
+def GetResource(url):
+  return Resource.get_by_id(url, namespace=settings.PLAYGROUND_NAMESPACE)
+
+
+def PutResource(url, etag, content):
+   content_cache = Resource(id=url, etag=etag, content=content,
+                            namespace=settings.PLAYGROUND_NAMESPACE)
+   content_cache.put()
+
+
 def fix(project):
   if project._properties.has_key('end_user_url'):
     project._properties.pop('end_user_url', None)
@@ -187,8 +205,8 @@ def CopyProject(user, project_id):
   for path in paths:
     if path.endswith('/'):
       continue
-    contents = src_tree.GetFileContents(path)
-    dst_tree.SetFile(path, contents)
+    content = src_tree.GetFileContents(path)
+    dst_tree.SetFile(path, content)
   return project
 
 
