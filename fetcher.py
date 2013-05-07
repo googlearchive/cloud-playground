@@ -27,12 +27,12 @@ class Fetcher(object):
   def __init__(self, url, url_auth_suffix='', follow_redirects=False, headers={}):
     self.url = url
     self.response = None
-    self.response_content = None
-    self.resource = model.GetResource(url)
-    if self.resource:
-      headers['If-None-Match'] = '{}'.format(self.resource.etag)
+    self.etag, self.response_content = model.GetResource(url)
+    if self.etag:
+      headers['If-None-Match'] = '{}'.format(self.etag)
     self.rpc = urlfetch.create_rpc()
     full_url = '{}{}'.format(url, url_auth_suffix)
+    #shared.i('urlfetch.make_fetch_call {} {}'.format(headers, full_url))
     urlfetch.make_fetch_call(self.rpc, full_url, headers=headers,
                              follow_redirects=follow_redirects,
                              validate_certificate=True)
@@ -43,15 +43,14 @@ class Fetcher(object):
     self.response = self.rpc.get_result()
     shared.i('{} {}'.format(self.response.status_code, self.url))
     if self.response.status_code == httplib.NOT_MODIFIED:
-      self.response_content = self.resource.content
       return
     if self.response.status_code != httplib.OK:
       raise FetchError(self.url, self.response)
     if self.response.content_was_truncated:
       raise FetchError(self.url, self.response)
-    etag = self.response.headers['ETag']
-    model.PutResource(self.url, etag, self.response.content)
     self.response_content = self.response.content
+    self.etag = self.response.headers['ETag']
+    model.PutResource(self.url, self.etag, self.response_content)
 
   @property
   def content(self):

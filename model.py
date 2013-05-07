@@ -10,6 +10,7 @@ import shared
 from google.appengine.api import memcache
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
+from google.appengine.api.datastore_types import _MAX_RAW_PROPERTY_BYTES
 
 
 class Global(ndb.Model):
@@ -51,17 +52,46 @@ class Resource(ndb.Model):
 
   The url is used as the entity key."""
   etag = ndb.StringProperty(required=True, indexed=False)
+  content = ndb.BlobProperty(required=False)
+  last_modified = ndb.DateTimeProperty(auto_now=True)
+
+
+class ResourceChunk(ndb.Model):
+  """A model for storing resources > _MAX_RAW_PROPERTY_BYTES."""
   content = ndb.BlobProperty(required=True)
 
 
 def GetResource(url):
-  return Resource.get_by_id(url, namespace=settings.PLAYGROUND_NAMESPACE)
+  key = ndb.Key(Resource, url, namespace=settings.PLAYGROUND_NAMESPACE)
+  query = ndb.Query(ancestor=key)
+  results = query.fetch()
+  if not results:
+    return None, None
+  resource = results[0]
+  if resource.content is not None:
+    return resource.etag, resource.content
+  content = ''
+  for resource_chunk in results[1:]:
+    content = content + resource_chunk.content
+  return resource.etag, content
 
 
 def PutResource(url, etag, content):
-   content_cache = Resource(id=url, etag=etag, content=content,
-                            namespace=settings.PLAYGROUND_NAMESPACE)
-   content_cache.put()
+  key = ndb.Key(Resource, url, namespace=settings.PLAYGROUND_NAMESPACE)
+  keys = ndb.Query(ancestor=key).fetch(keys_only=True)
+  ndb.delete_multi(keys)
+  resource = Resource(id=url, etag=etag,
+                      namespace=settings.PLAYGROUND_NAMESPACE)
+  if len(content) <= _MAX_RAW_PROPERTY_BYTES:
+    resource.content=content
+    resource.put()
+    return
+  chunks = [content[i:i + _MAX_RAW_PROPERTY_BYTES]
+            for i in range(0, len(content), _MAX_RAW_PROPERTY_BYTES)]
+  entities = [ResourceChunk(id=i + 1, parent=resource.key, content=chunks[i])
+              for i in range(0, len(chunks))]
+  entities.append(resource)
+  ndb.put_multi(entities)
 
 
 def fix(project):
