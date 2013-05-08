@@ -207,6 +207,35 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
   }
 
   // TODO: test
+  $scope.new_project_by_url = function(repo_url) {
+    $scope.force_location_hash('my_templates');
+    for (var i in $scope.template_projects) {
+      if ($scope.template_projects[i].template_url == repo_url) {
+        throw 'template already exists ' + repo_url;
+      }
+    }
+    DoSerial
+    .then(function() {
+      var data = {
+        'name': '(Creating template project...)',
+        'description': '(Please wait...)',
+        'in_pogress_task_name': 'foo',
+      };
+      $scope.template_projects.push(data);
+    })
+    DoSerial
+    .then(function() {
+      return $http.post('/playground/create_template_project_by_url', {
+          repo_url: repo_url,
+      })
+      .success(function(data, status, headers, config) {
+        $scope.template_projects.pop();
+        $scope.template_projects.push(data);
+      });
+    });
+  };
+
+  // TODO: test
   function maybe_create_project(template_url) {
     var deferred = $q.defer();
 
@@ -313,35 +342,6 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
       .success(function(data, status, headers, config) {
         $scope.projects.pop();
         $scope.projects.push(data);
-      });
-    });
-  };
-
-  // TODO: test
-  $scope.new_project_by_url = function(repo_url) {
-    $scope.force_location_hash('my_templates');
-    for (var i in $scope.template_projects) {
-      if ($scope.template_projects[i].template_url == repo_url) {
-        throw 'template already exists ' + repo_url;
-      }
-    }
-    DoSerial
-    .then(function() {
-      var data = {
-        'name': '(Creating template project...)',
-        'description': '(Please wait...)',
-        'in_pogress_task_name': 'foo',
-      };
-      $scope.template_projects.push(data);
-    })
-    DoSerial
-    .then(function() {
-      return $http.post('/playground/create_template_project_by_url', {
-          repo_url: repo_url,
-      })
-      .success(function(data, status, headers, config) {
-        $scope.template_projects.pop();
-        $scope.template_projects.push(data);
       });
     });
   };
