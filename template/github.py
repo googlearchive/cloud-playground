@@ -110,6 +110,7 @@ def GetInfo(html_url):
   - https://api.github.com/users/GoogleCloudPlatform/repos
   - https://github.com/GoogleCloudPlatform/appengine-guestbook-python
   - https://github.com/GoogleCloudPlatform/appengine-guestbook-python/tree/part6-staticfiles
+  - https://api.github.com/repos/GoogleCloudPlatform/appengine-guestbook-python/branches/part6-staticfiles
   """
   matcher = _GITHUB_URL_RE.match(html_url)
   if not matcher:
@@ -117,11 +118,11 @@ def GetInfo(html_url):
   components = matcher.group(1).split('/')
   components.extend([None, None])
   kwargs = {}
-  if components[0] == 'users':
+  if components[0] in ('users', 'repos'):
     components.pop(0)
   kwargs['user'] = components.pop(0)
   kwargs['repo'] = components.pop(0)
-  if components[0] == 'tree':
+  if components[0] in ('tree', 'branches'):
     components.pop(0)
     kwargs['branch'] = components.pop(0)
   return Info(**kwargs)
