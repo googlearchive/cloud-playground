@@ -7,6 +7,7 @@ import traceback
 
 from mimic.__mimic import common
 
+import fetcher
 import model
 import settings
 import shared
@@ -43,9 +44,10 @@ class CodesiteRepoCollection(collection.RepoCollection):
   def PopulateRepos(self):
     shared.EnsureRunningInTask()  # gives us automatic retries
     baseurl = self.repo_collection.key.id()
-    page = shared.Fetch(baseurl, follow_redirects=True).content
+    fetched = fetcher.Fetcher(baseurl, follow_redirects=True)
+    page = fetched.content
     candidate_repos = self._GetChildPaths(page)
-    rpcs = []
+    fetches = []
 
     # we found a project in the root directory
     if 'app.yaml' in candidate_repos:
@@ -60,16 +62,14 @@ class CodesiteRepoCollection(collection.RepoCollection):
         continue
       project_url = '{0}{1}'.format(baseurl, c)
       app_yaml_url = '{0}app.yaml'.format(project_url)
-      rpc = shared.Fetch(app_yaml_url, follow_redirects=True, async=True)
-      rpcs.append((c, project_url, app_yaml_url, rpc))
+      fetched = fetcher.Fetcher(app_yaml_url, follow_redirects=True)
+      fetches.append((c, project_url, app_yaml_url, fetched))
 
     repos = []
-    for c, project_url, app_yaml_url, rpc in rpcs:
+    for c, project_url, app_yaml_url, fetched in fetches:
       try:
-        result = rpc.get_result()
-        shared.i('{0} {1}'.format(result.status_code, app_yaml_url))
-        if result.status_code != 200:
-          continue
+        content = fetched.content
+        shared.i('found app.yaml: {}'.format(app_yaml_url))
         name = c.rstrip('/') or project_url
         description = 'Sample code from {0}'.format(project_url)
         model.CreateRepoAsync(project_url, html_url=project_url,
@@ -88,7 +88,8 @@ class CodesiteRepoCollection(collection.RepoCollection):
 
     def add_files(dirname):
       url = os.path.join(repo_url, dirname)
-      page = shared.Fetch(url, follow_redirects=True).content
+      fetched = fetcher.Fetcher(url, follow_redirects=True)
+      page = fetched.content
       paths = self._GetChildPaths(page)
       shared.i('{0} -> {1}', url, paths)
       if not paths:
