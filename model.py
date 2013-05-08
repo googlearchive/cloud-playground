@@ -107,7 +107,7 @@ def fixit():
   query = PlaygroundProject.query(namespace=settings.PLAYGROUND_NAMESPACE)
   for project in query:
     fix(project)
-  shared.i('fixed')
+  shared.w('all fixed')
 
 
 class PlaygroundUser(ndb.Model):
@@ -172,12 +172,13 @@ def CreateRepoAsync(repo_url, html_url, name, description):
                 description=description,
                 namespace=settings.PLAYGROUND_NAMESPACE)
   elif repo.in_progress_task_name:
-    raise RuntimeError('repo recreation for {} already executing in task {}'
+    shared.w('ignoring recreation of {} which is already executing in task {}'
                        .format(repo_url, repo.in_progress_task_name))
+    return
   task = taskqueue.add(queue_name='repo',
                        url='/_playground_tasks/populate_repo',
                        params={'repo_url': repo_url})
-  shared.w('task {} added to populate repo {}'.format(task.name, repo_url))
+  shared.i('task {} added to populate repo {}'.format(task.name, repo_url))
   repo.in_progress_task_name = task.name
   if repo.project:
     SetProjectOwningTask(repo.project, task.name)

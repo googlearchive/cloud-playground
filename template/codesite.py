@@ -1,6 +1,5 @@
 """Module for accessing code.google.com projects."""
 
-import logging
 import os
 import re
 import sys
@@ -68,7 +67,7 @@ class CodesiteRepoCollection(collection.RepoCollection):
     for c, project_url, app_yaml_url, rpc in rpcs:
       try:
         result = rpc.get_result()
-        shared.w('{0} {1}'.format(result.status_code, app_yaml_url))
+        shared.i('{0} {1}'.format(result.status_code, app_yaml_url))
         if result.status_code != 200:
           continue
         name = c.rstrip('/') or project_url
@@ -91,9 +90,9 @@ class CodesiteRepoCollection(collection.RepoCollection):
       url = os.path.join(repo_url, dirname)
       page = shared.Fetch(url, follow_redirects=True).content
       paths = self._GetChildPaths(page)
-      shared.w('{0} -> {1}', url, paths)
+      shared.i('{0} -> {1}', url, paths)
       if not paths:
-        logging.info('- {0}'.format(dirname))
+        shared.i('- {0}'.format(dirname))
         tree.SetFile(dirname, page)
       for path in paths:
         if common.GetExtension(path) in settings.SKIP_EXTENSIONS:

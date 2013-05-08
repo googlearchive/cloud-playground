@@ -1,7 +1,6 @@
 """Module for accessing github.com projects."""
 
 import json
-import logging
 import os
 import urllib
 
@@ -70,10 +69,10 @@ class FilesystemRepoCollection(collection.RepoCollection):
         else:
           try:
             with open(fullpath, 'rb') as f:
-              logging.info('- {0}'.format(relpath))
+              shared.i('- {0}'.format(relpath))
               tree.SetFile(relpath, f.read())
           except IOError:
             # file access may be disallowed due to app.yaml skip_files
-            logging.info('SKIPPING: {}'.format(relpath))
+            shared.w('skipping {}'.format(relpath))
 
     add_files('')

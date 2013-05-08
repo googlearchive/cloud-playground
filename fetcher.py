@@ -52,7 +52,7 @@ class Fetcher(object):
       model.PutResource(self.url, self.etag, self.response_content)
       return
     if self.etag and self.response_content:
-      shared.w('Using existing content etag={}, url={}'
+      shared.w('using existing content etag={}, url={}'
                .format(self.etag, self.url))
       return
     raise FetchError(self.url, self.response)
