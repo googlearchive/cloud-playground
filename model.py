@@ -139,7 +139,7 @@ class Repo(ndb.Model):
   description = ndb.StringProperty(required=True, indexed=False)
   html_url = ndb.StringProperty(required=True, indexed=False)
   project = ndb.KeyProperty(required=True, kind=PlaygroundProject,
-                            indexed=False)
+                            indexed=True)
   created = ndb.DateTimeProperty(required=True, auto_now_add=True,
                                  indexed=False)
   updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
@@ -390,4 +390,17 @@ def DeleteProject(user, tree, project_id):
     usr.projects.remove(prj.key)
     usr.put()
 
-  del_project()
+  @ndb.transactional(xg=True)
+  def del_repos(keys):
+    ndb.delete_multi(keys)
+    del_project()
+
+  project_key = ndb.Key(PlaygroundProject, long(project_id),
+                        namespace=settings.PLAYGROUND_NAMESPACE)
+  repo_query = Repo.query(namespace=settings.PLAYGROUND_NAMESPACE)
+  repo_query = repo_query.filter(Repo.project==project_key)
+  keys = repo_query.fetch(keys_only=True)
+  if keys:
+    del_repos(keys)
+  else:
+    del_project()
