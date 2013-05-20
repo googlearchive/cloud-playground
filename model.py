@@ -223,8 +223,7 @@ def GetTemplateProjects():
 
 
 @ndb.transactional(xg=True)
-def CopyProject(user, project_id):
-  tp = GetProject(project_id)
+def CopyProject(user, tp):
   project = CreateProject(user=user,
                           template_url=tp.template_url,
                           html_url=tp.html_url,

@@ -377,7 +377,14 @@ class CopyProject(PlaygroundHandler):
     project_id = self.request.data['project_id']
     if not project_id:
       raise error.PlaygroundError('project_id required')
-    project = model.CopyProject(self.user, project_id)
+    tp = model.GetProject(project_id)
+    if not tp or tp.in_progress_task_name:
+      self.response.set_status(httplib.REQUEST_TIMEOUT)
+      self.response.headers['X-Cloud-Playground-Error'] = 'True'
+      self.response.write('Requested project is not yet available.'
+                          ' Please try again in 30 seconds.')
+      return
+    project = model.CopyProject(self.user, tp)
     r = self.DictOfProject(project)
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
@@ -415,6 +422,12 @@ class CreateTemplateProjectByUrl(PlaygroundHandler):
       html_url = name = description = repo_url
       repo = model.CreateRepoAsync(repo_url, html_url, name, description)
     project = repo.project.get()
+    if not project or project.in_progress_task_name:
+      self.response.set_status(httplib.REQUEST_TIMEOUT)
+      self.response.headers['X-Cloud-Playground-Error'] = 'True'
+      self.response.write('Requested template is not yet available.'
+                          ' Please try again in 30 seconds.')
+      return
     r = self.DictOfProject(project)
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))

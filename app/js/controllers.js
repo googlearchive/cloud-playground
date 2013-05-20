@@ -208,10 +208,11 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
 
   // TODO: test
   $scope.new_project_by_url = function(repo_url) {
+    var deferred = $q.defer();
     $scope.force_location_hash('my_templates');
     for (var i in $scope.template_projects) {
       if ($scope.template_projects[i].template_url == repo_url) {
-        throw 'template already exists ' + repo_url;
+        throw 'Template already exists: ' + repo_url;
       }
     }
     DoSerial
@@ -231,18 +232,20 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
       .success(function(data, status, headers, config) {
         $scope.template_projects.pop();
         $scope.template_projects.push(data);
+        deferred.resolve();
+      })
+      .error(function(data, status, headers, config) {
+        $scope.template_projects.pop();
+        deferred.reject('Failed to create template project due to HTTP error ' +
+                        status + ' ' + data);
       });
     });
+    return deferred.promise;
   };
 
   // TODO: test
-  function maybe_create_project(template_url) {
+  function create_project_from_template(template_url) {
     var deferred = $q.defer();
-
-    if (!template_url) {
-      deferred.resolve();
-      return deferred.promise;
-    }
 
     var user_projects = by_template_url(template_url, $scope.projects);
     var template_projects = by_template_url(template_url,
@@ -265,8 +268,13 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
     }
 
     if (template_projects.length == 0) {
-      // TODO: investigate using deferred.reject() instead of 'throw'
-      throw 'Unknown template URL ' + template_url;
+      $scope.status = 'Creating new template project based on ' + template_url;
+      deferred.resolve();
+      deferred.promise
+      .then(function() {
+        return $scope.new_project_by_url(template_url);
+      });
+      return deferred.promise;
     }
 
     if (template_projects.length > 1) {
@@ -275,11 +283,11 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
             ' template projects with template URL ' + template_url;
     }
 
-    $scope.status = 'Cloning project from template ' + template_url;
-    $scope.new_project(template_projects[0]);
-
-    deferred.resolve();
     deferred.promise
+    .then(function() {
+      $scope.status = 'Cloning project from template ' + template_url;
+      return $scope.new_project(template_projects[0]);
+    })
     .then(function() {
       var user_projects = by_template_url(template_url, $scope.projects);
       if (user_projects.length != 1) {
@@ -288,13 +296,18 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
       }
       $scope.select_project(user_projects[0]);
     });
+    deferred.resolve();
     return deferred.promise;
   }
 
   // TODO: test
   DoSerial
   .then(function() {
-    maybe_create_project($routeParams.template_url);
+    var template_url = $routeParams.template_url;
+    if (template_url) {
+      $location.url('/playground/');
+      return create_project_from_template(template_url);
+    }
   })
   .then($scope.set_loaded);
 
@@ -326,24 +339,27 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
   }
 
   $scope.new_project = function(template_project) {
+    var deferred = $q.defer();
     $scope.force_location_hash('my_projects');
-    DoSerial
-    .then(function() {
-      var data = {
-        'name': '(Creating project...)',
-        'description': '(Please wait...)',
-      };
-      $scope.projects.push(data);
+    var data = {
+      'name': '(Creating project...)',
+      'description': '(Please wait and then refresh this page.)',
+    };
+    $scope.projects.push(data);
+    $http.post('/playground/copyproject', {
+        project_id: template_project.key,
     })
-    .then(function() {
-      return $http.post('/playground/copyproject', {
-          project_id: template_project.key,
-      })
-      .success(function(data, status, headers, config) {
-        $scope.projects.pop();
-        $scope.projects.push(data);
-      });
+    .success(function(data, status, headers, config) {
+      $scope.projects.pop();
+      $scope.projects.push(data);
+      deferred.resolve();
+    })
+    .error(function(data, status, headers, config) {
+      $scope.projects.pop();
+      deferred.reject('Failed to copy project due to HTTP error ' +
+                      status + ' ' + data);
     });
+    return deferred.promise;
   };
 
 }
