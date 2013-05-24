@@ -5,4 +5,5 @@ queue:
   #max_concurrent_requests: 1
   retry_parameters:
     min_backoff_seconds: 5
-    max_backoff_seconds: 3600
+    max_backoff_seconds: 7200 # 2 hours
+    task_age_limit: 2d
