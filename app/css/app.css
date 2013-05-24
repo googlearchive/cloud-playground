@@ -7,6 +7,8 @@ BODY {
 
 A:hover {
   text-decoration: none;
+  /* fix ng-click anchor link cursor */
+  cursor: pointer;
 }
 
 .context-menu {
