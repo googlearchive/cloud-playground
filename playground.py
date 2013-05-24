@@ -516,7 +516,10 @@ class MimicIntercept(mimic_wsgi.Mimic):
       logging.info('\n' * 3)
     if (os.environ['HTTP_HOST'] in settings.PLAYGROUND_HOSTS
         and os.environ['PATH_INFO'] == '/'):
-      self._RedirectResponse('/playground')
+      url = '/playground'
+      if self.request.query_string:
+        url += '?' + self.request.query_string
+      self._RedirectResponse(url)
       # empty body
       return iter([''])
     return super(MimicIntercept, self).__iter__()
