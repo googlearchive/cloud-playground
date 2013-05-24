@@ -21,7 +21,7 @@ function AlertController($scope, Alert) {
 function HeaderController($scope, $location) {
 
   $scope.alreadyhome = function() {
-    return $location.url() == '/playground/';
+    return $location.path() == '/playground/';
   };
 
 }
@@ -212,7 +212,7 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
     $scope.force_location_hash('my_templates');
     for (var i in $scope.template_projects) {
       if ($scope.template_projects[i].template_url == repo_url) {
-        throw 'Template already exists: ' + repo_url;
+        throw 'Template already exists';
       }
     }
     DoSerial
@@ -253,16 +253,18 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
 
     if (user_projects.length == 1) {
       $scope.status = 'Opening project';
+      Alert.info('Found an existing project based on the requested template');
       $scope.select_project(user_projects[0]);
       deferred.resolve();
       return deferred.promise;
     }
 
     if (user_projects.length > 1) {
-      Alert.info('You have multiple projects with the specified template ' +
-                 template_url);
-      $scope.projects = user_projects;
-      $scope.template_projects = template_projects;
+      Alert.info('You have ' + user_projects.length +
+                 ' projects based on the requested template');
+      // TODO: make these assignments work
+      //$scope.projects = user_projects;
+      //$scope.template_projects = template_projects;
       deferred.resolve();
       return deferred.promise;
     }
@@ -305,7 +307,7 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
   .then(function() {
     var template_url = $routeParams.template_url;
     if (template_url) {
-      $location.url('/playground/');
+      $location.search({});
       return create_project_from_template(template_url);
     }
   })
