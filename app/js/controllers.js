@@ -165,7 +165,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
           break;
         }
       }
-      $location.url('/playground/');
+      $location.path('/playground/');
     });
   };
 
@@ -209,7 +209,6 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
   // TODO: test
   $scope.new_project_by_url = function(repo_url) {
     var deferred = $q.defer();
-    $scope.force_location_hash('my_templates');
     for (var i in $scope.template_projects) {
       if ($scope.template_projects[i].template_url == repo_url) {
         throw 'Template already exists';
@@ -328,21 +327,8 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
     });
   };
 
-  // TODO: test
-  $scope.force_location_hash = function(hash) {
-    DoSerial
-    .then(function() {
-      $location.hash('');
-    })
-    .tick()
-    .then(function() {
-      $location.hash(hash);
-    });
-  }
-
   $scope.new_project = function(template_project) {
     var deferred = $q.defer();
-    $scope.force_location_hash('my_projects');
     var data = {
       'name': '(Creating project...)',
       'description': '(Please wait and then refresh this page.)',
