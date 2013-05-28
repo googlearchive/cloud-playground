@@ -405,7 +405,7 @@ function OAuth2AdminController($scope, $log, dialog, key, url, client_id,
 }
 
 function ProjectController($scope, $browser, $http, $routeParams, $window,
-                           $dialog, $log, DoSerial, DomElementById,
+                           $dialog, $location, $log, DoSerial, DomElementById,
                            WrappedElementById, Backoff) {
 
   // keep in sync with appengine_config.py
@@ -525,6 +525,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   }
 
   $scope.select_file = function(file) {
+    $location.hash(file.path);
     if ($scope.is_image_mime_type(file.mime_type)) {
       $scope.current_file = file;
       return;
@@ -534,7 +535,18 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     });
   };
 
-  $scope._select_first_file = function() {
+  $scope.set_path = function(path) {
+    $location.hash(path);
+  }
+
+  $scope._select_a_file = function() {
+    var path = $location.hash();
+    var file = $scope.files[path];
+    if (file) {
+      $scope.select_file(file);
+      return;
+    }
+    // select first file
     for (var path in $scope.files) {
       $scope.select_file($scope.files[path]);
       break;
@@ -560,7 +572,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     }
   })
   .then($scope._list_files)
-  .then($scope._select_first_file);
+  .then($scope._select_a_file);
 
   // TODO: test
   $scope.insert_path = function(path) {
@@ -671,7 +683,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
       return $http.post(url)
       .success(function(data, status, headers, config) {
         delete $scope.files[file.path];
-        $scope._select_first_file();
+        $scope._select_a_file();
       });
     });
   };
