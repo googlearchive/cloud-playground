@@ -144,7 +144,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
             break;
           }
         }
-        $location.url('/playground/p/' + project.key);
+        $location.path('/playground/p/' + project.key);
       });
     });
   };
