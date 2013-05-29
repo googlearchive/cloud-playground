@@ -2,6 +2,17 @@
 #
 set -ue
 
+VERSION=$(git log -1 --pretty=format:%H)
+if [ -n "$(git status --porcelain)" ]
+then
+  git status
+  echo
+  echo -e "Hit [ENTER] to continue: \c"
+  read
+  VERSION="dirty-$VERSION"
+fi
+
+
 $(dirname $0)/sdkapi.sh
 
 APPCFG=$(which appcfg.py) \
@@ -18,7 +29,10 @@ function deploy() {
   appcfg.py --oauth2 $* rollback .
 
   echo -e "\n*** DEPLOYING ***\n"
-  appcfg.py --oauth2 $* update .
+  appcfg.py --oauth2 $* update -V $VERSION .
+
+  echo -e "\n*** SETTING DEFAULT VERSION ***\n"
+  appcfg.py --oauth2 $* set_default_version -V $VERSION .
 }
 
 
