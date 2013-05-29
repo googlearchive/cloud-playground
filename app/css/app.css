@@ -318,6 +318,10 @@ BUTTON.admin > I[class*=" icon-"] {
   white-space: pre;
 }
 
+.alert-no-margin {
+  margin: 0px;
+}
+
 .loading {
   font-size: 200%;
   line-height: 2em;
