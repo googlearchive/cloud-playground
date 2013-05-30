@@ -19,7 +19,7 @@ from google.appengine.api import urlfetch_errors
 
 
 _GITHUB_URL_RE = re.compile(
-    '^https?://(?:[^/]+.)?github.com/(.+)$'
+    '^(?:https?|git)://(?:[^/]+.)?github.com/(.+?)(?:\.git)?$'
 )
 
 # projects which should not be shown in the cloud playground by default
@@ -109,6 +109,8 @@ def GetInfo(html_url):
   For example:
   - https://api.github.com/users/GoogleCloudPlatform/repos
   - https://github.com/GoogleCloudPlatform/appengine-guestbook-python
+  - https://github.com/GoogleCloudPlatform/appengine-guestbook-python.git
+  - git://github.com/GoogleCloudPlatform/appengine-guestbook-python.git
   - https://github.com/GoogleCloudPlatform/appengine-guestbook-python/tree/part6-staticfiles
   - https://api.github.com/repos/GoogleCloudPlatform/appengine-guestbook-python/branches/part6-staticfiles
   """
