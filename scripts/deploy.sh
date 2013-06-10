@@ -3,9 +3,9 @@
 set -ue
 
 VERSION=$(git log -1 --pretty=format:%H)
-if [ -n "$(git status --porcelain)" ]
+if [ -n "$(git status --ignored --porcelain)" ]
 then
-  git status
+  git status --ignored
   echo
   echo -e "Hit [ENTER] to continue: \c"
   read
