@@ -5,6 +5,13 @@
 angular.module('playgroundApp.services', [])
 
 // TODO: test
+.factory('IframedDetector', function($location, $rootScope, $window) {
+  $rootScope.iframed = $location.search()['iframed']
+                       || $window.top != $window.self;
+  return {};
+})
+
+// TODO: test
 .factory('Alert', function() {
 
   var alert_list = [];

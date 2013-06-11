@@ -38,7 +38,8 @@ function RenameProjectController($scope, $log, dialog, project_name) {
 }
 
 function PageController($scope, $http, DoSerial, $routeParams, $window,
-                        $dialog, $location, $log, WindowService) {
+                        $dialog, $location, $log, WindowService,
+                        IframedDetector) {
 
   function getconfig() {
     $scope.status = 'Retrieving configuration';

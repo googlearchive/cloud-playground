@@ -31,7 +31,7 @@
       <!-- cover up IFRAMEs during drag -->
       <div id="drag-div" class="hidden">
       </div>
-      <div id="header" ng-controller="HeaderController">
+      <div id="header" ng-controller="HeaderController" ng-hide="iframed">
         <a class="logo" ng-href="/playground"><span class='app-back' pg-visible="!alreadyhome()">&#x2039;</span>Cloud Playground</a>
         <sup class="experimental">experimental</sup>
 

@@ -1,6 +1,6 @@
 <div>
   <div id="source-container">
-    <div id="nav">
+    <div id="nav" ng-hide="iframed">
       <div id="navheader">
         <div class="project_name" title="{{project.description}}">{{project.name}}</div>
         <div class="dropdown"><a ng-click="project_context_menu($event)">…</a></div>
