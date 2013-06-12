@@ -18,11 +18,11 @@
       </div>
     </div>
 
-    <div id="source-filename">
+    <form id="source-filename" class="form-reduced-margin">
       <button ng-click='run()' title='run {{project.name}}' class='btn btn-success'><i class="icon-play"></i></button>
       {{current_file.path}}
       <span class="filestatus" ng-bind="filestatus"></span>
-    </div>
+    </form>
     <span ng-show="file == current_file" ng-repeat="file in files">
       <div ng-hide="is_image_mime_type(file.mime_type)" class="source-code" ui-codeMirror="{onChange: create_on_change_closure(file), file: file}" ng-model="file.contents"></div>
       <img ng-show="is_image_mime_type(file.mime_type)" ng-src="{{image_url_of(file)}}">

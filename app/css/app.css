@@ -315,7 +315,7 @@ BUTTON.admin > I[class*=" icon-"] {
 }
 
 .alert DIV {
-  white-space: pre;
+  white-space: pre-wrap;
 }
 
 .alert-no-margin {
@@ -325,4 +325,12 @@ BUTTON.admin > I[class*=" icon-"] {
 .loading {
   font-size: 200%;
   line-height: 2em;
+}
+
+.form-reduced-margin {
+  margin-bottom: 2px;
+}
+
+.alert-reduced-margin {
+  margin-bottom: 2px;
 }
