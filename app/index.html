@@ -26,7 +26,7 @@
 
   </head>
   <body ng-cloak ng-controller="PageController">
-    <div id="container">
+    <div id="container" ng-class="{iframed: iframed}">
 
       <!-- cover up IFRAMEs during drag -->
       <div id="drag-div" class="hidden">
@@ -52,7 +52,7 @@
         <div ng-view></div>
       </div>
 
-      <div id="footer" ng-show="loaded">
+      <div id="footer" ng-show="!iframed && loaded">
         <div class="diag">
           <span>namespace: {{namespace()}}</span>
         </div>

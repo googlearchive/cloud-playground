@@ -104,7 +104,7 @@ H1 {
   color: #aaa;
 }
 
-#source-filename {
+.current-file-path {
   font-weight: bold;
   color: #777;
   display: inline-block;
@@ -150,11 +150,6 @@ H1 {
       #nav #filelist .fileentry.selected .filename {
         font-weight: bold;
       }
-
-  #nav #navheader , #source-filename {
-    /* run.png is 42px x 32px */
-    height: 34px;
-  }
 
   #nav .dropdown {
     text-align: right;
@@ -223,6 +218,10 @@ H1 {
     /* bottom padding should be at least footer height */
     padding: 0em 1em 4em;
   }
+  .iframed #main {
+    /* no padding-bottom in iframed case */
+    padding: 0em 1em;
+  }
 
   #footer {
     width: 100%;
@@ -258,6 +257,9 @@ BUTTON.admin > I[class*=" icon-"] {
 
 #source-container {
   height: 400px;
+}
+.iframed #source-container {
+  height: 200px;
 }
 
   #source-container .source-code {

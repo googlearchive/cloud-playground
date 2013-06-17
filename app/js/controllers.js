@@ -770,4 +770,22 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     });
   };
 
+  $scope.$watch('selected_path', function(newpath, oldpath) {
+    if (!newpath) {
+      return;
+    }
+    if ($scope.current_file != $scope.files[newpath]) {
+      $scope.select_file($scope.files[newpath]);
+    }
+  });
+
+  $scope.$watch('current_file', function(newfile, oldfile) {
+    if (!newfile) {
+      return;
+    }
+    if ($scope.selected_path != newfile.path) {
+      $scope.selected_path = newfile.path;
+    }
+  });
+
 }
