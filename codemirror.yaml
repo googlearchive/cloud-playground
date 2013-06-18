@@ -1,7 +1,14 @@
 handlers:
-- url: /codemirror/lib/(codemirror\.(js|css))
+- url: /codemirror/lib/(codemirror\.css)
   static_files: codemirror/lib/\1
-  upload: codemirror/lib/codemirror\.(js|css)
+  upload: codemirror/lib/codemirror\.css
+  expiration: 10m
+  secure: always
+  mime_type: text/css; charset=utf-8
+
+- url: /codemirror/lib/(codemirror\.js)
+  static_files: codemirror/lib/\1
+  upload: codemirror/lib/codemirror\.js
   expiration: 10m
   secure: always
 

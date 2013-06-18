@@ -1,13 +1,12 @@
 handlers:
 #- url: /bootstrap/js
-#  mime_type: application/javascript; charset=utf-8
 #  static_dir: bootstrap/docs/assets/js
 #  secure: always
 
 - url: /bootstrap/css
-  mime_type: text/css; charset=utf-8
   static_dir: bootstrap/docs/assets/css
   secure: always
+  mime_type: text/css; charset=utf-8
 
 - url: /bootstrap/img/(glyphicons-halflings.*\.png)
   static_files: bootstrap/docs/assets/img/\1

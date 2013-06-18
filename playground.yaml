@@ -6,6 +6,7 @@ handlers:
 - url: /playground/css
   static_dir: app/css
   secure: always
+  mime_type: text/css; charset=utf-8
 
 - url: /playground/img
   static_dir: app/img
@@ -16,11 +17,13 @@ handlers:
   static_files: app/\1
   upload: app/.*\.html
   secure: always
+  mime_type: text/html; charset=utf-8
 
 - url: (/playground/?|/playground/p/[^/]*/?)?
   static_files: app/index.html
   upload: app/index.html
   secure: always
+  mime_type: text/html; charset=utf-8
 
 - url: /playground/.*
   script: playground.app
