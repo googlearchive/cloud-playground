@@ -40,8 +40,8 @@ class FilesystemRepoCollection(collection.RepoCollection):
       if not os.path.isdir(dirpath):
         continue
       try:
-        f = open(os.path.join(dirpath, _PLAYGROUND_JSON))
-        data = json.loads(f.read())
+        with open(os.path.join(dirpath, _PLAYGROUND_JSON)) as f:
+          data = json.loads(f.read())
         name = data.get('template_name')
         description = data.get('template_description')
       except IOError:
