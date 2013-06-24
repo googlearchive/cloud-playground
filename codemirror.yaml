@@ -11,13 +11,39 @@ handlers:
   upload: codemirror/lib/codemirror\.js
   expiration: 10m
   secure: always
+  mime_type: text/javascript; charset=utf-8
 
-- url: /codemirror/addon/
-  static_dir: codemirror/addon
+- url: /codemirror/addon/(.*\.css)
+  static_files: codemirror/addon/\1
+  upload: codemirror/addon/.*\.css
   expiration: 10m
   secure: always
+  mime_type: text/css; charset=utf-8
 
-- url: /codemirror/mode/
-  static_dir: codemirror/mode
+- url: /codemirror/addon/(.*\.js)
+  static_files: codemirror/addon/\1
+  upload: codemirror/addon/.*\.js
   expiration: 10m
   secure: always
+  mime_type: text/javascript; charset=utf-8
+
+- url: /codemirror/mode/(.*\.css)
+  static_files: codemirror/mode/\1
+  upload: codemirror/mode/.*\.css
+  expiration: 10m
+  secure: always
+  mime_type: text/css; charset=utf-8
+
+- url: /codemirror/mode/(.*\.js)
+  static_files: codemirror/mode/\1
+  upload: codemirror/mode/.*\.js
+  expiration: 10m
+  secure: always
+  mime_type: text/javascript; charset=utf-8
+
+- url: /codemirror/mode/(.*\.html)
+  static_files: codemirror/mode/\1
+  upload: codemirror/mode/.*\.html
+  expiration: 10m
+  secure: always
+  mime_type: text/html; charset=utf-8

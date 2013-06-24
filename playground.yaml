@@ -2,6 +2,7 @@ handlers:
 - url: /playground/js
   static_dir: app/js
   secure: always
+  mime_type: text/javascript; charset=utf-8
 
 - url: /playground/css
   static_dir: app/css

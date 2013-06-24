@@ -3,3 +3,4 @@ handlers:
   static_files: app/lib/angular/angular.js
   upload: app/lib/angular/angular.js
   secure: always
+  mime_type: text/javascript; charset=utf-8

@@ -1,4 +1,6 @@
 handlers:
-- url: /ui-bootstrap
-  static_dir: app/lib/ui-bootstrap/
+- url: /ui-bootstrap/(.*\.js)
+  static_files: app/lib/ui-bootstrap/\1
+  upload: app/lib/ui-bootstrap/.*\.js
   secure: always
+  mime_type: text/javascript; charset=utf-8

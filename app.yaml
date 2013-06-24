@@ -73,6 +73,3 @@ skip_files:
 - ^(.*/)?.*/RCS/.*
 - ^(.*/)?\..*
 - ^(.*/)?.*\.bak$
-# cloud playground entries
-- ^codemirror/.*LICENSE
-- ^codemirror/.*ls

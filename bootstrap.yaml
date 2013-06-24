@@ -2,6 +2,7 @@ handlers:
 #- url: /bootstrap/js
 #  static_dir: bootstrap/docs/assets/js
 #  secure: always
+#  mime_type: text/javascript; charset=utf-8
 
 - url: /bootstrap/css
   static_dir: bootstrap/docs/assets/css
