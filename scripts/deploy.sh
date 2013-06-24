@@ -3,15 +3,15 @@
 set -ue
 
 VERSION=$(git log -1 --pretty=format:%H)
-if [ -n "$(git status --ignored --porcelain)" ]
+if [ -n "$(git status --porcelain)" ]
 then
-  git status --ignored
-  echo
-  echo -e "Hit [ENTER] to continue: \c"
-  read
   VERSION="dirty-$VERSION"
 fi
 
+git status
+echo
+echo -e "Hit [ENTER] to continue: \c"
+read
 
 $(dirname $0)/sdkapi.sh
 
