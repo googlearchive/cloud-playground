@@ -22,7 +22,18 @@ do
   APPCFG=$(readlink $APPCFG)
 done
 
-SDK_HOME=$(dirname $APPCFG)
+BIN_DIR=$(dirname $APPCFG)
+
+if [ "$(basename $BIN_DIR)" == "bin" ]
+then
+  SDK_HOME=$(dirname $BIN_DIR)
+  if [ -d $SDK_HOME/platform/google_appengine ]
+  then
+    SDK_HOME=$SDK_HOME/platform/google_appengine
+  fi
+else
+  SDK_HOME=$BIN_DIR
+fi
 
 function deploy() {
   echo -e "\n*** Rolling back any pending updates (just in case) ***\n"
