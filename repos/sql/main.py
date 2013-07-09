@@ -2,6 +2,7 @@ import os
 import logging
 import webapp2
 
+from google.appengine.api import app_identity
 from google.appengine.api import rdbms
 
 import jinja2
@@ -12,7 +13,12 @@ jinja2_env = jinja2.Environment(
     loader=jinja2.FileSystemLoader(template_path)
 )
 
-CLOUDSQL_INSTANCE = 'google.com:sqlreduce:sqlreduce'
+# Assume Cloud SQL instance name matches app id
+APP_ID = app_identity.get_application_id()
+CLOUDSQL_INSTANCE = '{}:{}'.format(APP_ID, APP_ID)
+
+# To create the intial database, follow the setup instructions
+# https://developers.google.com/appengine/training/cloud-sql/deploy_the_app
 DATABASE_NAME = 'guestbook'
 USER_NAME = None #'username'
 PASSWORD = None #'password'
