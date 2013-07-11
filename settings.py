@@ -31,6 +31,9 @@ _APP_IDS = set((PLAYGROUND_APP_ID, EXEC_CODE_APP_ID))
 
 # Our app id
 _APP_ID = os.environ['APPLICATION_ID'].split('~')[-1]
+# support regular 'appspot.com' app ids only
+assert ':' not in _APP_ID, ('{} app ids are unsupported'
+                            .format(_APP_ID.split(':')[0]))
 
 # Automatically detect deployments to other app ids
 if _APP_ID not in _APP_IDS:
