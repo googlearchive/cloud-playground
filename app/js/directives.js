@@ -30,25 +30,29 @@ angular.module('playgroundApp.directives', [])
 // TODO: DETERMINE how must of this we should test
 .directive('pgResizer', function(WrappedElementById) {
 
-  var downx, downy, isdown, initialheight, elem;
   var dragDiv = WrappedElementById('drag-div');
 
-  function movefunc(evt) {
-    if (!isdown) {
-      return;
-    }
-    var newheight = initialheight + (evt.pageY - downy);
-    elem.css('height', newheight + 'px');
+  function setElemHeight(elem, height) {
+    elem.css('height', height + 'px');
   };
 
-  function upfunc(evt) {
-    isdown = false;
-    dragDiv.addClass('hidden');
-    dragDiv.unbind('mousemove', movefunc);
-    dragDiv.unbind('mouseup', upfunc);
-  };
+  function getHeight(key) {
+    try {
+      return parseInt(localStorage.getItem('pgResizer-height-' + key));
+    } catch(e) {
+      return 0;
+    }
+  }
+
+  function setHeight(key, height) {
+    console.log('setHeight(', height, ')');
+    localStorage.setItem('pgResizer-height-' + key, height);
+  }
 
   return function(scope, element, attr) {
+    var downY, isDown;
+    var containerElem = WrappedElementById(attr.pgResizer);
+
     element.css({
       cursor: 'move',
       borderTop: '4px solid #fff',
@@ -56,14 +60,32 @@ angular.module('playgroundApp.directives', [])
       backgroundColor: '#eee',
       padding: '2px',
     });
+    if (getHeight(attr.pgResizer)) {
+      setElemHeight(containerElem, getHeight(attr.pgResizer));
+    }
     element.bind('mousedown', function(evt) {
       evt.preventDefault();
-      isdown = true;
-      downx = evt.pageX;
-      downy = evt.pageY;
-      elem = WrappedElementById(attr.pgResizer);
-      initialheight = elem.prop('offsetHeight');
+      isDown = true;
+      downY = evt.pageY;
       dragDiv.removeClass('hidden');
+
+      if (!getHeight(attr.pgResizer)) {
+        setHeight(attr.pgResizer, containerElem.prop('offsetHeight'));
+      }
+
+      var movefunc = function(evt) {
+        setHeight(attr.pgResizer, getHeight(attr.pgResizer) + (evt.pageY - downY));
+        downY = evt.pageY;
+        setElemHeight(containerElem, getHeight(attr.pgResizer));
+      };
+
+      var upfunc = function(evt) {
+        isDown = false;
+        dragDiv.addClass('hidden');
+        dragDiv.unbind('mousemove', movefunc);
+        dragDiv.unbind('mouseup', upfunc);
+      };
+
       dragDiv.bind('mousemove', movefunc);
       dragDiv.bind('mouseup', upfunc);
     });
