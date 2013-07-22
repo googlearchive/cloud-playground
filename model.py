@@ -221,6 +221,8 @@ def GetTemplateProjects():
   projects = GetProjects(user)
   return projects
 
+def _CreateProjectTree(project):
+  return common.config.CREATE_TREE_FUNC(str(project.key.id()))
 
 @ndb.transactional(xg=True)
 def CopyProject(user, tp):
@@ -229,14 +231,28 @@ def CopyProject(user, tp):
                           html_url=tp.html_url,
                           project_name=tp.project_name,
                           project_description=tp.project_description)
-  src_tree = common.config.CREATE_TREE_FUNC(str(tp.key.id()))
-  dst_tree = common.config.CREATE_TREE_FUNC(str(project.key.id()))
+  src_tree = _CreateProjectTree(tp)
+  dst_tree = _CreateProjectTree(project)
+  CopyTree(dst_tree, src_tree)
+  return project
+
+
+def CopyTree(dst_tree, src_tree):
   paths = src_tree.ListDirectory(None)
   for path in paths:
     if path.endswith('/'):
       continue
     content = src_tree.GetFileContents(path)
     dst_tree.SetFile(path, content)
+
+
+def ResetProject(project_id, project_tree):
+  project_tree.Clear()
+  project = GetProject(project_id)
+  repo = GetRepo(project.template_url)
+  tp = repo.project.get()
+  template_tree = _CreateProjectTree(tp)
+  CopyTree(project_tree, template_tree)
   return project
 
 
@@ -251,7 +267,6 @@ def TouchProject(project_id):
   project = GetProject(project_id)
   project.put()
   return project
-
 
 def _UpdateProjectUserKeys(dst_user, src_user):
   projects = GetProjects(src_user)

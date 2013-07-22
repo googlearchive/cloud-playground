@@ -770,6 +770,24 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     });
   };
 
+  $scope.reset = function() {
+    var project_id = $scope.namespace();
+    return $http.post('/playground/p/' + project_id + '/reset')
+    .success(function(data, status, headers, config) {
+      for (var i in $scope.projects) {
+        if ($scope.projects[i].key == data.key) {
+          $scope.projects[i] = data;
+          break;
+        }
+      }
+      DoSerial 
+      .then($scope._list_files)
+      .then(function() {
+        $scope.select_file($scope.files[$location.hash()]);
+      });
+    });
+  }
+
   $scope.$watch('selected_path', function(newpath, oldpath) {
     if (!newpath) {
       return;
