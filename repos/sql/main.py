@@ -1,3 +1,18 @@
+"""
+To create the intial database, follow the setup instructions:
+  https://developers.google.com/appengine/training/cloud-sql/deploy_the_app
+
+At a minimum:
+
+  create database guestbook charset utf8;
+  use guestbook;
+  create TABLE entries (id int not null auto_increment primary key,
+                        guest_name varchar(255),
+                        content varchar(255),
+                        created_at timestamp)
+                        DEFAULT CHARSET=utf8;
+"""
+
 import os
 import logging
 import webapp2
