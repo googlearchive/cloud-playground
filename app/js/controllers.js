@@ -783,7 +783,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
       DoSerial 
       .then($scope._list_files)
       .then(function() {
-        $scope.select_file($scope.files[$location.hash()]);
+        $scope._select_a_file();
       });
     });
   }
