@@ -770,7 +770,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     });
   };
 
-  $scope.reset = function() {
+  $scope.reset_project = function() {
     var project_id = $scope.namespace();
     return $http.post('/playground/p/' + project_id + '/reset')
     .success(function(data, status, headers, config) {
@@ -787,6 +787,24 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
       });
     });
   }
+
+  $scope.prompt_reset_project = function() {
+    var title = 'Confirm project reset';
+    var msg = 'Are you sure you want to reset project "' +
+              $scope.project.name +
+              '"?';
+    var btns = [{result: false, label: 'Cancel'},
+                {result: true, label: 'RESET PROJECT',
+                 cssClass: 'btn-primary btn-danger'}];
+    // TODO: autofocus primary button
+    $dialog.messageBox(title, msg, btns)
+    .open()
+    .then(function(result) {
+      if (result) {
+        $scope.reset_project();
+      }
+    });
+  };
 
   $scope.$watch('selected_path', function(newpath, oldpath) {
     if (!newpath) {
