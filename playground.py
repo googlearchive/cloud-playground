@@ -6,17 +6,18 @@ import json
 import logging
 import os
 import re
+import StringIO
 import urllib
-
-from mimic import mimic_wsgi
-from mimic.__mimic import common
-from mimic.__mimic import mimic
+import zipfile
 
 import webapp2
 from webapp2_extras import security
 from webapp2_extras import sessions
 
 import error
+from mimic import mimic_wsgi
+from mimic.__mimic import common
+from mimic.__mimic import mimic
 import model
 import secret
 import settings
@@ -481,6 +482,26 @@ class ResetProject(PlaygroundHandler):
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
 
+
+class DownloadProject(PlaygroundHandler):
+
+  def get(self, project_id):
+    assert project_id
+    project_data = model.DownloadProject(project_id, self.tree)
+    buf = StringIO.StringIO()
+    zf = zipfile.ZipFile(buf, mode='w', compression=zipfile.ZIP_DEFLATED)
+    for project_file in project_data["files"]:
+      zf.writestr(project_file["path"], project_file["content"])
+    zf.close()
+
+    filename = '{}.zip'.format(project_data["project_name"])
+    content_disposition = 'attachment; filename="{}"'.format(filename)
+    
+    self.response.headers['Content-Disposition'] = content_disposition
+    self.response.headers['Content-Type'] = 'application/zip'
+    self.response.write(buf.getvalue())
+
+
 class TouchProject(PlaygroundHandler):
 
   def post(self, project_id):
@@ -566,6 +587,7 @@ app = webapp2.WSGIApplication([
     ('/playground/p/(.*)/rename', RenameProject),
     ('/playground/p/(.*)/touch', TouchProject),
     ('/playground/p/(.*)/reset', ResetProject),
+    ('/playground/p/(.*)/download', DownloadProject),
 
     # admin tools
     ('/playground/nuke', Nuke),

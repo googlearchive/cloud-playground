@@ -1,5 +1,6 @@
 """Module containing the datastore mode and associated functions."""
 
+import os
 import random
 
 from mimic.__mimic import common
@@ -255,6 +256,17 @@ def ResetProject(project_id, project_tree):
   CopyTree(project_tree, template_tree)
   return project
 
+def DownloadProject(project_id, project_tree):
+  project = GetProject(project_id)
+  project_name = project.project_name
+  paths = project_tree.ListDirectory(None)
+  files = []
+  for path in paths:
+    if os.path.isdir(path):
+      continue
+    content = project_tree.GetFileContents(path)
+    files.append({"path": path, "content": content})
+  return {"project_name": project_name, "files": files}
 
 def RenameProject(project_id, project_name):
   project = GetProject(project_id)

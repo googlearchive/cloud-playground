@@ -806,6 +806,11 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     });
   };
 
+  $scope.download = function() {
+    var project_id = $scope.namespace();
+    $window.location = '/playground/p/' + project_id + '/download';
+  }
+
   $scope.$watch('selected_path', function(newpath, oldpath) {
     if (!newpath) {
       return;
