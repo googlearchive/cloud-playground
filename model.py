@@ -10,8 +10,8 @@ import shared
 
 from google.appengine.api import memcache
 from google.appengine.api import taskqueue
-from google.appengine.ext import ndb
 from google.appengine.api.datastore_types import _MAX_RAW_PROPERTY_BYTES
+from google.appengine.ext import ndb
 
 
 class Global(ndb.Model):
@@ -51,7 +51,8 @@ class PlaygroundProject(ndb.Model):
 class Resource(ndb.Model):
   """A cache for web content.
 
-  The url is used as the entity key."""
+  The url is used as the entity key.
+  """
   etag = ndb.StringProperty(required=True, indexed=False)
   content = ndb.BlobProperty(required=False)
   last_modified = ndb.DateTimeProperty(auto_now=True)
@@ -63,6 +64,7 @@ class ResourceChunk(ndb.Model):
 
 
 def GetResource(url):
+  """Retrieve a previously stored resource."""
   key = ndb.Key(Resource, url, namespace=settings.PLAYGROUND_NAMESPACE)
   query = ndb.Query(ancestor=key)
   results = query.fetch()
@@ -78,13 +80,14 @@ def GetResource(url):
 
 
 def PutResource(url, etag, content):
+  """Persist a resource."""
   key = ndb.Key(Resource, url, namespace=settings.PLAYGROUND_NAMESPACE)
   keys = ndb.Query(ancestor=key).fetch(keys_only=True)
   ndb.delete_multi(keys)
   resource = Resource(id=url, etag=etag,
                       namespace=settings.PLAYGROUND_NAMESPACE)
   if len(content) <= _MAX_RAW_PROPERTY_BYTES:
-    resource.content=content
+    resource.content = content
     resource.put()
     return
   chunks = [content[i:i + _MAX_RAW_PROPERTY_BYTES]
@@ -95,19 +98,19 @@ def PutResource(url, etag, content):
   ndb.put_multi(entities)
 
 
-def fix(project):
+def Fix(project):
   if project._properties.has_key('end_user_url'):
     project._properties.pop('end_user_url', None)
     project.put()
     shared.w('fixed {}'.format(project.key))
 
 
-def fixit():
+def Fixit():
   """Method to hold temporary code for data model migrations."""
 
   query = PlaygroundProject.query(namespace=settings.PLAYGROUND_NAMESPACE)
   for project in query:
-    fix(project)
+    Fix(project)
   shared.w('all fixed')
 
 
@@ -166,6 +169,7 @@ def GetRepo(repo_url):
 
 @ndb.transactional(xg=True)
 def CreateRepoAsync(repo_url, html_url, name, description):
+  """Asynchronously create a repo."""
   repo = GetRepo(repo_url)
   if not repo:
     user = GetTemplateOwner()
@@ -174,7 +178,7 @@ def CreateRepoAsync(repo_url, html_url, name, description):
                 namespace=settings.PLAYGROUND_NAMESPACE)
   elif repo.in_progress_task_name:
     shared.w('ignoring recreation of {} which is already executing in task {}'
-                       .format(repo_url, repo.in_progress_task_name))
+             .format(repo_url, repo.in_progress_task_name))
     return
   task = taskqueue.add(queue_name='repo',
                        url='/_playground_tasks/populate_repo',
@@ -370,8 +374,7 @@ def CreateProject(user, template_url, html_url, project_name,
                           template_url=template_url,
                           html_url=html_url,
                           namespace=settings.PLAYGROUND_NAMESPACE,
-                          in_progress_task_name=in_progress_task_name,
-                          )
+                          in_progress_task_name=in_progress_task_name)
   prj.put()
   # transactional get before update
   user = user.key.get()
@@ -406,7 +409,7 @@ def DeleteProject(user, tree, project_id):
   tree.Clear()
 
   @ndb.transactional(xg=True)
-  def del_project():
+  def DelProject():
     # 2. get current entities
     usr = user.key.get()
     prj = GetProject(project_id)
@@ -417,16 +420,16 @@ def DeleteProject(user, tree, project_id):
     usr.put()
 
   @ndb.transactional(xg=True)
-  def del_repos(keys):
+  def DelRepos(keys):
     ndb.delete_multi(keys)
-    del_project()
+    DelProject()
 
   project_key = ndb.Key(PlaygroundProject, long(project_id),
                         namespace=settings.PLAYGROUND_NAMESPACE)
   repo_query = Repo.query(namespace=settings.PLAYGROUND_NAMESPACE)
-  repo_query = repo_query.filter(Repo.project==project_key)
+  repo_query = repo_query.filter(Repo.project == project_key)
   keys = repo_query.fetch(keys_only=True)
   if keys:
-    del_repos(keys)
+    DelRepos(keys)
   else:
-    del_project()
+    DelProject()

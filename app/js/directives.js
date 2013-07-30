@@ -39,7 +39,7 @@ angular.module('playgroundApp.directives', [])
   function getHeight(key) {
     try {
       return parseInt(localStorage.getItem('pgResizer-height-' + key));
-    } catch(e) {
+    } catch (e) {
       return 0;
     }
   }
@@ -74,7 +74,8 @@ angular.module('playgroundApp.directives', [])
       }
 
       var movefunc = function(evt) {
-        setHeight(attr.pgResizer, getHeight(attr.pgResizer) + (evt.pageY - downY));
+        setHeight(attr.pgResizer,
+                  getHeight(attr.pgResizer) + (evt.pageY - downY));
         downY = evt.pageY;
         setElemHeight(containerElem, getHeight(attr.pgResizer));
       };

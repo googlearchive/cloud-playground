@@ -118,7 +118,7 @@ angular.module('ui.directives')
         scope.$watch('file.mime_type', function() {
           // This could be called upon renaming the file.
           codeMirror.setOption('mode', opts.file.mime_type.split(';')[0]);
-        })
+        });
       };
 
       $timeout(deferCodeMirror);

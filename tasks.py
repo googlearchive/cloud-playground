@@ -24,7 +24,7 @@ class PopulateRepo(webapp2.RequestHandler):
   def post(self):
     repo_url = self.request.get('repo_url')
     shared.i('task {} populating repo {}'.format(shared.GetCurrentTaskName(),
-                                                  repo_url))
+                                                 repo_url))
     repo = model.GetRepo(repo_url)
     collection = templates.GetCollection(repo_url)
     collection.CreateTemplateProject(repo)

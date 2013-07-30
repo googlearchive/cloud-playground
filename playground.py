@@ -523,7 +523,7 @@ class Fixit(PlaygroundHandler):
   def get(self):
     if not users.is_current_user_admin():
       shared.e('You must be an admin for this app')
-    model.fixit()
+    model.Fixit()
     self.response.write('done')
 
 

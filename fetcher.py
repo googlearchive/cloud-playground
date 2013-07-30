@@ -24,7 +24,8 @@ class FetchError(urlfetch.Error):
 class Fetcher(object):
   """A wrapper for URL fetch which performs validation and conversion."""
 
-  def __init__(self, url, url_auth_suffix='', follow_redirects=False, headers={}):
+  def __init__(self, url, url_auth_suffix='', follow_redirects=False,
+               headers={}):
     self.url = url
     self.response = None
     self.etag, self.response_content = model.GetResource(url)
@@ -32,10 +33,11 @@ class Fetcher(object):
       headers['If-None-Match'] = '{}'.format(self.etag)
     self.rpc = urlfetch.create_rpc()
     full_url = '{}{}'.format(url, url_auth_suffix)
-    #shared.i('urlfetch.make_fetch_call {} {}'.format(headers, full_url))
+    # shared.i('urlfetch.make_fetch_call {} {}'.format(headers, full_url))
     urlfetch.make_fetch_call(self.rpc, full_url, headers=headers,
                              follow_redirects=follow_redirects,
                              validate_certificate=True)
+
 
   def _CheckResponse(self):
     if self.response:

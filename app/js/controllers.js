@@ -220,14 +220,14 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
       var data = {
         'name': '(Creating template project...)',
         'description': '(Please wait...)',
-        'in_pogress_task_name': 'foo',
+        'in_pogress_task_name': 'foo'
       };
       $scope.template_projects.push(data);
-    })
+    });
     DoSerial
     .then(function() {
       return $http.post('/playground/create_template_project_by_url', {
-          repo_url: repo_url,
+          repo_url: repo_url
       })
       .success(function(data, status, headers, config) {
         $scope.template_projects.pop();
@@ -323,7 +323,7 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
     DoSerial
     .then(function() {
       return $http.post('/playground/recreate_template_project', {
-          project_id: template_project.key,
+          project_id: template_project.key
       });
     });
   };
@@ -336,7 +336,7 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
     };
     $scope.projects.push(data);
     $http.post('/playground/copyproject', {
-        project_id: template_project.key,
+        project_id: template_project.key
     })
     .success(function(data, status, headers, config) {
       $scope.projects.pop();
@@ -509,7 +509,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
       $scope.$apply(); // need to apply here for dirty mark
       Backoff.schedule(_save_dirty_files);
     };
-  }
+  };
 
   $scope.select_file = function(file) {
     $location.hash(file.path);
@@ -524,7 +524,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
 
   $scope.set_path = function(path) {
     $location.hash(path);
-  }
+  };
 
   $scope._select_a_file = function() {
     var path = $location.hash();
@@ -780,13 +780,13 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
           break;
         }
       }
-      DoSerial 
+      DoSerial
       .then($scope._list_files)
       .then(function() {
         $scope._select_a_file();
       });
     });
-  }
+  };
 
   $scope.prompt_reset_project = function() {
     var title = 'Confirm project reset';

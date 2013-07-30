@@ -6,8 +6,8 @@ angular.module('playgroundApp.services', [])
 
 // TODO: test
 .factory('IframedDetector', function($location, $rootScope, $window) {
-  $rootScope.iframed = $location.search()['iframed']
-                       || $window.top != $window.self;
+  $rootScope.iframed = $location.search()['iframed'] ||
+                       $window.top != $window.self;
   return {};
 })
 

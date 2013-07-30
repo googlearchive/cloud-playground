@@ -19,7 +19,7 @@ from google.appengine.api import urlfetch_errors
 
 
 _GITHUB_URL_RE = re.compile(
-    '^(?:https?|git)://(?:[^/]+.)?github.com/(.+?)(?:\.git)?$'
+    r'^(?:https?|git)://(?:[^/]+.)?github.com/(.+?)(?:\.git)?$'
 )
 
 # projects which should not be shown in the cloud playground by default
