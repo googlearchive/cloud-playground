@@ -3,7 +3,7 @@
 	url = http://marijnhaverbeke.nl/git/codemirror
 [submodule "bootstrap"]
 	path = bootstrap
-	url = https://github.com/twitter/bootstrap
+	url = https://github.com/twbs/bootstrap
 [submodule "mimic"]
 	path = mimic
 	url = https://code.google.com/p/cloud-playground.mimic
