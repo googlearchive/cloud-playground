@@ -337,3 +337,7 @@ BUTTON.admin > I[class*=" icon-"] {
 .alert-reduced-margin {
   margin-bottom: 2px;
 }
+
+.btn.pull-right {
+  margin-right: 5px;
+}

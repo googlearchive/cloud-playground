@@ -21,7 +21,7 @@
     <form class="form-inline form-reduced-margin">
       <button ng-click='run()' title='run {{project.name}}' class='btn btn-success'><i class="icon-play"></i></button>
       <button ng-click='prompt_reset_project()' title='reset {{project.name}}' class='btn btn-danger pull-right'>Reset Project</button>
-      <button ng-click='download()' title='download {{project.name}}' class='btn btn-primary pull-right'>Download ZIP</button>
+      <button ng-click='prompt_download_project()' title='download {{project.name}}' class='btn btn-primary pull-right'>Download ZIP</button>
       <span ng-hide="iframed" class="current-file-path">{{current_file.path}}</span>
       <select ng-show="iframed" ng-model="selected_path">
         <option ng-repeat="file in files">{{file.path}}</option>

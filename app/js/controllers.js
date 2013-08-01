@@ -39,7 +39,7 @@ function RenameProjectController($scope, $log, dialog, project_name) {
 
 function PageController($scope, $http, DoSerial, $routeParams, $window,
                         $dialog, $location, $log, WindowService,
-                        IframedDetector) {
+                        IframedDetector, ConfirmDialog) {
 
   function getconfig() {
     $scope.status = 'Retrieving configuration';
@@ -174,17 +174,12 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     var title = 'Confirm project deletion';
     var msg = 'Are you sure you want to delete project "' + project.name +
               '"?';
-    var btns = [{result: false, label: 'Cancel'},
-                {result: true, label: 'DELETE PROJECT',
-                 cssClass: 'btn-primary btn-danger'}];
-    // TODO: autofocus primary button
-    $dialog.messageBox(title, msg, btns)
-    .open()
-    .then(function(result) {
-      if (result) {
-        $scope.delete_project(project);
-      }
-    });
+    var okButtonText = 'DELETE PROJECT';
+    var callback = function() {
+      $scope.delete_project(project);
+    }
+
+    ConfirmDialog(title, msg, okButtonText, callback);
   };
 
   $scope.set_loaded = function() {
@@ -393,7 +388,7 @@ function OAuth2AdminController($scope, $log, dialog, key, url, client_id,
 
 function ProjectController($scope, $browser, $http, $routeParams, $window,
                            $dialog, $location, $log, DoSerial, DomElementById,
-                           WrappedElementById, Backoff) {
+                           WrappedElementById, Backoff, ConfirmDialog) {
 
   // keep in sync with appengine_config.py
   var MIMIC_PROJECT_ID_QUERY_PARAM = '_mimic_project';
@@ -680,18 +675,13 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     var title = 'Confirm file deletion';
     var msg = 'Are you sure you want to delete file "' +
               $scope.current_file.path + '"?';
-    var btns = [{result: false, label: 'Cancel'},
-                {result: true, label: 'DELETE FILE',
-                 cssClass: 'btn-primary btn-danger'}];
-    // TODO: autofocus primary button
-    $dialog.messageBox(title, msg, btns)
-    .open()
-    .then(function(result) {
-      if (result) {
-        delete_file(file);
-      }
-    });
-  };
+    var okButtonText = 'DELETE FILE';
+    var callback = function() {
+      delete_file(file);
+    }
+
+    ConfirmDialog(title, msg, okButtonText, callback);
+  }
 
   // TODO: test
   function file_rename(file, path) {
@@ -793,23 +783,31 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     var msg = 'Are you sure you want to reset project "' +
               $scope.project.name +
               '"?';
-    var btns = [{result: false, label: 'Cancel'},
-                {result: true, label: 'RESET PROJECT',
-                 cssClass: 'btn-primary btn-danger'}];
-    // TODO: autofocus primary button
-    $dialog.messageBox(title, msg, btns)
-    .open()
-    .then(function(result) {
-      if (result) {
-        $scope.reset_project();
-      }
-    });
+    var okButtonText = 'RESET PROJECT';
+    var callback = function() {
+      $scope.reset_project();
+    }
+
+    ConfirmDialog(title, msg, okButtonText, callback);
   };
 
-  $scope.download = function() {
+  $scope.download_project = function() {
     var project_id = $scope.namespace();
     $window.location = '/playground/p/' + project_id + '/download';
   }
+
+  $scope.prompt_download_project = function() {
+    var title = 'Confirm project download';
+    var msg = 'Are you sure you want to download project "' +
+              $scope.project.name +
+              '"?';
+    var okButtonText = 'DOWNLOAD PROJECT';
+    var callback = function() {
+      $scope.download_project();
+    }
+
+    ConfirmDialog(title, msg, okButtonText, callback);
+  };
 
   $scope.$watch('selected_path', function(newpath, oldpath) {
     if (!newpath) {
