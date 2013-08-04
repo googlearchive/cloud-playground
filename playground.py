@@ -434,19 +434,6 @@ class CreateTemplateProjectByUrl(PlaygroundHandler):
     self.response.write(tojson(r))
 
 
-class NewProject(PlaygroundHandler):
-  """Request handler for creating new projects via an HTML link."""
-
-  # TODO: replace external uses of:
-  # https://appid.appspot.com/playground/newproject?template_url=...
-  # with https://appid.appspot.com/playground/?template_url=...
-  def get(self):
-    template_url = self.request.get('template_url')
-    if not template_url:
-      raise error.PlaygroundError('template_url required')
-    self.redirect('/playground/?template_url={}'.format(template_url))
-
-
 class DeleteProject(PlaygroundHandler):
 
   def post(self, project_id):
@@ -586,8 +573,6 @@ app = webapp2.WSGIApplication([
     ('/playground/gettemplateprojects', GetTemplateProjects),
     ('/playground/getprojects', GetProjects),
     ('/playground/copyproject', CopyProject),
-    # TODO: remove
-    ('/playground/newproject', NewProject),
     ('/playground/p/(.*)/getproject', GetProject),
     ('/playground/p/(.*)/delete', DeleteProject),
     ('/playground/p/(.*)/rename', RenameProject),
