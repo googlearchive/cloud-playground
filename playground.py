@@ -550,7 +550,7 @@ class Redirector(object):
 
   def __call__(self, environ, start_response):
     if common.IsDevMode():
-      logging.info('\n' * 3)
+      logging.info('\n' * 1)
     # TODO: Use App Engine Modules to dispatch requests instead.
     if (environ['HTTP_HOST'] in settings.PLAYGROUND_HOSTS
         and environ['PATH_INFO'] == '/'):
