@@ -53,10 +53,10 @@ class UrlFetchTree(common.Tree):
   def _ToFileURL(self, control_path, params):
     params = params.copy()
     params[common.config.PROJECT_ID_QUERY_PARAM] = self.namespace
-    return ('https://{0}/_ah/mimic/{1}?{2}'
-            .format(settings.PLAYGROUND_USER_CONTENT_HOST,
-                    control_path,
-                    urllib.urlencode(params)))
+    url = '/_ah/mimic/{0}?{1}'.format(control_path, urllib.urlencode(params))
+    if settings.PLAYGROUND_USER_CONTENT_HOST:
+      url = '//{0}{1}'.format(settings.PLAYGROUND_USER_CONTENT_HOST, url)
+    return url
 
   def IsMutable(self):
     return True

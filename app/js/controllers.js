@@ -415,8 +415,11 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     p[MIMIC_PROJECT_ID_QUERY_PARAM] = $scope.project.key;
     angular.extend(p, params);
     var qs = toquerystring(p);
-    return '//' + $scope.config.PLAYGROUND_USER_CONTENT_HOST +
-           '/_ah/mimic/' + control_path + qs;
+    var url = '/_ah/mimic/' + control_path + qs;
+    if ($scope.config.PLAYGROUND_USER_CONTENT_HOST) {
+      url = '//' + $scope.config.PLAYGROUND_USER_CONTENT_HOST + url;
+    }
+    return url;
   };
 
   $scope.image_url_of = function(file) {

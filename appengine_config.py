@@ -38,7 +38,12 @@ if common.IsDevMode():
   scheme = 'http'
 else:
   scheme = 'https'
-mimic_ALLOWED_USER_CONTENT_HOSTS = [settings.PLAYGROUND_USER_CONTENT_HOST]
+
+if settings.PLAYGROUND_USER_CONTENT_HOST:
+  mimic_ALLOWED_USER_CONTENT_HOSTS = [settings.PLAYGROUND_USER_CONTENT_HOST]
+else:
+  mimic_ALLOWED_USER_CONTENT_HOSTS = None
+
 mimic_CORS_ALLOWED_ORIGINS = ['{0}://{1}'.format(scheme, h)
                               for h in settings.PLAYGROUND_HOSTS]
 
