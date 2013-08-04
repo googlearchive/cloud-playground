@@ -538,26 +538,32 @@ class Nuke(PlaygroundHandler):
     self.redirect('/playground')
 
 
-class MimicIntercept(mimic_wsgi.Mimic):
-  """WSGI app which handles all requests destined for the target app."""
+class Redirector(object):
+  """WSGI middleware which redirects '/' to '/playground'.
 
-  def __iter__(self):
+  Redirects occur only for PLAYGROUND_HOSTS. Requests to mimic are passed
+  through unaltered.
+  """
+
+  def __init__(self, app):
+    self.app = app
+
+  def __call__(self, environ, start_response):
     if common.IsDevMode():
       logging.info('\n' * 3)
-    if (os.environ['HTTP_HOST'] in settings.PLAYGROUND_HOSTS
-        and os.environ['PATH_INFO'] == '/'):
+    # TODO: Use App Engine Modules to dispatch requests instead.
+    if (environ['HTTP_HOST'] in settings.PLAYGROUND_HOSTS
+        and environ['PATH_INFO'] == '/'):
       url = '/playground'
-      if os.environ['QUERY_STRING']:
-        url += '?' + os.environ['QUERY_STRING']
-      self._RedirectResponse(url)
-      # empty body
+      if environ['QUERY_STRING']:
+        url += '?' + environ['QUERY_STRING']
+      start_response('302 Found', [('Location', url)])
       return iter([''])
-    return super(MimicIntercept, self).__iter__()
+    else:
+      return self.app(environ, start_response)
 
-  def _RedirectResponse(self, location):
-    status = '302 Found'
-    response_headers = [('Location', location)]
-    self.start_response(status, response_headers)
+
+MimicIntercept = Redirector(mimic_wsgi.Mimic)
 
 
 config = {}
