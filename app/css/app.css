@@ -341,3 +341,7 @@ BUTTON.admin > I[class*=" icon-"] {
 .btn.pull-right {
   margin-right: 5px;
 }
+
+.template_container {
+  width: 80%;
+}

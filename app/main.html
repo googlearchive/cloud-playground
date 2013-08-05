@@ -58,17 +58,17 @@
               <span ng-show="!!tp.in_progress_task_name">(Fetching...)</span>
             </button>
           </div>
-          <div style="display: inline-block;">
+          <div class="template_container" style="display: inline-block;">
             <span class="template_name">
               <a ng-href="{{tp.html_url}}" target="{{tp.name}}">{{tp.name}}</a>
             </span>
             <span ng-show="config.is_admin || config.is_devappserver">
-              <button class="admin btn btn-mini btn-link "
+              <button class="admin btn btn-mini btn-link pull-right"
                       ng-click="recreate_template_project(tp)"
                       ng-disabled="!!tp.in_progress_task_name">
                 <i class="icon-refresh"></i> refresh
               </button>
-              <button class="admin btn btn-danger btn-mini btn-link "
+              <button class="admin btn btn-mini btn-link pull-right"
                       ng-click="prompt_delete_project(tp)"
                       ng-disabled="!!tp.in_progress_task_name">
                 <i class="icon-remove"></i> delete
