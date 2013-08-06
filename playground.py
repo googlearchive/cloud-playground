@@ -555,7 +555,7 @@ class Redirector(object):
       return self.app(environ, start_response)
 
 
-MimicIntercept = Redirector(mimic_wsgi.Mimic)
+mimic_intercept_app = Redirector(mimic_wsgi.Mimic)
 
 
 config = {}
