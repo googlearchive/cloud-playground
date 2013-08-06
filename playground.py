@@ -308,6 +308,7 @@ class GetConfig(PlaygroundHandler):
 class OAuth2Admin(PlaygroundHandler):
 
   def post(self):
+    """Handles HTTP POST requests."""
     if not users.is_current_user_admin():
       self.response.set_status(httplib.UNAUTHORIZED)
       return
@@ -375,6 +376,7 @@ class CopyProject(PlaygroundHandler):
   """Request handler for copying projects."""
 
   def post(self):
+    """Handles HTTP POST requests."""
     project_id = self.request.data['project_id']
     if not project_id:
       raise error.PlaygroundError('project_id required')
@@ -395,6 +397,7 @@ class RecreateTemplateProject(PlaygroundHandler):
   """Request handler for recreating template projects."""
 
   def post(self):
+    """Handles HTTP POST requests."""
     if not users.is_current_user_admin():
       self.response.set_status(httplib.UNAUTHORIZED)
       return
@@ -415,6 +418,7 @@ class CreateTemplateProjectByUrl(PlaygroundHandler):
   """Request handler for (re)creating template projects."""
 
   def post(self):
+    """Handles HTTP POST requests."""
     repo_url = self.request.data.get('repo_url')
     if not repo_url:
       raise error.PlaygroundError('repo_id required')
@@ -473,17 +477,18 @@ class ResetProject(PlaygroundHandler):
 class DownloadProject(PlaygroundHandler):
 
   def get(self, project_id):
+    """Handles HTTP GET requests."""
     assert project_id
     project_data = model.DownloadProject(project_id, self.tree)
     buf = StringIO.StringIO()
     zf = zipfile.ZipFile(buf, mode='w', compression=zipfile.ZIP_DEFLATED)
-    for project_file in project_data["files"]:
-      zf.writestr(project_file["path"], project_file["content"])
+    for project_file in project_data['files']:
+      zf.writestr(project_file['path'], project_file['content'])
     zf.close()
 
-    filename = '{}.zip'.format(project_data["project_name"])
+    filename = '{}.zip'.format(project_data['project_name'])
     content_disposition = 'attachment; filename="{}"'.format(filename)
-    
+
     self.response.headers['Content-Disposition'] = content_disposition
     self.response.headers['Content-Type'] = 'application/zip'
     self.response.write(buf.getvalue())
