@@ -15,6 +15,9 @@ PLAYGROUND_NAMESPACE = '_playground'
 # template projects location
 TEMPLATE_PROJECT_DIR = 'repos/'
 
+# name for the session cookie
+SESSION_COOKIE_NAME = 'session'
+
 # Extensions to exclude when creating template projects
 SKIP_EXTENSIONS = ('swp', 'pyc', 'svn')
 
@@ -45,17 +48,29 @@ if _DEV_MODE:
                       # port 7070 for karma e2e test
                       'localhost:7070', '127.0.0.1:7070',
                       app_identity.get_default_version_hostname())
-  #PLAYGROUND_USER_CONTENT_HOST = backends.get_hostname('user-content-backend')
+  # PLAYGROUND_USER_CONTENT_HOST = backends.get_hostname('user-content-backend')
   PLAYGROUND_USER_CONTENT_HOST = None
   EXEC_CODE_HOST = backends.get_hostname('exec-code-backend')
 else:
   PLAYGROUND_HOSTS = ('{0}.appspot.com'.format(PLAYGROUND_APP_ID),
                       'cloud-playground.appspot.com')
-  #PLAYGROUND_USER_CONTENT_HOST = ('{0}-dot-{1}.appspot.com'
-  #                                .format(USER_CONTENT_PREFIX,
-  #                                        PLAYGROUND_APP_ID))
+  # PLAYGROUND_USER_CONTENT_HOST = ('{0}-dot-{1}.appspot.com'
+  #                                 .format(USER_CONTENT_PREFIX,
+  #                                         PLAYGROUND_APP_ID))
   PLAYGROUND_USER_CONTENT_HOST = None
   EXEC_CODE_HOST = '{0}.appspot.com'.format(EXEC_CODE_APP_ID)
+
+
+SESSION_COOKIE_ARGS = {
+    'httponly': True,
+    'secure': not _DEV_MODE,
+}
+
+XSRF_COOKIE_ARGS = {
+    'httponly': False,
+    'secure': not _DEV_MODE,
+}
+
 
 def PrintAppIdsInMap():
   """Prints a new line delimited list of known app ids."""

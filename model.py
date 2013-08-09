@@ -314,7 +314,7 @@ def GetGlobalRootEntity():
 
 
 def GetTemplateOwner():
-  return GetOrCreateUser('TEMPLATE')
+  return GetOrCreateUser(shared.TEMPLATE_OWNER)
 
 
 def GetRepoCollection(url):

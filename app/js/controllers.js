@@ -49,10 +49,10 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     });
   };
 
-  $scope.getproject = function() {
+  $scope.retrieveproject = function() {
       $scope.status = 'Retrieving project ' + project_id;
       var project_id = $scope.namespace();
-      return $http.get('/playground/p/' + project_id + '/getproject')
+      return $http.get('/playground/p/' + encodeURI(project_id) + '/retrieve')
       .success(function(data, status, headers, config) {
           $scope.projects.push(data);
       });
@@ -137,7 +137,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
   $scope.select_project = function(project) {
     DoSerial
     .then(function() {
-      return $http.post('/playground/p/' + project.key + '/touch')
+      return $http.post('/playground/p/' + encodeURI(project.key) + '/touch')
       .success(function(data, status, headers, config) {
         for (var i in $scope.projects) {
           if ($scope.projects[i] == project) {
@@ -145,7 +145,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
             break;
           }
         }
-        $location.path('/playground/p/' + project.key);
+        $location.path('/playground/p/' + encodeURI(project.key));
       });
     });
   };
@@ -330,9 +330,7 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
       'description': '(Please wait and then refresh this page.)',
     };
     $scope.projects.push(data);
-    $http.post('/playground/copyproject', {
-        project_id: template_project.key
-    })
+    $http.post('/playground/p/' + encodeURI(template_project.key) + '/copy')
     .success(function(data, status, headers, config) {
       $scope.projects.pop();
       $scope.projects.push(data);
@@ -552,7 +550,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   .then(function() {
     if (!setcurrentproject()) {
       // project_id is not in $scope.projects
-      return $scope.getproject()
+      return $scope.retrieveproject()
       .then(setcurrentproject);
     }
   })
@@ -765,7 +763,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
 
   $scope.reset_project = function() {
     var project_id = $scope.namespace();
-    return $http.post('/playground/p/' + project_id + '/reset')
+    return $http.post('/playground/p/' + encodeURI(project_id) + '/reset')
     .success(function(data, status, headers, config) {
       for (var i in $scope.projects) {
         if ($scope.projects[i].key == data.key) {
@@ -796,7 +794,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
 
   $scope.download_project = function() {
     var project_id = $scope.namespace();
-    $window.location = '/playground/p/' + project_id + '/download';
+    $window.location = '/playground/p/' + encodeURI(project_id) + '/download';
   }
 
   $scope.prompt_download_project = function() {

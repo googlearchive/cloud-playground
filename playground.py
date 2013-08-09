@@ -11,10 +11,11 @@ import urllib
 import zipfile
 
 import webapp2
-from webapp2_extras import security
 from webapp2_extras import sessions
 
 import error
+from error import *
+import middleware
 from mimic import mimic_wsgi
 from mimic.__mimic import common
 from mimic.__mimic import mimic
@@ -27,9 +28,9 @@ from template import templates
 
 from google.appengine.api import namespace_manager
 from google.appengine.api import users
-from google.appengine.ext import ndb
 
 
+DEBUG = True
 
 _JSON_MIME_TYPE = 'application/json'
 
@@ -41,171 +42,41 @@ _DEV_APPSERVER = os.environ['SERVER_SOFTWARE'].startswith('Development/')
 
 _DASH_DOT_DASH = '-dot-'
 
-# RFC1113 formatted 'Expires' to prevent HTTP/1.0 caching
-_LONG_AGO = 'Mon, 01 Jan 1990 00:00:00 GMT'
-
-# HTTP methods which do not affect state
-_HTTP_READ_METHODS = ('GET', 'OPTIONS')
-
 # must fit in front of '-dot-appid.appspot.com' and not contain '-dot-'
 _VALID_PROJECT_RE = re.compile('^[a-z0-9-]{0,50}$')
 
-# AngularJS XSRF Cookie, see http://docs.angularjs.org/api/ng.$http
-_XSRF_TOKEN_COOKIE = 'XSRF-TOKEN'
-
-# AngularJS XSRF HTTP Header, see http://docs.angularjs.org/api/ng.$http
-_XSRF_TOKEN_HEADER = 'X-XSRF-TOKEN'
-
-_ANON_USER_KEY = u'anon_user_key'
-
 
 def tojson(r):
+  """Converts a python object to JSON."""
   return _JSON_ENCODER.encode(r)
 
 
-# From http://webapp-improved.appspot.com/guide/extras.html
-class SessionHandler(webapp2.RequestHandler):
-  """Convenience request handler for dealing with sessions."""
+class Warmup(webapp2.RequestHandler):
+  """Handler for warmup/start requests"""
 
-  def _AdoptAnonymousProjects(self, dest_user_key, source_user_key):
-    model.AdoptProjects(dest_user_key, source_user_key)
-
-  def get_user_key(self):
-    """Returns the email from logged in user or the session user key."""
-    user = users.get_current_user()
-    anon_user_key = self.session.get(_ANON_USER_KEY)
-    if user and anon_user_key:
-      self._AdoptAnonymousProjects(user.email(), anon_user_key)
-      self.session.pop(_ANON_USER_KEY)
-    if user:
-      return user.email()
-    if not anon_user_key:
-      suffix = security.generate_random_string(
-          length=10,
-          pool=security.LOWERCASE_ALPHANUMERIC)
-      anon_user_key = 'user_{0}'.format(suffix)
-      self.session[_ANON_USER_KEY] = anon_user_key
-    return anon_user_key
-
-  def _PerformCsrfRequestValidation(self):
-    session_xsrf = self.session['xsrf']
-    client_xsrf = self.request.headers.get(_XSRF_TOKEN_HEADER)
-    if not client_xsrf:
-      raise error.PlaygroundError('Missing client XSRF token. '
-                                  'Clear your cookies and refresh the page.')
-    if client_xsrf != session_xsrf:
-      # do not log tokens in production
-      if common.IsDevMode():
-        logging.error('Client XSRF token={0!r}, session XSRF token={1!r}'
-                      .format(client_xsrf, session_xsrf))
-      raise error.PlaygroundError('Client XSRF token does not match session '
-                                  'XSRF token. Clear your cookies and refresh '
-                                  'the page.')
-
-  def PerformValidation(self):
-    """To be overriden by subclasses."""
-    if self.request.method not in _HTTP_READ_METHODS:
-      self._PerformCsrfRequestValidation()
-
-  def dispatch(self):
-    """WSGI request dispatch."""
-    # Get a session store for this request.
-    self.session_store = sessions.get_store(request=self.request)
-    # Ensure valid session is present (including GET requests)
-    _ = self.session
-    try:
-      self.user = model.GetOrCreateUser(self.get_user_key())
-      self.PerformValidation()
-    except error.PlaygroundError, e:
-      # Manually dispatch to handle_exception
-      self.handle_exception(e, self.app.debug)
-      return
-
-    try:
-      # Exceptions during dispatch are automatically handled by handle_exception
-      super(SessionHandler, self).dispatch()
-      # Note App Engine automatically sets a 'Date' header for us. See
-      # https://developers.google.com/appengine/docs/python/runtime#Responses
-      self.response.headers['Expires'] = _LONG_AGO
-      self.response.headers['Cache-Control'] = 'private, max-age=0'
-      self.response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-    finally:
-      # Save all sessions.
-      self.session_store.save_sessions(self.response)
-
-  @webapp2.cached_property
-  def session(self):
-    """Lazily create and return a valid session."""
-    # Returns a session using the default cookie key.
-    session = self.session_store.get_session()
-    if not session:
-      # initialize the session
-      session['xsrf'] = security.generate_random_string(entropy=128)
-      self.response.set_cookie(_XSRF_TOKEN_COOKIE, session['xsrf'])
-    return session
+  def get(self):
+    templates.GetRepoCollections()
 
 
-class PlaygroundHandler(SessionHandler):
+class PlaygroundHandler(webapp2.RequestHandler):
   """Convenience request handler with playground specific functionality."""
 
   @webapp2.cached_property
   def project_id(self):
-    return mimic.GetProjectIdFromPathInfo(self.request.path_info)
+    return mimic.GetProjectId(self.request.environ, False)
 
   @webapp2.cached_property
   def project(self):
-    if not self.project_id:
-      return None
-    return model.GetProject(self.project_id)
+    return self.request.environ['playground.project']
+
+  @webapp2.cached_property
+  def user(self):
+    return self.request.environ['playground.user']
 
   @webapp2.cached_property
   def tree(self):
-    if not self.project:
-      raise Exception('Project {0} does not exist'.format(self.project_id))
-    namespace = str(self.project_id)
     # TODO: instantiate tree elsewhere
-    assert namespace_manager.get_namespace() == namespace, (
-        'namespace_manager.get_namespace()={0!r} != namespace={1!r}'
-        .format(namespace_manager.get_namespace(), namespace))
-    return common.config.CREATE_TREE_FUNC(namespace)
-
-  def _PerformWriteAccessCheck(self):
-    user_key = self.user.key.id()
-    if not user_key:
-      shared.e('FIX ME: no user')
-    if not self.project:
-      # TODO: better approach which allows the creation of new projects
-      return
-    if (user_key not in self.project.writers
-        and not users.is_current_user_admin()):
-      raise error.PlaygroundError('You are not authorized to edit this project')
-
-  def PerformValidation(self):
-    super(PlaygroundHandler, self).PerformValidation()
-    if not shared.ThisIsPlaygroundApp():
-      raise error.PlaygroundError('Cloud Playground user interface not '
-                                  'implemented here.')
-    if self.request.method not in _HTTP_READ_METHODS:
-      self._PerformWriteAccessCheck()
-
-  def handle_playground_error(self, exception):
-    """Called if this handled throws a PlaygroundError.
-
-    Args:
-      exception: the exception that was thrown
-    """
-    self.error(500)
-    logging.exception(exception)
-    self.response.clear()
-    # Note App Engine automatically sets a 'Date' header for us. See
-    # https://developers.google.com/appengine/docs/python/runtime#Responses
-    self.response.headers['Expires'] = _LONG_AGO
-    self.response.headers['Cache-Control'] = 'private, max-age=0'
-    self.response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-    self.response.headers['Content-Type'] = 'text/plain'
-    self.response.headers['X-Cloud-Playground-Error'] = 'True'
-    self.response.out.write('{0}'.format(cgi.escape(exception.message,
-                                                    quote=True)))
+    return common.config.CREATE_TREE_FUNC(str(self.project.key.id()))
 
   def handle_exception(self, exception, debug_mode):
     """Called if this handler throws an exception during execution.
@@ -214,10 +85,10 @@ class PlaygroundHandler(SessionHandler):
       exception: the exception that was thrown
       debug_mode: True if the web application is running in debug mode
     """
-    if isinstance(exception, error.PlaygroundError):
-      self.handle_playground_error(exception)
-    else:
-      super(PlaygroundHandler, self).handle_exception(exception, debug_mode)
+    status, headers, body = error.MakeErrorResponse(exception, debug_mode)
+    self.error(status)
+    self.response.clear()
+    self.response.write('{}'.format(cgi.escape(body, quote=True)))
 
   def DictOfProject(self, project):
     return {
@@ -230,8 +101,8 @@ class PlaygroundHandler(SessionHandler):
         'run_url': self._GetPlaygroundRunUrl(project.key.id()),
         'in_progress_task_name': project.in_progress_task_name,
         'orderby': project.orderby,
+        'writers': project.writers,
     }
-
 
   def _GetPlaygroundRunUrl(self, project_id):
     """Determine the playground run url."""
@@ -246,16 +117,39 @@ class PlaygroundHandler(SessionHandler):
                                        urllib.quote_plus(str(project_id)),
                                        _DASH_DOT_DASH,
                                        settings.EXEC_CODE_HOST)
+  def PerformAccessCheck(self):
+    """Perform authorization checks.
+
+    Subclasses must provide a suitable implementation.
+
+    Raises:
+      error.PlaygroundError if autorization check fails
+    """
+    raise NotImplementedError()
+
 
   def dispatch(self):
     """WSGI request dispatch with automatic JSON parsing."""
+
+    if not shared.ThisIsPlaygroundApp(self.request.environ):
+      Abort(httplib.FORBIDDEN, 'Cloud Playground is not here')
+
+    try:
+      self.PerformAccessCheck()
+    except error.PlaygroundError, e:
+      # Manually dispatch to handle_exception
+      self.handle_exception(e, self.app.debug)
+      return
+
     content_type = self.request.headers.get('Content-Type')
     if content_type and content_type.split(';')[0] == 'application/json':
       self.request.data = json.loads(self.request.body)
+    # Exceptions in super.dispatch are automatically routed to handle_exception
     super(PlaygroundHandler, self).dispatch()
 
 
 class RedirectHandler(PlaygroundHandler):
+  """Handler for redirecting an admin page."""
 
   def _GetAppId(self, namespace):
     if namespace == settings.PLAYGROUND_NAMESPACE:
@@ -265,6 +159,10 @@ class RedirectHandler(PlaygroundHandler):
 
 
 class DatastoreRedirect(RedirectHandler):
+  """Handler for redirecting to the datastore admin page."""
+
+  def PerformAccessCheck(self):
+    pass
 
   def get(self, namespace):
     if _DEV_APPSERVER:
@@ -277,6 +175,10 @@ class DatastoreRedirect(RedirectHandler):
 
 
 class MemcacheRedirect(RedirectHandler):
+  """Handler for redirecting to the memcache admin page."""
+
+  def PerformAccessCheck(self):
+    pass
 
   def get(self, namespace):
     if _DEV_APPSERVER:
@@ -289,6 +191,10 @@ class MemcacheRedirect(RedirectHandler):
 
 
 class GetConfig(PlaygroundHandler):
+  """Handler for retrieving config data."""
+
+  def PerformAccessCheck(self):
+    pass
 
   def get(self):
     """Handles HTTP GET requests."""
@@ -306,6 +212,10 @@ class GetConfig(PlaygroundHandler):
 
 
 class OAuth2Admin(PlaygroundHandler):
+  """Admin only hander for editing OAuth2 credentials."""
+
+  def PerformAccessCheck(self):
+    shared.AssertIsAdmin()
 
   def post(self):
     """Handles HTTP POST requests."""
@@ -331,16 +241,23 @@ class OAuth2Admin(PlaygroundHandler):
     self.response.write(tojson(r))
 
 
-class GetProject(PlaygroundHandler):
+class RetrieveProject(PlaygroundHandler):
+  """Handler to retrieve project metadata."""
 
-  def get(self, project_id):
-    project = model.GetProject(project_id)
-    r = self.DictOfProject(project)
+  def PerformAccessCheck(self):
+    shared.AssertHasProjectReadAccess(self.request.environ)
+
+  def get(self):
+    r = self.DictOfProject(self.project)
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
 
 
 class GetProjects(PlaygroundHandler):
+  """Handler which gets the user's projects."""
+
+  def PerformAccessCheck(self):
+    pass
 
   def get(self):
     r = [self.DictOfProject(p) for p in model.GetProjects(self.user)]
@@ -349,6 +266,10 @@ class GetProjects(PlaygroundHandler):
 
 
 class GetTemplateProjects(PlaygroundHandler):
+  """Handler which retrieves a lsit of projects."""
+
+  def PerformAccessCheck(self):
+    pass
 
   def get(self):
     by_project_name = lambda p: p.project_name
@@ -359,6 +280,10 @@ class GetTemplateProjects(PlaygroundHandler):
 
 
 class Login(PlaygroundHandler):
+  """Login handler."""
+
+  def PerformAccessCheck(self):
+    pass
 
   def get(self):
     """Handles HTTP GET requests."""
@@ -366,6 +291,10 @@ class Login(PlaygroundHandler):
 
 
 class Logout(PlaygroundHandler):
+  """Logout handler."""
+
+  def PerformAccessCheck(self):
+    pass
 
   def get(self):
     """Handles HTTP GET requests."""
@@ -375,18 +304,15 @@ class Logout(PlaygroundHandler):
 class CopyProject(PlaygroundHandler):
   """Request handler for copying projects."""
 
+  def PerformAccessCheck(self):
+    shared.AssertHasProjectReadAccess(self.request.environ)
+
   def post(self):
     """Handles HTTP POST requests."""
-    project_id = self.request.data['project_id']
-    if not project_id:
-      raise error.PlaygroundError('project_id required')
-    tp = model.GetProject(project_id)
+    tp = self.request.environ['playground.project']
     if not tp or tp.in_progress_task_name:
-      self.response.set_status(httplib.REQUEST_TIMEOUT)
-      self.response.headers['X-Cloud-Playground-Error'] = 'True'
-      self.response.write('Requested project is not yet available.'
-                          ' Please try again in 30 seconds.')
-      return
+      Abort(httplib.REQUEST_TIMEOUT, 'Requested template is not yet available. '
+                                     'Please try again in 30  seconds.')
     project = model.CopyProject(self.user, tp)
     r = self.DictOfProject(project)
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
@@ -396,6 +322,9 @@ class CopyProject(PlaygroundHandler):
 class RecreateTemplateProject(PlaygroundHandler):
   """Request handler for recreating template projects."""
 
+  def PerformAccessCheck(self):
+    shared.AssertIsAdmin()
+
   def post(self):
     """Handles HTTP POST requests."""
     if not users.is_current_user_admin():
@@ -403,11 +332,11 @@ class RecreateTemplateProject(PlaygroundHandler):
       return
     project_id = self.request.data['project_id']
     if not project_id:
-      raise error.PlaygroundError('project_id required')
+      Abort(httplib.BAD_REQUEST, 'project_id required')
     project = model.GetProject(project_id)
     if not project:
-      raise error.PlaygroundError('failed to retrieve project {}'
-                                  .format(project_id))
+      Abort(httplib.NOT_FOUND,
+            'failed to retrieve project {}'.format(project_id))
     repo_url = project.template_url
     repo = model.GetRepo(repo_url)
     model.CreateRepoAsync(repo.key.id(), repo.html_url, repo.name,
@@ -417,69 +346,75 @@ class RecreateTemplateProject(PlaygroundHandler):
 class CreateTemplateProjectByUrl(PlaygroundHandler):
   """Request handler for (re)creating template projects."""
 
+  def PerformAccessCheck(self):
+    pass
+
   def post(self):
     """Handles HTTP POST requests."""
     repo_url = self.request.data.get('repo_url')
     if not repo_url:
-      raise error.PlaygroundError('repo_id required')
+      Abort(httplib.BAD_REQUEST, 'repo_id required')
     repo = model.GetRepo(repo_url)
     if not repo:
       html_url = name = description = repo_url
       repo = model.CreateRepoAsync(repo_url, html_url, name, description)
     project = repo.project.get()
     if not project or project.in_progress_task_name:
-      self.response.set_status(httplib.REQUEST_TIMEOUT)
-      self.response.headers['X-Cloud-Playground-Error'] = 'True'
-      self.response.write('Requested template is not yet available.'
-                          ' Please try again in 30 seconds.')
-      return
+      Abort(httplib.REQUEST_TIMEOUT, 'Requested template is not yet available. '
+                                     'Please try again in 30  seconds.')
     r = self.DictOfProject(project)
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
 
 
 class DeleteProject(PlaygroundHandler):
+  """Handler for deleting a project."""
 
-  def post(self, project_id):
-    assert project_id
-    project = model.GetProject(project_id)
-    if not project:
-      raise Exception('Project {0} does not exist'.format(project_id))
-    user = self.user
-    if users.is_current_user_admin():
-      user = model.GetOrCreateUser(project.owner)
-    model.DeleteProject(user, tree=self.tree, project_id=project_id)
+  def PerformAccessCheck(self):
+    shared.AssertHasProjectWriteAccess(self.request.environ)
+
+  def post(self):
+    model.DeleteProject(self.user, tree=self.tree, project_id=self.project_id)
 
 
 class RenameProject(PlaygroundHandler):
+  """Handler for renaming a project."""
 
-  def post(self, project_id):
-    assert project_id
+  def PerformAccessCheck(self):
+    shared.AssertHasProjectWriteAccess(self.request.environ)
+
+  def post(self):
     data = json.loads(self.request.body)
     newname = data.get('newname')
     assert newname
-    project = model.RenameProject(project_id, newname)
+    project = model.RenameProject(self.project_id, newname)
     r = self.DictOfProject(project)
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
 
 
 class ResetProject(PlaygroundHandler):
+  """Handler to reset a project to the template state."""
 
-  def post(self, project_id):
-    assert project_id
-    project = model.ResetProject(project_id, self.tree)
+  def PerformAccessCheck(self):
+    shared.AssertHasProjectWriteAccess(self.request.environ)
+
+  def post(self):
+    project = model.ResetProject(self.project_id, self.tree)
     r = self.DictOfProject(project)
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
 
 
 class DownloadProject(PlaygroundHandler):
+  """Handler for downloading project source code."""
 
-  def get(self, project_id):
+  def PerformAccessCheck(self):
+    shared.AssertHasProjectReadAccess(self.request.environ)
+
+  def get(self):
     """Handles HTTP GET requests."""
-    assert project_id
-    project_data = model.DownloadProject(project_id, self.tree)
+    project_data = model.DownloadProject(self.project_id, self.tree)
     buf = StringIO.StringIO()
     zf = zipfile.ZipFile(buf, mode='w', compression=zipfile.ZIP_DEFLATED)
     for project_file in project_data['files']:
@@ -495,22 +430,20 @@ class DownloadProject(PlaygroundHandler):
 
 
 class TouchProject(PlaygroundHandler):
+  """Handler for updating the project last access timestamp."""
 
-  def post(self, project_id):
-    assert project_id
-    project = model.TouchProject(project_id)
+  def PerformAccessCheck(self):
+    shared.AssertHasProjectWriteAccess(self.request.environ)
+
+  def post(self):
+    project = model.TouchProject(self.project_id)
     r = self.DictOfProject(project)
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
 
 
-class Warmup(PlaygroundHandler):
-
-  def get(self):
-    templates.GetRepoCollections()
-
-
 class Fixit(PlaygroundHandler):
+  """Admin only handler for performing data cleanup operations."""
 
   def get(self):
     if not users.is_current_user_admin():
@@ -520,6 +453,10 @@ class Fixit(PlaygroundHandler):
 
 
 class Nuke(PlaygroundHandler):
+  """Admin only handler for reseting global data."""
+
+  def PerformAccessCheck(self):
+    shared.AssertIsAdmin()
 
   def post(self):
     if not users.is_current_user_admin():
@@ -530,64 +467,34 @@ class Nuke(PlaygroundHandler):
     self.redirect('/playground')
 
 
-class Redirector(object):
-  """WSGI middleware which redirects '/' to '/playground'.
-
-  Redirects occur only for PLAYGROUND_HOSTS. Requests to mimic are passed
-  through unaltered.
-  """
-
-  def __init__(self, app):
-    self.app = app
-
-  def __call__(self, environ, start_response):
-    if common.IsDevMode():
-      logging.info('\n' * 1)
-    # TODO: Use App Engine Modules to dispatch requests instead.
-    if (environ['HTTP_HOST'] in settings.PLAYGROUND_HOSTS
-        and environ['PATH_INFO'] == '/'):
-      url = '/playground'
-      if environ['QUERY_STRING']:
-        url += '?' + environ['QUERY_STRING']
-      start_response('302 Found', [('Location', url)])
-      return iter([''])
-    else:
-      return self.app(environ, start_response)
-
-
-mimic_intercept_app = Redirector(mimic_wsgi.Mimic)
-
-
-config = {}
-config['webapp2_extras.sessions'] = {
-    'secret_key': secret.GetSecret('webapp2_extras.sessions', entropy=128),
-    'cookie_args': {
-        'httponly': True,
-        'secure': not common.IsDevMode(),
-    },
+config = {
+    'webapp2_extras.sessions': {
+        'secret_key': secret.GetSecret('webapp2_extras.sessions', entropy=128),
+        'cookie_args': settings.SESSION_COOKIE_ARGS,
+    }
 }
 
 app = webapp2.WSGIApplication([
     # config actions
     ('/playground/getconfig', GetConfig),
-    ('/playground/oauth2_admin', OAuth2Admin),
 
     # project actions
     ('/playground/recreate_template_project', RecreateTemplateProject),
     ('/playground/create_template_project_by_url', CreateTemplateProjectByUrl),
     ('/playground/gettemplateprojects', GetTemplateProjects),
     ('/playground/getprojects', GetProjects),
-    ('/playground/copyproject', CopyProject),
-    ('/playground/p/(.*)/getproject', GetProject),
-    ('/playground/p/(.*)/delete', DeleteProject),
-    ('/playground/p/(.*)/rename', RenameProject),
-    ('/playground/p/(.*)/touch', TouchProject),
-    ('/playground/p/(.*)/reset', ResetProject),
-    ('/playground/p/(.*)/download', DownloadProject),
+    ('/playground/p/.*/copy', CopyProject),
+    ('/playground/p/.*/retrieve', RetrieveProject),
+    ('/playground/p/.*/delete', DeleteProject),
+    ('/playground/p/.*/rename', RenameProject),
+    ('/playground/p/.*/touch', TouchProject),
+    ('/playground/p/.*/reset', ResetProject),
+    ('/playground/p/.*/download', DownloadProject),
 
     # admin tools
     ('/playground/nuke', Nuke),
     ('/playground/fixit', Fixit),
+    ('/playground/oauth2_admin', OAuth2Admin),
 
     # /playground
     ('/playground/login', Login),
@@ -600,4 +507,11 @@ app = webapp2.WSGIApplication([
 
     # backends in the dev_appserver
     ('/_ah/start', Warmup),
-], debug=True, config=config)
+], debug=DEBUG)
+app = middleware.Session(app, config)
+
+mimic_intercept_app = mimic_wsgi.Mimic
+mimic_intercept_app = middleware.MimicControlAccessFilter(mimic_intercept_app)
+mimic_intercept_app = middleware.Session(mimic_intercept_app, config)
+mimic_intercept_app = middleware.Redirector(mimic_intercept_app)
+mimic_intercept_app = middleware.ErrorHandler(mimic_intercept_app, debug=DEBUG)
