@@ -303,12 +303,6 @@ BUTTON.admin > I[class*=" icon-"] {
   display: none;
 }
 
-.key {
-  color: #ccc;
-  text-align: right;
-  font-family: monospace;
-}
-
 .dirtymarker {
   opacity: 0.3;
 }
