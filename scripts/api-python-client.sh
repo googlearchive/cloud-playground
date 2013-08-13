@@ -16,7 +16,7 @@ ROOT_DIR=$( dirname $SCRIPT_DIR)
 if [ ! -d $ROOT_DIR/$EXTRACT_DIRECTORY ]
 then
   echo -e "\n*** Downloading $DOWNLOAD_BASE_URL/$DOWNLOAD_FILENAME ***\n"
-  wget -q $DOWNLOAD_BASE_URL/$DOWNLOAD_FILENAME -O /tmp/$DOWNLOAD_FILENAME || exit
+  curl -s $DOWNLOAD_BASE_URL/$DOWNLOAD_FILENAME -o /tmp/$DOWNLOAD_FILENAME || exit
   echo "Done"
 
   echo -e "\n*** Extracting /tmp/$DOWNLOAD_FILENAME into $ROOT_DIR/$EXTRACT_DIRECTORY ***\n"

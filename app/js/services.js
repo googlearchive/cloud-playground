@@ -191,11 +191,11 @@ angular.module('playgroundApp.services', [])
 // Prompt service. Used only for prompts that do not require text input.
 // TODO: test
 .factory('ConfirmDialog', function($dialog) {
-  return function(title, msg, okButtonText, callback) {
+  return function(title, msg, okButtonText, okButtonClass, callback) {
     // TODO: autofocus primary button
     var btns = [{result: false, label: 'Cancel'},
                 {result: true, label: okButtonText,
-                 cssClass: 'btn-primary btn-danger'}];
+                 cssClass: okButtonClass}];
     $dialog.messageBox(title, msg, btns)
     .open()
     .then(function(result) {

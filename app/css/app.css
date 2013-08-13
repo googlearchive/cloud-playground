@@ -284,10 +284,9 @@ BUTTON.admin > I[class*=" icon-"] {
   }
 
 #output-iframe {
-  border: 2px solid #51a351;
-  border-radius: 5px;
   width: 100%;
   height: 17em;
+  border: 1px solid #ccc;
 }
 
 #drag-div {
@@ -333,9 +332,41 @@ BUTTON.admin > I[class*=" icon-"] {
 }
 
 .btn.pull-right {
-  margin-right: 5px;
+  margin-left: 5px;
 }
 
 .template_container {
   width: 80%;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  vertical-align: baseline;
+}
+
+.form-inline {
+  padding-top: 3px;
+  padding-bottom: 3px;
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+
+/* enable flexbox layout */
+.form-inline.url-container {
+  display: -moz-box;      /* OLD: Firefox (buggy) */ 
+  display: box;           /* OLD */
+  display: -ms-flexbox;   /* MID: IE 10 */
+  display: -webkit-flex;  /* NEW, Chrome 21+ */
+  display: flex;          /* NEW: Opera 12.1, Firefox 22+ */
+}
+
+.url-bar {
+ -webkit-flex: 1 1 auto;
+ -ms-flex: 1 1 auto;
+ box-flex: 1;
+ flex: 1 1 auto;
+ width: 90%;
+}
+
+.url-button {
+  height: 30px;  /* same as URL input bar */
 }

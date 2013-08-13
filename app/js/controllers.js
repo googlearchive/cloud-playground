@@ -175,11 +175,12 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     var msg = 'Are you sure you want to delete project "' + project.name +
               '"?';
     var okButtonText = 'DELETE PROJECT';
+    var okButtonClass = 'btn btn-danger';
     var callback = function() {
       $scope.delete_project(project);
     }
 
-    ConfirmDialog(title, msg, okButtonText, callback);
+    ConfirmDialog(title, msg, okButtonText, okButtonClass, callback);
   };
 
   $scope.set_loaded = function() {
@@ -677,11 +678,12 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     var msg = 'Are you sure you want to delete file "' +
               $scope.current_file.path + '"?';
     var okButtonText = 'DELETE FILE';
+    var okButtonClass = 'btn btn-danger';
     var callback = function() {
       delete_file(file);
     }
 
-    ConfirmDialog(title, msg, okButtonText, callback);
+    ConfirmDialog(title, msg, okButtonText, okButtonClass, callback);
   }
 
   // TODO: test
@@ -785,11 +787,12 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
               $scope.project.name +
               '"?';
     var okButtonText = 'RESET PROJECT';
+    var okButtonClass = 'btn btn-danger';
     var callback = function() {
       $scope.reset_project();
     }
 
-    ConfirmDialog(title, msg, okButtonText, callback);
+    ConfirmDialog(title, msg, okButtonText, okButtonClass, callback);
   };
 
   $scope.download_project = function() {
@@ -803,11 +806,12 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
               $scope.project.name +
               '"?';
     var okButtonText = 'DOWNLOAD PROJECT';
+    var okButtonClass = 'btn btn-primary';
     var callback = function() {
       $scope.download_project();
     }
 
-    ConfirmDialog(title, msg, okButtonText, callback);
+    ConfirmDialog(title, msg, okButtonText, okButtonClass, callback);
   };
 
   $scope.$watch('selected_path', function(newpath, oldpath) {
