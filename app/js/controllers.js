@@ -556,7 +556,8 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     }
   })
   .then($scope._list_files)
-  .then($scope._select_a_file);
+  .then($scope._select_a_file)
+  .then($scope.set_loaded);
 
   // TODO: test
   $scope.insert_path = function(path) {
