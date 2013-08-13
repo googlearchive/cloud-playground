@@ -14,6 +14,7 @@ echo -e "Hit [ENTER] to continue: \c"
 read
 
 $(dirname $0)/sdkapi.sh
+$(dirname $0)/api-python-client.sh
 
 APPCFG=$(which appcfg.py) \
   || (echo "ERROR: appcfg.py must be in your PATH"; exit 1)

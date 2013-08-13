@@ -3,6 +3,7 @@
 set -uex
 
 $(dirname $0)/sdkapi.sh
+$(dirname $0)/api-python-client.sh
 
 dev_appserver.py \
   --host 0.0.0.0 \

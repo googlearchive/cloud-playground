@@ -17,3 +17,5 @@
 # compiled Python files
 *.pyc
 
+# Google API Python Client library
+/api-python-client/
