@@ -25,7 +25,7 @@
         <td><button class="btn btn-small btn-primary" ng-class="{disabled: !project.key}" ng-click="select_project(project)"><i class="icon-share-alt icon-white"></i> open project</button>
         <td class="project_name">{{project.name}}</td>
         <td class="project_description">{{project.description}}</td>
-        <td><button class="btn btn-small btn-danger" ng-class="{disabled: !project.key}" ng-click="prompt_delete_project(project)"><i class="icon-remove icon-white"></i> delete</button></td>
+        <td><a ng-class="{disabled: !project.key}" ng-click="prompt_delete_project(project)" title="delete project"><i class="icon-trash"></i></a></td>
       </tr>
 
       <tr class="project" ng-hide="has_projects()">
@@ -63,15 +63,15 @@
               <a ng-href="{{tp.html_url}}" target="{{tp.name}}">{{tp.name}}</a>
             </span>
             <span ng-show="config.is_admin || config.is_devappserver">
-              <button class="admin btn btn-mini btn-link pull-right"
+              <button class="btn btn-mini pull-right"
                       ng-click="recreate_template_project(tp)"
                       ng-disabled="!!tp.in_progress_task_name">
                 <i class="icon-refresh"></i> refresh
               </button>
-              <button class="admin btn btn-mini btn-link pull-right"
+              <button class="btn btn-mini pull-right"
                       ng-click="prompt_delete_project(tp)"
                       ng-disabled="!!tp.in_progress_task_name">
-                <i class="icon-remove"></i> delete
+                <i class="icon-trash"></i> delete
               </button>
             </span>
             <div class="template_description">{{tp.description}}</div>
