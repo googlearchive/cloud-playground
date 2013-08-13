@@ -36,11 +36,11 @@
         <a class="logo" ng-href="/playground"><span class='app-back' pg-visible="!alreadyhome()">&#x2039;</span>Cloud Playground</a>
         <sup class="experimental">experimental</sup>
 
-        <div class="topbar">
+        <div class="topbar" ng-show="config">
           <div class="email">
-            <span ng-show="config.is_logged_in"><i class="icon-user"></i> {{config.email}}</span>
-            <button ng-show="config.is_logged_in" class="btn" onclick="window.location='/playground/logout'">logout</button>
-            <button ng-hide="config.is_logged_in" class="btn btn-success" onclick="window.location='/playground/login'">login</button>
+            <span ng-show="config.is_logged_in">{{config.email}}</span>
+            <button ng-show="config.is_logged_in" class="btn" onclick="window.location='/playground/logout'">Sign out</button>
+            <button ng-hide="config.is_logged_in" class="btn btn-danger" onclick="window.location='/playground/login'">SIGN IN</button>
           </div>
         </div>
       </div>

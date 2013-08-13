@@ -22,7 +22,7 @@
     <tbody>
       <tr class="project_row" ng-repeat="project in projects | orderBy:'orderby':true" ng-class="{ghost: !project.key}">
         <td class="project_id diag" ng-show="config.is_admin">{{project.key}}</div>
-        <td><button class="btn btn-small btn-success" ng-class="{disabled: !project.key}" ng-click="select_project(project)"><i class="icon-share-alt icon-white"></i> open project</button>
+        <td><button class="btn btn-small btn-primary" ng-class="{disabled: !project.key}" ng-click="select_project(project)"><i class="icon-share-alt icon-white"></i> open project</button>
         <td class="project_name">{{project.name}}</td>
         <td class="project_description">{{project.description}}</td>
         <td><button class="btn btn-small btn-danger" ng-class="{disabled: !project.key}" ng-click="prompt_delete_project(project)"><i class="icon-remove icon-white"></i> delete</button></td>
