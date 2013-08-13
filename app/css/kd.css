@@ -50,8 +50,7 @@ tfoot, thead, tr, th, td {
 	-webkit-user-select:none;
 	-moz-user-select:none;
 	cursor:default;
-	/*override Bootstrap*/
-	box-shadow: none;
+	box-shadow: none; /*override Bootstrap*/
 }
 
 .btn:hover, .btn.hover {

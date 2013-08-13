@@ -340,7 +340,7 @@ BUTTON.admin > I[class*=" icon-"] {
 }
 
 [class^="icon-"], [class*=" icon-"] {
-  vertical-align: baseline;
+  vertical-align: text-bottom;
 }
 
 .form-inline {
@@ -369,4 +369,8 @@ BUTTON.admin > I[class*=" icon-"] {
 
 .url-button {
   height: 30px;  /* same as URL input bar */
+}
+
+.login-button {
+  margin-right: 15px;
 }

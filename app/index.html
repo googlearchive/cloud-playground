@@ -39,8 +39,8 @@
         <div class="topbar" ng-show="config">
           <div class="email">
             <span ng-show="config.is_logged_in">{{config.email}}</span>
-            <button ng-show="config.is_logged_in" class="btn" onclick="window.location='/playground/logout'">Sign out</button>
-            <button ng-hide="config.is_logged_in" class="btn btn-danger" onclick="window.location='/playground/login'">SIGN IN</button>
+            <button ng-show="config.is_logged_in" class="btn login-button" onclick="window.location='/playground/logout'">Sign out</button>
+            <button ng-hide="config.is_logged_in" class="btn btn-danger login-button" onclick="window.location='/playground/login'">SIGN IN</button>
           </div>
         </div>
       </div>
