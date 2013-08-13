@@ -128,7 +128,7 @@ describe('ProjectController', function() {
   beforeEach(module('mocks.dialog'));
 
   beforeEach(inject(function($browser) {
-    $browser.url('/playground/p/76/');
+    $browser.url('http://localhost:8080/playground/p/76/');
   }));
 
   beforeEach(inject(function($rootScope, $injector, $window) {
@@ -213,6 +213,7 @@ describe('ProjectController', function() {
          spyOn(DoSerial, 'then').andCallThrough();
          expect(DoSerial.then).not.toHaveBeenCalled();
          doInit();
+         dump(scope);
          expect(DoSerial.then).toHaveBeenCalledWith(scope._select_first_file);
        }));
 
@@ -745,7 +746,7 @@ describe('PageController', function() {
         mockProject.name + '"?';
       var btns = [{result: false, label: 'Cancel'},
         {result: true, label: 'DELETE PROJECT',
-          cssClass: 'btn-primary btn-danger'}];
+          cssClass: 'btn btn-danger'}];
 
       it('should call $scope.delete_project()', function() {
         scope.delete_project = jasmine.createSpy();
@@ -851,15 +852,15 @@ describe('MainController', function() {
 
       beforeEach(function() {
         $httpBackend
-        .when('POST', '/playground/copyproject')
+        .when('POST', '/playground/p/12/copy')
         .respond(make_project(42, 1));
       });
 
-      it('should call /playground/copyproject', inject(function() {
+      it('should call /playground/p/12/copy', inject(function() {
         expect(scope.projects).toBeDefined();
         expect(scope.template_projects).toBeDefined();
         expect(scope.template_projects.length).toBeGreaterThan(0);
-        $httpBackend.expectPOST('/playground/copyproject');
+        $httpBackend.expectPOST('/playground/p/12/copy');
         scope.new_project(scope.template_projects[0]);
         flushDoSerial();
         $httpBackend.flush();
