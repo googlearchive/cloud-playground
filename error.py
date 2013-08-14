@@ -15,6 +15,9 @@ class PlaygroundError(Exception):
     super(PlaygroundError, self).__init__(message)
     self.status_code = status_code
 
+  def __str__(self):
+    return '{}<{} {}>'.format(__class__, self.status_code, self.message)
+
 
 def Abort(status_code, message):
   raise PlaygroundError(status_code, message)
@@ -50,8 +53,7 @@ def MakeErrorResponse(exception, debug_mode):
     formatted_exception = traceback.format_exception(exc_info[0], exc_info[1],
                                                      exc_info[2])
     if debug_mode:
-      message = ('APP DEBUG MODE TRACEBACK:\n{}'
-                 .format('\n'.join(formatted_exception)))
+      message = ('\n{}'.format('\n'.join(formatted_exception)))
     else:
       message = 'Ouch. How awkward.'
   status = '{} {}'.format(status_code, httplib.responses[status_code])

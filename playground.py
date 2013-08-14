@@ -86,8 +86,9 @@ class PlaygroundHandler(webapp2.RequestHandler):
       debug_mode: True if the web application is running in debug mode
     """
     status, headers, body = error.MakeErrorResponse(exception, debug_mode)
-    self.error(status)
     self.response.clear()
+    self.error(status)
+    self.response.headers.extend(headers)
     self.response.write('{}'.format(cgi.escape(body, quote=True)))
 
   def DictOfProject(self, project):
@@ -130,11 +131,10 @@ class PlaygroundHandler(webapp2.RequestHandler):
 
   def dispatch(self):
     """WSGI request dispatch with automatic JSON parsing."""
-
-    if not shared.ThisIsPlaygroundApp(self.request.environ):
-      Abort(httplib.FORBIDDEN, 'Cloud Playground is not here')
-
     try:
+      if not shared.ThisIsPlaygroundApp(self.request.environ):
+        Abort(httplib.FORBIDDEN,
+              'playground handlers are not available in this app id')
       self.PerformAccessCheck()
     except error.PlaygroundError, e:
       # Manually dispatch to handle_exception
@@ -509,6 +509,7 @@ app = webapp2.WSGIApplication([
     ('/_ah/start', Warmup),
 ], debug=DEBUG)
 app = middleware.Session(app, config)
+app = middleware.ErrorHandler(app, debug=DEBUG)
 
 mimic_intercept_app = mimic_wsgi.Mimic
 mimic_intercept_app = middleware.MimicControlAccessFilter(mimic_intercept_app)

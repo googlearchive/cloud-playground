@@ -160,8 +160,9 @@ class Session(object):
       return start_response(status, headers, exc_info)
 
     # TODO: use modules dispatch to handle this instead
-    #if not shared.ThisIsPlaygroundApp(environ):
-    #  Abort(error.FORBIDDEN, 'xxxxxxxxxxxxx Cloud Playground is not here')
+    if not shared.ThisIsPlaygroundApp(environ):
+      Abort(httplib.FORBIDDEN,
+            'playground service is not available in this app id')
 
     # 1. ensure we have a session
     request = webapp2.Request(environ, app=self.app)
