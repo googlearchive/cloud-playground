@@ -72,10 +72,6 @@ class UrlFetchTree(common.Tree):
     """
     url = self._ToFileURL('file', {'path': path})
     headers = {}
-    if common.IsDevMode():
-      cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,
-                                self.namespace)
-      headers['Cookie'] = cookie
     resp = urlfetch.fetch(url, headers=headers, method='GET',
                           follow_redirects=False, deadline=_URL_FETCH_DEADLINE)
     return resp
@@ -92,10 +88,6 @@ class UrlFetchTree(common.Tree):
     """
     url = self._ToFileURL('file', {'path': path})
     headers = {}
-    if common.IsDevMode():
-      cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,
-                                self.namespace)
-      headers['Cookie'] = cookie
     resp = urlfetch.fetch(url, headers=headers, method='PUT', payload=content,
                           follow_redirects=False,
                           deadline=_URL_FETCH_DEADLINE)
@@ -137,10 +129,6 @@ class UrlFetchTree(common.Tree):
     """
     url = self._ToFileURL('file', {'path': path, 'newpath': newpath})
     headers = {}
-    if common.IsDevMode():
-      cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,
-                                self.namespace)
-      headers['Cookie'] = cookie
     resp = urlfetch.fetch(url, headers=headers, method='POST',
                           follow_redirects=False, deadline=_URL_FETCH_DEADLINE)
     if resp.status_code != httplib.OK:
@@ -159,10 +147,6 @@ class UrlFetchTree(common.Tree):
     """
     url = self._ToFileURL('delete', {'path': path})
     headers = {}
-    if common.IsDevMode():
-      cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,
-                                self.namespace)
-      headers['Cookie'] = cookie
     resp = urlfetch.fetch(url, headers=headers, method='POST',
                           follow_redirects=False, deadline=_URL_FETCH_DEADLINE)
     if resp.status_code != httplib.OK:
@@ -192,10 +176,6 @@ class UrlFetchTree(common.Tree):
     path = self._NormalizeDirectoryPath(path)
     url = self._ToFileURL('dir', {})
     headers = {}
-    if common.IsDevMode():
-      cookie = '{0}={1}'.format(common.config.PROJECT_NAME_COOKIE,
-                                self.namespace)
-      headers['Cookie'] = cookie
     resp = urlfetch.fetch(url, headers=headers, method='GET',
                           follow_redirects=False, deadline=_URL_FETCH_DEADLINE)
     if resp.status_code != httplib.OK:
