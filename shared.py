@@ -92,7 +92,7 @@ def AssertHasProjectReadAccess(environ):
     return
   if TEMPLATE_OWNER in project.writers:
     return
-  Abort(httplib.UNAUTHORIZED, 'Not authorized to access this project')
+  Abort(httplib.UNAUTHORIZED, 'Missing project read access')
 
 
 def AssertHasProjectWriteAccess(environ):
@@ -104,4 +104,4 @@ def AssertHasProjectWriteAccess(environ):
     return
   if user.key.id() in project.writers:
     return
-  Abort(httplib.UNAUTHORIZED, 'Not authorized to access this project')
+  Abort(httplib.UNAUTHORIZED, 'Missing project write access')
