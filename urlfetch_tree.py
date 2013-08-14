@@ -54,8 +54,9 @@ class UrlFetchTree(common.Tree):
     params = params.copy()
     params[common.config.PROJECT_ID_QUERY_PARAM] = self.namespace
     url = '/_ah/mimic/{0}?{1}'.format(control_path, urllib.urlencode(params))
-    if settings.PLAYGROUND_USER_CONTENT_HOST:
-      url = '//{0}{1}'.format(settings.PLAYGROUND_USER_CONTENT_HOST, url)
+    playground_hostname = (settings.PLAYGROUND_USER_CONTENT_HOST or
+                           settings.PLAYGROUND_HOSTS[0])
+    url = 'https://{0}{1}'.format(playground_hostname, url)
     return url
 
   def IsMutable(self):
