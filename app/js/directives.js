@@ -45,7 +45,6 @@ angular.module('playgroundApp.directives', [])
   }
 
   function setHeight(key, height) {
-    console.log('setHeight(', height, ')');
     localStorage.setItem('pgResizer-height-' + key, height);
   }
 
