@@ -1,5 +1,6 @@
 """Module for shared playground functions."""
 
+import httplib
 import logging
 import os
 
@@ -7,11 +8,10 @@ from mimic.__mimic import common
 from mimic.__mimic import mimic
 
 import error
-from error import *
+from error import Abort
 import settings
 
 from google.appengine.api import app_identity
-from google.appengine.api import namespace_manager
 from google.appengine.api import users
 
 
@@ -56,7 +56,8 @@ def GetCurrentTaskName():
 def EnsureRunningInTask():
   """Ensures that we're currently executing inside a task.
 
-  If not, raise a RuntimeError.
+  Raises:
+    RuntimeError: when not executing inside a task.
   """
   if GetCurrentTaskName():
     return
@@ -80,8 +81,14 @@ def AssertIsAdmin():
 
 
 def AssertHasProjectReadAccess(environ):
-  #if 'playground.project' not in environ:
-  #  Abort(httplib.BAD_REQUEST, 'Unable to determine project from URL')
+  """Assert that the current user has project read permissions.
+
+  Args:
+    environ: the current WSGI environ
+
+  Returns:
+    True if the current user as read access to the current project.
+  """
   user = environ['playground.user']
   project = environ['playground.project']
   if not project:
@@ -96,6 +103,14 @@ def AssertHasProjectReadAccess(environ):
 
 
 def AssertHasProjectWriteAccess(environ):
+  """Assert that the current user has project write permissions.
+
+  Args:
+    environ: the current WSGI environ
+
+  Returns:
+    True if the current user as write access to the current project.
+  """
   user = environ['playground.user']
   project = environ['playground.project']
   if not project:
