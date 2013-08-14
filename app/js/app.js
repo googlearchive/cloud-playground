@@ -4,6 +4,7 @@ angular.module('playgroundApp', [
     'playgroundApp.filters',
     'playgroundApp.services',
     'playgroundApp.directives',
+    'ngRoute',
     'ui.bootstrap',
     'ui',
 ])
