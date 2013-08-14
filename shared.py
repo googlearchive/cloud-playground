@@ -87,8 +87,12 @@ def AssertHasProjectReadAccess(environ):
     environ: the current WSGI environ
 
   Returns:
-    True if the current user as read access to the current project.
+    True if the current user as read access to the current project. When
+    deployed as two collaborating app ids, as determined by
+    settings.TWO_COLLABORATING_APP_IDS, always returns True.
   """
+  if settings.TWO_COLLABORATING_APP_IDS:
+    return True
   user = environ['playground.user']
   project = environ['playground.project']
   if not project:

@@ -42,6 +42,7 @@ assert ':' not in _APP_ID, ('{} app ids are unsupported'
 if _APP_ID not in _APP_IDS:
   PLAYGROUND_APP_ID = _APP_ID
   EXEC_CODE_APP_ID = _APP_ID
+TWO_COLLABORATING_APP_IDS = PLAYGROUND_APP_ID != EXEC_CODE_APP_ID
 
 if _DEV_MODE:
   PLAYGROUND_HOSTS = ('localhost:8080', '127.0.0.1:8080',
