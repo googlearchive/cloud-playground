@@ -21,6 +21,9 @@ SESSION_COOKIE_NAME = 'session'
 # Extensions to exclude when creating template projects
 SKIP_EXTENSIONS = ('swp', 'pyc', 'svn')
 
+# The application alias where the playground IDE runs
+PLAYGROUND_APP_ID_ALIAS = 'cloud-playground'
+
 # The application where the playground IDE runs
 PLAYGROUND_APP_ID = 'try-appengine'
 
@@ -53,8 +56,8 @@ if _DEV_MODE:
   PLAYGROUND_USER_CONTENT_HOST = None
   EXEC_CODE_HOST = backends.get_hostname('exec-code-backend')
 else:
-  PLAYGROUND_HOSTS = ('{0}.appspot.com'.format(PLAYGROUND_APP_ID),
-                      'cloud-playground.appspot.com')
+  PLAYGROUND_HOSTS = ('{}.appspot.com'.format(PLAYGROUND_APP_ID),
+                      '{}.appspot.com'.format(PLAYGROUND_APP_ID_ALIAS))
   # PLAYGROUND_USER_CONTENT_HOST = ('{0}-dot-{1}.appspot.com'
   #                                 .format(USER_CONTENT_PREFIX,
   #                                         PLAYGROUND_APP_ID))

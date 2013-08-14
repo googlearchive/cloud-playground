@@ -12,6 +12,7 @@ from error import Abort
 import settings
 
 from google.appengine.api import app_identity
+from google.appengine.api import backends
 from google.appengine.api import users
 
 
@@ -64,10 +65,10 @@ def EnsureRunningInTask():
   raise RuntimeError('Not executing in a task queue')
 
 
-def ThisIsPlaygroundApp(environ):
+def ThisIsPlaygroundApp():
   """Determines whether this is the playground app id."""
   if common.IsDevMode():
-    return environ['HTTP_HOST'] in settings.PLAYGROUND_HOSTS
+    return not backends.get_backend()
   return app_identity.get_application_id() == settings.PLAYGROUND_APP_ID
 
 

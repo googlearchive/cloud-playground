@@ -132,7 +132,7 @@ class PlaygroundHandler(webapp2.RequestHandler):
   def dispatch(self):
     """WSGI request dispatch with automatic JSON parsing."""
     try:
-      if not shared.ThisIsPlaygroundApp(self.request.environ):
+      if not shared.ThisIsPlaygroundApp():
         Abort(httplib.FORBIDDEN,
               'playground handlers are not available in this app id')
       self.PerformAccessCheck()
@@ -512,7 +512,8 @@ app = middleware.Session(app, config)
 app = middleware.ErrorHandler(app, debug=DEBUG)
 
 mimic_intercept_app = mimic_wsgi.Mimic
-mimic_intercept_app = middleware.MimicControlAccessFilter(mimic_intercept_app)
-mimic_intercept_app = middleware.Session(mimic_intercept_app, config)
-mimic_intercept_app = middleware.Redirector(mimic_intercept_app)
+if shared.ThisIsPlaygroundApp():
+  mimic_intercept_app = middleware.MimicControlAccessFilter(mimic_intercept_app)
+  mimic_intercept_app = middleware.Session(mimic_intercept_app, config)
+  mimic_intercept_app = middleware.Redirector(mimic_intercept_app)
 mimic_intercept_app = middleware.ErrorHandler(mimic_intercept_app, debug=DEBUG)

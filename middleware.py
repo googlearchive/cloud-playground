@@ -159,11 +159,6 @@ class Session(object):
       ])
       return start_response(status, headers, exc_info)
 
-    # TODO: use modules dispatch to handle this instead
-    if not shared.ThisIsPlaygroundApp(environ):
-      Abort(httplib.FORBIDDEN,
-            'playground service is not available in this app id')
-
     # 1. ensure we have a session
     request = webapp2.Request(environ, app=self.app)
     session = environ['playground.session'] = GetOrMakeSession(request)
@@ -210,6 +205,16 @@ class MimicControlAccessFilter(object):
     self.exc_info = None
 
   def __call__(self, environ, start_response):
+    # TODO: use modules dispatch to handle this instead
+    if environ['PATH_INFO'].startswith(common.CONTROL_PREFIX):
+      if not shared.ThisIsPlaygroundApp():
+        Abort(httplib.FORBIDDEN,
+              'playground service is not available in this app id')
+    else:
+      if shared.ThisIsPlaygroundApp():
+        Abort(httplib.NOT_FOUND,
+              'mimic execution playground is not available in this app id')
+
     if environ['PATH_INFO'].startswith(common.CONTROL_PREFIX):
       if shared.IsHttpReadMethod(environ):
         shared.AssertHasProjectReadAccess(environ)

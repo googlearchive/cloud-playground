@@ -53,7 +53,8 @@ class UrlFetchTree(common.Tree):
   def _ToFileURL(self, control_path, params):
     params = params.copy()
     params[common.config.PROJECT_ID_QUERY_PARAM] = self.namespace
-    url = '/_ah/mimic/{0}?{1}'.format(control_path, urllib.urlencode(params))
+    url = '{}/{}?{}'.format(common.CONTROL_PREFIX, control_path,
+                            urllib.urlencode(params))
     playground_hostname = (settings.PLAYGROUND_USER_CONTENT_HOST or
                            settings.PLAYGROUND_HOSTS[0])
     url = 'https://{0}{1}'.format(playground_hostname, url)
