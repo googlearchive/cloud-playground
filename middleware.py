@@ -204,8 +204,7 @@ class MimicControlAccessFilter(object):
     self.config = getattr(app, 'config', None)
     self.exc_info = None
 
-  def __call__(self, environ, start_response):
-    # TODO: use modules dispatch to handle this instead
+  def _AssertCollaboratingAppIdAccessCheck(self, environ):
     if environ['PATH_INFO'].startswith(common.CONTROL_PREFIX):
       if not shared.ThisIsPlaygroundApp():
         Abort(httplib.FORBIDDEN,
@@ -214,6 +213,10 @@ class MimicControlAccessFilter(object):
       if shared.ThisIsPlaygroundApp():
         Abort(httplib.NOT_FOUND,
               'mimic execution playground is not available in this app id')
+
+  def __call__(self, environ, start_response):
+    if settings.TWO_COLLABORATING_APP_IDS:
+      self._AssertCollaboratingAppIdAccessCheck(environ)
 
     if environ['PATH_INFO'].startswith(common.CONTROL_PREFIX):
       if shared.IsHttpReadMethod(environ):
