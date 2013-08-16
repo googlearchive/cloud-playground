@@ -16,15 +16,6 @@ from google.appengine.api import backends
 from google.appengine.api import users
 
 
-# RFC1113 formatted 'Expires' to prevent HTTP/1.0 caching
-LONG_AGO = 'Mon, 01 Jan 1990 00:00:00 GMT'
-
-# 10 minutes
-MEMCACHE_TIME = 3600
-
-# Owner of template projects
-TEMPLATE_OWNER = 'TEMPLATE'
-
 # HTTP methods which do not affect state
 _HTTP_READ_METHODS = ('GET', 'OPTIONS')
 
@@ -102,7 +93,7 @@ def AssertHasProjectReadAccess(environ):
     return
   if user.key.id() in project.writers:
     return
-  if TEMPLATE_OWNER in project.writers:
+  if PROJECT_TEMPLATE_OWNER in project.writers:
     return
   Abort(httplib.UNAUTHORIZED, 'Missing project read access')
 

@@ -6,6 +6,15 @@ from google.appengine.api import app_identity
 from google.appengine.api import backends
 
 
+# RFC1113 formatted 'Expires' to prevent HTTP/1.0 caching
+LONG_AGO = 'Mon, 01 Jan 1990 00:00:00 GMT'
+
+# 10 minutes
+TEMPLATE_MEMCACHE_TIME = 3600
+
+# Owner of template projects
+PROJECT_TEMPLATE_OWNER = 'TEMPLATE'
+
 # whether or not we're running in the dev_appserver
 _DEV_MODE = os.environ['SERVER_SOFTWARE'].startswith('Development/')
 

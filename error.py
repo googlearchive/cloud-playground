@@ -5,7 +5,7 @@ import logging
 import sys
 import traceback
 
-import shared
+import settings
 
 
 class PlaygroundError(Exception):
@@ -37,7 +37,7 @@ def MakeErrorResponse(exception, debug_mode):
       ('content-type', 'text_plain; charset=utf-8'),
       # Note App Engine automatically sets a 'Date' header for us. See
       # https://developers.google.com/appengine/docs/python/runtime#Responses
-      ('Expires', shared.LONG_AGO),
+      ('Expires', settings.LONG_AGO),
       ('Cache-Control', 'private, max-age=0'),
   ]
   if isinstance(exception, PlaygroundError):

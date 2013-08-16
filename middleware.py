@@ -154,7 +154,7 @@ class Session(object):
       headers.extend([
           # Note App Engine automatically sets a 'Date' header for us. See
           # https://developers.google.com/appengine/docs/python/runtime#Responses
-          ('Expires', shared.LONG_AGO),
+          ('Expires', settings.LONG_AGO),
           ('Cache-Control', 'private, max-age=0'),
       ])
       return start_response(status, headers, exc_info)

@@ -55,7 +55,7 @@ def GetRepoCollections():
   memcache.set(_MEMCACHE_KEY_REPO_COLLECTIONS,
                repo_collections,
                namespace=settings.PLAYGROUND_NAMESPACE,
-               time=shared.MEMCACHE_TIME)
+               time=settings.TEMPLATE_MEMCACHE_TIME)
   return repo_collections
 
 
