@@ -93,7 +93,7 @@ def AssertHasProjectReadAccess(environ):
     return
   if user.key.id() in project.writers:
     return
-  if PROJECT_TEMPLATE_OWNER in project.writers:
+  if settings.PROJECT_TEMPLATE_OWNER in project.writers:
     return
   Abort(httplib.UNAUTHORIZED, 'Missing project read access')
 
