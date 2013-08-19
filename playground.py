@@ -103,6 +103,7 @@ class PlaygroundHandler(webapp2.RequestHandler):
         'in_progress_task_name': project.in_progress_task_name,
         'orderby': project.orderby,
         'writers': project.writers,
+        'access_key': project.access_key,
     }
 
   def _GetPlaygroundRunUrl(self, project_id):
@@ -444,6 +445,9 @@ class TouchProject(PlaygroundHandler):
 
 class Fixit(PlaygroundHandler):
   """Admin only handler for performing data cleanup operations."""
+
+  def PerformAccessCheck(self):
+    shared.AssertIsAdmin()
 
   def get(self):
     if not users.is_current_user_admin():

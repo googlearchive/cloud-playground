@@ -5,6 +5,7 @@ import random
 
 from mimic.__mimic import common
 
+import secret
 import settings
 import shared
 
@@ -42,6 +43,8 @@ class PlaygroundProject(ndb.Model):
                                  indexed=False)
   updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
   in_progress_task_name = ndb.StringProperty(indexed=False)
+  # TODO: required=True
+  access_key = ndb.StringProperty(required=False, indexed=False)
 
   @property
   def orderby(self):
@@ -99,8 +102,14 @@ def PutResource(url, etag, content):
 
 
 def Fix(project):
+  dirty = False
+  if not project.access_key:
+    project.access_key = secret.GenerateRandomString()
+    dirty = True
   if project._properties.has_key('end_user_url'):
-    project._properties.pop('end_user_url', None)
+    project._properties.pop('end_user_url')
+    dirty = True
+  if dirty:
     project.put()
     shared.w('fixed {}'.format(project.key))
 
@@ -374,7 +383,8 @@ def CreateProject(user, template_url, html_url, project_name,
                           template_url=template_url,
                           html_url=html_url,
                           namespace=settings.PLAYGROUND_NAMESPACE,
-                          in_progress_task_name=in_progress_task_name)
+                          in_progress_task_name=in_progress_task_name,
+                          access_key=secret.GenerateRandomString())
   prj.put()
   # transactional get before update
   user = user.key.get()

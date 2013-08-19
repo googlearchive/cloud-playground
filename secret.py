@@ -14,6 +14,10 @@ class PlaygroundSecret(ndb.Model):
   updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
 
+def GenerateRandomString(entropy=128, pool=security.LOWERCASE_ALPHANUMERIC):
+  return security.generate_random_string(entropy=entropy, pool=pool)
+
+
 def GetSecret(key_name, entropy):
   """Returns and lazily creates random application secrets."""
   # optimistically try fast, transactionless get_by_key_name
@@ -21,8 +25,7 @@ def GetSecret(key_name, entropy):
                                       namespace=settings.PLAYGROUND_NAMESPACE)
   # fall back to slower get_or_insert
   if not entity:
-    candidate_secret_key = security.generate_random_string(
-        entropy=entropy, pool=security.LOWERCASE_ALPHANUMERIC)
+    candidate_secret_key = GenerateRandomString()
     entity = PlaygroundSecret.get_or_insert(
         key_name, secret_key=candidate_secret_key,
         namespace=settings.PLAYGROUND_NAMESPACE)
