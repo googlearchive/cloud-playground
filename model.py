@@ -101,28 +101,6 @@ def PutResource(url, etag, content):
   ndb.put_multi(entities)
 
 
-def Fix(project):
-  dirty = False
-  if not project.access_key:
-    project.access_key = secret.GenerateRandomString()
-    dirty = True
-  if project._properties.has_key('end_user_url'):
-    project._properties.pop('end_user_url')
-    dirty = True
-  if dirty:
-    project.put()
-    shared.w('fixed {}'.format(project.key))
-
-
-def Fixit():
-  """Method to hold temporary code for data model migrations."""
-
-  query = PlaygroundProject.query(namespace=settings.PLAYGROUND_NAMESPACE)
-  for project in query:
-    Fix(project)
-  shared.w('all fixed')
-
-
 class PlaygroundUser(ndb.Model):
   """A Model to store playground users."""
   projects = ndb.KeyProperty(repeated=True, kind=PlaygroundProject,

@@ -11,6 +11,7 @@ includes:
 - ui-bootstrap.yaml
 - bootstrap.yaml
 - codemirror.yaml
+- fixit.yaml
 - playground.yaml
 - iframed.yaml
 - tasks.yaml

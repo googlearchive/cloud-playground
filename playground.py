@@ -15,6 +15,7 @@ from webapp2_extras import sessions
 
 import error
 from error import *
+import fixit
 import middleware
 from mimic import mimic_wsgi
 from mimic.__mimic import common
@@ -444,16 +445,14 @@ class TouchProject(PlaygroundHandler):
 
 
 class Fixit(PlaygroundHandler):
-  """Admin only handler for performing data cleanup operations."""
+  """Admin only handler for initiating data cleanup operations."""
 
   def PerformAccessCheck(self):
     shared.AssertIsAdmin()
 
   def get(self):
-    if not users.is_current_user_admin():
-      shared.e('You must be an admin for this app')
-    model.Fixit()
-    self.response.write('done')
+    fixit.Begin()
+    self.response.write('Fixit begun')
 
 
 class Nuke(PlaygroundHandler):

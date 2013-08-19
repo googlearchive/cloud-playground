@@ -1,0 +1,5 @@
+handlers:
+- url: /playground/fix/project
+  script: fixit.app
+  secure: always
+  login: admin
