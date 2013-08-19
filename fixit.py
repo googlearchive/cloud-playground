@@ -8,6 +8,7 @@ from google.appengine.api import taskqueue
 from google.appengine.datastore.datastore_query import Cursor
 
 import model
+import secret
 import settings
 import shared
 
