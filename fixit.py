@@ -14,7 +14,7 @@ import shared
 
 
 # number of entities to fix at a time
-_PAGE_SIZE = 20
+_CURSOR_PAGE_SIZE = 200
 
 
 def Begin():
@@ -45,7 +45,7 @@ class ProjectHandler(webapp2.RequestHandler):
     cursor = self.request.get('cursor', None)
     if cursor:
       cursor = Cursor(urlsafe=cursor)
-    projects, next_cursor, more = query.fetch_page(_PAGE_SIZE,
+    projects, next_cursor, more = query.fetch_page(_CURSOR_PAGE_SIZE,
                                                    start_cursor=cursor)
     if next_cursor:
       taskqueue.add(url='/playground/fix/project',
