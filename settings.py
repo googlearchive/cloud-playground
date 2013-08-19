@@ -6,6 +6,18 @@ from google.appengine.api import app_identity
 from google.appengine.api import backends
 
 
+# The application where the playground IDE runs
+PLAYGROUND_APP_ID = 'try-appengine'
+
+# The application where user code runs
+EXEC_CODE_APP_ID = 'shared-playground'
+
+# The application alias where the playground IDE runs
+PLAYGROUND_APP_ID_ALIAS = 'cloud-playground'
+
+# user content hostname prefix
+USER_CONTENT_PREFIX = 'user-content'
+
 # RFC1113 formatted 'Expires' to prevent HTTP/1.0 caching
 LONG_AGO = 'Mon, 01 Jan 1990 00:00:00 GMT'
 
@@ -29,17 +41,6 @@ SESSION_COOKIE_NAME = 'session'
 
 # Extensions to exclude when creating template projects
 SKIP_EXTENSIONS = ('swp', 'pyc', 'svn')
-
-# The application alias where the playground IDE runs
-PLAYGROUND_APP_ID_ALIAS = 'cloud-playground'
-
-# The application where the playground IDE runs
-PLAYGROUND_APP_ID = 'try-appengine'
-
-# The application where user code runs
-EXEC_CODE_APP_ID = 'shared-playground'
-
-USER_CONTENT_PREFIX = 'user-content'
 
 # All app ids used by this project
 _APP_IDS = set((PLAYGROUND_APP_ID, EXEC_CODE_APP_ID))
