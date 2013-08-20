@@ -146,6 +146,8 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
           }
         }
         $location.path('/playground/p/' + encodeURI(project.key));
+        //Gets rid of the template_url query parameter
+        $location.search({});
       });
     });
   };
@@ -191,6 +193,17 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
 
 function MainController($scope, $http, $window, $location, $log, $routeParams,
                         $q, Alert, DoSerial) {
+
+  // TODO: test
+  DoSerial
+  .then(function() {
+    var template_url = $routeParams.template_url;
+    if (template_url) {
+      return create_project_from_template(template_url);
+    } else {
+      $scope.set_loaded();
+    }
+  });
 
   // TODO: test
   function by_template_url(template_url, projects) {
@@ -297,17 +310,6 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
     deferred.resolve();
     return deferred.promise;
   }
-
-  // TODO: test
-  DoSerial
-  .then(function() {
-    var template_url = $routeParams.template_url;
-    if (template_url) {
-      $location.search({});
-      return create_project_from_template(template_url);
-    }
-  })
-  .then($scope.set_loaded);
 
   $scope.login = function() {
     $window.location.replace('/playground/login');
