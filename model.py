@@ -43,8 +43,7 @@ class PlaygroundProject(ndb.Model):
                                  indexed=False)
   updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
   in_progress_task_name = ndb.StringProperty(indexed=False)
-  # TODO: required=True
-  access_key = ndb.StringProperty(required=False, indexed=False)
+  access_key = ndb.StringProperty(required=True, indexed=False)
 
   @property
   def orderby(self):
