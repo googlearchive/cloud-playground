@@ -38,7 +38,7 @@
 <br>
   <hr pg-resizer="source-container">
 
-  <div id='output-container' class="hidden">
+  <div id='output-container'>
     <div class="alert alert-no-margin">
        If your app fails to load in the below iframe, try running your app in a
        <a ng-click='popout(); run();'>separate window</a>
@@ -47,7 +47,7 @@
       <input ng-model='project.run_url' type='url' class='span8 url-bar' ng-click='select_me($event)'>
       <button ng-click='popout(); run()' class='btn pull-right url-button'><i class="icon-share-alt"></i></button>
     </div>
-    <iframe id="output-iframe">
+    <iframe id="output-iframe" ng-init="run()">
     </iframe>
     <hr pg-resizer="output-iframe">
   </div>
