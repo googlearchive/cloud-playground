@@ -15,7 +15,7 @@ from . import collection
 from google.appengine.ext import ndb
 
 
-_PLAYGROUND_JSON = '__playground.json'
+_PLAYGROUND_SETTINGS_FILENAME = '.playground'
 
 
 def IsValidUrl(url):
@@ -40,7 +40,7 @@ class FilesystemRepoCollection(collection.RepoCollection):
       if not os.path.isdir(dirpath):
         continue
       try:
-        with open(os.path.join(dirpath, _PLAYGROUND_JSON)) as f:
+        with open(os.path.join(dirpath, _PLAYGROUND_SETTINGS_FILENAME)) as f:
           data = json.loads(f.read())
         name = data.get('template_name')
         description = data.get('template_description')
@@ -60,7 +60,7 @@ class FilesystemRepoCollection(collection.RepoCollection):
 
     def add_files(dirname):
       for path in os.listdir(os.path.join(repo_url, dirname)):
-        if path == _PLAYGROUND_JSON:
+        if path == _PLAYGROUND_SETTINGS_FILENAME:
           continue
         if common.GetExtension(path) in settings.SKIP_EXTENSIONS:
           continue

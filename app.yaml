@@ -72,5 +72,14 @@ skip_files:
 - ^(.*/)?.*~
 - ^(.*/)?.*\.py[co]
 - ^(.*/)?.*/RCS/.*
-- ^(.*/)?\..*
+# don't skip .playground files
+#- ^(.*/)?\..*
 - ^(.*/)?.*\.bak$
+# dot files we do want to skip
+- ^(.*/)?.bin
+- ^(.*/)?.chrome-*
+- ^(.*/)?.git.*
+- ^(.*/)?.idea
+- ^(.*/)?.jshintrc
+- ^(.*/)?.name
+- ^(.*/)?.travis.yml
