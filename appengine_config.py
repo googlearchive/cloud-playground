@@ -20,8 +20,8 @@ def _FixupSysPath():
   """Add api-python-client directory to sys.path."""
   app_root_dir = os.path.dirname(__file__)
   api_python_client_dir = os.path.join(app_root_dir, 'api-python-client')
-  assert api_python_client_dir not in sys.path
-  sys.path.append(api_python_client_dir)
+  if api_python_client_dir not in sys.path:
+    sys.path.append(api_python_client_dir)
 
 
 _FixupSysPath()
