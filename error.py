@@ -15,8 +15,8 @@ class PlaygroundError(Exception):
     super(PlaygroundError, self).__init__(message)
     self.status_code = status_code
 
-  def __str__(self):
-    return '{}<{} {}>'.format(__class__, self.status_code, self.message)
+  def __repr__(self):
+    return '{}<{} {}>'.format(__class__, self.status_code, self.message).encode('unicode-escape')
 
 
 def Abort(status_code, message):
