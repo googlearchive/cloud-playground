@@ -100,26 +100,32 @@ class PlaygroundHandler(webapp2.RequestHandler):
         'description': project.project_description,
         'template_url': project.template_url,
         'html_url': project.html_url,
-        'run_url': self._GetPlaygroundRunUrl(project.key.id()),
+        'run_url': self._GetPlaygroundRunUrl(project),
         'in_progress_task_name': project.in_progress_task_name,
         'orderby': project.orderby,
         'writers': project.writers,
         'access_key': project.access_key,
     }
 
-  def _GetPlaygroundRunUrl(self, project_id):
+  def _GetPlaygroundRunUrl(self, project):
     """Determine the playground run url."""
-    assert project_id
     if common.IsDevMode():
-      return '{0}://{1}/?{2}={3}'.format(self.request.scheme,
-                                         settings.EXEC_CODE_HOST,
-                                         common.config.PROJECT_ID_QUERY_PARAM,
-                                         urllib.quote_plus(str(project_id)))
+      return ('{0}://{1}/?{2}={3}&{4}={5}'
+              .format(self.request.scheme,
+                      settings.EXEC_CODE_HOST,
+                      common.config.PROJECT_ID_QUERY_PARAM,
+                      urllib.quote_plus(str(project.key.id())),
+                      settings.ACCESS_KEY_SET_COOKIE_PARAM_NAME,
+                      project.access_key))
     else:
-      return '{0}://{1}{2}{3}/'.format(self.request.scheme,
-                                       urllib.quote_plus(str(project_id)),
-                                       _DASH_DOT_DASH,
-                                       settings.EXEC_CODE_HOST)
+      return ('{0}://{1}{2}{3}/?{4}={5}'
+              .format(self.request.scheme,
+                      urllib.quote_plus(str(project.key.id())),
+                      _DASH_DOT_DASH,
+                      settings.EXEC_CODE_HOST,
+                      settings.ACCESS_KEY_SET_COOKIE_PARAM_NAME,
+                      project.access_key))
+
   def PerformAccessCheck(self):
     """Perform authorization checks.
 
@@ -515,8 +521,10 @@ app = middleware.Session(app, config)
 app = middleware.ErrorHandler(app, debug=DEBUG)
 
 mimic_intercept_app = mimic_wsgi.Mimic
+mimic_intercept_app = middleware.MimicControlAccessFilter(mimic_intercept_app)
 if shared.ThisIsPlaygroundApp():
-  mimic_intercept_app = middleware.MimicControlAccessFilter(mimic_intercept_app)
   mimic_intercept_app = middleware.Session(mimic_intercept_app, config)
-  mimic_intercept_app = middleware.Redirector(mimic_intercept_app)
+else:
+  mimic_intercept_app = middleware.AccessKeyCookieFilter(mimic_intercept_app)
+mimic_intercept_app = middleware.Redirector(mimic_intercept_app)
 mimic_intercept_app = middleware.ErrorHandler(mimic_intercept_app, debug=DEBUG)

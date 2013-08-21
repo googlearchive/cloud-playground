@@ -35,9 +35,12 @@ _URL_FETCH_DEADLINE = 6
 class UrlFetchTree(common.Tree):
   """An implementation of Tree backed by URL Fetch."""
 
-  def __init__(self, namespace=''):
+  def __init__(self, namespace, access_key):
+    assert namespace
+    assert access_key
     super(UrlFetchTree, self).__init__(namespace)
     self.namespace = namespace
+    self.access_key = access_key
 
   def __repr__(self):
     return ('<{0} namespace={1!r}>'
@@ -63,6 +66,11 @@ class UrlFetchTree(common.Tree):
   def IsMutable(self):
     return True
 
+  def _Fetch(self, url, method, payload=None):
+    headers = {settings.ACCESS_KEY_HTTP_HEADER: self.access_key}
+    return urlfetch.fetch(url, headers=headers, method=method, payload=payload,
+                          follow_redirects=False, deadline=_URL_FETCH_DEADLINE)
+
   def RemoteGetFile(self, path):
     """Retrieve the file via URL Fetch.
 
@@ -73,10 +81,7 @@ class UrlFetchTree(common.Tree):
       The URL Fetch response.
     """
     url = self._ToFileURL('file', {'path': path})
-    headers = {}
-    resp = urlfetch.fetch(url, headers=headers, method='GET',
-                          follow_redirects=False, deadline=_URL_FETCH_DEADLINE)
-    return resp
+    return self._Fetch(url, method='GET')
 
   def RemotePutFile(self, path, content):
     """Put the file via URL Fetch.
@@ -89,10 +94,7 @@ class UrlFetchTree(common.Tree):
       The URL Fetch response.
     """
     url = self._ToFileURL('file', {'path': path})
-    headers = {}
-    resp = urlfetch.fetch(url, headers=headers, method='PUT', payload=content,
-                          follow_redirects=False,
-                          deadline=_URL_FETCH_DEADLINE)
+    resp = self._Fetch(url, method='PUT', payload=content)
     if resp.status_code != httplib.OK:
       shared.e('{0} status code during HTTP PUT on {1}'
                .format(resp.status_code, url))
@@ -130,9 +132,7 @@ class UrlFetchTree(common.Tree):
       True if the move succeeded.
     """
     url = self._ToFileURL('file', {'path': path, 'newpath': newpath})
-    headers = {}
-    resp = urlfetch.fetch(url, headers=headers, method='POST',
-                          follow_redirects=False, deadline=_URL_FETCH_DEADLINE)
+    resp = self._Fetch(url, method='POST')
     if resp.status_code != httplib.OK:
       shared.e('{0} status code during HTTP POST on {1}'
                .format(resp.status_code, url))
@@ -148,9 +148,7 @@ class UrlFetchTree(common.Tree):
       True if the delete succeeded.
     """
     url = self._ToFileURL('delete', {'path': path})
-    headers = {}
-    resp = urlfetch.fetch(url, headers=headers, method='POST',
-                          follow_redirects=False, deadline=_URL_FETCH_DEADLINE)
+    resp = self._Fetch(url, method='POST')
     if resp.status_code != httplib.OK:
       shared.e('{0} status code during HTTP POST on {1}'
                .format(resp.status_code, url))
@@ -177,9 +175,7 @@ class UrlFetchTree(common.Tree):
     """
     path = self._NormalizeDirectoryPath(path)
     url = self._ToFileURL('dir', {})
-    headers = {}
-    resp = urlfetch.fetch(url, headers=headers, method='GET',
-                          follow_redirects=False, deadline=_URL_FETCH_DEADLINE)
+    resp = self._Fetch(url, method='GET')
     if resp.status_code != httplib.OK:
       shared.e('{0} status code during HTTP GET on {1}'
                .format(resp.status_code, url))

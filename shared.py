@@ -83,15 +83,16 @@ def AssertHasProjectReadAccess(environ):
     deployed as two collaborating app ids, as determined by
     settings.TWO_COLLABORATING_APP_IDS, always returns True.
   """
-  if settings.TWO_COLLABORATING_APP_IDS:
-    return True
-  user = environ['playground.user']
   project = environ['playground.project']
   if not project:
     Abort(httplib.NOT_FOUND, 'Project does not exist')
+  access_key = environ.get(settings.ACCESS_KEY_HTTP_HEADER_WSGI, None)
+  if access_key and access_key == project.access_key:
+    return
   if users.is_current_user_admin():
     return
-  if user.key.id() in project.writers:
+  user = environ.get('playground.user', None)
+  if user and user.key.id() in project.writers:
     return
   if settings.PROJECT_TEMPLATE_OWNER in project.writers:
     return
@@ -107,12 +108,12 @@ def AssertHasProjectWriteAccess(environ):
   Returns:
     True if the current user as write access to the current project.
   """
-  user = environ['playground.user']
   project = environ['playground.project']
   if not project:
     Abort(httplib.NOT_FOUND, 'Project does not exist')
   if users.is_current_user_admin():
     return
-  if user.key.id() in project.writers:
+  user = environ.get('playground.user')
+  if user and user.key.id() in project.writers:
     return
   Abort(httplib.UNAUTHORIZED, 'Missing project write access')

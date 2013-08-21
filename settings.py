@@ -36,8 +36,34 @@ PLAYGROUND_NAMESPACE = '_playground'
 # template projects location
 TEMPLATE_PROJECT_DIR = 'repos/'
 
+# project access_key query parameter name
+ACCESS_KEY_SET_COOKIE_PARAM_NAME = 'set_access_key_cookie'
+
+ACCESS_KEY_HTTP_HEADER = 'X-Cloud-Playground-Access-Key'
+
+ACCESS_KEY_HTTP_HEADER_WSGI = 'HTTP_X_CLOUD_PLAYGROUND_ACCESS_KEY'
+
+ACCESS_KEY_COOKIE_NAME = 'access_key'
+
+ACCESS_KEY_COOKIE_ARGS = {
+    'httponly': True,
+    'secure': not _DEV_MODE,
+}
+
 # name for the session cookie
 SESSION_COOKIE_NAME = 'session'
+
+SESSION_COOKIE_ARGS = {
+    'httponly': True,
+    'secure': not _DEV_MODE,
+}
+
+XSRF_COOKIE_ARGS = {
+    'httponly': False,
+    'secure': not _DEV_MODE,
+}
+
+
 
 # Extensions to exclude when creating template projects
 SKIP_EXTENSIONS = ('swp', 'pyc', 'svn')
@@ -73,17 +99,6 @@ else:
   #                                         PLAYGROUND_APP_ID))
   PLAYGROUND_USER_CONTENT_HOST = None
   EXEC_CODE_HOST = '{0}.appspot.com'.format(EXEC_CODE_APP_ID)
-
-
-SESSION_COOKIE_ARGS = {
-    'httponly': True,
-    'secure': not _DEV_MODE,
-}
-
-XSRF_COOKIE_ARGS = {
-    'httponly': False,
-    'secure': not _DEV_MODE,
-}
 
 
 def PrintAppIdsInMap():

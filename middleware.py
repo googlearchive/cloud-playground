@@ -187,6 +187,33 @@ class Session(object):
     return self.app(environ, custom_start_response)
 
 
+class AccessKeyCookieFilter(object):
+  """WSGI middleware which sets access_key cookies on demand."""
+
+  def __init__(self, app):
+    self.app = app
+
+  def __call__(self, environ, start_response):
+    request = webapp2.Request(environ, app=self.app)
+    access_key = request.get(settings.ACCESS_KEY_SET_COOKIE_PARAM_NAME)
+    environ['mimic.access_key'] = access_key
+
+    def custom_start_response(status, headers, exc_info=None):
+      if access_key:
+        # keep session cookies private
+        headers.extend([
+            MakeCookieHeader(settings.ACCESS_KEY_COOKIE_NAME, access_key,
+                             settings.ACCESS_KEY_COOKIE_ARGS),
+            # Note App Engine automatically sets a 'Date' header for us. See
+            # https://developers.google.com/appengine/docs/python/runtime#Responses
+            ('Expires', settings.LONG_AGO),
+            ('Cache-Control', 'private, max-age=0'),
+        ])
+      return start_response(status, headers, exc_info)
+
+    return self.app(environ, custom_start_response)
+
+
 class MimicControlAccessFilter(object):
   """WSGI middleware which performs mimic project access checks.
 
