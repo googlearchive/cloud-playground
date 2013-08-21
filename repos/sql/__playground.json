@@ -1,4 +1,5 @@
 {
   "template_name" : "Google Developers Academy - Cloud SQL Guestbook (Takashi Matsuo - June 2012)",
-  "template_description" : "https://developers.google.com/academy/apis/cloud/appengine/cloud-sql/application_with_local_mysql"
+  "template_description" : "https://developers.google.com/academy/apis/cloud/appengine/cloud-sql/application_with_local_mysql",
+  "open_files": ["main.py"]
 }

@@ -277,8 +277,9 @@ class GithubRepoCollection(collection.RepoCollection):
     for repo in repos:
       name = repo['name']
       description=repo['description'] or repo['html_url']
-      model.CreateRepoAsync(repo['html_url'], html_url=repo['html_url'],
-                            name=name, description=description)
+      model.CreateRepoAsync(repo_url=repo['html_url'],
+                            html_url=repo['html_url'],
+                            name=name, description=description, open_files=[])
 
   def CreateProjectTreeFromRepo(self, tree, repo):
     # e.g. https://github.com/GoogleCloudPlatform/appengine-guestbook-python

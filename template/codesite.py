@@ -72,8 +72,8 @@ class CodesiteRepoCollection(collection.RepoCollection):
         shared.i('found app.yaml: {}'.format(app_yaml_url))
         name = c.rstrip('/') or project_url
         description = 'Sample code from {0}'.format(project_url)
-        model.CreateRepoAsync(project_url, html_url=project_url,
-                              name=name, description=description)
+        model.CreateRepoAsync(repo_url=project_url, html_url=project_url,
+                              name=name, description=description, open_files=[])
       except urlfetch_errors.Error:
         exc_info = sys.exc_info()
         formatted_exception = traceback.format_exception(exc_info[0],

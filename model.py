@@ -42,6 +42,7 @@ class PlaygroundProject(ndb.Model):
   created = ndb.DateTimeProperty(required=True, auto_now_add=True,
                                  indexed=False)
   updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
+  open_files = ndb.StringProperty(required=False, repeated=True, indexed=False)
   in_progress_task_name = ndb.StringProperty(indexed=False)
   access_key = ndb.StringProperty(required=True, indexed=False)
 
@@ -133,6 +134,7 @@ class Repo(ndb.Model):
   created = ndb.DateTimeProperty(required=True, auto_now_add=True,
                                  indexed=False)
   updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
+  open_files = ndb.StringProperty(required=False, repeated=True, indexed=False)
   in_progress_task_name = ndb.StringProperty(indexed=False)
 
 
@@ -154,13 +156,13 @@ def GetRepo(repo_url):
 
 
 @ndb.transactional(xg=True)
-def CreateRepoAsync(repo_url, html_url, name, description):
+def CreateRepoAsync(repo_url, html_url, name, description, open_files):
   """Asynchronously create a repo."""
   repo = GetRepo(repo_url)
   if not repo:
     user = GetTemplateOwner()
     repo = Repo(id=repo_url, html_url=html_url, name=name,
-                description=description,
+                description=description, open_files=open_files,
                 namespace=settings.PLAYGROUND_NAMESPACE)
   elif repo.in_progress_task_name:
     shared.w('ignoring recreation of {} which is already executing in task {}'
@@ -179,6 +181,7 @@ def CreateRepoAsync(repo_url, html_url, name, description):
                             html_url=html_url,
                             project_name=name,
                             project_description=description,
+                            open_files=open_files,
                             in_progress_task_name=task.name)
     repo.project = project.key
   repo.put()
@@ -221,7 +224,8 @@ def CopyProject(user, tp):
                           template_url=tp.template_url,
                           html_url=tp.html_url,
                           project_name=tp.project_name,
-                          project_description=tp.project_description)
+                          project_description=tp.project_description,
+                          open_files=tp.open_files)
   src_tree = _CreateProjectTree(tp)
   dst_tree = _CreateProjectTree(project)
   CopyTree(dst_tree, src_tree)
@@ -337,7 +341,7 @@ def NewProjectName():
 
 @ndb.transactional(xg=True)
 def CreateProject(user, template_url, html_url, project_name,
-                  project_description, in_progress_task_name=None):
+                  project_description, open_files, in_progress_task_name=None):
   """Create a new user project.
 
   Args:
@@ -346,6 +350,8 @@ def CreateProject(user, template_url, html_url, project_name,
     html_url: The end user URL to populate the project files or None.
     project_name: The project name.
     project_description: The project description.
+    open_files: List of files to open.
+    in_progress_task_name: Optional owning task name.
 
   Returns:
     The new project entity.
@@ -359,9 +365,10 @@ def CreateProject(user, template_url, html_url, project_name,
                           writers=[user.key.id()],
                           template_url=template_url,
                           html_url=html_url,
-                          namespace=settings.PLAYGROUND_NAMESPACE,
+                          open_files=open_files,
                           in_progress_task_name=in_progress_task_name,
-                          access_key=secret.GenerateRandomString())
+                          access_key=secret.GenerateRandomString(),
+                          namespace=settings.PLAYGROUND_NAMESPACE)
   prj.put()
   # transactional get before update
   user = user.key.get()

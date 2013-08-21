@@ -526,7 +526,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
   };
 
   $scope._select_a_file = function() {
-    var path = $location.hash();
+    var path = $location.hash() || $scope.project.open_files[0];
     var file = $scope.files[path];
     if (file) {
       $scope.select_file(file);

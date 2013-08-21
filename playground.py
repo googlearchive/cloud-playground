@@ -98,6 +98,7 @@ class PlaygroundHandler(webapp2.RequestHandler):
         'key': str(project.key.id()),
         'name': project.project_name,
         'description': project.project_description,
+        'open_files': project.open_files,
         'template_url': project.template_url,
         'html_url': project.html_url,
         'run_url': self._GetPlaygroundRunUrl(project),
@@ -348,7 +349,7 @@ class RecreateTemplateProject(PlaygroundHandler):
     repo_url = project.template_url
     repo = model.GetRepo(repo_url)
     model.CreateRepoAsync(repo.key.id(), repo.html_url, repo.name,
-                          repo.description)
+                          repo.description, repo.open_files)
 
 
 class CreateTemplateProjectByUrl(PlaygroundHandler):
@@ -365,7 +366,9 @@ class CreateTemplateProjectByUrl(PlaygroundHandler):
     repo = model.GetRepo(repo_url)
     if not repo:
       html_url = name = description = repo_url
-      repo = model.CreateRepoAsync(repo_url, html_url, name, description)
+      repo = model.CreateRepoAsync(repo_url=repo_url, html_url=html_url,
+                                   name=name, description=description,
+                                   open_files=[])
     project = repo.project.get()
     if not project or project.in_progress_task_name:
       Abort(httplib.REQUEST_TIMEOUT, 'Requested template is not yet available. '
