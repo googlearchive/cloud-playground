@@ -195,7 +195,8 @@ class AccessKeyCookieFilter(object):
 
   def __call__(self, environ, start_response):
     request = webapp2.Request(environ, app=self.app)
-    access_key = request.get(settings.ACCESS_KEY_SET_COOKIE_PARAM_NAME)
+    access_key = (request.get(settings.ACCESS_KEY_SET_COOKIE_PARAM_NAME) or
+                  request.cookies.get(settings.ACCESS_KEY_COOKIE_NAME))
     environ['mimic.access_key'] = access_key
 
     def custom_start_response(status, headers, exc_info=None):

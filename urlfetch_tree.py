@@ -23,6 +23,8 @@ import urllib
 
 from mimic.__mimic import common
 
+import error
+from error import Abort
 import settings
 import shared
 
@@ -36,8 +38,10 @@ class UrlFetchTree(common.Tree):
   """An implementation of Tree backed by URL Fetch."""
 
   def __init__(self, namespace, access_key):
-    assert namespace
-    assert access_key
+    if not namespace:
+      Abort(httplib.FORBIDDEN, 'Missing namespace')
+    if not access_key:
+      Abort(httplib.FORBIDDEN, 'Missing access key')
     super(UrlFetchTree, self).__init__(namespace)
     self.namespace = namespace
     self.access_key = access_key
