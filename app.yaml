@@ -12,6 +12,7 @@ includes:
 - bootstrap.yaml
 - codemirror.yaml
 - fixit.yaml
+- internal.yaml
 - playground.yaml
 - iframed.yaml
 - tasks.yaml

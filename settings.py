@@ -6,6 +6,8 @@ from google.appengine.api import app_identity
 from google.appengine.api import backends
 
 
+DEBUG = True
+
 # The application where the playground IDE runs
 PLAYGROUND_APP_ID = 'try-appengine'
 

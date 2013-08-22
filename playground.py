@@ -25,13 +25,9 @@ import secret
 import settings
 import shared
 
-from template import templates
-
 from google.appengine.api import namespace_manager
 from google.appengine.api import users
 
-
-DEBUG = True
 
 _JSON_MIME_TYPE = 'application/json'
 
@@ -50,13 +46,6 @@ _VALID_PROJECT_RE = re.compile('^[a-z0-9-]{0,50}$')
 def tojson(r):
   """Converts a python object to JSON."""
   return _JSON_ENCODER.encode(r)
-
-
-class Warmup(webapp2.RequestHandler):
-  """Handler for warmup/start requests"""
-
-  def get(self):
-    templates.GetRepoCollections()
 
 
 class PlaygroundHandler(webapp2.RequestHandler):
@@ -513,15 +502,10 @@ app = webapp2.WSGIApplication([
     ('/playground/logout', Logout),
     ('/playground/datastore/(.*)', DatastoreRedirect),
     ('/playground/memcache/(.*)', MemcacheRedirect),
-
-    # warmup requests
-    ('/_ah/warmup', Warmup),
-
-    # backends in the dev_appserver
-    ('/_ah/start', Warmup),
-], debug=DEBUG)
+], debug=settings.DEBUG)
 app = middleware.Session(app, config)
-app = middleware.ErrorHandler(app, debug=DEBUG)
+app = middleware.ErrorHandler(app, debug=settings.DEBUG)
+
 
 mimic_intercept_app = mimic_wsgi.Mimic
 mimic_intercept_app = middleware.MimicControlAccessFilter(mimic_intercept_app)
@@ -530,4 +514,5 @@ if shared.ThisIsPlaygroundApp():
 else:
   mimic_intercept_app = middleware.AccessKeyCookieFilter(mimic_intercept_app)
 mimic_intercept_app = middleware.Redirector(mimic_intercept_app)
-mimic_intercept_app = middleware.ErrorHandler(mimic_intercept_app, debug=DEBUG)
+mimic_intercept_app = middleware.ErrorHandler(mimic_intercept_app,
+                                              debug=settings.DEBUG)
