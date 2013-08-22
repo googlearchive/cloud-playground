@@ -331,6 +331,14 @@ BUTTON.admin > I[class*=" icon-"] {
   margin-bottom: 2px;
 }
 
+.btn-height {
+  height: 27px;
+}
+
+.btn.pull-left {
+  margin-right: 5px;
+}
+
 .btn.pull-right {
   margin-left: 5px;
 }
