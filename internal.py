@@ -4,6 +4,7 @@ import webapp2
 
 from template import templates
 
+import middleware
 import settings
 
 
@@ -21,3 +22,4 @@ app = webapp2.WSGIApplication([
     # backends in the dev_appserver
     ('/_ah/start', Warmup),
 ], debug=settings.DEBUG)
+app = middleware.ProjectFilter(app)

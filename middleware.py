@@ -175,16 +175,29 @@ class Session(object):
     # TODO: avoid creating a datastore entity on every anonymous request
     environ['playground.user'] = model.GetOrCreateUser(user_key)
 
-    # 3. ensure we have a project, if one is specified
-    project_id = mimic.GetProjectId(environ, False)
-    if project_id:
-      environ['playground.project'] = model.GetProject(project_id)
-
-    # 4. perform CSRF checks
+    # 3. perform CSRF checks
     if not shared.IsHttpReadMethod(environ):
       _PerformCsrfRequestValidation(session, environ)
 
     return self.app(environ, custom_start_response)
+
+
+class ProjectFilter(object):
+  """WSGI middleware which determined the current project.
+
+  Adds the following keys to the environ:
+  - environ['playground.project'] contains the current project
+  """
+
+  def __init__(self, app):
+    self.app = app
+
+  def __call__(self, environ, start_response):
+    project_id = mimic.GetProjectId(environ, False)
+    if project_id:
+      environ['playground.project'] = model.GetProject(project_id)
+    return self.app(environ, start_response)
+
 
 
 class AccessKeyCookieFilter(object):

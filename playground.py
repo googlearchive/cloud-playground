@@ -504,6 +504,7 @@ app = webapp2.WSGIApplication([
     ('/playground/memcache/(.*)', MemcacheRedirect),
 ], debug=settings.DEBUG)
 app = middleware.Session(app, config)
+app = middleware.ProjectFilter(app)
 app = middleware.ErrorHandler(app, debug=settings.DEBUG)
 
 
@@ -514,5 +515,6 @@ if shared.ThisIsPlaygroundApp():
 else:
   mimic_intercept_app = middleware.AccessKeyCookieFilter(mimic_intercept_app)
 mimic_intercept_app = middleware.Redirector(mimic_intercept_app)
+mimic_intercept_app = middleware.ProjectFilter(mimic_intercept_app)
 mimic_intercept_app = middleware.ErrorHandler(mimic_intercept_app,
                                               debug=settings.DEBUG)
