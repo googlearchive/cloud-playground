@@ -17,11 +17,9 @@ import error
 from error import *
 import fixit
 import middleware
-from mimic import mimic_wsgi
 from mimic.__mimic import common
 from mimic.__mimic import mimic
 import model
-import secret
 import settings
 import shared
 
@@ -468,13 +466,6 @@ class Nuke(PlaygroundHandler):
     self.redirect('/playground')
 
 
-config = {
-    'webapp2_extras.sessions': {
-        'secret_key': secret.GetSecret('webapp2_extras.sessions', entropy=128),
-        'cookie_args': settings.SESSION_COOKIE_ARGS,
-    }
-}
-
 app = webapp2.WSGIApplication([
     # config actions
     ('/playground/getconfig', GetConfig),
@@ -503,18 +494,6 @@ app = webapp2.WSGIApplication([
     ('/playground/datastore/(.*)', DatastoreRedirect),
     ('/playground/memcache/(.*)', MemcacheRedirect),
 ], debug=settings.DEBUG)
-app = middleware.Session(app, config)
+app = middleware.Session(app, settings.WSGI_CONFIG)
 app = middleware.ProjectFilter(app)
 app = middleware.ErrorHandler(app, debug=settings.DEBUG)
-
-
-mimic_intercept_app = mimic_wsgi.Mimic
-mimic_intercept_app = middleware.MimicControlAccessFilter(mimic_intercept_app)
-if shared.ThisIsPlaygroundApp():
-  mimic_intercept_app = middleware.Session(mimic_intercept_app, config)
-else:
-  mimic_intercept_app = middleware.AccessKeyCookieFilter(mimic_intercept_app)
-mimic_intercept_app = middleware.Redirector(mimic_intercept_app)
-mimic_intercept_app = middleware.ProjectFilter(mimic_intercept_app)
-mimic_intercept_app = middleware.ErrorHandler(mimic_intercept_app,
-                                              debug=settings.DEBUG)

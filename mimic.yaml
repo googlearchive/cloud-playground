@@ -8,22 +8,22 @@ handlers:
 
 # allow file retrieval
 - url: /_ah/mimic/file
-  script: playground.mimic_intercept_app
+  script: intercept.app
   secure: always
 
 # allow file deletion
 - url: /_ah/mimic/delete
-  script: playground.mimic_intercept_app
+  script: intercept.app
   secure: always
 
 # allow directory listing
 - url: /_ah/mimic/dir
-  script: playground.mimic_intercept_app
+  script: intercept.app
   secure: always
 
 # allow file rename
 - url: /_ah/mimic/move
-  script: playground.mimic_intercept_app
+  script: intercept.app
   secure: always
 
 # block other mimic control requests
@@ -33,7 +33,7 @@ handlers:
 
 # script handler for everything else / user code
 - url: /.*
-  script: playground.mimic_intercept_app
+  script: intercept.app
   # This script handler must either not require login, or require admin login
   # (via 'login: admin'). Do not specify 'login: required' since offline
   # requests (Cron, Task Queue, etc.) will fail with this error:
