@@ -5,7 +5,7 @@
 
 <div ng-show="loaded">
 
-  <h1 class="projectlistheader"><a id="my_projects"></a>My Projects</h1>
+  <h4 class="space-above"><a id="my_projects"></a>My Projects</h4>
 
   <table class="table-condensed">
 
@@ -45,7 +45,7 @@
 
   </table>
   <div>
-    <h1><a id="my_templates"></a>Project Templates</h1>
+    <h4 class="space-above"><a id="my_templates"></a>Project Templates</h4>
     <div ng-repeat="tp in template_projects | orderBy:'name'">
         <div class="tp" style="margin: .5em;"
              ng-hide="!!tp.in_progress_task_name && ! config.is_admin && ! config.is_devappserver">
@@ -81,7 +81,7 @@
   </div>
 
   <div>
-    <h1>Import new templates</h1>
+    <h4 class="space-above">Import new templates</h4>
     <form class="form-horizontal">
       <div class="control-group">
         <label class='control-label' for='import_url'>Github project URL</label>

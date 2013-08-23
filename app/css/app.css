@@ -94,10 +94,8 @@ TABLE {
     color: #555;
   }
 
-H1 {
-  font-size: 1.2em;
-  font-weight: bold;
-  margin: 1.7em 0em .4em;
+.space-above {
+  margin-top: 2em;
 }
 
 #navheader {
