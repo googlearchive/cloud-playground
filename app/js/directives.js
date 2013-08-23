@@ -38,7 +38,8 @@ angular.module('playgroundApp.directives', [])
 
   function getHeight(key) {
     try {
-      return parseInt(localStorage.getItem('pgResizer-height-' + key));
+      var height = localStorage.getItem('pgResizer-height-' + key);
+      return Math.max(parseInt(height), 0);
     } catch (e) {
       return 0;
     }
