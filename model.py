@@ -45,7 +45,7 @@ class PlaygroundProject(ndb.Model):
   open_files = ndb.StringProperty(required=False, repeated=True, indexed=False)
   in_progress_task_name = ndb.StringProperty(indexed=False)
   access_key = ndb.StringProperty(required=True, indexed=False)
-  expiration_seconds= ndb.IntegerProperty()
+  expiration_seconds = ndb.IntegerProperty(required=False, indexed=False)
 
   @property
   def orderby(self):
@@ -343,7 +343,7 @@ def NewProjectName():
 
 @ndb.transactional(xg=True)
 def CreateProject(user, template_url, html_url, project_name,
-                  project_description, open_files, 
+                  project_description, open_files,
                   in_progress_task_name=None, expiration_seconds=None):
   """Create a new user project.
 
@@ -354,8 +354,8 @@ def CreateProject(user, template_url, html_url, project_name,
     project_name: The project name.
     project_description: The project description.
     open_files: List of files to open.
-    in_progress_task_name: Optional owning task name.
-    expiration_seconds: Time (in seconds) till expiration, from last update. Optional.
+    in_progress_task_name: Owning task name. Optional.
+    expiration_seconds: Seconds till expiration, from last update. Optional.
 
   Returns:
     The new project entity.
