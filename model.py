@@ -45,6 +45,7 @@ class PlaygroundProject(ndb.Model):
   open_files = ndb.StringProperty(required=False, repeated=True, indexed=False)
   in_progress_task_name = ndb.StringProperty(indexed=False)
   access_key = ndb.StringProperty(required=True, indexed=False)
+  expiration_seconds= ndb.IntegerProperty()
 
   @property
   def orderby(self):
@@ -219,13 +220,14 @@ def _CreateProjectTree(project):
   return common.config.CREATE_TREE_FUNC(str(project.key.id()))
 
 @ndb.transactional(xg=True)
-def CopyProject(user, tp):
+def CopyProject(user, tp, expiration_seconds):
   project = CreateProject(user=user,
                           template_url=tp.template_url,
                           html_url=tp.html_url,
                           project_name=tp.project_name,
                           project_description=tp.project_description,
-                          open_files=tp.open_files)
+                          open_files=tp.open_files,
+                          expiration_seconds=expiration_seconds)
   src_tree = _CreateProjectTree(tp)
   dst_tree = _CreateProjectTree(project)
   CopyTree(dst_tree, src_tree)
@@ -341,7 +343,8 @@ def NewProjectName():
 
 @ndb.transactional(xg=True)
 def CreateProject(user, template_url, html_url, project_name,
-                  project_description, open_files, in_progress_task_name=None):
+                  project_description, open_files, 
+                  in_progress_task_name=None, expiration_seconds=None):
   """Create a new user project.
 
   Args:
@@ -352,6 +355,7 @@ def CreateProject(user, template_url, html_url, project_name,
     project_description: The project description.
     open_files: List of files to open.
     in_progress_task_name: Optional owning task name.
+    expiration_seconds: Time (in seconds) till expiration, from last update. Optional.
 
   Returns:
     The new project entity.
@@ -368,7 +372,8 @@ def CreateProject(user, template_url, html_url, project_name,
                           open_files=open_files,
                           in_progress_task_name=in_progress_task_name,
                           access_key=secret.GenerateRandomString(),
-                          namespace=settings.PLAYGROUND_NAMESPACE)
+                          namespace=settings.PLAYGROUND_NAMESPACE,
+                          expiration_seconds=expiration_seconds)
   prj.put()
   # transactional get before update
   user = user.key.get()

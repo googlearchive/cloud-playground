@@ -199,7 +199,8 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
   .then(function() {
     var template_url = $routeParams.template_url;
     if (template_url) {
-      return create_project_from_template(template_url);
+      var expiration_seconds = parseInt($routeParams.expiration_seconds);
+      return create_project_from_template(template_url, expiration_seconds);
     } else {
       $scope.set_loaded();
     }
@@ -253,7 +254,7 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
   };
 
   // TODO: test
-  function create_project_from_template(template_url) {
+  function create_project_from_template(template_url, expiration_seconds) {
     var deferred = $q.defer();
 
     var user_projects = by_template_url(template_url, $scope.projects);
@@ -297,7 +298,7 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
     deferred.promise
     .then(function() {
       $scope.status = 'Cloning project from template ' + template_url;
-      return $scope.new_project(template_projects[0]);
+      return $scope.new_project(template_projects[0], expiration_seconds);
     })
     .then(function() {
       var user_projects = by_template_url(template_url, $scope.projects);
@@ -326,14 +327,16 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
     });
   };
 
-  $scope.new_project = function(template_project) {
+  $scope.new_project = function(template_project, expiration_seconds) {
     var deferred = $q.defer();
     var data = {
       'name': '(Creating project...)',
       'description': '(Please wait and then refresh this page.)',
     };
     $scope.projects.push(data);
-    $http.post('/playground/p/' + encodeURI(template_project.key) + '/copy')
+    $http.post('/playground/p/' + encodeURI(template_project.key) + '/copy', {
+      'expiration_seconds': expiration_seconds
+    })
     .success(function(data, status, headers, config) {
       $scope.projects.pop();
       $scope.projects.push(data);
