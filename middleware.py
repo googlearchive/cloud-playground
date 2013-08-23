@@ -261,9 +261,12 @@ class MimicControlAccessFilter(object):
 
     if environ['PATH_INFO'].startswith(common.CONTROL_PREFIX):
       if shared.IsHttpReadMethod(environ):
-        shared.AssertHasProjectReadAccess(environ)
+        if not shared.HasProjectReadAccess(environ):
+          Abort(httplib.UNAUTHORIZED, 'no project read access to mimic control')
       else:
-        shared.AssertHasProjectWriteAccess(environ)
+        if not HasProjectWriteAccess(environ):
+          Abort(httplib.UNAUTHORIZED,
+                'no project write access to mimic control')
     return self.app(environ, start_response)
 
 

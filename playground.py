@@ -241,7 +241,8 @@ class RetrieveProject(PlaygroundHandler):
   """Handler to retrieve project metadata."""
 
   def PerformAccessCheck(self):
-    shared.AssertHasProjectReadAccess(self.request.environ)
+    if HasProjectReadAccess(self.request.environ):
+      Abort(httplib.UNAUTHORIZED, 'no project read access')
 
   def get(self):
     r = self.DictOfProject(self.project)
@@ -301,7 +302,8 @@ class CopyProject(PlaygroundHandler):
   """Request handler for copying projects."""
 
   def PerformAccessCheck(self):
-    shared.AssertHasProjectReadAccess(self.request.environ)
+    if not HasProjectReadAccess(self.request.environ):
+      Abort(httplib.UNAUTHORIZED, 'no project read access')
 
   def post(self):
     """Handles HTTP POST requests."""
@@ -370,7 +372,8 @@ class DeleteProject(PlaygroundHandler):
   """Handler for deleting a project."""
 
   def PerformAccessCheck(self):
-    shared.AssertHasProjectWriteAccess(self.request.environ)
+    if not HasProjectWriteAccess(environ):
+      Abort(httplib.UNAUTHORIZED, 'no project write access')
 
   def post(self):
     model.DeleteProject(self.user, tree=self.tree, project_id=self.project_id)
@@ -380,7 +383,8 @@ class RenameProject(PlaygroundHandler):
   """Handler for renaming a project."""
 
   def PerformAccessCheck(self):
-    shared.AssertHasProjectWriteAccess(self.request.environ)
+    if not HasProjectWriteAccess(environ):
+      Abort(httplib.UNAUTHORIZED, 'no project write access')
 
   def post(self):
     data = json.loads(self.request.body)
@@ -396,7 +400,8 @@ class ResetProject(PlaygroundHandler):
   """Handler to reset a project to the template state."""
 
   def PerformAccessCheck(self):
-    shared.AssertHasProjectWriteAccess(self.request.environ)
+    if not HasProjectWriteAccess(environ):
+      Abort(httplib.UNAUTHORIZED, 'no project write access')
 
   def post(self):
     project = model.ResetProject(self.project_id, self.tree)
@@ -409,7 +414,8 @@ class DownloadProject(PlaygroundHandler):
   """Handler for downloading project source code."""
 
   def PerformAccessCheck(self):
-    shared.AssertHasProjectReadAccess(self.request.environ)
+    if not HasProjectReadAccess(self.request.environ):
+      Abort(httplib.UNAUTHORIZED, 'no project read access')
 
   def get(self):
     """Handles HTTP GET requests."""
@@ -432,7 +438,8 @@ class TouchProject(PlaygroundHandler):
   """Handler for updating the project last access timestamp."""
 
   def PerformAccessCheck(self):
-    shared.AssertHasProjectWriteAccess(self.request.environ)
+    if not HasProjectWriteAccess(environ):
+      Abort(httplib.UNAUTHORIZED, 'no project write access')
 
   def post(self):
     project = model.TouchProject(self.project_id)

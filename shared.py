@@ -72,7 +72,7 @@ def AssertIsAdmin():
     Abort(403, 'Admin only function')
 
 
-def AssertHasProjectReadAccess(environ):
+def HasProjectReadAccess(environ):
   """Assert that the current user has project read permissions.
 
   Args:
@@ -88,18 +88,18 @@ def AssertHasProjectReadAccess(environ):
     Abort(httplib.NOT_FOUND, 'Project does not exist')
   access_key = environ.get(settings.ACCESS_KEY_HTTP_HEADER_WSGI, None)
   if access_key and access_key == project.access_key:
-    return
+    return True
   if users.is_current_user_admin():
-    return
+    return True
   user = environ.get('playground.user', None)
   if user and user.key.id() in project.writers:
-    return
+    return True
   if settings.PROJECT_TEMPLATE_OWNER in project.writers:
-    return
-  Abort(httplib.UNAUTHORIZED, 'Missing project read access')
+    return True
+  return False
 
 
-def AssertHasProjectWriteAccess(environ):
+def HasProjectWriteAccess(environ):
   """Assert that the current user has project write permissions.
 
   Args:
@@ -112,8 +112,8 @@ def AssertHasProjectWriteAccess(environ):
   if not project:
     Abort(httplib.NOT_FOUND, 'Project does not exist')
   if users.is_current_user_admin():
-    return
+    return True
   user = environ.get('playground.user')
   if user and user.key.id() in project.writers:
-    return
-  Abort(httplib.UNAUTHORIZED, 'Missing project write access')
+    return True
+  return False
