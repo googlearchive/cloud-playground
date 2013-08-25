@@ -183,9 +183,10 @@ class Session(object):
 
 
 class ProjectFilter(object):
-  """WSGI middleware which determined the current project.
+  """WSGI middleware which determines the current project.
 
   Adds the following keys to the environ:
+  - environ['playground.project_id'] contains the current project
   - environ['playground.project'] contains the current project
   """
 
@@ -199,9 +200,12 @@ class ProjectFilter(object):
     return self.app(environ, start_response)
 
 
-
 class AccessKeyCookieFilter(object):
-  """WSGI middleware which sets access_key cookies on demand."""
+  """WSGI middleware which manages and trackes access_key cookies.
+
+  If a set cookie query parameter is found or an existing cookie the access_key
+  is stored in environ['mimic.access_key'].
+  """
 
   def __init__(self, app):
     self.app = app
@@ -228,6 +232,24 @@ class AccessKeyCookieFilter(object):
     return self.app(environ, custom_start_response)
 
 
+class AccessKeyHttpHeaderFilter(object):
+  """WSGI middleware which detects access_key HTTP header.
+
+  If the header is detected, the access_key is stored in
+  environ['mimic.access_key'].
+  """
+
+  def __init__(self, app):
+    self.app = app
+
+  def __call__(self, environ, start_response):
+    request = webapp2.Request(environ, app=self.app)
+    access_key = request.headers.get(settings.ACCESS_KEY_HTTP_HEADER)
+    if access_key:
+      environ['mimic.access_key'] = access_key
+    return self.app(environ, start_response)
+
+
 class MimicControlAccessFilter(object):
   """WSGI middleware which performs mimic project access checks.
 
@@ -235,9 +257,7 @@ class MimicControlAccessFilter(object):
 
   Requires that the following keys be present in the environ:
   - environ['playground.user']    contains the current user entity
-
-  Adds the following keys to the environ:
-  - environ['playground.project'] contains the current project if applicable
+  - environ['playground.project'] contains the current project entity
   """
 
   def __init__(self, app):

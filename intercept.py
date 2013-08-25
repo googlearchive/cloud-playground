@@ -13,6 +13,7 @@ if shared.ThisIsPlaygroundApp():
   app = middleware.Session(app, settings.WSGI_CONFIG)
 else:
   app = middleware.AccessKeyCookieFilter(app)
+app = middleware.AccessKeyHttpHeaderFilter(app)
 app = middleware.Redirector(app)
 app = middleware.ProjectFilter(app)
 app = middleware.ErrorHandler(app, debug=settings.DEBUG)
