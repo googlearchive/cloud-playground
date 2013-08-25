@@ -7,6 +7,7 @@ import os
 from mimic.__mimic import common
 from mimic.__mimic import mimic
 
+import appids
 import error
 from error import Abort
 import settings
@@ -60,7 +61,7 @@ def ThisIsPlaygroundApp():
   """Determines whether this is the playground app id."""
   if common.IsDevMode():
     return not backends.get_backend()
-  return app_identity.get_application_id() == settings.PLAYGROUND_APP_ID
+  return app_identity.get_application_id() == appids.PLAYGROUND_APP_ID
 
 
 def IsHttpReadMethod(environ):

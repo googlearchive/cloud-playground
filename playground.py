@@ -13,6 +13,7 @@ import zipfile
 import webapp2
 from webapp2_extras import sessions
 
+import appids
 import error
 from error import *
 import fixit
@@ -22,6 +23,7 @@ from mimic.__mimic import mimic
 import model
 import settings
 import shared
+from template import templates
 
 from google.appengine.api import namespace_manager
 from google.appengine.api import users
@@ -100,7 +102,7 @@ class PlaygroundHandler(webapp2.RequestHandler):
     if common.IsDevMode():
       return ('{0}://{1}/?{2}={3}&{4}={5}'
               .format(self.request.scheme,
-                      settings.EXEC_CODE_HOST,
+                      settings.MIMIC_HOST,
                       common.config.PROJECT_ID_QUERY_PARAM,
                       urllib.quote_plus(str(project.key.id())),
                       settings.ACCESS_KEY_SET_COOKIE_PARAM_NAME,
@@ -110,7 +112,7 @@ class PlaygroundHandler(webapp2.RequestHandler):
               .format(self.request.scheme,
                       urllib.quote_plus(str(project.key.id())),
                       _DASH_DOT_DASH,
-                      settings.EXEC_CODE_HOST,
+                      settings.MIMIC_HOST,
                       settings.ACCESS_KEY_SET_COOKIE_PARAM_NAME,
                       project.access_key))
 
@@ -149,9 +151,9 @@ class RedirectHandler(PlaygroundHandler):
 
   def _GetAppId(self, namespace):
     if namespace == settings.PLAYGROUND_NAMESPACE:
-      return settings.PLAYGROUND_APP_ID
+      return appids.PLAYGROUND_APP_ID
     else:
-      return settings.EXEC_CODE_APP_ID
+      return appids.MIMIC_APP_ID
 
 
 class DatastoreRedirect(RedirectHandler):

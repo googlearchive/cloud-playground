@@ -10,6 +10,7 @@ from mimic.__mimic import common
 from mimic.__mimic import datastore_tree
 from mimic.__mimic import mimic
 
+import appids
 import caching_urlfetch_tree
 import settings
 
@@ -29,7 +30,7 @@ _FixupSysPath()
 # our current app id
 app_id = app_identity.get_application_id()
 
-if common.IsDevMode() or app_id == settings.PLAYGROUND_APP_ID:
+if common.IsDevMode() or app_id == appids.PLAYGROUND_APP_ID:
   mimic_CREATE_TREE_FUNC = datastore_tree.DatastoreTree
 else:
   mimic_CREATE_TREE_FUNC = caching_urlfetch_tree.CachingUrlFetchTree
