@@ -38,6 +38,8 @@
   <hr ng-hide="iframed" pg-resizer="source-container">
 
   <div id='output-container'>
+    <iframe class="control-iframe" ng-attr-src="{{control_url}}">
+    </iframe>
     <div class="alert alert-no-margin">
        If your app fails to load in the below iframe, try running your app in a
        <a ng-click='popout(); run();'>separate window</a>

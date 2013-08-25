@@ -26,6 +26,11 @@ handlers:
   script: intercept.app
   secure: always
 
+# allow log handler
+- url: /_ah/mimic/log
+  script: intercept.app
+  secure: always
+
 # block other mimic control requests
 - url: /_ah/mimic/.*
   script: deny.app

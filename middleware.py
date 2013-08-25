@@ -269,7 +269,7 @@ class MimicControlAccessFilter(object):
     self.exc_info = None
 
   def _AssertCollaboratingAppIdAccessCheck(self, environ):
-    if environ['PATH_INFO'].startswith(common.CONTROL_PREFIX):
+    if environ['PATH_INFO'] in common.CONTROL_PATHS_REQUIRING_TREE:
       if not shared.ThisIsPlaygroundApp():
         Abort(httplib.FORBIDDEN,
               'playground service is not available in this app id')
@@ -282,7 +282,7 @@ class MimicControlAccessFilter(object):
     if settings.TWO_COLLABORATING_APP_IDS:
       self._AssertCollaboratingAppIdAccessCheck(environ)
 
-    if environ['PATH_INFO'].startswith(common.CONTROL_PREFIX):
+    if environ['PATH_INFO'] in common.CONTROL_PATHS_REQUIRING_TREE:
       if shared.IsHttpReadMethod(environ):
         if not shared.HasProjectReadAccess(environ):
           Abort(httplib.UNAUTHORIZED, 'no project read access to mimic control')

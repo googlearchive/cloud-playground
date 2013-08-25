@@ -90,31 +90,40 @@ class PlaygroundHandler(webapp2.RequestHandler):
         'open_files': project.open_files,
         'template_url': project.template_url,
         'html_url': project.html_url,
-        'run_url': self._GetPlaygroundRunUrl(project),
+        'run_url': self._MakeMimicUrl(project, '/'),
+        'control_url': self._MakeMimicUrl(project, '/_ah/mimic/log',
+                                          {'mode': 'postMessage'}),
         'in_progress_task_name': project.in_progress_task_name,
         'orderby': project.orderby,
         'writers': project.writers,
         'access_key': project.access_key,
     }
 
-  def _GetPlaygroundRunUrl(self, project):
-    """Determine the playground run url."""
+  def _MakeMimicUrl(self, project, path, params={}):
+    """Build a mimic url."""
+    project_id = urllib.quote_plus(str(project.key.id()))
+    path = path.lstrip('/')
     if common.IsDevMode():
-      return ('{0}://{1}/?{2}={3}&{4}={5}'
-              .format(self.request.scheme,
-                      settings.MIMIC_HOST,
-                      common.config.PROJECT_ID_QUERY_PARAM,
-                      urllib.quote_plus(str(project.key.id())),
-                      settings.ACCESS_KEY_SET_COOKIE_PARAM_NAME,
-                      project.access_key))
+      url = ('{0}://{1}/{2}'
+             .format(self.request.scheme,
+                     settings.MIMIC_HOST,
+                     path))
+      params.update({
+          common.config.PROJECT_ID_QUERY_PARAM: project_id,
+      })
     else:
-      return ('{0}://{1}{2}{3}/?{4}={5}'
-              .format(self.request.scheme,
-                      urllib.quote_plus(str(project.key.id())),
-                      _DASH_DOT_DASH,
-                      settings.MIMIC_HOST,
-                      settings.ACCESS_KEY_SET_COOKIE_PARAM_NAME,
-                      project.access_key))
+      url = ('{0}://{1}{2}{3}/{4}'
+             .format(self.request.scheme,
+                     project_id,
+                     _DASH_DOT_DASH,
+                     settings.MIMIC_HOST,
+                     path))
+    params.update({
+        settings.ACCESS_KEY_SET_COOKIE_PARAM_NAME: project.access_key,
+    })
+    if params:
+      url = "{}?{}".format(url, urllib.urlencode(params))
+    return url
 
   def PerformAccessCheck(self):
     """Perform authorization checks.

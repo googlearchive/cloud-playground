@@ -281,6 +281,12 @@ BUTTON.admin > I[class*=" icon-"] {
     height: 100%;
   }
 
+.control-iframe {
+  width: 100%;
+  height: 4em;
+  border: 1px solid blue;
+}
+
 #output-iframe {
   width: 100%;
   height: 17em;

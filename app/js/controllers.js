@@ -390,7 +390,7 @@ function OAuth2AdminController($scope, $log, dialog, key, url, client_id,
 
 }
 
-function ProjectController($scope, $browser, $http, $routeParams, $window,
+function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
                            $dialog, $location, $log, DoSerial, DomElementById,
                            WrappedElementById, Backoff, ConfirmDialog) {
 
@@ -835,6 +835,12 @@ function ProjectController($scope, $browser, $http, $routeParams, $window,
     }
     if ($scope.selected_path != newfile.path) {
       $scope.selected_path = newfile.path;
+    }
+  });
+
+  $scope.$watch('project.control_url', function(value) {
+    if (value) {
+      $scope.control_url = $sce.trustAsResourceUrl(value);
     }
   });
 
