@@ -37,7 +37,7 @@
 <br>
   <hr ng-hide="iframed" pg-resizer="source-container">
 
-  <div id='output-container'>
+  <div>
     <iframe class="control-iframe" ng-attr-src="{{control_url}}">
     </iframe>
     <div class="alert alert-no-margin">
@@ -49,12 +49,13 @@
       <input ng-model='project.run_url' type='url' class='span8 url-bar' ng-click='select_me($event)'>
       <button ng-click='popout(); run()' class='btn pull-right url-button' title='open in a separate window'><i class="icon-share-alt"></i></button>
     </div>
-    <iframe id="output-iframe" ng-init="run()">
+    <iframe id="output-iframe" ng-init="run()" ng-hide="requested_popout">
     </iframe>
 
     <hr ng-hide="iframed" pg-resizer="output-iframe">
+  </div>
 
-
+  <div>
     <div ng-show="logs.length">
       <a ng-click="clear_logs()" ng-show="logs.length" class="btn pull-right">clear logs</a>
       <h4>Log output</h4>

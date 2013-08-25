@@ -397,11 +397,10 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   // keep in sync with appengine_config.py
   var MIMIC_PROJECT_ID_QUERY_PARAM = '_mimic_project';
 
-  // TODO: remove; don't maintain DOM references
-  var _output_window;
+  $scope.output_window = null;
 
   // TODO: remove; don't maintain DOM references
-  var _popout = false;
+  $scope.requested_popout = false;
 
   // TODO: remove once file contents are returned in JSON response
   $scope.no_json_transform = function(data) { return data; };
@@ -747,8 +746,8 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   // TODO: test
   $scope.popout = function() {
-    _popout = true;
-    _output_window = undefined;
+    $scope.requested_popout = true;
+    $scope.output_window = undefined;
   };
 
   // TODO: test
@@ -765,19 +764,19 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
       _save_dirty_files();
     })
     .then(function() {
+      $scope.clear_logs();
+    })
+    .then(function() {
       // TODO: try to avoid DOM access
-      var container = WrappedElementById('output-container');
-      if (_output_window && _output_window.closed) {
-        _popout = false;
+      if ($scope.output_window && $scope.output_window.closed) {
+        $scope.requested_popout = false;
       }
-      if (_popout) {
-        container.addClass('hidden');
+      if ($scope.requested_popout) {
         // TODO: create open window service (so we can test)
         // TODO: read https://github.com/vojtajina/ng-directive-testing
-        _output_window = window.open($scope.project.run_url,
-                                     $scope.project.key);
+        $scope.output_window = window.open($scope.project.run_url,
+                                           $scope.project.key);
       } else {
-        container.removeClass('hidden');
         var iframe = WrappedElementById('output-iframe');
         iframe.attr('src', $scope.project.run_url);
       }
