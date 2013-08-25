@@ -51,7 +51,21 @@
     </div>
     <iframe id="output-iframe" ng-init="run()">
     </iframe>
+
     <hr ng-hide="iframed" pg-resizer="output-iframe">
+
+
+    <div ng-show="logs.length">
+      <a ng-click="clear_logs()" ng-show="logs.length" class="btn pull-right">clear logs</a>
+      <h4>Log output</h4>
+    </div>
+    <div class="ae-logs">
+      <div ng-repeat="entry in logs | orderBy:'created':false">
+         <span class="ae-logs-timestamp">{{entry.created * 1000 | date:'yyyy-MM-dd HH:mm:ss.sss Z'}}</span>
+         <span class="ae-logs-severity ae-logs-severity-{{entry.levelname}}">{{entry.levelname | limitTo:1}}</span>
+         <span ng-bind="entry.message" class="ae-logs-message"></span>
+      </div>
+    </div>
   </div>
 
 

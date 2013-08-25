@@ -386,3 +386,41 @@ BUTTON.admin > I[class*=" icon-"] {
 .login-button {
   margin-right: 15px;
 }
+
+.ae-logs {
+  font-family: monospace;
+  font-size: 0.9em;
+  line-height: 1.5em;
+  max-height: 20em;
+  overflow: hidden;
+}
+
+.ae-logs-timestamp {
+}
+
+.ae-logs-message {
+}
+
+.ae-logs-severity {
+  width: 1.2em;
+  line-height: 1.2em;
+  border-radius: 2px;
+  text-align: center;
+  font-weight: bold;
+  display: inline-block;
+}
+  .ae-logs-severity-DEBUG {
+    background-color: #09f;
+  }
+  .ae-logs-severity-INFO {
+    background-color: #3c0;
+  }
+  .ae-logs-severity-WARNING {
+    background-color: #fd0;
+  }
+  .ae-logs-severity-ERROR {
+    background-color: #f90;
+  }
+  .ae-logs-severity-CRITICAL {
+    background-color: #f22;
+  }

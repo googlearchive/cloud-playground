@@ -406,6 +406,12 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   // TODO: remove once file contents are returned in JSON response
   $scope.no_json_transform = function(data) { return data; };
 
+  $scope.logs = [];
+
+  $scope.clear_logs = function() {
+    $scope.logs = [];
+  }
+
   function toquerystring(params) {
       var qs = '';
       angular.forEach(params, function(value, key) {
@@ -616,6 +622,15 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     hide_context_menus();
     $scope.$apply();
   }, false);
+
+  // TODO: test
+  $window.addEventListener('message', function(evt) {
+    var entry = evt.data['log_entry'];
+    // $sce helps defend against hostile input
+    $scope.logs.push(entry);
+    $scope.$apply();
+    return true;
+  });
 
   // TODO: test
   // TODO: replace with $dialog
