@@ -196,7 +196,9 @@ class ProjectFilter(object):
   def __call__(self, environ, start_response):
     project_id = mimic.GetProjectId(environ, False)
     if project_id:
-      environ['playground.project'] = model.GetProject(project_id)
+      project = model.GetProject(project_id)
+      assert project, 'project_id {} not found in datastore'.format(project_id)
+      environ['playground.project'] = project
     return self.app(environ, start_response)
 
 
@@ -214,7 +216,8 @@ class AccessKeyCookieFilter(object):
     request = webapp2.Request(environ, app=self.app)
     access_key = (request.get(settings.ACCESS_KEY_SET_COOKIE_PARAM_NAME) or
                   request.cookies.get(settings.ACCESS_KEY_COOKIE_NAME))
-    environ['mimic.access_key'] = access_key
+    if access_key:
+      environ['mimic.access_key'] = access_key
 
     def custom_start_response(status, headers, exc_info=None):
       if access_key:

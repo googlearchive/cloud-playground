@@ -12,8 +12,8 @@ angular.module('playgroundApp.directives', [])
         elm.css('left', value[0] + 'px');
         elm.css('top', value[1] + 'px');
       }
-    })
-  }
+    });
+  };
 })
 
 // TODO: test
