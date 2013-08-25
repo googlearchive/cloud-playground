@@ -86,8 +86,8 @@ def HasProjectReadAccess(environ):
   """
   project = environ['playground.project']
   if not project:
-    Abort(httplib.NOT_FOUND, 'Project does not exist')
-  access_key = environ.get(settings.ACCESS_KEY_HTTP_HEADER_WSGI, None)
+    Abort(httplib.NOT_FOUND, 'requested read access to non-existent project')
+  access_key = environ.get('mimic.access_key')
   if access_key and access_key == project.access_key:
     return True
   if users.is_current_user_admin():
@@ -111,7 +111,7 @@ def HasProjectWriteAccess(environ):
   """
   project = environ['playground.project']
   if not project:
-    Abort(httplib.NOT_FOUND, 'Project does not exist')
+    Abort(httplib.NOT_FOUND, 'requested write access to non-existent project')
   if users.is_current_user_admin():
     return True
   user = environ.get('playground.user')

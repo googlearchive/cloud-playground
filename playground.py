@@ -243,7 +243,7 @@ class RetrieveProject(PlaygroundHandler):
   """Handler to retrieve project metadata."""
 
   def PerformAccessCheck(self):
-    if HasProjectReadAccess(self.request.environ):
+    if not shared.HasProjectReadAccess(self.request.environ):
       Abort(httplib.UNAUTHORIZED, 'no project read access')
 
   def get(self):
@@ -304,7 +304,7 @@ class CopyProject(PlaygroundHandler):
   """Request handler for copying projects."""
 
   def PerformAccessCheck(self):
-    if not HasProjectReadAccess(self.request.environ):
+    if not shared.HasProjectReadAccess(self.request.environ):
       Abort(httplib.UNAUTHORIZED, 'no project read access')
 
   def post(self):
@@ -374,7 +374,7 @@ class DeleteProject(PlaygroundHandler):
   """Handler for deleting a project."""
 
   def PerformAccessCheck(self):
-    if not HasProjectWriteAccess(environ):
+    if not shared.HasProjectWriteAccess(self.request.environ):
       Abort(httplib.UNAUTHORIZED, 'no project write access')
 
   def post(self):
@@ -385,7 +385,7 @@ class RenameProject(PlaygroundHandler):
   """Handler for renaming a project."""
 
   def PerformAccessCheck(self):
-    if not HasProjectWriteAccess(environ):
+    if not shared.HasProjectWriteAccess(self.request.environ):
       Abort(httplib.UNAUTHORIZED, 'no project write access')
 
   def post(self):
@@ -402,7 +402,7 @@ class ResetProject(PlaygroundHandler):
   """Handler to reset a project to the template state."""
 
   def PerformAccessCheck(self):
-    if not HasProjectWriteAccess(environ):
+    if not shared.HasProjectWriteAccess(self.request.environ):
       Abort(httplib.UNAUTHORIZED, 'no project write access')
 
   def post(self):
@@ -416,7 +416,7 @@ class DownloadProject(PlaygroundHandler):
   """Handler for downloading project source code."""
 
   def PerformAccessCheck(self):
-    if not HasProjectReadAccess(self.request.environ):
+    if not shared.HasProjectReadAccess(self.request.environ):
       Abort(httplib.UNAUTHORIZED, 'no project read access')
 
   def get(self):
@@ -440,7 +440,7 @@ class TouchProject(PlaygroundHandler):
   """Handler for updating the project last access timestamp."""
 
   def PerformAccessCheck(self):
-    if not HasProjectWriteAccess(environ):
+    if not shared.HasProjectWriteAccess(self.request.environ):
       Abort(httplib.UNAUTHORIZED, 'no project write access')
 
   def post(self):

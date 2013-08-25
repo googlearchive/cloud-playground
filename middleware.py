@@ -264,7 +264,7 @@ class MimicControlAccessFilter(object):
         if not shared.HasProjectReadAccess(environ):
           Abort(httplib.UNAUTHORIZED, 'no project read access to mimic control')
       else:
-        if not HasProjectWriteAccess(environ):
+        if not shared.HasProjectWriteAccess(environ):
           Abort(httplib.UNAUTHORIZED,
                 'no project write access to mimic control')
     return self.app(environ, start_response)
