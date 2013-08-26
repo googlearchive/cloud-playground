@@ -11,6 +11,10 @@ A:hover {
   cursor: pointer;
 }
 
+IFRAME {
+  display: block;
+}
+
 .context-menu {
   position: absolute;
   margin-left: -2em;
@@ -423,4 +427,18 @@ BUTTON.admin > I[class*=" icon-"] {
   }
   .ae-logs-severity-CRITICAL {
     background-color: #f22;
+  }
+
+.pg-resizer {
+  cursor: move;
+  background-color: #eee;
+  border-top: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+  padding: 1px 0 2px;
+  margin: 0px 0 20px;
+}
+  .pg-resizer:hover {
+    background-color: #ddd;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
   }

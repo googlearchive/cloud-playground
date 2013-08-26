@@ -53,13 +53,7 @@ angular.module('playgroundApp.directives', [])
     var downY, isDown;
     var containerElem = WrappedElementById(attr.pgResizer);
 
-    element.css({
-      cursor: 'move',
-      borderTop: '4px solid #fff',
-      borderBottom: '4px solid #fff',
-      backgroundColor: '#eee',
-      padding: '2px',
-    });
+    element.addClass('pg-resizer');
     if (getHeight(attr.pgResizer)) {
       setElemHeight(containerElem, getHeight(attr.pgResizer));
     }
