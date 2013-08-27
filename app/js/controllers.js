@@ -624,11 +624,18 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   // TODO: test
   $window.addEventListener('message', function(evt) {
-    var entry = evt.data['log_entry'];
-    // $sce helps defend against hostile input
-    $scope.logs.push(entry);
-    $scope.$apply();
-    return true;
+    if (!evt || !evt.data) {
+      return;
+    }
+    var msg;
+    if (msg = evt.data['socket.onopen']) {
+      $scope.run();
+    } else if (msg = evt.data['socket.onmessage']) {
+      var log_entry = JSON.parse(msg.data);
+      // $sce helps defend against hostile input
+      $scope.logs.push(log_entry);
+      $scope.$apply();
+    }
   });
 
   // TODO: test
