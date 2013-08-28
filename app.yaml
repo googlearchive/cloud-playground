@@ -16,7 +16,7 @@ includes:
 - playground.yaml
 - iframed.yaml
 - tasks.yaml
-- mimic.yaml
+- intercept.yaml
 
 # https://developers.google.com/appengine/docs/python/config/appconfig#Builtin_Handlers
 builtins:
