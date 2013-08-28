@@ -186,7 +186,6 @@ class ProjectFilter(object):
   """WSGI middleware which determines the current project.
 
   Adds the following keys to the environ:
-  - environ['playground.project_id'] contains the current project
   - environ['playground.project'] contains the current project
   """
 
@@ -195,7 +194,7 @@ class ProjectFilter(object):
 
   def __call__(self, environ, start_response):
     project_id = mimic.GetProjectId(environ, False)
-    if project_id:
+    if project_id and shared.ThisIsPlaygroundApp():
       project = model.GetProject(project_id)
       assert project, 'project_id {} not found in datastore'.format(project_id)
       environ['playground.project'] = project
