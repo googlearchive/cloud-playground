@@ -20,6 +20,7 @@ class PlaygroundError(Exception):
 
 
 def Abort(status_code, message):
+  logging.debug('Abort {} {}'.format(status_code, message))
   raise PlaygroundError(status_code, message)
 
 
