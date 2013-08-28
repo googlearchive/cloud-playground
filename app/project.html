@@ -55,7 +55,7 @@
     <hr ng-hide="iframed" pg-resizer="output-iframe">
   </div>
 
-  <div>
+  <div ng-hide="iframed">
     <div ng-show="logs.length">
       <a ng-click="clear_logs()" ng-show="logs.length" class="btn pull-right">clear logs</a>
       <h4>Log output</h4>
