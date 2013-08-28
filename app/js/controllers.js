@@ -275,6 +275,7 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
       // TODO: make these assignments work
       //$scope.projects = user_projects;
       //$scope.template_projects = template_projects;
+      $scope.set_loaded();
       deferred.resolve();
       return deferred.promise;
     }
