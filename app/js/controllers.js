@@ -392,7 +392,8 @@ function OAuth2AdminController($scope, $log, dialog, key, url, client_id,
 
 function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
                            $dialog, $location, $log, DoSerial, DomElementById,
-                           WrappedElementById, Backoff, ConfirmDialog) {
+                           WrappedElementById, Backoff, ConfirmDialog,
+                           $timeout) {
 
   // keep in sync with appengine_config.py
   var MIMIC_PROJECT_ID_QUERY_PARAM = '_mimic_project';
@@ -629,7 +630,8 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     }
     var msg;
     if (msg = evt.data['socket.onopen']) {
-      $scope.run();
+      // https://code.google.com/p/googleappengine/issues/detail?id=7571
+      $timeout($scope.run, 1000);
     } else if (msg = evt.data['socket.onmessage']) {
       var log_entry = JSON.parse(msg.data);
       // $sce helps defend against hostile input
