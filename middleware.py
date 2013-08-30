@@ -9,6 +9,7 @@ from webapp2_extras import securecookie
 from webapp2_extras import security
 from webapp2_extras import sessions
 
+import appids
 import error
 from error import *
 from mimic.__mimic import common
@@ -278,7 +279,7 @@ class MimicControlAccessFilter(object):
               'mimic execution playground is not available in this app id')
 
   def __call__(self, environ, start_response):
-    if settings.TWO_COLLABORATING_APP_IDS:
+    if appids.TWO_COLLABORATING_APP_IDS:
       self._AssertCollaboratingAppIdAccessCheck(environ)
 
     if environ['PATH_INFO'] in common.CONTROL_PATHS_REQUIRING_TREE:

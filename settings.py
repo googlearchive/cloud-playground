@@ -70,21 +70,6 @@ WSGI_CONFIG = {
 # Extensions to exclude when creating template projects
 SKIP_EXTENSIONS = ('swp', 'pyc', 'svn')
 
-# All app ids used by this project
-_APP_IDS = set((appids.PLAYGROUND_APP_ID, appids.MIMIC_APP_ID))
-
-# Our app id
-_APP_ID = os.environ['APPLICATION_ID'].split('~')[-1]
-# support regular 'appspot.com' app ids only
-assert ':' not in _APP_ID, ('{} app ids are unsupported'
-                            .format(_APP_ID.split(':')[0]))
-
-# Automatically detect deployments to other app ids
-if _APP_ID not in _APP_IDS:
-  appids.PLAYGROUND_APP_ID = _APP_ID
-  appids.MIMIC_APP_ID = _APP_ID
-TWO_COLLABORATING_APP_IDS = appids.PLAYGROUND_APP_ID != appids.MIMIC_APP_ID
-
 if _DEV_MODE:
   PLAYGROUND_HOSTS = ('localhost:8080', '127.0.0.1:8080',
                       # port 7070 for karma e2e test
