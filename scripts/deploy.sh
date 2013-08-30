@@ -13,8 +13,11 @@ echo
 echo -e "Hit [ENTER] to continue: \c"
 read
 
-$(dirname $0)/sdkapi.sh
-$(dirname $0)/api-python-client.sh
+SCRIPTS_DIR=$( dirname $0 )
+ROOT_DIR=$( dirname $SCRIPTS_DIR )
+
+$SCRIPTS_DIR/sdkapi.sh
+$SCRIPTS_DIR/api-python-client.sh
 
 APPCFG=$(which appcfg.py) \
   || (echo "ERROR: appcfg.py must be in your PATH"; exit 1)
@@ -36,6 +39,28 @@ else
   SDK_HOME=$BIN_DIR
 fi
 
+function get_app_id() {
+  local app_id
+  app_id=$( cat $ROOT_DIR/app.yaml | egrep '^application:' | sed 's/application:\s*\([0-9a-z][-0-9a-z]*[0-9a-z]\).*/\1/' )
+  while [ $# -gt 0 ]
+  do
+    if [ "$1" == "-A" ]
+    then
+      shift
+      app_id=$1
+    elif [ "${1/=*/}" == "--application" ]
+    then
+      app_id=${1/--application=/}
+    fi
+    shift
+  done
+  echo $app_id
+}
+
+APP_ID=$(get_app_id $*)
+echo "Using app id: $APP_ID"
+echo
+
 function deploy() {
   echo -e "\n*** Rolling back any pending updates (just in case) ***\n"
   appcfg.py --oauth2 $* rollback .
@@ -48,13 +73,9 @@ function deploy() {
 }
 
 
-if [ $( echo "$*" | egrep -- '-A'\|'--application=' >/dev/null; echo $? ) == 0 ]
-then
-  deploy $*
-else
-  appids=$(python -c 'import appids; appids.PrintAppIds()')
-  for appid in $appids
-  do
-    deploy -A $appid $*
-  done
-fi
+APP_IDS=$(APPLICATION_ID=$APP_ID python -c 'import appids; appids.PrintAppIds()')
+echo "Using app ids: $APP_IDS"
+for appid in $APP_IDS
+do
+  deploy $* -A $appid
+done
