@@ -1,4 +1,4 @@
-application: try-appengine
+application: fredsa-bliss
 version: playground
 runtime: python27
 api_version: 1
