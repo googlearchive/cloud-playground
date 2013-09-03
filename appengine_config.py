@@ -65,3 +65,8 @@ mimic_CORS_ALLOWED_HEADERS = 'Origin, X-XSRF-Token, X-Requested-With, Accept, Co
 # pylint: disable-msg=C6409
 def namespace_manager_default_namespace_for_request():
   return mimic.GetNamespace()
+
+#def webapp_add_wsgi_middleware(app):
+#  from google.appengine.ext.appstats import recording
+#  app = recording.appstats_wsgi_middleware(app)
+#  return app
