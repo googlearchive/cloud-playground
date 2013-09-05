@@ -38,7 +38,7 @@ handlers:
 
 # script handler for everything else / user code
 - url: /.*
-  script: intercept.app
+  script: intercept.user_app
   # This script handler must either not require login, or require admin login
   # (via 'login: admin'). Do not specify 'login: required' since offline
   # requests (Cron, Task Queue, etc.) will fail with this error:
