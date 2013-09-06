@@ -146,7 +146,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
           }
         }
         $location.path('/playground/p/' + encodeURI(project.key));
-        //Gets rid of the template_url query parameter
+        // remove template_url and other query parameters
         $location.search({});
       });
     });
@@ -640,6 +640,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     }
     var msg;
     if (msg = evt.data['socket.onopen']) {
+      // give Channel API opportunity to become fully setup
       // https://code.google.com/p/googleappengine/issues/detail?id=7571
       $timeout($scope.run, 1000);
     } else if (msg = evt.data['socket.onmessage']) {
