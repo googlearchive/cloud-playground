@@ -5,6 +5,7 @@ import random
 
 from mimic.__mimic import common
 
+import datetime
 import secret
 import settings
 import shared
@@ -221,6 +222,9 @@ def _CreateProjectTree(project):
 
 @ndb.transactional(xg=True)
 def CopyProject(user, tp, expiration_seconds):
+  if (expiration_seconds and 
+      expiration_seconds < settings.MIN_EXPIRATION_SECONDS):
+    expiration_seconds = settings.MIN_EXPIRATION_SECONDS
   project = CreateProject(user=user,
                           template_url=tp.template_url,
                           html_url=tp.html_url,
@@ -379,7 +383,58 @@ def CreateProject(user, template_url, html_url, project_name,
   user = user.key.get()
   user.projects.append(prj.key)
   user.put()
+  # call taskqueue to schedule expiration
+  if prj.expiration_seconds:
+    ScheduleExpiration(prj)
   return prj
+
+
+def GetProjectLastModified(project):
+  """Gets the time that the project was last modified.
+
+  Returns a datetime object.
+  """
+  last_modified = project.updated
+  tree = _CreateProjectTree(project)
+  paths = tree.ListDirectory(None)
+  for path in paths:
+    if path.endswith('/'):
+      continue
+    file_mtime = tree.GetFileLastModified(path)
+    if file_mtime > last_modified:
+      last_modified = file_mtime
+  return last_modified
+
+
+def ScheduleExpiration(project):
+  base_url = '/playground/p/{0}/check_expiration'
+  expiration_url = base_url.format(project.key.id())
+  expiration_date = (GetProjectLastModified(project) + 
+                    datetime.timedelta(0, project.expiration_seconds))
+  taskqueue.add(url=expiration_url, 
+                eta=expiration_date)  
+
+
+def CheckExpiration(project):
+  """Expires the project if appropriate.
+
+  Project expires if more than expiration_seconds
+  seconds has elapsed since last modification.  Used
+  in the CheckExpiration request handler.
+  """
+  expiration_seconds = project.expiration_seconds
+  now = datetime.datetime.now()
+  current_expiration_date = (GetProjectLastModified(project) + 
+                            datetime.timedelta(0, expiration_seconds))
+  # Expire the project
+  if now > current_expiration_date:
+    user = GetOrCreateUser(project.owner)
+    tree = _CreateProjectTree(project)
+    project_id = project.key.id()
+    DeleteProject(user, tree, project_id)
+  # Defer expiration
+  else:
+    ScheduleExpiration(project)
 
 
 @ndb.transactional()

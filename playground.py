@@ -98,6 +98,7 @@ class PlaygroundHandler(webapp2.RequestHandler):
         'orderby': project.orderby,
         'writers': project.writers,
         'access_key': project.access_key,
+        'expiration_seconds': project.expiration_seconds,
     }
 
   def _MakeMimicUrl(self, project, path, params={}):
@@ -322,8 +323,8 @@ class CopyProject(PlaygroundHandler):
     tp = self.request.environ['playground.project']
     if not tp or tp.in_progress_task_name:
       Abort(httplib.REQUEST_TIMEOUT, 'Requested template is not yet available. '
-                                     'Please try again in 30  seconds.')
-    expiration_seconds = self.request.get('expiration_seconds', None)
+                                     'Please try again in 30 seconds.')
+    expiration_seconds = self.request.data.get('expiration_seconds') 
     project = model.CopyProject(self.user, tp, expiration_seconds)
     r = self.DictOfProject(project)
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
@@ -486,6 +487,13 @@ class Nuke(PlaygroundHandler):
     self.redirect('/playground')
 
 
+class CheckExpiration(webapp2.RequestHandler):
+  """Checks to see if project should be expired."""
+
+  def post(self):
+    project = self.request.environ.get('playground.project')
+    model.CheckExpiration(project)
+
 app = webapp2.WSGIApplication([
     # config actions
     ('/playground/getconfig', GetConfig),
@@ -517,3 +525,8 @@ app = webapp2.WSGIApplication([
 app = middleware.Session(app, settings.WSGI_CONFIG)
 app = middleware.ProjectFilter(app)
 app = middleware.ErrorHandler(app, debug=settings.DEBUG)
+
+internal_app = webapp2.WSGIApplication([
+    ('/playground/p/.*/check_expiration', CheckExpiration)
+], debug=settings.DEBUG)
+internal_app = middleware.ProjectFilter(internal_app)

@@ -116,6 +116,14 @@ class UrlFetchTree(common.Tree):
       return None
     return len(contents)
 
+  def GetFileLastModified(self, path):
+    resp = self.RemoteGetFile(path)
+    if resp.status_code != httplib.OK:
+      return None
+    date_header = resp.headers['Last-Modified']
+    date = datetime.strptime(date_header, common.RFC_1123_DATE_FORMAT) 
+    return date
+
   def HasFile(self, path):
     # root always exists, even if there are no files in the datastore
     if path == '':  # pylint: disable-msg=C6403

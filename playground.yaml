@@ -26,6 +26,11 @@ handlers:
   secure: always
   mime_type: text/html; charset=utf-8
 
+- url: /playground/p/.*/check_expiration
+  script: playground.internal_app
+  secure: always
+  login: admin
+
 - url: /playground/.*
   script: playground.app
   secure: always
