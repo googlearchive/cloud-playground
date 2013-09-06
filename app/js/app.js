@@ -25,6 +25,7 @@ angular.module('playgroundApp', [
   .when('/playground/p/:project_id/', {
      templateUrl: '/playground/project.html',
      controller: ProjectController,
+     reloadOnSearch: false,
   });
 
   $httpProvider.responseInterceptors.push('playgroundHttpInterceptor');

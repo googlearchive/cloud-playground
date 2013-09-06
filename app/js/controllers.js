@@ -535,6 +535,15 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     $location.hash(path);
   };
 
+  $scope.$on('$routeUpdate', function(evt) {
+    var file = $scope.files[$location.hash()];
+    if (file) {
+      $scope.select_file(file);
+    } else {
+      $scope._select_a_file();
+    }
+  });
+
   $scope._select_a_file = function() {
     var path = $location.hash() || $scope.project.open_files[0];
     var file = $scope.files[path];
@@ -637,8 +646,8 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
       var log_entry = JSON.parse(msg.data);
       // $sce helps defend against hostile input
       $scope.logs.push(log_entry);
-      $scope.$apply();
     }
+    $scope.$apply();
   });
 
   // TODO: test

@@ -49,7 +49,7 @@
       <input ng-model='project.run_url' type='url' class='span8 url-bar' ng-click='select_me($event)'>
       <button ng-click='popout(); run()' class='btn pull-right url-button' title='open in a separate window'><i class="icon-share-alt"></i></button>
     </div>
-    <iframe id="output-iframe" ng-init="run()" ng-hide="requested_popout">
+    <iframe id="output-iframe" ng-hide="requested_popout">
     </iframe>
 
     <hr ng-hide="iframed" pg-resizer="output-iframe">
