@@ -646,6 +646,8 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
       var log_entry = JSON.parse(msg.data);
       // $sce helps defend against hostile input
       $scope.logs.push(log_entry);
+    } else if (msg = evt.data['navigate_to']) {
+      $scope.set_path(msg.path);
     }
     $scope.$apply();
   });
