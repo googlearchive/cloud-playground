@@ -105,9 +105,14 @@ angular.module('ui.directives')
         };
 
         codeMirror.setOption('extraKeys', {
+          'Cmd-Enter': function(cm) {
+            scope.run();
+            scope.$apply();
+          },
           'Ctrl-Enter': function(cm) {
             scope.run();
-          }
+            scope.$apply();
+          },
         });
 
         scope.$watch('file.path', function() {
