@@ -3,37 +3,37 @@ handlers:
   # The version id handler should probably just be split off into its own
   # script. This handler doesn't require user login because client apps will
   # want to know if this is a mimic and its version.
-  script: mimic.app
+  script: mimic.control_app
   secure: always
 
 # allow file retrieval
 - url: /_ah/mimic/file
-  script: intercept.app
+  script: intercept.control_app
   secure: always
 
 # allow file deletion
 - url: /_ah/mimic/delete
-  script: intercept.app
+  script: intercept.control_app
   secure: always
 
 # allow directory listing
 - url: /_ah/mimic/dir
-  script: intercept.app
+  script: intercept.control_app
   secure: always
 
 # allow file rename
 - url: /_ah/mimic/move
-  script: intercept.app
+  script: intercept.control_app
   secure: always
 
 # allow log handler
 - url: /_ah/mimic/log
-  script: intercept.app
+  script: intercept.control_app
   secure: always
 
 # block other mimic control requests
 - url: /_ah/mimic/.*
-  script: deny.app
+  script: deny.control_app
   secure: always
 
 # script handler for everything else / user code
