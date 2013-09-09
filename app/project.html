@@ -46,11 +46,16 @@
     </div>
     <div class='form-inline url-container'>
       <button ng-click='run()' class='btn btn-primary url-button pull-left ' title='Reload'><i class="icon-play icon-white"></i></button>
-      <input ng-model='project.run_url' type='url' class='span8 url-bar' ng-click='select_me($event)'>
+      <input ng-model='iframe_run_url' type='url' class='span8 url-bar' ng-click='select_me($event)'>
       <button ng-click='popout(); run()' class='btn pull-right url-button' title='Open in a separate window'><i class="icon-share-alt"></i></button>
     </div>
-    <iframe id="output-iframe" ng-hide="requested_popout">
-    </iframe>
+    <div id="output-iframe">
+      <div class="running" ng-show="!output_ready">
+        Running...
+      </div>
+      <iframe ng-hide="requested_popout" ng-src="{{iframe_run_url}}" pg-load="output_loaded()" pg-visible="output_ready">
+      </iframe>
+    </div>
 
     <hr ng-hide="iframed" pg-resizer="output-iframe">
   </div>

@@ -799,11 +799,18 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
         $scope.output_window = window.open($scope.project.run_url,
                                            $scope.project.key);
       } else {
-        var iframe = WrappedElementById('output-iframe');
-        iframe.attr('src', 'about:blank');
-        iframe.attr('src', $scope.project.run_url);
+        $scope.iframe_run_url = $sce.trustAsResourceUrl('about:blank');
+        $timeout(function() {
+          $scope.output_ready = false;
+          var trusted_url = $sce.trustAsResourceUrl($scope.project.run_url);
+          $scope.iframe_run_url = trusted_url;
+        });
       }
     });
+  };
+
+  $scope.output_loaded = function() {
+    $scope.output_ready = true;
   };
 
   $scope.reset_project = function() {
