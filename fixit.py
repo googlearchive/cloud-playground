@@ -47,7 +47,7 @@ class ProjectHandler(webapp2.RequestHandler):
       cursor = Cursor(urlsafe=cursor)
     projects, next_cursor, more = query.fetch_page(_CURSOR_PAGE_SIZE,
                                                    start_cursor=cursor)
-    if next_cursor:
+    if more and next_cursor:
       taskqueue.add(queue_name='fixit',
                     url='/playground/fix/project',
                     params={'cursor': next_cursor.urlsafe()})
