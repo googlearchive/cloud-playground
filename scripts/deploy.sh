@@ -74,7 +74,7 @@ function deploy() {
 
 
 APP_IDS=$(APPLICATION_ID=$APP_ID python -c 'import appids; appids.PrintAppIds()')
-echo "Using app ids: $APP_IDS"
+echo -e "Using app ids:\n$APP_IDS"
 for appid in $APP_IDS
 do
   deploy $* -A $appid
