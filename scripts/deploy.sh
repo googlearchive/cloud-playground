@@ -16,7 +16,6 @@ read
 SCRIPTS_DIR=$( dirname $0 )
 ROOT_DIR=$( dirname $SCRIPTS_DIR )
 
-$SCRIPTS_DIR/sdkapi.sh
 $SCRIPTS_DIR/api-python-client.sh
 
 APPCFG=$(which appcfg.py) \

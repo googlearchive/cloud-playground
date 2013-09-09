@@ -5,9 +5,6 @@
 /.project
 /.pydevproject
 
-# from scripts/sdkapi.sh
-/sdkapi/
-
 # Testacular
 /test_out/
 /.chrome-test/
