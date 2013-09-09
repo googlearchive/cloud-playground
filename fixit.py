@@ -18,7 +18,7 @@ _CURSOR_PAGE_SIZE = 200
 
 
 def Begin():
-  taskqueue.add(url='/playground/fix/project')
+  taskqueue.add(queue_name='fixit', url='/playground/fix/project')
 
 
 def FixProject(project):
@@ -48,7 +48,8 @@ class ProjectHandler(webapp2.RequestHandler):
     projects, next_cursor, more = query.fetch_page(_CURSOR_PAGE_SIZE,
                                                    start_cursor=cursor)
     if next_cursor:
-      taskqueue.add(url='/playground/fix/project',
+      taskqueue.add(queue_name='fixit',
+                    url='/playground/fix/project',
                     params={'cursor': next_cursor.urlsafe()})
     for project in projects:
       FixProject(project)

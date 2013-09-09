@@ -411,7 +411,8 @@ def ScheduleExpiration(project):
   expiration_url = base_url.format(project.key.id())
   expiration_date = (GetProjectLastModified(project) + 
                     datetime.timedelta(0, project.expiration_seconds))
-  taskqueue.add(url=expiration_url, 
+  taskqueue.add(queue_name='expiration',
+                url=expiration_url,
                 eta=expiration_date)  
 
 
