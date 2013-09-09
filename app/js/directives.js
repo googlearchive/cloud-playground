@@ -27,6 +27,17 @@ angular.module('playgroundApp.directives', [])
   };
 })
 
+// TODO: test
+.directive('pgLoad', function() {
+  return function(scope, iElement, iAttrs, controller) {
+    scope.$watch(iAttrs.pgVisible, function(value) {
+      iElement.bind('load', function(evt) {
+        scope.$apply(iAttrs.pgLoad);
+      });
+    });
+  };
+})
+
 // TODO: DETERMINE how must of this we should test
 .directive('pgResizer', function(WrappedElementById) {
 
