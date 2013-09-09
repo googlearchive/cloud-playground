@@ -800,6 +800,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
                                            $scope.project.key);
       } else {
         var iframe = WrappedElementById('output-iframe');
+        iframe.attr('src', 'about:blank');
         iframe.attr('src', $scope.project.run_url);
       }
     });
