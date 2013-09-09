@@ -41,7 +41,7 @@ fi
 
 function get_app_id() {
   local app_id
-  app_id=$( cat $ROOT_DIR/app.yaml | egrep '^application:' | sed 's/application:\s*\([0-9a-z][-0-9a-z]*[0-9a-z]\).*/\1/' )
+  app_id=$( cat $ROOT_DIR/app.yaml | egrep '^application:' | sed 's/application: *\([0-9a-z][-0-9a-z]*[0-9a-z]\).*/\1/' )
   while [ $# -gt 0 ]
   do
     if [ "$1" == "-A" ]
