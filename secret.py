@@ -25,7 +25,7 @@ def GetSecret(key_name, entropy):
                                       namespace=settings.PLAYGROUND_NAMESPACE)
   # fall back to slower get_or_insert
   if not entity:
-    candidate_secret_key = GenerateRandomString()
+    candidate_secret_key = GenerateRandomString(entropy)
     entity = PlaygroundSecret.get_or_insert(
         key_name, secret_key=candidate_secret_key,
         namespace=settings.PLAYGROUND_NAMESPACE)
