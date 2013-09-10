@@ -101,7 +101,7 @@ class PlaygroundHandler(webapp2.RequestHandler):
 
   def _MakeMimicUrl(self, project, path, params=None):
     """Build a mimic url."""
-    if parms is None:
+    if params is None:
       params = {}
     project_id = urllib.quote_plus(str(project.key.id()))
     path = path.lstrip('/')
