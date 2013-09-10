@@ -119,7 +119,7 @@ class UrlFetchTree(common.Tree):
     if resp.status_code != httplib.OK:
       return None
     date_header = resp.headers['Last-Modified']
-    date = datetime.strptime(date_header, common.RFC_1123_DATE_FORMAT)
+    date = datetime.datetime.strptime(date_header, common.RFC_1123_DATE_FORMAT)
     return date
 
   def HasFile(self, path):
