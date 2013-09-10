@@ -1,6 +1,6 @@
 """Playground middleware."""
 
-import cgi
+import httplib
 import logging
 import sys
 
@@ -11,13 +11,12 @@ from webapp2_extras import sessions
 
 import appids
 import error
-from error import *
+from error import Abort
 from mimic.__mimic import common
 from mimic.__mimic import mimic
 import model
 import settings
 import shared
-import traceback
 
 from google.appengine.api import users
 
@@ -57,6 +56,7 @@ def AdoptAnonymousProjects(dest_user_key, source_user_key):
 
 
 def GetOrMakeSession(request):
+  """Get a new or current session."""
   session_store = sessions.get_store(request=request)
   session = session_store.get_session()
 
@@ -85,16 +85,16 @@ def _PerformCsrfRequestValidation(session, environ):
   session_xsrf = session['xsrf']
   client_xsrf = environ.get(_XSRF_TOKEN_HEADER)
   if not client_xsrf:
-    Abort(httplib.UNAUTHORIZED, 'Missing client XSRF token. '
-                                'Clear your cookies and refresh the page.')
+    Abort(httplib.UNAUTHORIZED,
+          'Missing client XSRF token. Clear your cookies and refresh the page.')
   if client_xsrf != session_xsrf:
     # do not log tokens in production
     if common.IsDevMode():
       logging.error('Client XSRF token={0!r}, session XSRF token={1!r}'
                     .format(client_xsrf, session_xsrf))
-    Abort(httplib.UNAUTHORIZED, 'Client XSRF token does not match session '
-                                'XSRF token. Clear your cookies and refresh '
-                                'the page.')
+    Abort(httplib.UNAUTHORIZED,
+          'Client XSRF token does not match session XSRF token.'
+          ' Clear your cookies and refresh the page.')
 
 
 class Redirector(object):
@@ -149,6 +149,7 @@ class Session(object):
   def __call__(self, environ, start_response):
     additional_headers = []
 
+    # pylint:disable-msg=invalid-name
     def custom_start_response(status, headers, exc_info=None):
       headers.extend(additional_headers)
       # keep session cookies private
@@ -219,7 +220,9 @@ class AccessKeyCookieFilter(object):
     if access_key:
       environ['mimic.access_key'] = access_key
 
+    # pylint:disable-msg=invalid-name
     def custom_start_response(status, headers, exc_info=None):
+      """Custom WSGI start_response which adds cookie header."""
       if access_key:
         # keep session cookies private
         headers.extend([
@@ -305,7 +308,7 @@ class ErrorHandler(object):
       logging.info('\n' * 1)
     try:
       return self.app(environ, start_response)
-    except Exception, e:
+    except Exception, e:  # pylint:disable-msg=broad-except
       status, headers, body = error.MakeErrorResponse(e, self.debug)
       start_response(status, headers, sys.exc_info())
       return body

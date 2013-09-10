@@ -5,10 +5,8 @@ import logging
 import os
 
 from mimic.__mimic import common
-from mimic.__mimic import mimic
 
 import appids
-import error
 from error import Abort
 import settings
 
@@ -21,21 +19,21 @@ from google.appengine.api import users
 _HTTP_READ_METHODS = ('GET', 'OPTIONS')
 
 
-def e(msg, *args, **kwargs):
+def e(msg, *args, **kwargs):  # pylint:disable-msg=invalid-name
   if isinstance(msg, basestring):
     if args or kwargs:
       msg = msg.format(*args, **kwargs)
   raise RuntimeError(repr(msg))
 
 
-def i(msg, *args, **kwargs):
+def i(msg, *args, **kwargs):  # pylint:disable-msg=invalid-name
   if isinstance(msg, basestring):
     if args or kwargs:
       msg = msg.format(*args, **kwargs)
   logging.info('@@@@@ {0}'.format(repr(msg)))
 
 
-def w(msg, *args, **kwargs):
+def w(msg, *args, **kwargs):  # pylint:disable-msg=invalid-name
   if isinstance(msg, basestring):
     if args or kwargs:
       msg = msg.format(*args, **kwargs)

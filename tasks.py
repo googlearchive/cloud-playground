@@ -10,7 +10,7 @@ from template import templates
 
 class PopulateRepoCollection(webapp2.RequestHandler):
 
-  def post(self):
+  def post(self):  # pylint:disable-msg=invalid-name
     repo_collection_url = self.request.get('repo_collection_url')
     shared.i('task {} populating repo collection {}'
              .format(shared.GetCurrentTaskName(), repo_collection_url))
@@ -21,7 +21,7 @@ class PopulateRepoCollection(webapp2.RequestHandler):
 
 class PopulateRepo(webapp2.RequestHandler):
 
-  def post(self):
+  def post(self):  # pylint:disable-msg=invalid-name
     repo_url = self.request.get('repo_url')
     shared.i('task {} populating repo {}'.format(shared.GetCurrentTaskName(),
                                                  repo_url))

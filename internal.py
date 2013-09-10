@@ -9,9 +9,9 @@ import settings
 
 
 class Warmup(webapp2.RequestHandler):
-  """Handler for warmup/start requests"""
+  """Handler for warmup/start requests."""
 
-  def get(self):
+  def get(self):  # pylint:disable-msg=invalid-name
     templates.GetRepoCollections()
 
 

@@ -16,7 +16,8 @@ class PlaygroundError(Exception):
     self.status_code = status_code
 
   def __repr__(self):
-    return '{}<{} {}>'.format(__class__, self.status_code, self.message).encode('unicode-escape')
+    text = '{}<{} {}>'.format(self.__class__, self.status_code, self.message)
+    return text.encode('unicode-escape')
 
 
 def Abort(status_code, message):

@@ -65,10 +65,8 @@ class CodesiteRepoCollection(collection.RepoCollection):
       fetched = fetcher.Fetcher(app_yaml_url, follow_redirects=True)
       fetches.append((c, project_url, app_yaml_url, fetched))
 
-    repos = []
     for c, project_url, app_yaml_url, fetched in fetches:
       try:
-        content = fetched.content
         shared.i('found app.yaml: {}'.format(app_yaml_url))
         name = c.rstrip('/') or project_url
         description = 'Sample code from {0}'.format(project_url)
@@ -86,7 +84,7 @@ class CodesiteRepoCollection(collection.RepoCollection):
   def CreateProjectTreeFromRepo(self, tree, repo):
     repo_url = repo.key.id()
 
-    def add_files(dirname):
+    def AddFiles(dirname):
       url = os.path.join(repo_url, dirname)
       fetched = fetcher.Fetcher(url, follow_redirects=True)
       page = fetched.content
@@ -99,6 +97,6 @@ class CodesiteRepoCollection(collection.RepoCollection):
         if common.GetExtension(path) in settings.SKIP_EXTENSIONS:
           continue
         relpath = os.path.join(dirname, path)
-        add_files(relpath)
+        AddFiles(relpath)
 
-    add_files('')
+    AddFiles('')

@@ -3,7 +3,6 @@
 import cgi
 import httplib
 import json
-import logging
 import os
 import re
 import StringIO
@@ -11,11 +10,10 @@ import urllib
 import zipfile
 
 import webapp2
-from webapp2_extras import sessions
 
 import appids
 import error
-from error import *
+from error import Abort
 import fixit
 import middleware
 from mimic.__mimic import common
@@ -25,7 +23,6 @@ import settings
 import shared
 from template import templates
 
-from google.appengine.api import namespace_manager
 from google.appengine.api import users
 
 
@@ -43,7 +40,7 @@ _DASH_DOT_DASH = '-dot-'
 _VALID_PROJECT_RE = re.compile('^[a-z0-9-]{0,50}$')
 
 
-def tojson(r):
+def tojson(r):  # pylint:disable-msg=invalid-name
   """Converts a python object to JSON."""
   return _JSON_ENCODER.encode(r)
 
@@ -52,22 +49,23 @@ class PlaygroundHandler(webapp2.RequestHandler):
   """Convenience request handler with playground specific functionality."""
 
   @webapp2.cached_property
-  def project_id(self):
+  def project_id(self):  # pylint:disable-msg=invalid-name
     return mimic.GetProjectId(self.request.environ, False)
 
   @webapp2.cached_property
-  def project(self):
+  def project(self):  # pylint:disable-msg=invalid-name
     return self.request.environ['playground.project']
 
   @webapp2.cached_property
-  def user(self):
+  def user(self):  # pylint:disable-msg=invalid-name
     return self.request.environ['playground.user']
 
   @webapp2.cached_property
-  def tree(self):
+  def tree(self):  # pylint:disable-msg=invalid-name
     # TODO: instantiate tree elsewhere
     return common.config.CREATE_TREE_FUNC(str(self.project.key.id()))
 
+  # pylint:disable-msg=invalid-name
   def handle_exception(self, exception, debug_mode):
     """Called if this handler throws an exception during execution.
 
@@ -124,7 +122,7 @@ class PlaygroundHandler(webapp2.RequestHandler):
         settings.ACCESS_KEY_SET_COOKIE_PARAM_NAME: project.access_key,
     })
     if params:
-      url = "{}?{}".format(url, urllib.urlencode(params))
+      url = '{}?{}'.format(url, urllib.urlencode(params))
     return url
 
   def PerformAccessCheck(self):
@@ -137,8 +135,7 @@ class PlaygroundHandler(webapp2.RequestHandler):
     """
     raise NotImplementedError()
 
-
-  def dispatch(self):
+  def dispatch(self):  # pylint:disable-msg=invalid-name
     """WSGI request dispatch with automatic JSON parsing."""
     try:
       if not shared.ThisIsPlaygroundApp():
@@ -173,7 +170,7 @@ class DatastoreRedirect(RedirectHandler):
   def PerformAccessCheck(self):
     pass
 
-  def get(self, namespace):
+  def get(self, namespace):  # pylint:disable-msg=invalid-name
     if _DEV_APPSERVER:
       url = '//localhost:8000/datastore?namespace={0}'.format(namespace)
     else:
@@ -189,7 +186,7 @@ class MemcacheRedirect(RedirectHandler):
   def PerformAccessCheck(self):
     pass
 
-  def get(self, namespace):
+  def get(self, namespace):  # pylint:disable-msg=invalid-name
     if _DEV_APPSERVER:
       url = '//localhost:8000/memcache?namespace={0}'.format(namespace)
     else:
@@ -205,7 +202,7 @@ class GetConfig(PlaygroundHandler):
   def PerformAccessCheck(self):
     pass
 
-  def get(self):
+  def get(self):  # pylint:disable-msg=invalid-name
     """Handles HTTP GET requests."""
     r = {
         'PLAYGROUND_USER_CONTENT_HOST': settings.PLAYGROUND_USER_CONTENT_HOST,
@@ -226,7 +223,7 @@ class OAuth2Admin(PlaygroundHandler):
   def PerformAccessCheck(self):
     shared.AssertIsAdmin()
 
-  def post(self):
+  def post(self):  # pylint:disable-msg=invalid-name
     """Handles HTTP POST requests."""
     if not users.is_current_user_admin():
       self.response.set_status(httplib.UNAUTHORIZED)
@@ -257,7 +254,7 @@ class RetrieveProject(PlaygroundHandler):
     if not shared.HasProjectReadAccess(self.request.environ):
       Abort(httplib.UNAUTHORIZED, 'no project read access')
 
-  def get(self):
+  def get(self):  # pylint:disable-msg=invalid-name
     r = self.DictOfProject(self.project)
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
@@ -269,7 +266,7 @@ class GetProjects(PlaygroundHandler):
   def PerformAccessCheck(self):
     pass
 
-  def get(self):
+  def get(self):  # pylint:disable-msg=invalid-name
     r = [self.DictOfProject(p) for p in model.GetProjects(self.user)]
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
@@ -281,7 +278,7 @@ class GetTemplateProjects(PlaygroundHandler):
   def PerformAccessCheck(self):
     pass
 
-  def get(self):
+  def get(self):  # pylint:disable-msg=invalid-name
     by_project_name = lambda p: p.project_name
     r = [self.DictOfProject(p)
          for p in sorted(model.GetTemplateProjects(), key=by_project_name)]
@@ -295,7 +292,7 @@ class Login(PlaygroundHandler):
   def PerformAccessCheck(self):
     pass
 
-  def get(self):
+  def get(self):  # pylint:disable-msg=invalid-name
     """Handles HTTP GET requests."""
     self.redirect(users.create_login_url('/playground'))
 
@@ -306,7 +303,7 @@ class Logout(PlaygroundHandler):
   def PerformAccessCheck(self):
     pass
 
-  def get(self):
+  def get(self):  # pylint:disable-msg=invalid-name
     """Handles HTTP GET requests."""
     self.redirect(users.create_logout_url('/playground'))
 
@@ -318,13 +315,14 @@ class CopyProject(PlaygroundHandler):
     if not shared.HasProjectReadAccess(self.request.environ):
       Abort(httplib.UNAUTHORIZED, 'no project read access')
 
-  def post(self):
+  def post(self):  # pylint:disable-msg=invalid-name
     """Handles HTTP POST requests."""
     tp = self.request.environ['playground.project']
     if not tp or tp.in_progress_task_name:
-      Abort(httplib.REQUEST_TIMEOUT, 'Requested template is not yet available. '
-                                     'Please try again in 30 seconds.')
-    expiration_seconds = self.request.data.get('expiration_seconds') 
+      Abort(httplib.REQUEST_TIMEOUT,
+            'Requested template is not yet available. '
+            'Please try again in 30 seconds.')
+    expiration_seconds = self.request.data.get('expiration_seconds')
     project = model.CopyProject(self.user, tp, expiration_seconds)
     r = self.DictOfProject(project)
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
@@ -337,7 +335,7 @@ class RecreateTemplateProject(PlaygroundHandler):
   def PerformAccessCheck(self):
     shared.AssertIsAdmin()
 
-  def post(self):
+  def post(self):  # pylint:disable-msg=invalid-name
     """Handles HTTP POST requests."""
     if not users.is_current_user_admin():
       self.response.set_status(httplib.UNAUTHORIZED)
@@ -361,7 +359,7 @@ class CreateTemplateProjectByUrl(PlaygroundHandler):
   def PerformAccessCheck(self):
     pass
 
-  def post(self):
+  def post(self):  # pylint:disable-msg=invalid-name
     """Handles HTTP POST requests."""
     repo_url = self.request.data.get('repo_url')
     if not repo_url:
@@ -374,8 +372,9 @@ class CreateTemplateProjectByUrl(PlaygroundHandler):
                                    open_files=[])
     project = repo.project.get()
     if not project or project.in_progress_task_name:
-      Abort(httplib.REQUEST_TIMEOUT, 'Requested template is not yet available. '
-                                     'Please try again in 30  seconds.')
+      Abort(httplib.REQUEST_TIMEOUT,
+            'Requested template is not yet available. '
+            'Please try again in 30  seconds.')
     r = self.DictOfProject(project)
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
@@ -388,7 +387,7 @@ class DeleteProject(PlaygroundHandler):
     if not shared.HasProjectWriteAccess(self.request.environ):
       Abort(httplib.UNAUTHORIZED, 'no project write access')
 
-  def post(self):
+  def post(self):  # pylint:disable-msg=invalid-name
     model.DeleteProject(self.user, tree=self.tree, project_id=self.project_id)
 
 
@@ -399,7 +398,7 @@ class RenameProject(PlaygroundHandler):
     if not shared.HasProjectWriteAccess(self.request.environ):
       Abort(httplib.UNAUTHORIZED, 'no project write access')
 
-  def post(self):
+  def post(self):  # pylint:disable-msg=invalid-name
     data = json.loads(self.request.body)
     newname = data.get('newname')
     assert newname
@@ -416,7 +415,7 @@ class ResetProject(PlaygroundHandler):
     if not shared.HasProjectWriteAccess(self.request.environ):
       Abort(httplib.UNAUTHORIZED, 'no project write access')
 
-  def post(self):
+  def post(self):  # pylint:disable-msg=invalid-name
     project = model.ResetProject(self.project_id, self.tree)
     r = self.DictOfProject(project)
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
@@ -430,9 +429,9 @@ class DownloadProject(PlaygroundHandler):
     if not shared.HasProjectReadAccess(self.request.environ):
       Abort(httplib.UNAUTHORIZED, 'no project read access')
 
-  def get(self):
+  def get(self):  # pylint:disable-msg=invalid-name
     """Handles HTTP GET requests."""
-    project_data = model.DownloadProject(self.project_id, self.tree)
+    project_data = model.GetProjectData(self.project_id, self.tree)
     buf = StringIO.StringIO()
     zf = zipfile.ZipFile(buf, mode='w', compression=zipfile.ZIP_DEFLATED)
     for project_file in project_data['files']:
@@ -454,7 +453,7 @@ class TouchProject(PlaygroundHandler):
     if not shared.HasProjectWriteAccess(self.request.environ):
       Abort(httplib.UNAUTHORIZED, 'no project write access')
 
-  def post(self):
+  def post(self):  # pylint:disable-msg=invalid-name
     project = model.TouchProject(self.project_id)
     r = self.DictOfProject(project)
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
@@ -467,7 +466,7 @@ class Fixit(PlaygroundHandler):
   def PerformAccessCheck(self):
     shared.AssertIsAdmin()
 
-  def get(self):
+  def get(self):  # pylint:disable-msg=invalid-name
     fixit.Begin()
     self.response.write('Fixit begun')
 
@@ -478,7 +477,7 @@ class Nuke(PlaygroundHandler):
   def PerformAccessCheck(self):
     shared.AssertIsAdmin()
 
-  def post(self):
+  def post(self):  # pylint:disable-msg=invalid-name
     if not users.is_current_user_admin():
       shared.e('You must be an admin for this app')
     model.DeleteReposAndTemplateProjects()
@@ -490,7 +489,7 @@ class Nuke(PlaygroundHandler):
 class CheckExpiration(webapp2.RequestHandler):
   """Checks to see if project should be expired."""
 
-  def post(self):
+  def post(self):  # pylint:disable-msg=invalid-name
     project = self.request.environ.get('playground.project')
     model.CheckExpiration(project)
 

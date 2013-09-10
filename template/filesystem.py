@@ -12,8 +12,6 @@ import shared
 
 from . import collection
 
-from google.appengine.ext import ndb
-
 
 _PLAYGROUND_SETTINGS_FILENAME = '.playground'
 
@@ -30,7 +28,6 @@ class FilesystemRepoCollection(collection.RepoCollection):
 
   def PopulateRepos(self):
     shared.EnsureRunningInTask()  # gives us automatic retries
-    repos = []
     template_dir = self.repo_collection.key.id()  # repo_collection_url
     for dirname in os.listdir(template_dir):
       # skip github submodule templates in production
@@ -51,14 +48,14 @@ class FilesystemRepoCollection(collection.RepoCollection):
         open_files = []
       url = os.path.join(template_dir, dirname)
       html_url = ('https://code.google.com/p/cloud-playground/source/browse/'
-                      '?repo=bliss#git%2F{}'.format(urllib.quote(url)))
+                  '?repo=bliss#git%2F{}'.format(urllib.quote(url)))
       model.CreateRepoAsync(repo_url=url, html_url=html_url, name=name,
                             description=description, open_files=open_files)
 
   def CreateProjectTreeFromRepo(self, tree, repo):
     repo_url = repo.key.id()
 
-    def add_files(dirname):
+    def AddFiles(dirname):
       for path in os.listdir(os.path.join(repo_url, dirname)):
         if path == _PLAYGROUND_SETTINGS_FILENAME:
           continue
@@ -67,7 +64,7 @@ class FilesystemRepoCollection(collection.RepoCollection):
         relpath = os.path.join(dirname, path)
         fullpath = os.path.join(repo_url, dirname, path)
         if os.path.isdir(fullpath):
-          add_files(relpath)
+          AddFiles(relpath)
         else:
           try:
             with open(fullpath, 'rb') as f:
@@ -77,4 +74,4 @@ class FilesystemRepoCollection(collection.RepoCollection):
             # file access may be disallowed due to app.yaml skip_files
             shared.w('skipping {}'.format(relpath))
 
-    add_files('')
+    AddFiles('')

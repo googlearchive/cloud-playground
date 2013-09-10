@@ -10,7 +10,7 @@ handlers:
   upload: favicon\.ico
 
 - url: /.*
-  script: helloworld.app
+  script: helloworld.APP
 
 libraries:
 - name: webapp2

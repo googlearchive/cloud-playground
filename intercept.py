@@ -4,7 +4,6 @@ from mimic import mimic_wsgi
 
 import middleware
 import settings
-import shared
 
 
 control_app = mimic_wsgi.Mimic

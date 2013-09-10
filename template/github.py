@@ -1,13 +1,10 @@
 """Module for accessing github.com projects."""
 
 import base64
-import httplib
 import re
 import sys
 import traceback
 import yaml
-
-from mimic.__mimic import common
 
 import fetcher
 import model
@@ -83,6 +80,8 @@ _PROJECT_URL_SKIP_LIST = [
 #     "default_branch": "master"
 #   }
 # ]
+
+
 class Info(object):
 
   def __init__(self, user, repo=None, branch=None, path=''):
@@ -91,12 +90,12 @@ class Info(object):
     self.branch = branch
     self.path = path
 
-  def repository_url(self):
+  def RepositoryUrl(self):
     return 'https://api.github.com/repos/{owner}/{repo}'.format(**self.__dict__)
 
-  def branches_url(self):
-    if self.branch == None:
-      fetched = FetchAsyncWithAuth(self.repository_url())
+  def BranchesUrl(self):
+    if self.branch is None:
+      fetched = FetchAsyncWithAuth(self.RepositoryUrl())
       data = fetched.json_content
       self.branch = data['master_branch']
     return ('https://api.github.com/repos/{owner}/{repo}/branches/{branch}'
@@ -113,6 +112,11 @@ def GetInfo(html_url):
   - git://github.com/GoogleCloudPlatform/appengine-guestbook-python.git
   - https://github.com/GoogleCloudPlatform/appengine-guestbook-python/tree/part6-staticfiles
   - https://api.github.com/repos/GoogleCloudPlatform/appengine-guestbook-python/branches/part6-staticfiles
+
+  Args:
+    html_url: The url for the human readable HTML page.
+  Returns:
+    The info object.
   """
   matcher = _GITHUB_URL_RE.match(html_url)
   if not matcher:
@@ -184,7 +188,7 @@ class GithubRepoCollection(collection.RepoCollection):
     https://api.github.com/users/GoogleCloudPlatform/repos
 
     Args:
-      page: the JSON response returned by
+      data: the JSON response returned by
             https://api.github.com/users/{user}/repos
 
     Returns:
@@ -194,7 +198,7 @@ class GithubRepoCollection(collection.RepoCollection):
     # - html_url, branches_url, name, description, master_branch, owner.login
     repos = [entry for entry in data
              if self._IsAppEnginePythonRepo(entry['name'])
-                and entry['html_url'] not in _PROJECT_URL_SKIP_LIST]
+             and entry['html_url'] not in _PROJECT_URL_SKIP_LIST]
 
     # fetch master_branch url for each repo
     candidates1 = []
@@ -207,7 +211,7 @@ class GithubRepoCollection(collection.RepoCollection):
 
       info = Info(user=repo['owner']['login'], repo=repo['name'],
                   branch=repo['master_branch'])
-      branches_url = info.branches_url()
+      branches_url = info.BranchesUrl()
       fetched = FetchAsyncWithAuth(branches_url)
       candidates1.append((repo, fetched))
 
@@ -230,7 +234,6 @@ class GithubRepoCollection(collection.RepoCollection):
     for repo, fetched in candidates2:
       data = fetched.json_content
 
-      contains_app_yaml = False
       app_yaml_urls = [
           entry['url'] for entry in data['tree']
           if entry['path'] == 'app.yaml' and entry['type'] == 'blob'
@@ -243,7 +246,6 @@ class GithubRepoCollection(collection.RepoCollection):
       candidates3.append((repo, fetched))
 
     # filter repos whose app.yaml does not contain 'runtime: python27'
-    candidates4 = []
     for repo, fetched in candidates3:
       data = fetched.json_content
       base64_content = data['content']
@@ -259,6 +261,7 @@ class GithubRepoCollection(collection.RepoCollection):
     return repos
 
   def PopulateRepos(self):
+    """Populate repos."""
     shared.EnsureRunningInTask()  # gives us automatic retries
     repo_collection_url = self.repo_collection.key.id()
     info = GetInfo(repo_collection_url)
@@ -273,10 +276,9 @@ class GithubRepoCollection(collection.RepoCollection):
       # fetch fewer when we're not authenticated
       repos = repos[:1]
 
-    repo_entities = []
     for repo in repos:
       name = repo['name']
-      description=repo['description'] or repo['html_url']
+      description = repo['description'] or repo['html_url']
       model.CreateRepoAsync(repo_url=repo['html_url'],
                             html_url=repo['html_url'],
                             name=name, description=description, open_files=[])
@@ -288,7 +290,7 @@ class GithubRepoCollection(collection.RepoCollection):
     info = GetInfo(html_url)
 
     # e.g. https://api.github.com/repos/GoogleCloudPlatform/appengine-guestbook-python/branches/part6-staticfiles
-    branches_url = info.branches_url()
+    branches_url = info.BranchesUrl()
     fetched = FetchAsyncWithAuth(branches_url)
     data = fetched.json_content
 

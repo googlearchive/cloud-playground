@@ -5,6 +5,7 @@ This module is used by:
   scripts/deploy.sh
 """
 
+
 import os
 
 
@@ -15,6 +16,7 @@ _APP_ID_TUPLES = [
     # development environment
     ('fredsa-bliss', 'fredsa-hr', None),
 ]
+
 
 def _GetTupleFor(app_id):
   for app_ids in _APP_ID_TUPLES:

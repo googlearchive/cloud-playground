@@ -80,7 +80,7 @@ def GetResource(url):
     return resource.etag, resource.content
   content = ''
   for resource_chunk in results[1:]:
-    content = content + resource_chunk.content
+    content += resource_chunk.content
   return resource.etag, content
 
 
@@ -217,12 +217,15 @@ def GetTemplateProjects():
   projects = GetProjects(user)
   return projects
 
+
 def _CreateProjectTree(project):
   return common.config.CREATE_TREE_FUNC(str(project.key.id()))
 
+
 @ndb.transactional(xg=True)
 def CopyProject(user, tp, expiration_seconds):
-  if (expiration_seconds and 
+  """Create new a project from a template."""
+  if (expiration_seconds and
       expiration_seconds < settings.MIN_EXPIRATION_SECONDS):
     expiration_seconds = settings.MIN_EXPIRATION_SECONDS
   project = CreateProject(user=user,
@@ -256,7 +259,18 @@ def ResetProject(project_id, project_tree):
   CopyTree(project_tree, template_tree)
   return project
 
-def DownloadProject(project_id, project_tree):
+
+def GetProjectData(project_id, project_tree):
+  """Get project data.
+
+  Used to the playground to provide project downloads.
+
+  Args:
+    project_id: The project id.
+    project_tree: The project tree.
+  Returns:
+    Project data as a dict.
+  """
   project = GetProject(project_id)
   project_name = project.project_name
   paths = project_tree.ListDirectory(None)
@@ -265,8 +279,9 @@ def DownloadProject(project_id, project_tree):
     if os.path.isdir(path):
       continue
     content = project_tree.GetFileContents(path)
-    files.append({"path": path, "content": content})
-  return {"project_name": project_name, "files": files}
+    files.append({'path': path, 'content': content})
+  return {'project_name': project_name, 'files': files}
+
 
 def RenameProject(project_id, project_name):
   project = GetProject(project_id)
@@ -280,7 +295,9 @@ def TouchProject(project_id):
   project.put()
   return project
 
+
 def _UpdateProjectUserKeys(dst_user, src_user):
+  """Transfer project ownership to a new user."""
   projects = GetProjects(src_user)
   dst_user_key = dst_user.key.id()
   src_user_key = src_user.key.id()
@@ -318,6 +335,7 @@ def GetRepoCollection(url):
 
 
 def DeleteReposAndTemplateProjects():
+  """Delete repos and related template projects."""
   user = GetTemplateOwner()
 
   # delete template projects
@@ -392,7 +410,10 @@ def CreateProject(user, template_url, html_url, project_name,
 def GetProjectLastModified(project):
   """Gets the time that the project was last modified.
 
-  Returns a datetime object.
+  Args:
+    project: the playground project
+  Returns:
+    A datetime object.
   """
   last_modified = project.updated
   tree = _CreateProjectTree(project)
@@ -409,11 +430,11 @@ def GetProjectLastModified(project):
 def ScheduleExpiration(project):
   base_url = '/playground/p/{0}/check_expiration'
   expiration_url = base_url.format(project.key.id())
-  expiration_date = (GetProjectLastModified(project) + 
-                    datetime.timedelta(0, project.expiration_seconds))
+  expiration_date = (GetProjectLastModified(project) +
+                     datetime.timedelta(0, project.expiration_seconds))
   taskqueue.add(queue_name='expiration',
                 url=expiration_url,
-                eta=expiration_date)  
+                eta=expiration_date)
 
 
 def CheckExpiration(project):
@@ -422,11 +443,14 @@ def CheckExpiration(project):
   Project expires if more than expiration_seconds
   seconds has elapsed since last modification.  Used
   in the CheckExpiration request handler.
+
+  Args:
+    project: the playground project
   """
   expiration_seconds = project.expiration_seconds
   now = datetime.datetime.now()
-  current_expiration_date = (GetProjectLastModified(project) + 
-                            datetime.timedelta(0, expiration_seconds))
+  current_expiration_date = (GetProjectLastModified(project) +
+                             datetime.timedelta(0, expiration_seconds))
   # Expire the project
   if now > current_expiration_date:
     user = GetOrCreateUser(project.owner)

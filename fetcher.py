@@ -9,6 +9,7 @@ import shared
 from google.appengine.api import urlfetch
 
 
+# pylint:disable-msg=nonstandard-exception
 class FetchError(urlfetch.Error):
   """URL Fetch error for response code != 200."""
 
@@ -20,6 +21,7 @@ class FetchError(urlfetch.Error):
     return 'Status code {0} fetching {1} {2}'.format(self.response.status_code,
                                                      self.url,
                                                      self.response.content)
+
 
 class Fetcher(object):
   """A wrapper for URL fetch which performs validation and conversion."""
@@ -38,8 +40,8 @@ class Fetcher(object):
                              follow_redirects=follow_redirects,
                              validate_certificate=True)
 
-
   def _CheckResponse(self):
+    """Verify the current response."""
     if self.response:
       return
     self.response = self.rpc.get_result()

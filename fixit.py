@@ -1,4 +1,4 @@
-"""Module migrating/fixing schemas"""
+"""Module migrating/fixing schemas."""
 
 import webapp2
 
@@ -28,6 +28,7 @@ def FixProject(project):
   if not project.access_key:
     project.access_key = secret.GenerateRandomString()
     dirty = True
+  # pylint:disable-msg=protected-access
   if project._properties.has_key('end_user_url'):
     project._properties.pop('end_user_url')
     dirty = True
@@ -38,7 +39,7 @@ def FixProject(project):
 
 class ProjectHandler(webapp2.RequestHandler):
 
-  def post(self):
+  def post(self):  # pylint:disable-msg=invalid-name,missing-docstring
     assert self.request.environ[common.HTTP_X_APPENGINE_QUEUENAME]
     query = model.PlaygroundProject.query(
         namespace=settings.PLAYGROUND_NAMESPACE)

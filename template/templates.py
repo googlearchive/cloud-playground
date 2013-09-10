@@ -8,8 +8,6 @@ import model
 import settings
 import shared
 
-from mimic.__mimic import common
-
 from . import codesite
 from . import filesystem
 from . import github
@@ -23,10 +21,10 @@ REPO_COLLECTIONS = [
      'Fred''s samples on github'),
     ('https://api.github.com/users/GoogleCloudPlatform/repos',
      'Google Cloud Platform samples on github'),
-    #('https://google-app-engine-samples.googlecode.com/svn/trunk/',
-    # 'Python App Engine Samples'),
-    #('https://google-app-engine-samples.googlecode.com/svn/trunk/python27/',
-    # 'Python 2.7 App Engine Samples'),
+    # ('https://google-app-engine-samples.googlecode.com/svn/trunk/',
+    #  'Python App Engine Samples'),
+    # ('https://google-app-engine-samples.googlecode.com/svn/trunk/python27/',
+    #  'Python 2.7 App Engine Samples'),
 ]
 
 _MEMCACHE_KEY_REPO_COLLECTIONS = '{0}'.format(model.RepoCollection.__name__)
@@ -44,7 +42,7 @@ def ClearCache():
 def GetRepoCollections():
   """Get repo collections."""
   repo_collections = memcache.get(_MEMCACHE_KEY_REPO_COLLECTIONS,
-                         namespace=settings.PLAYGROUND_NAMESPACE)
+                                  namespace=settings.PLAYGROUND_NAMESPACE)
   if repo_collections:
     return repo_collections
   query = model.RepoCollection.query(ancestor=model.GetGlobalRootEntity().key)

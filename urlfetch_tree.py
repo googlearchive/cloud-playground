@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # Copyright 2012 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,13 +15,13 @@
 """A mutable tree implementation that is backed by URL Fetch."""
 
 
+import datetime
 import httplib
 import json
 import urllib
 
 from mimic.__mimic import common
 
-import error
 from error import Abort
 import settings
 import shared
@@ -121,7 +119,7 @@ class UrlFetchTree(common.Tree):
     if resp.status_code != httplib.OK:
       return None
     date_header = resp.headers['Last-Modified']
-    date = datetime.strptime(date_header, common.RFC_1123_DATE_FORMAT) 
+    date = datetime.strptime(date_header, common.RFC_1123_DATE_FORMAT)
     return date
 
   def HasFile(self, path):

@@ -14,7 +14,7 @@ handlers:
   upload: favicon\.ico
 
 - url: /.*
-  script: main.app
+  script: main.APP
 
 libraries:
 - name: webapp2
