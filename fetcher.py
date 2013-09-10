@@ -27,7 +27,9 @@ class Fetcher(object):
   """A wrapper for URL fetch which performs validation and conversion."""
 
   def __init__(self, url, url_auth_suffix='', follow_redirects=False,
-               headers={}):
+               headers=None):
+    if headers is None:
+      headers = {}
     self.url = url
     self.response = None
     self.etag, self.response_content = model.GetResource(url)

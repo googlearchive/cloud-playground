@@ -99,8 +99,10 @@ class PlaygroundHandler(webapp2.RequestHandler):
         'expiration_seconds': project.expiration_seconds,
     }
 
-  def _MakeMimicUrl(self, project, path, params={}):
+  def _MakeMimicUrl(self, project, path, params=None):
     """Build a mimic url."""
+    if parms is None:
+      params = {}
     project_id = urllib.quote_plus(str(project.key.id()))
     path = path.lstrip('/')
     if common.IsDevMode():
