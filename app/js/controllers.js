@@ -459,9 +459,9 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   $scope._list_files = function() {
     var url = $scope.url_of('dir', {});
+    $scope.files = {};
     return $http.get(url)
     .success(function(data, status, headers, config) {
-      $scope.files = {};
       angular.forEach(data, function(props, i) {
         $scope.files[props.path] = props;
       });
