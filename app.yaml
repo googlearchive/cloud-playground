@@ -84,3 +84,44 @@ skip_files:
 - ^(.*/)?.jshintrc
 - ^(.*/)?.name
 - ^(.*/)?.travis.yml
+
+pagespeed:
+  enabled_rewriters:
+
+  # HTML Rewriters
+  - ProxyCss  # enabled by default
+  - ProxyImages  # enabled by default
+  - ProxyJs  # enabled by default
+  - ConvertMetaTags  # enabled by default
+  - InlineCss  # enabled by default
+  - InlineJs
+  - InlineImages
+  - InlinePreviewImages  # enabled by default
+  - CollapseWhitespace
+  - CombineHeads
+  - ElideAttributes
+  - RemoveComments
+  - RemoveQuotes
+  - LeftTrimUrls
+
+  # CSS Rewriters
+  - CombineCss  # enabled by default
+  - MoveCssToHead  # enabled by default
+  - MinifyCss
+
+  # Image Rewriters
+  - WebpOptimization  # enabled by default
+  - ImageConvertToJpeg  # enabled by default
+  - ImageRecompressJpeg  # enabled by default
+  - ImageProgressiveJpeg  # enabled by default
+  - ImageRecompressPng  # enabled by default
+  - ImageStripMetadata  # enabled by default
+  - ImageStripColorProfile  # enabled by default
+  - ImageResize  # enabled by default
+  - LazyloadImages  # enabled by default
+  - ImageAddDimensions
+
+  # JavaScript Rewriters
+  - CombineJs  # enabled by default
+  - JsOptimize  # enabled by default
+  - DeferJs
