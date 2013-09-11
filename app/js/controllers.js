@@ -44,6 +44,11 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
                         $dialog, $location, $log, WindowService,
                         IframedDetector, ConfirmDialog) {
 
+  DoSerial
+  .then(getconfig)
+  .then(get_template_projects)
+  .then(getprojects);
+  
   function getconfig() {
     $scope.status = 'Retrieving configuration';
     return $http.get('/playground/getconfig')
@@ -76,11 +81,6 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
       $scope.template_projects = data;
     });
   }
-
-  DoSerial
-  .then(getconfig)
-  .then(get_template_projects)
-  .then(getprojects);
 
   $scope.namespace = function() {
     return $routeParams.project_id ||
@@ -142,21 +142,9 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
   };
 
   $scope.select_project = function(project) {
-    DoSerial
-    .then(function() {
-      return $http.post('/playground/p/' + encodeURI(project.key) + '/touch')
-      .success(function(data, status, headers, config) {
-        for (var i in $scope.projects) {
-          if ($scope.projects[i] == project) {
-            $scope.projects[i] = project = data;
-            break;
-          }
-        }
-        $location.path('/playground/p/' + encodeURI(project.key));
-        // remove template_url and other query parameters
-        $location.search({});
-      });
-    });
+    $location.path('/playground/p/' + encodeURI(project.key));
+    // remove template_url and other query parameters
+    $location.search({});
   };
 
   $scope.delete_project = function(project) {
@@ -575,6 +563,29 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
       return false;
   }
 
+  $scope.touch_project = function(project_key) {
+    // Stops calling touch_project if on different page.
+    if ($routeParams.project_id != project_key) {
+      return;
+    }
+    // Calls touch project repeatedly to prevent expiration.
+    return $http.post('/playground/p/' + 
+      encodeURI(project_key) + '/touch')
+    .success(function(data, status, headers, config) {
+      for (var i in $scope.projects) {
+        if ($scope.projects[i].key == project_key) {
+          $scope.project = $scope.projects[i] = data;
+          break;
+        }
+      }
+      if ($scope.project.expiration_seconds) {
+        $timeout(function() {
+          $scope.touch_project($scope.project.key);
+        }, $scope.project.expiration_seconds*1000/2);
+      }
+    });
+  };
+
   DoSerial
   .then(function() {
     if (!setcurrentproject()) {
@@ -585,7 +596,10 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   })
   .then($scope._list_files)
   .then($scope._select_a_file)
-  .then($scope.set_loaded);
+  .then($scope.set_loaded)
+  .then(function() {
+    $scope.touch_project($scope.project.key);
+  });
 
   // TODO: test
   $scope.insert_path = function(path) {
