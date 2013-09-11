@@ -16,6 +16,9 @@ function AlertController($scope, Alert) {
     Alert.remove_alert(idx);
   };
 
+  $scope.cookie_problem = function() {
+    return Alert.cookie_problem();
+  }
 }
 
 function HeaderController($scope, $location) {
@@ -90,6 +93,10 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
 
   $scope.memcache_admin = function() {
     WindowService.open('/playground/memcache/' + $scope.namespace(), '_blank');
+  };
+
+  $scope.reload = function() {
+    WindowService.reload();
   };
 
   $scope.big_red_button = function() {

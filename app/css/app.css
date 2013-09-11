@@ -324,7 +324,7 @@ BUTTON.admin > I[class*=" icon-"] {
   opacity: 0.5;
 }
 
-.alert DIV {
+.alert-pre DIV {
   white-space: pre-wrap;
 }
 

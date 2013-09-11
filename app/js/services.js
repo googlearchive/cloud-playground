@@ -16,6 +16,8 @@ angular.module('playgroundApp.services', [])
 
   var alert_list = [];
 
+  var is_cookie_problem = false;
+
   var Alert = {
     alert_list: alert_list,
 
@@ -49,6 +51,13 @@ angular.module('playgroundApp.services', [])
 
     remove_alert: function(idx) {
       alert_list.splice(idx, 1);
+    },
+
+    cookie_problem: function(problem) {
+      if (problem == undefined) {
+        return is_cookie_problem;
+      }
+      is_cookie_problem = problem;
     },
   };
 
@@ -105,7 +114,7 @@ angular.module('playgroundApp.services', [])
   return DoSerial;
 })
 
-.factory('playgroundHttpInterceptor', function($q, $log, $window) {
+.factory('playgroundHttpInterceptor', function($q, $log, $window, Alert) {
   return function(promise) {
     return promise.then(function(response) {
       return response;
@@ -115,6 +124,9 @@ angular.module('playgroundApp.services', [])
       if (err instanceof Error) {
         throw err;
       } else if (err.headers('X-Cloud-Playground-Error')) {
+        if (err.status == 401) {
+          Alert.cookie_problem(true);
+        }
         throw 'Cloud Playground error:\n' + err.data;
       } else {
         // err properties: data, status, headers, config

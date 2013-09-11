@@ -85,16 +85,14 @@ def _PerformCsrfRequestValidation(session, environ):
   session_xsrf = session['xsrf']
   client_xsrf = environ.get(_XSRF_TOKEN_HEADER)
   if not client_xsrf:
-    Abort(httplib.UNAUTHORIZED,
-          'Missing client XSRF token. Clear your cookies and refresh the page.')
+    Abort(httplib.UNAUTHORIZED, 'Missing client XSRF token.')
   if client_xsrf != session_xsrf:
     # do not log tokens in production
     if common.IsDevMode():
       logging.error('Client XSRF token={0!r}, session XSRF token={1!r}'
                     .format(client_xsrf, session_xsrf))
     Abort(httplib.UNAUTHORIZED,
-          'Client XSRF token does not match session XSRF token.'
-          ' Clear your cookies and refresh the page.')
+          'Client XSRF token does not match session XSRF token.')
 
 
 class Redirector(object):
