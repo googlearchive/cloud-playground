@@ -36,7 +36,7 @@ def MakeErrorResponse(exception, debug_mode):
     response body.
   """
   headers = [
-      ('content-type', 'text_plain; charset=utf-8'),
+      ('content-type', 'text/plain; charset=utf-8'),
       # Note App Engine automatically sets a 'Date' header for us. See
       # https://developers.google.com/appengine/docs/python/runtime#Responses
       ('Expires', settings.LONG_AGO),
