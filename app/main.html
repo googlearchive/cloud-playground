@@ -15,6 +15,7 @@
         <th class="project_id" ng-show="config.is_admin">Id</th>
         <th class="project_name">Name</th>
         <th class="project_description">Description</th>
+        <th class="project_writers" ng-show="config.is_admin">Writers</th>
         <th></th>
       </tr>
     </thead>
@@ -25,11 +26,12 @@
         <td class="project_id diag" ng-show="config.is_admin">{{project.key}}</div>
         <td class="project_name">{{project.name}}</td>
         <td class="project_description">{{project.description}}</td>
+        <td class="project_writers diag">{{project.writers}}</td>
         <td><a ng-class="{disabled: !project.key}" ng-click="prompt_delete_project(project)" title="delete project"><i class="icon-trash"></i></a></td>
       </tr>
 
       <tr class="project" ng-hide="has_projects()">
-         <td colspan="5">
+         <td colspan="6">
            <div>
              <b>No projects created yet.</b>
            </div>
@@ -75,6 +77,7 @@
               </button>
             </span>
             <div class="template_description">{{tp.description}}</div>
+            <div class="template_writers diag" ng-show="config.is_admin">{{tp.writers}}</div>
           </div>
         </div>
     </div>

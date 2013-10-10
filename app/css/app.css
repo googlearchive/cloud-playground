@@ -233,10 +233,10 @@ TABLE {
     padding: 1em 0em 0.5em;
   }
 
-    #footer .diag {
-      color: #ccc;
-      display: inline-block;
-    }
+.diag {
+  color: #ccc;
+  display: inline-block;
+}
 
 .adminlinks {
   color: #999;
