@@ -66,12 +66,18 @@ angular.module('playgroundApp.services', [])
 })
 
 // TODO: improve upon flushDoSerial(); allow one step to be executed at a time
-.factory('DoSerial', function($timeout, $log, $exceptionHandler) {
+.factory('DoSerial', function($timeout, $log, $exceptionHandler, Alert) {
 
   var work_items = [];
   var pending_promise;
 
-  var on_promised_satisfied = function() {
+  var on_promised_satisfied_success = function() {
+    pending_promise = undefined;
+    maybe_next();
+  };
+
+  var on_promised_satisfied_error = function(rejection) {
+    Alert.error('Execution step failed\n:' + angular.toJson(rejection));
     pending_promise = undefined;
     maybe_next();
   };
@@ -88,8 +94,8 @@ angular.module('playgroundApp.services', [])
     }
 
     if (result && result.then) {
-      pending_promise = result.then(on_promised_satisfied,
-                                    on_promised_satisfied);
+      pending_promise = result.then(on_promised_satisfied_success,
+                                    on_promised_satisfied_error);
     } else {
       maybe_next();
     }
