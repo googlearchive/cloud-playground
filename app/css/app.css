@@ -128,10 +128,9 @@ TABLE {
   }
 
     #nav #filelist .fileentry {
-      margin: .2em 0em 0em;
+      margin: 2px 0px 0px;
       cursor: pointer;
       overflow: hidden;
-      display: inline-block;
     }
 
     #nav #filelist .fileentry.selected {
@@ -147,6 +146,7 @@ TABLE {
         width: 160px;
         overflow: hidden;
         white-space: nowrap;
+        line-height: normal;
       }
 
       #nav #filelist .fileentry.selected .filename {
