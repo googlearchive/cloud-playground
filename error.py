@@ -59,5 +59,5 @@ def MakeErrorResponse(exception, debug_mode):
     else:
       message = 'Ouch. How awkward.'
   status = '{} {}'.format(status_code, httplib.responses[status_code])
-  body = '{}\n{}\n'.format(status, message)
+  body = message
   return status, headers, body
