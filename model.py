@@ -201,7 +201,7 @@ def GetProjects(user):
     # users.projects references projects which do not exist
     missing_projects = [key for (key, prj) in zip(user.projects, projects)
                         if prj is None]
-    raise RuntimeError('Missing project(s): {0}'.format(missing_projects))
+    shared.e('Missing project(s): {0}'.format(missing_projects))
   return projects
 
 
@@ -464,9 +464,8 @@ def SetProjectOwningTask(project_key, in_progress_task_name):
   project = project_key.get()
   if (None not in (in_progress_task_name, project.in_progress_task_name)
       and in_progress_task_name != project.in_progress_task_name):
-    raise RuntimeError('illegal project task move {} -> {}'
-                       .format(project.in_progress_task_name,
-                               in_progress_task_name))
+    shared.e('illegal project task move {} -> {}'
+             .format(project.in_progress_task_name, in_progress_task_name))
   project.in_progress_task_name = in_progress_task_name
   project.put()
   return project
