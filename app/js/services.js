@@ -121,26 +121,27 @@ angular.module('playgroundApp.services', [])
 })
 
 .factory('playgroundHttpInterceptor', function($q, $log, $window, Alert) {
-  return function(promise) {
-    return promise.then(function(response) {
-      return response;
-    }, function(err) {
-      // TODO: use 'return $q.reject(err)' instead of throwing errors,
-      // while still showing errors in Alert service and $log
-      if (err instanceof Error) {
-        throw err;
-      } else if (err.headers('X-Cloud-Playground-Error')) {
-        if (err.status == 401) {
+  return {
+    'request': function(config) {
+      return config || $q.when(config);
+    },
+
+   'requestError': function(response) {
+      return $q.reject(response);
+    },
+
+    'response': function(response) {
+      return response || $q.when(response);
+    },
+
+   'responseError': function(response) {
+      if (response.headers('X-Cloud-Playground-Error')) {
+        if (response.status == 401) {
           Alert.cookie_problem(true);
         }
-        throw 'Cloud Playground error:\n' + err.data;
-      } else {
-        // err properties: data, status, headers, config
-        throw 'HTTP ERROR ' + err.status + ': ' +
-              err.config.method + ' ' + err.config.url + '\n' +
-              err.data;
       }
-    });
+      return $q.reject(response);
+    }
   };
 })
 

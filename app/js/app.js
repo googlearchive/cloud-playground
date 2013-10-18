@@ -28,7 +28,7 @@ angular.module('playgroundApp', [
      reloadOnSearch: false,
   });
 
-  $httpProvider.responseInterceptors.push('playgroundHttpInterceptor');
+  $httpProvider.interceptors.push('playgroundHttpInterceptor');
 
   // TODO: test these defaults?
   $dialogProvider.options({
