@@ -57,8 +57,8 @@ function get_app_id() {
 }
 
 APP_ID=$(get_app_id $*)
-echo "Using app id: $APP_ID"
 echo
+echo "Using app id: $APP_ID"
 
 function deploy() {
   echo -e "\n*** Rolling back any pending updates (just in case) ***\n"
