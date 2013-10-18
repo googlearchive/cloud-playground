@@ -36,8 +36,12 @@
         <td class="project_name">{{project.name}}</td>
         <td class="project_description">{{project.description}}</td>
         <td class="project_writers diag" ng-show="config.is_admin">{{project.writers}}</td>
-        <td><a ng-show="config.is_admin" ng-class="{disabled: !project.key}" ng-click="recreate_template_project(project)" title="refresh project"><i class="icon-refresh"></i></a></td>
-        <td><a ng-show="config.is_admin || project.writable" ng-click="prompt_delete_project(project)" title="delete project"><i class="icon-trash"></i></a></td>
+        <td>
+          <a ng-show="config.is_admin && !project.writable" ng-class="{disabled: !project.key}" ng-click="recreate_template_project(project)" title="refresh project"><i class="icon-refresh"></i></a>
+        </td>
+        <td>
+          <a ng-show="config.is_admin || project.writable" ng-click="prompt_delete_project(project)" title="delete project"><i class="icon-trash"></i></a>
+        </td>
       </tr>
 
     </tbody>
