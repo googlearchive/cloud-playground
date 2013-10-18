@@ -50,7 +50,10 @@ class PlaygroundProject(ndb.Model):
 
   @property
   def orderby(self):
-    return '{0}-{1}'.format(self.owner, self.updated.isoformat())
+    if self.owner == settings.PROJECT_TEMPLATE_OWNER:
+      return '1-{}-{}'.format(self.project_name, self.updated.isoformat())
+    else:
+      return '2-{}-{}'.format(self.owner, self.updated.isoformat())
 
 
 class Resource(ndb.Model):
