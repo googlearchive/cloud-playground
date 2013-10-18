@@ -385,7 +385,7 @@ class DeleteProject(PlaygroundHandler):
       Abort(httplib.UNAUTHORIZED, 'no project write access')
 
   def post(self):  # pylint:disable-msg=invalid-name
-    model.DeleteProject(self.user, project=self.project)
+    model.DeleteProject(self.project)
 
 
 class RenameProject(PlaygroundHandler):

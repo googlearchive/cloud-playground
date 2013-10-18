@@ -453,8 +453,7 @@ def CheckExpiration(project):
                              datetime.timedelta(0, expiration_seconds))
   # Expire the project
   if now > current_expiration_date:
-    user = GetOrCreateUser(project.owner)
-    DeleteProject(user, project)
+    DeleteProject(project)
   # Defer expiration
   else:
     ScheduleExpiration(project)
@@ -478,7 +477,7 @@ def GetOrInsertRepoCollection(uri, description):
                                       parent=GetGlobalRootEntity().key)
 
 
-def DeleteProject(user, project):
+def DeleteProject(project):
   """Delete an existing project."""
   assert project
   tree = _CreateProjectTree(project)
@@ -488,8 +487,10 @@ def DeleteProject(user, project):
   @ndb.transactional(xg=True)
   def DelProject():
     # 2. get current entities
-    usr = user.key.get()
     prj = project.key.get()
+    user_key = ndb.Key(PlaygroundUser, prj.owner,
+                       namespace=settings.PLAYGROUND_NAMESPACE)
+    usr = user_key.get()
     # 3. delete project
     prj.key.delete()
     # 4. delete project references
@@ -500,7 +501,7 @@ def DeleteProject(user, project):
     usr.put()
 
   @ndb.transactional(xg=True)
-  def DelRepos(keys):
+  def DelReposAndProject(keys):
     ndb.delete_multi(keys)
     DelProject()
 
@@ -508,6 +509,6 @@ def DeleteProject(user, project):
   repo_query = repo_query.filter(Repo.project == project.key)
   keys = repo_query.fetch(keys_only=True)
   if keys:
-    DelRepos(keys)
+    DelReposAndProject(keys)
   else:
     DelProject()
