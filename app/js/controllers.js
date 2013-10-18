@@ -46,7 +46,6 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
 
   DoSerial
   .then(getconfig)
-  .then(get_template_projects)
   .then(getprojects);
   
   function getconfig() {
@@ -71,14 +70,6 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     return $http.get('/playground/getprojects')
     .success(function(data, status, headers, config) {
       $scope.projects = data;
-    });
-  }
-
-  function get_template_projects() {
-    $scope.status = 'Retrieving template projects';
-    return $http.get('/playground/gettemplateprojects')
-    .success(function(data, status, headers, config) {
-      $scope.template_projects = data;
     });
   }
 
@@ -134,13 +125,6 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     });
   };
 
-  $scope.has_projects = function() {
-    for (var i in $scope.projects) {
-      return true;
-    }
-    return false;
-  };
-
   $scope.select_project = function(project) {
     $location.path('/playground/p/' + encodeURI(project.key));
     // remove template_url and other query parameters
@@ -154,12 +138,6 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
       for (var i in $scope.projects) {
         if ($scope.projects[i] == project) {
           $scope.projects.splice(i, 1);
-          break;
-        }
-      }
-      for (var i in $scope.template_projects) {
-        if ($scope.template_projects[i] == project) {
-          $scope.template_projects.splice(i, 1);
           break;
         }
       }
@@ -195,10 +173,11 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
     var template_url = $routeParams.template_url;
     if (template_url) {
       var expiration_seconds = parseInt($routeParams.expiration_seconds);
-      return create_project_from_template(template_url, expiration_seconds);
-    } else {
-      $scope.set_loaded();
+      return $scope.new_project_by_url(template_url, expiration_seconds);
     }
+  })
+  .then(function() {
+    $scope.set_loaded();
   });
 
   // TODO: test
@@ -212,14 +191,10 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
     return results;
   }
 
+
   // TODO: test
-  $scope.new_project_by_url = function(repo_url) {
+  $scope.new_project_by_url = function(repo_url, expiration_seconds) {
     var deferred = $q.defer();
-    for (var i in $scope.template_projects) {
-      if ($scope.template_projects[i].template_url == repo_url) {
-        throw 'Template already exists';
-      }
-    }
     DoSerial
     .then(function() {
       var data = {
@@ -227,86 +202,29 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
         'description': '(Please wait...)',
         'in_pogress_task_name': 'foo'
       };
-      $scope.template_projects.push(data);
-    });
-    DoSerial
-    .then(function() {
-      return $http.post('/playground/create_template_project_by_url', {
-          repo_url: repo_url
+      $scope.projects.push(data);
+      $http.post('/playground/create_template_project_by_url', {
+          repo_url: repo_url,
+          expiration_seconds: expiration_seconds
       })
       .success(function(data, status, headers, config) {
-        $scope.template_projects.pop();
-        $scope.template_projects.push(data);
+        $scope.projects.pop();
+        $scope.projects.push(data);
         deferred.resolve();
       })
       .error(function(data, status, headers, config) {
-        $scope.template_projects.pop();
-        deferred.reject('Failed to create template project due to HTTP error ' +
-                        status + ' ' + data);
+        $scope.projects.pop();
+        if (status == 408) {
+          Alert.error(data);
+          deferred.resolve();
+        } else {
+          deferred.reject('Failed to create template project due to HTTP error ' +
+                          status + ' ' + data);
+        }
       });
+      return deferred.promise;
     });
-    return deferred.promise;
   };
-
-  // TODO: test
-  function create_project_from_template(template_url, expiration_seconds) {
-    var deferred = $q.defer();
-
-    var user_projects = by_template_url(template_url, $scope.projects);
-    var template_projects = by_template_url(template_url,
-                                            $scope.template_projects);
-
-    if (user_projects.length == 1) {
-      $scope.status = 'Opening project';
-      Alert.info('Found an existing project based on the requested template');
-      $scope.select_project(user_projects[0]);
-      deferred.resolve();
-      return deferred.promise;
-    }
-
-    if (user_projects.length > 1) {
-      Alert.info('You have ' + user_projects.length +
-                 ' projects based on the requested template');
-      // TODO: make these assignments work
-      //$scope.projects = user_projects;
-      //$scope.template_projects = template_projects;
-      $scope.set_loaded();
-      deferred.resolve();
-      return deferred.promise;
-    }
-
-    if (template_projects.length == 0) {
-      $scope.status = 'Creating new template project based on ' + template_url;
-      deferred.resolve();
-      deferred.promise
-      .then(function() {
-        return $scope.new_project_by_url(template_url);
-      });
-      return deferred.promise;
-    }
-
-    if (template_projects.length > 1) {
-      // TODO: investigate using deferred.reject() instead of 'throw'
-      throw 'Found ' + template_projects.length +
-            ' template projects with template URL ' + template_url;
-    }
-
-    deferred.promise
-    .then(function() {
-      $scope.status = 'Cloning project from template ' + template_url;
-      return $scope.new_project(template_projects[0], expiration_seconds);
-    })
-    .then(function() {
-      var user_projects = by_template_url(template_url, $scope.projects);
-      if (user_projects.length != 1) {
-        throw 'Unexpectedly found ' + user_projects.length +
-              ' projects with template URL ' + template_url;
-      }
-      $scope.select_project(user_projects[0]);
-    });
-    deferred.resolve();
-    return deferred.promise;
-  }
 
   $scope.login = function() {
     $window.location.replace('/playground/login');

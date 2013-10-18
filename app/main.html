@@ -5,7 +5,7 @@
 
 <div ng-show="loaded">
 
-  <h4 class="space-above"><a id="my_projects"></a>My Projects</h4>
+  <h4 class="space-above"><a id="my_projects"></a>Projects</h4>
 
   <table class="table-condensed">
 
@@ -17,74 +17,35 @@
         <th class="project_description">Description</th>
         <th class="project_writers" ng-show="config.is_admin">Writers</th>
         <th></th>
+        <th></th>
       </tr>
     </thead>
 
     <tbody>
       <tr class="project_row" ng-repeat="project in projects | orderBy:'orderby':true" ng-class="{ghost: !project.key}">
-        <td><button class="btn btn-small btn-primary" ng-class="{disabled: !project.key}" ng-click="select_project(project)"><i class="icon-share-alt icon-white"></i> open project</button>
-        <td class="project_id diag" ng-show="config.is_admin">{{project.key}}</div>
+        <td>
+            <button ng-show="project.writable" class="btn btn-small btn-primary" ng-disabled="!project.key" ng-click="select_project(project)">
+              <i class="icon-share-alt icon-white"></i> open project
+            </button>
+            <button ng-show="!project.writable && !project.in_progress_task_name" class="btn btn-small" ng-disabled="!!project.in_progress_task_name" ng-click="new_project(project)">
+              <i class="icon-plus"></i> make a copy
+            </button>
+            <span ng-show="!!project.in_progress_task_name">(Fetching...)</span>
+        </td>
+        <td class="project_id diag" ng-show="config.is_admin">{{project.key}}</td>
         <td class="project_name">{{project.name}}</td>
         <td class="project_description">{{project.description}}</td>
-        <td class="project_writers diag">{{project.writers}}</td>
-        <td><a ng-class="{disabled: !project.key}" ng-click="prompt_delete_project(project)" title="delete project"><i class="icon-trash"></i></a></td>
+        <td class="project_writers diag" ng-show="config.is_admin">{{project.writers}}</td>
+        <td><a ng-show="config.is_admin" ng-class="{disabled: !project.key}" ng-click="recreate_template_project(project)" title="refresh project"><i class="icon-refresh"></i></a></td>
+        <td><a ng-show="config.is_admin || project.writable" ng-click="prompt_delete_project(project)" title="delete project"><i class="icon-trash"></i></a></td>
       </tr>
 
-      <tr class="project" ng-hide="has_projects()">
-         <td colspan="6">
-           <div>
-             <b>No projects created yet.</b>
-           </div>
-           <div style="color: gray;">
-              <div>Use the project templates below to start a new project.</div>
-             <div ng-hide="config.is_logged_in">
-               Or <a ng-click="login()">login</a> to access your saved projects.
-             </div>
-           </div>
-         </td>
-      </tr>
     </tbody>
 
   </table>
-  <div>
-    <h4 class="space-above"><a id="my_templates"></a>Project Templates</h4>
-    <div ng-repeat="tp in template_projects | orderBy:'name'">
-        <div class="tp" style="margin: .5em;"
-             ng-hide="!!tp.in_progress_task_name && ! config.is_admin && ! config.is_devappserver">
-          <div class="pull-left span2">
-            <button class="btn" ng-click="new_project(tp)"
-                    ng-disabled="!!tp.in_progress_task_name">
-              <span ng-hide="!!tp.in_progress_task_name">
-                <i class="icon-plus"></i> copy me
-              </span>
-              <span ng-show="!!tp.in_progress_task_name">(Fetching...)</span>
-            </button>
-          </div>
-          <div class="template_container" style="display: inline-block;">
-            <span class="template_name">
-              <a ng-href="{{tp.html_url}}" target="{{tp.name}}">{{tp.name}}</a>
-            </span>
-            <span ng-show="config.is_admin || config.is_devappserver">
-              <button class="btn btn-mini pull-right"
-                      ng-click="recreate_template_project(tp)"
-                      ng-disabled="!!tp.in_progress_task_name">
-                <i class="icon-refresh"></i> refresh
-              </button>
-              <button class="btn btn-mini pull-right"
-                      ng-click="prompt_delete_project(tp)"
-                      ng-disabled="!!tp.in_progress_task_name">
-                <i class="icon-trash"></i> delete
-              </button>
-            </span>
-            <div class="template_description">{{tp.description}}</div>
-            <div class="template_writers diag" ng-show="config.is_admin">{{tp.writers}}</div>
-          </div>
-        </div>
-    </div>
-  </div>
 
   <div>
-    <h4 class="space-above">Import new templates</h4>
+    <h4 class="space-above">Import new projects</h4>
     <form class="form-horizontal">
       <div class="control-group">
         <label class='control-label' for='import_url'>Github project URL</label>

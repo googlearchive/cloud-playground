@@ -231,7 +231,7 @@ def CopyProject(user, tp, expiration_seconds):
   project = CreateProject(user=user,
                           template_url=tp.template_url,
                           html_url=tp.html_url,
-                          project_name=tp.project_name,
+                          project_name='Copy of {}'.format(tp.project_name),
                           project_description=tp.project_description,
                           open_files=tp.open_files,
                           expiration_seconds=expiration_seconds)

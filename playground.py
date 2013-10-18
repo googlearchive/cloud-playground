@@ -92,6 +92,7 @@ class PlaygroundHandler(webapp2.RequestHandler):
         'writers': project.writers,
         'access_key': project.access_key,
         'expiration_seconds': project.expiration_seconds,
+        'writable': self.user.key.id() in project.writers,
     }
 
   def _MakeMimicUrl(self, project, path, params=None):
@@ -258,27 +259,16 @@ class RetrieveProject(PlaygroundHandler):
 
 
 class GetProjects(PlaygroundHandler):
-  """Handler which gets the user's projects."""
+  """Handler which gets the user's projects and template projects."""
 
   def PerformAccessCheck(self):
     pass
 
   def get(self):  # pylint:disable-msg=invalid-name
-    r = [self.DictOfProject(p) for p in model.GetProjects(self.user)]
-    self.response.headers['Content-Type'] = _JSON_MIME_TYPE
-    self.response.write(tojson(r))
-
-
-class GetTemplateProjects(PlaygroundHandler):
-  """Handler which retrieves a lsit of projects."""
-
-  def PerformAccessCheck(self):
-    pass
-
-  def get(self):  # pylint:disable-msg=invalid-name
-    by_project_name = lambda p: p.project_name
-    r = [self.DictOfProject(p)
-         for p in sorted(model.GetTemplateProjects(), key=by_project_name)]
+    user_projects = model.GetProjects(self.user)
+    template_projects = model.GetTemplateProjects()
+    projects = user_projects + template_projects
+    r = [self.DictOfProject(p) for p in projects]
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
 
@@ -497,7 +487,6 @@ app = webapp2.WSGIApplication([
     # project actions
     ('/playground/recreate_template_project', RecreateTemplateProject),
     ('/playground/create_template_project_by_url', CreateTemplateProjectByUrl),
-    ('/playground/gettemplateprojects', GetTemplateProjects),
     ('/playground/getprojects', GetProjects),
     ('/playground/p/.*/copy', CopyProject),
     ('/playground/p/.*/retrieve', RetrieveProject),

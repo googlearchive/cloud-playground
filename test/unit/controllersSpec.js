@@ -654,23 +654,6 @@ describe('PageController', function() {
 
   });
 
-  describe('has_projects function', function() {
-
-    beforeEach(function() {
-      doInit();
-    });
-
-    it('should return false when there is no project', function() {
-      scope.projects = [];
-      expect(scope.has_projects()).toBe(false);
-    });
-
-    it('should return true when there are projects', function() {
-      scope.projects = [make_project(1, 12)];
-      expect(scope.has_projects()).toBe(true);
-    });
-
-  });
 
   describe('select_project function', function() {
 
