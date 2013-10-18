@@ -83,5 +83,6 @@ def GetCollection(repo_collection_url):
   elif github.IsValidUrl(repo_collection_url):
     return github.GithubRepoCollection(repo_collection)
   else:
-    raise ValueError('Unknown repo collection URL {0}'
-                     .format(repo_collection_url))
+    shared.w('Unrecognized repo collection URL {0}'
+             .format(repo_collection_url))
+    return None

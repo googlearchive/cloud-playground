@@ -15,6 +15,8 @@ class PopulateRepoCollection(webapp2.RequestHandler):
     shared.i('task {} populating repo collection {}'
              .format(shared.GetCurrentTaskName(), repo_collection_url))
     collection = templates.GetCollection(repo_collection_url)
+    if not collection:
+      shared.e('missing repo collection {}'.format(repo_collection_url))
     collection.PopulateRepos()
     templates.ClearCache()
 
@@ -27,6 +29,10 @@ class PopulateRepo(webapp2.RequestHandler):
                                                  repo_url))
     repo = model.GetRepo(repo_url)
     collection = templates.GetCollection(repo_url)
+    if not collection:
+      project = repo.project.get()
+      model.DeleteProject(project)
+      return
     collection.CreateTemplateProject(repo)
 
 
