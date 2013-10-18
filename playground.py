@@ -60,11 +60,6 @@ class PlaygroundHandler(webapp2.RequestHandler):
   def user(self):  # pylint:disable-msg=invalid-name
     return self.request.environ['playground.user']
 
-  @webapp2.cached_property
-  def tree(self):  # pylint:disable-msg=invalid-name
-    # TODO: instantiate tree elsewhere
-    return common.config.CREATE_TREE_FUNC(str(self.project.key.id()))
-
   # pylint:disable-msg=invalid-name
   def handle_exception(self, exception, debug_mode):
     """Called if this handler throws an exception during execution.
@@ -390,7 +385,7 @@ class DeleteProject(PlaygroundHandler):
       Abort(httplib.UNAUTHORIZED, 'no project write access')
 
   def post(self):  # pylint:disable-msg=invalid-name
-    model.DeleteProject(self.user, tree=self.tree, project_id=self.project_id)
+    model.DeleteProject(self.user, project=self.project)
 
 
 class RenameProject(PlaygroundHandler):
