@@ -133,14 +133,14 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
 
   $scope.delete_project = function(project) {
     $scope.project = undefined;
+    for (var i in $scope.projects) {
+      if ($scope.projects[i] == project) {
+        $scope.projects.splice(i, 1);
+        break;
+      }
+    }
     $http.post('/playground/p/' + encodeURI(project.key) + '/delete')
     .success(function(data, status, headers, config) {
-      for (var i in $scope.projects) {
-        if ($scope.projects[i] == project) {
-          $scope.projects.splice(i, 1);
-          break;
-        }
-      }
       $location.path('/playground/');
     });
   };
