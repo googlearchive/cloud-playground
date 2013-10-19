@@ -266,7 +266,7 @@ class GetProjects(PlaygroundHandler):
 
   def get(self):  # pylint:disable-msg=invalid-name
     user_projects = model.GetProjects(self.user)
-    template_projects = model.GetTemplateProjects()
+    template_projects = model.GetPublicTemplateProjects()
     projects = user_projects + template_projects
     r = [self.DictOfProject(p) for p in projects]
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
@@ -336,8 +336,12 @@ class RecreateTemplateProject(PlaygroundHandler):
             'failed to retrieve project {}'.format(project_id))
     repo_url = project.template_url
     repo = model.GetRepo(repo_url)
-    model.CreateRepoAsync(repo.key.id(), repo.html_url, repo.name,
-                          repo.description, repo.open_files)
+    model.CreateRepoAsync(owner=model.GetOrCreateUser(repo.owner),
+                          repo_url=repo.key.id(),
+                          html_url=repo.html_url,
+                          name=repo.name,
+                          description=repo.description,
+                          open_files=repo.open_files)
 
 
 class CreateTemplateProjectByUrl(PlaygroundHandler):
@@ -354,8 +358,11 @@ class CreateTemplateProjectByUrl(PlaygroundHandler):
     repo = model.GetRepo(repo_url)
     if not repo:
       html_url = name = description = repo_url
-      repo = model.CreateRepoAsync(repo_url=repo_url, html_url=html_url,
-                                   name=name, description=description,
+      repo = model.CreateRepoAsync(owner=model.GetManualTemplateOwner(),
+                                   repo_url=repo_url,
+                                   html_url=html_url,
+                                   name=name,
+                                   description=description,
                                    open_files=[])
     project = repo.project.get()
     if not project or project.in_progress_task_name:

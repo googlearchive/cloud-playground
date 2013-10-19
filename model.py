@@ -50,8 +50,10 @@ class PlaygroundProject(ndb.Model):
 
   @property
   def orderby(self):
-    if self.owner == settings.PROJECT_TEMPLATE_OWNER:
+    if self.owner == settings.MANUAL_PROJECT_TEMPLATE_OWNER:
       return '1-{}-{}'.format(self.project_name, self.updated.isoformat())
+    elif self.owner == settings.PUBLIC_PROJECT_TEMPLATE_OWNER:
+      return '3-{}-{}'.format(self.project_name, self.updated.isoformat())
     else:
       return '2-{}-{}'.format(self.owner, self.updated.isoformat())
 
@@ -131,6 +133,7 @@ class Repo(ndb.Model):
 
   This Model uses the repo url as the entity key id.
   """
+  owner = ndb.StringProperty(required=True, indexed=False)
   name = ndb.StringProperty(required=True, indexed=False)
   description = ndb.StringProperty(required=True, indexed=False)
   html_url = ndb.StringProperty(required=True, indexed=False)
@@ -161,13 +164,16 @@ def GetRepo(repo_url):
 
 
 @ndb.transactional(xg=True)
-def CreateRepoAsync(repo_url, html_url, name, description, open_files):
+def CreateRepoAsync(owner, repo_url, html_url, name, description, open_files):
   """Asynchronously create a repo."""
   repo = GetRepo(repo_url)
   if not repo:
-    user = GetTemplateOwner()
-    repo = Repo(id=repo_url, html_url=html_url, name=name,
-                description=description, open_files=open_files,
+    repo = Repo(id=repo_url,
+                owner=owner.key.id(),
+                html_url=html_url,
+                name=name,
+                description=description,
+                open_files=open_files,
                 namespace=settings.PLAYGROUND_NAMESPACE)
   elif repo.in_progress_task_name:
     shared.w('ignoring recreation of {} which is already executing in task {}'
@@ -182,7 +188,7 @@ def CreateRepoAsync(repo_url, html_url, name, description, open_files):
   if repo.project:
     SetProjectOwningTask(repo.project, task.name)
   else:
-    project = CreateProject(user=user,
+    project = CreateProject(user=owner,
                             template_url=repo_url,
                             html_url=html_url,
                             project_name=name,
@@ -215,9 +221,9 @@ def GetProject(project_id):
   return project
 
 
-def GetTemplateProjects():
+def GetPublicTemplateProjects():
   """Get template projects."""
-  user = GetTemplateOwner()
+  user = GetPublicTemplateOwner()
   projects = GetProjects(user)
   return projects
 
@@ -232,11 +238,13 @@ def CopyProject(user, tp, expiration_seconds):
   if (expiration_seconds and
       expiration_seconds < settings.MIN_EXPIRATION_SECONDS):
     expiration_seconds = settings.MIN_EXPIRATION_SECONDS
+  name = 'Copy of {}'.format(tp.project_name)
+  description = 'Copy of {}'.format(tp.project_description)
   project = CreateProject(user=user,
                           template_url=tp.template_url,
                           html_url=tp.html_url,
-                          project_name='Copy of {}'.format(tp.project_name),
-                          project_description=tp.project_description,
+                          project_name=name,
+                          project_description=description,
                           open_files=tp.open_files,
                           expiration_seconds=expiration_seconds)
   src_tree = _CreateProjectTree(tp)
@@ -330,8 +338,12 @@ def GetGlobalRootEntity():
   return Global.get_or_insert('config', namespace=settings.PLAYGROUND_NAMESPACE)
 
 
-def GetTemplateOwner():
-  return GetOrCreateUser(settings.PROJECT_TEMPLATE_OWNER)
+def GetPublicTemplateOwner():
+  return GetOrCreateUser(settings.PUBLIC_PROJECT_TEMPLATE_OWNER)
+
+
+def GetManualTemplateOwner():
+  return GetOrCreateUser(settings.MANUAL_PROJECT_TEMPLATE_OWNER)
 
 
 def GetRepoCollection(url):
@@ -340,7 +352,7 @@ def GetRepoCollection(url):
 
 def DeleteReposAndTemplateProjects():
   """Delete repos and related template projects."""
-  user = GetTemplateOwner()
+  user = GetPublicTemplateOwner()
 
   # delete template projects
   keys = user.projects

@@ -91,7 +91,9 @@ def HasProjectReadAccess(environ):
   user = environ.get('playground.user', None)
   if user and user.key.id() in project.writers:
     return True
-  if settings.PROJECT_TEMPLATE_OWNER in project.writers:
+  if settings.PUBLIC_PROJECT_TEMPLATE_OWNER in project.writers:
+    return True
+  if settings.MANUAL_PROJECT_TEMPLATE_OWNER in project.writers:
     return True
   return False
 

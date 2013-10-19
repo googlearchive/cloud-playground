@@ -22,7 +22,7 @@
     </thead>
 
     <tbody>
-      <tr class="project_row" ng-repeat="project in projects | orderBy:'orderby':true" ng-class="{ghost: !project.key}">
+      <tr class="project_row" ng-repeat="project in projects | orderBy:'orderby':false" ng-class="{ghost: !project.key}">
         <td>
             <button ng-show="project.writable" class="btn btn-small btn-primary" ng-disabled="!project.key" ng-click="select_project(project)">
               <i class="icon-share-alt icon-white"></i> open project

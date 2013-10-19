@@ -49,8 +49,12 @@ class FilesystemRepoCollection(collection.RepoCollection):
       url = os.path.join(template_dir, dirname)
       html_url = ('https://code.google.com/p/cloud-playground/source/browse/'
                   '?repo=bliss#git%2F{}'.format(urllib.quote(url)))
-      model.CreateRepoAsync(repo_url=url, html_url=html_url, name=name,
-                            description=description, open_files=open_files)
+      model.CreateRepoAsync(owner=model.GetPublicTemplateOwner(),
+                            repo_url=url,
+                            html_url=html_url,
+                            name=name,
+                            description=description,
+                            open_files=open_files)
 
   def CreateProjectTreeFromRepo(self, tree, repo):
     repo_url = repo.key.id()

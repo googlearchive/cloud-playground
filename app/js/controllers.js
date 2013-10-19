@@ -200,7 +200,8 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
       var data = {
         'name': '(Creating template project...)',
         'description': '(Please wait...)',
-        'in_pogress_task_name': 'foo'
+        'in_pogress_task_name': 'foo',
+        'orderby': '0'
       };
       $scope.projects.push(data);
       $http.post('/playground/create_template_project_by_url', {

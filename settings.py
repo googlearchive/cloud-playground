@@ -21,8 +21,13 @@ LONG_AGO = 'Mon, 01 Jan 1990 00:00:00 GMT'
 # 10 minutes
 TEMPLATE_MEMCACHE_TIME = 3600
 
-# Owner of template projects
-PROJECT_TEMPLATE_OWNER = 'TEMPLATE'
+# owners of template projects
+PUBLIC_PROJECT_TEMPLATE_OWNER = 'PUBLIC_TEMPLATE'
+MANUAL_PROJECT_TEMPLATE_OWNER = 'MANUAL_TEMPLATE'
+PROJECT_TEMPLATE_OWNERS = [
+    PUBLIC_PROJECT_TEMPLATE_OWNER,
+    MANUAL_PROJECT_TEMPLATE_OWNER
+]
 
 # whether or not we're running in the dev_appserver
 _DEV_MODE = os.environ['SERVER_SOFTWARE'].startswith('Development/')
