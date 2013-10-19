@@ -209,6 +209,12 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
       })
       .success(function(data, status, headers, config) {
         $scope.projects.pop();
+        for (var i in $scope.projects) {
+          if ($scope.projects[i].key == data.key) {
+            $scope.projects.splice(i, 1);
+            break;
+          }
+        }
         $scope.projects.push(data);
         deferred.resolve();
       })
