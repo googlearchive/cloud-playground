@@ -22,7 +22,7 @@
     </thead>
 
     <tbody>
-      <tr class="project_row" ng-repeat="project in projects | orderBy:'orderby':false" ng-class="{ghost: !project.key}">
+      <tr class="project_row" ng-repeat="project in projects | orderBy:'orderby':true" ng-class="{ghost: !project.key}">
         <td>
             <button ng-show="project.writable" class="btn btn-small btn-primary" ng-disabled="!project.key" ng-click="select_project(project)">
               <i class="icon-share-alt icon-white"></i> open project
@@ -58,7 +58,7 @@
             <input class='span6' type='url' id='import_url'
                    ng-model='import_url' required
                    placeholder="https://github.com/github_user_id/repo_name">
-            <button class="btn" type="submit" ng-click="new_project_by_url(import_url)">Import</button>
+            <button class="btn" type="submit" ng-click="create_template_project_by_url(import_url)">Import</button>
           </div>
         </div>
       </div>

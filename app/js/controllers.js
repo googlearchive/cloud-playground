@@ -66,7 +66,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
   };
 
   function getprojects() {
-    $scope.status = 'Retrieving user projects';
+    $scope.status = 'Retrieving projects';
     return $http.get('/playground/getprojects')
     .success(function(data, status, headers, config) {
       $scope.projects = data;
@@ -173,27 +173,42 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
     var template_url = $routeParams.template_url;
     if (template_url) {
       var expiration_seconds = parseInt($routeParams.expiration_seconds);
-      return $scope.new_project_by_url(template_url, expiration_seconds);
+      return $scope.new_project_from_template_url(template_url, expiration_seconds)
+      .catch(function() {
+        $scope.set_loaded();
+      });
+    } else {
+      $scope.set_loaded();
     }
-  })
-  .then(function() {
-    $scope.set_loaded();
   });
 
   // TODO: test
-  function by_template_url(template_url, projects) {
-    var results = [];
-    for (var i in projects) {
-      if (projects[i].template_url == template_url) {
-        results.push(projects[i]);
-      }
-    }
-    return results;
-  }
-
+  $scope.new_project_from_template_url = function(repo_url, expiration_seconds) {
+    var deferred = $q.defer();
+    DoSerial
+    .then(function() {
+      $http.post('/playground/new_project_from_template_url', {
+          repo_url: repo_url
+      })
+      .success(function(data, status, headers, config) {
+        var project = data;
+        $scope.projects.push(project);
+        $scope.select_project(project);
+        deferred.resolve();
+      })
+      .error(function(data, status, headers, config) {
+        if (status == 408) {
+          Alert.error(data);
+        }
+        deferred.reject('Failed to create project due to HTTP error ' +
+                        status + ' ' + data);
+      });
+    });
+    return deferred.promise;
+  };
 
   // TODO: test
-  $scope.new_project_by_url = function(repo_url, expiration_seconds) {
+  $scope.create_template_project_by_url = function(repo_url) {
     var deferred = $q.defer();
     DoSerial
     .then(function() {
@@ -201,12 +216,11 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
         'name': '(Creating template project...)',
         'description': '(Please wait...)',
         'in_pogress_task_name': 'foo',
-        'orderby': '0'
+        'orderby': '3',
       };
       $scope.projects.push(data);
       $http.post('/playground/create_template_project_by_url', {
-          repo_url: repo_url,
-          expiration_seconds: expiration_seconds
+          repo_url: repo_url
       })
       .success(function(data, status, headers, config) {
         $scope.projects.pop();
@@ -253,6 +267,7 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
     var data = {
       'name': '(Creating project...)',
       'description': '(Please wait and then refresh this page.)',
+      'orderby': '3',
     };
     $scope.projects.push(data);
     $http.post('/playground/p/' + encodeURI(template_project.key) + '/copy', {

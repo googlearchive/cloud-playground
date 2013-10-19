@@ -78,6 +78,7 @@ class PlaygroundHandler(webapp2.RequestHandler):
     return {
         # cast to str since JavaScript doesn't support long
         'key': str(project.key.id()),
+        'owner': project.owner,
         'name': project.project_name,
         'description': project.project_description,
         'open_files': project.open_files,
@@ -307,7 +308,7 @@ class CopyProject(PlaygroundHandler):
     tp = self.request.environ['playground.project']
     if not tp or tp.in_progress_task_name:
       Abort(httplib.REQUEST_TIMEOUT,
-            'Requested template is not yet available. '
+            'Sorry. Requested template is not yet available. '
             'Please try again in 30 seconds.')
     expiration_seconds = self.request.data.get('expiration_seconds')
     project = model.CopyProject(self.user, tp, expiration_seconds)
@@ -344,6 +345,38 @@ class RecreateTemplateProject(PlaygroundHandler):
                           open_files=repo.open_files)
 
 
+class NewProjectFromTemplateUrl(PlaygroundHandler):
+  """Request handler for creating projects from template URLs."""
+
+  def PerformAccessCheck(self):
+    pass
+
+  def post(self):  # pylint:disable-msg=invalid-name
+    """Handles HTTP POST requests."""
+    repo_url = self.request.data.get('repo_url')
+    if not repo_url:
+      Abort(httplib.BAD_REQUEST, 'repo_url required')
+    repo = model.GetRepo(repo_url)
+    if not repo:
+      html_url = name = description = repo_url
+      repo = model.CreateRepoAsync(owner=model.GetManualTemplateOwner(),
+                                   repo_url=repo_url,
+                                   html_url=html_url,
+                                   name=name,
+                                   description=description,
+                                   open_files=[])
+    template_project = repo.project.get()
+    if not template_project or template_project.in_progress_task_name:
+      Abort(httplib.REQUEST_TIMEOUT,
+            'Sorry. Requested template is not yet available. '
+            'Please try again in 30 seconds.')
+    expiration_seconds = self.request.data.get('expiration_seconds')
+    project = model.CopyProject(self.user, template_project, expiration_seconds)
+    r = self.DictOfProject(project)
+    self.response.headers['Content-Type'] = _JSON_MIME_TYPE
+    self.response.write(tojson(r))
+
+
 class CreateTemplateProjectByUrl(PlaygroundHandler):
   """Request handler for (re)creating template projects."""
 
@@ -354,7 +387,7 @@ class CreateTemplateProjectByUrl(PlaygroundHandler):
     """Handles HTTP POST requests."""
     repo_url = self.request.data.get('repo_url')
     if not repo_url:
-      Abort(httplib.BAD_REQUEST, 'repo_id required')
+      Abort(httplib.BAD_REQUEST, 'repo_url required')
     repo = model.GetRepo(repo_url)
     if not repo:
       html_url = name = description = repo_url
@@ -367,8 +400,8 @@ class CreateTemplateProjectByUrl(PlaygroundHandler):
     project = repo.project.get()
     if not project or project.in_progress_task_name:
       Abort(httplib.REQUEST_TIMEOUT,
-            'Requested template is not yet available. '
-            'Please try again in 30  seconds.')
+            'Sorry. Requested template is not yet available. '
+            'Please try again in 30 seconds.')
     r = self.DictOfProject(project)
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
@@ -494,6 +527,7 @@ app = webapp2.WSGIApplication([
     # project actions
     ('/playground/recreate_template_project', RecreateTemplateProject),
     ('/playground/create_template_project_by_url', CreateTemplateProjectByUrl),
+    ('/playground/new_project_from_template_url', NewProjectFromTemplateUrl),
     ('/playground/getprojects', GetProjects),
     ('/playground/p/.*/copy', CopyProject),
     ('/playground/p/.*/retrieve', RetrieveProject),
