@@ -175,7 +175,8 @@ def CreateRepoAsync(repo_url, html_url, name, description, open_files):
     return
   task = taskqueue.add(queue_name='repo',
                        url='/_playground_tasks/populate_repo',
-                       params={'repo_url': repo_url})
+                       params={'repo_url': repo_url},
+                       transactional=True)
   shared.i('task {} added to populate repo {}'.format(task.name, repo_url))
   repo.in_progress_task_name = task.name
   if repo.project:

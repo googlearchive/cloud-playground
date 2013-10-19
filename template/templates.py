@@ -66,7 +66,7 @@ def _GetRepoCollections():
                          url='/_playground_tasks/populate_repo_collection',
                          params={
                              'repo_collection_url': repo_collection.key.id(),
-                         })
+                         }, transactional=True)
     shared.w('adding task {} to populate repo collection {!r}'.format(task.name,
                                                                       uri))
     repo_collections.append(repo_collection)
