@@ -46,7 +46,7 @@ class Project(ndb.Model):
   open_files = ndb.StringProperty(required=False, repeated=True, indexed=False)
   in_progress_task_name = ndb.StringProperty(indexed=False)
   access_key = ndb.StringProperty(required=True, indexed=False)
-  expiration_seconds = ndb.IntegerProperty(required=False, indexed=False)
+  expiration_seconds = ndb.IntegerProperty(required=True, indexed=False)
 
   @property
   def orderby(self):
@@ -193,6 +193,7 @@ def CreateRepoAsync(owner, repo_url, html_url, name, description, open_files):
                             project_name=name,
                             project_description=description,
                             open_files=open_files,
+                            expiration_seconds=0,
                             in_progress_task_name=task.name)
     repo.project = project.key
   repo.put()
@@ -242,9 +243,8 @@ def CopyProject(owner, template_project, expiration_seconds):
   Returns:
     A new project.
   """
-  if (expiration_seconds and
-      expiration_seconds < settings.MIN_EXPIRATION_SECONDS):
-    expiration_seconds = settings.MIN_EXPIRATION_SECONDS
+  expiration_seconds = expiration_seconds or settings.DEFAULT_EXPIRATION_SECONDS
+  expiration_seconds = min(settings.MIN_EXPIRATION_SECONDS, expiration_seconds)
   name = 'Copy of {}'.format(template_project.project_name)
   description = 'Copy of {}'.format(template_project.project_description)
   project = CreateProject(owner=owner,
@@ -388,8 +388,8 @@ def NewProjectName():
 
 @ndb.transactional(xg=True)
 def CreateProject(owner, template_url, html_url, project_name,
-                  project_description, open_files,
-                  in_progress_task_name=None, expiration_seconds=None):
+                  project_description, open_files, expiration_seconds,
+                  in_progress_task_name=None):
   """Create a new user project.
 
   Args:

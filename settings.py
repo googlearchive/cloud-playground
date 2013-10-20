@@ -73,6 +73,9 @@ WSGI_CONFIG = {
 # One hour
 MIN_EXPIRATION_SECONDS = 3600
 
+# One week
+DEFAULT_EXPIRATION_SECONDS = 604800
+
 # Extensions to exclude when creating template projects
 SKIP_EXTENSIONS = ('swp', 'pyc', 'svn')
 
