@@ -59,6 +59,14 @@ class Project(ndb.Model):
       return '2-{}-{}'.format(self.owner, self.updated.isoformat())
 
 
+class User(ndb.Model):
+  """A Model to store playground users."""
+  projects = ndb.KeyProperty(repeated=True, kind=Project, indexed=False)
+  created = ndb.DateTimeProperty(required=True, auto_now_add=True,
+                                 indexed=False)
+  updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
+
+
 class Resource(ndb.Model):
   """A cache for web content.
 
@@ -72,6 +80,34 @@ class Resource(ndb.Model):
 class ResourceChunk(ndb.Model):
   """A model for storing resources > _MAX_RAW_PROPERTY_BYTES."""
   content = ndb.BlobProperty(required=True)
+
+
+class RepoCollection(ndb.Model):
+  """A Model to represent a collection of code repositories.
+
+  The base url is used as the entity key id.
+  """
+  description = ndb.StringProperty(required=True, indexed=False)
+  created = ndb.DateTimeProperty(required=True, auto_now_add=True,
+                                 indexed=False)
+  updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
+
+
+class Repo(ndb.Model):
+  """A Model to represent code repositories.
+
+  This Model uses the repo url as the entity key id.
+  """
+  owner = ndb.StringProperty(required=True, indexed=False)
+  name = ndb.StringProperty(required=True, indexed=False)
+  description = ndb.StringProperty(required=True, indexed=False)
+  html_url = ndb.StringProperty(required=True, indexed=False)
+  project = ndb.KeyProperty(required=True, kind=Project, indexed=True)
+  created = ndb.DateTimeProperty(required=True, auto_now_add=True,
+                                 indexed=False)
+  updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
+  open_files = ndb.StringProperty(required=False, repeated=True, indexed=False)
+  in_progress_task_name = ndb.StringProperty(indexed=False)
 
 
 def GetResource(url):
@@ -107,42 +143,6 @@ def PutResource(url, etag, content):
               for i in range(0, len(chunks))]
   entities.append(resource)
   ndb.put_multi(entities)
-
-
-class User(ndb.Model):
-  """A Model to store playground users."""
-  projects = ndb.KeyProperty(repeated=True, kind=Project, indexed=False)
-  created = ndb.DateTimeProperty(required=True, auto_now_add=True,
-                                 indexed=False)
-  updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
-
-
-class RepoCollection(ndb.Model):
-  """A Model to represent a collection of code repositories.
-
-  The base url is used as the entity key id.
-  """
-  description = ndb.StringProperty(required=True, indexed=False)
-  created = ndb.DateTimeProperty(required=True, auto_now_add=True,
-                                 indexed=False)
-  updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
-
-
-class Repo(ndb.Model):
-  """A Model to represent code repositories.
-
-  This Model uses the repo url as the entity key id.
-  """
-  owner = ndb.StringProperty(required=True, indexed=False)
-  name = ndb.StringProperty(required=True, indexed=False)
-  description = ndb.StringProperty(required=True, indexed=False)
-  html_url = ndb.StringProperty(required=True, indexed=False)
-  project = ndb.KeyProperty(required=True, kind=Project, indexed=True)
-  created = ndb.DateTimeProperty(required=True, auto_now_add=True,
-                                 indexed=False)
-  updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
-  open_files = ndb.StringProperty(required=False, repeated=True, indexed=False)
-  in_progress_task_name = ndb.StringProperty(indexed=False)
 
 
 def GetOAuth2Credential(key):
