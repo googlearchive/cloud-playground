@@ -41,8 +41,7 @@ class ProjectHandler(webapp2.RequestHandler):
 
   def post(self):  # pylint:disable-msg=invalid-name,missing-docstring
     assert self.request.environ[common.HTTP_X_APPENGINE_QUEUENAME]
-    query = model.PlaygroundProject.query(
-        namespace=settings.PLAYGROUND_NAMESPACE)
+    query = model.Project.query(namespace=settings.PLAYGROUND_NAMESPACE)
     cursor = self.request.get('cursor', None)
     if cursor:
       cursor = Cursor(urlsafe=cursor)

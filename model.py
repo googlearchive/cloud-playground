@@ -32,7 +32,7 @@ class OAuth2Credential(ndb.Model):
   client_secret = ndb.StringProperty(required=True, indexed=False)
 
 
-class PlaygroundProject(ndb.Model):
+class Project(ndb.Model):
   """A Model to store playground projects."""
   project_name = ndb.StringProperty(required=True, indexed=False)
   project_description = ndb.StringProperty(required=True, indexed=False)
@@ -109,10 +109,9 @@ def PutResource(url, etag, content):
   ndb.put_multi(entities)
 
 
-class PlaygroundUser(ndb.Model):
+class User(ndb.Model):
   """A Model to store playground users."""
-  projects = ndb.KeyProperty(repeated=True, kind=PlaygroundProject,
-                             indexed=False)
+  projects = ndb.KeyProperty(repeated=True, kind=Project, indexed=False)
   created = ndb.DateTimeProperty(required=True, auto_now_add=True,
                                  indexed=False)
   updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
@@ -138,8 +137,7 @@ class Repo(ndb.Model):
   name = ndb.StringProperty(required=True, indexed=False)
   description = ndb.StringProperty(required=True, indexed=False)
   html_url = ndb.StringProperty(required=True, indexed=False)
-  project = ndb.KeyProperty(required=True, kind=PlaygroundProject,
-                            indexed=True)
+  project = ndb.KeyProperty(required=True, kind=Project, indexed=True)
   created = ndb.DateTimeProperty(required=True, auto_now_add=True,
                                  indexed=False)
   updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
@@ -202,8 +200,7 @@ def CreateRepoAsync(owner, repo_url, html_url, name, description, open_files):
 
 
 def GetOrCreateUser(user_id):
-  return PlaygroundUser.get_or_insert(user_id,
-                                      namespace=settings.PLAYGROUND_NAMESPACE)
+  return User.get_or_insert(user_id, namespace=settings.PLAYGROUND_NAMESPACE)
 
 
 def GetProjects(user):
@@ -217,8 +214,8 @@ def GetProjects(user):
 
 
 def GetProject(project_id):
-  project = PlaygroundProject.get_by_id(long(project_id),
-                                        namespace=settings.PLAYGROUND_NAMESPACE)
+  project = Project.get_by_id(long(project_id),
+                              namespace=settings.PLAYGROUND_NAMESPACE)
   return project
 
 
@@ -402,17 +399,17 @@ def CreateProject(user, template_url, html_url, project_name,
   Raises:
     PlaygroundError: If the project name already exists.
   """
-  prj = PlaygroundProject(project_name=project_name,
-                          project_description=project_description,
-                          owner=user.key.id(),
-                          writers=[user.key.id()],
-                          template_url=template_url,
-                          html_url=html_url,
-                          open_files=open_files,
-                          in_progress_task_name=in_progress_task_name,
-                          access_key=secret.GenerateRandomString(),
-                          namespace=settings.PLAYGROUND_NAMESPACE,
-                          expiration_seconds=expiration_seconds)
+  prj = Project(project_name=project_name,
+                project_description=project_description,
+                owner=user.key.id(),
+                writers=[user.key.id()],
+                template_url=template_url,
+                html_url=html_url,
+                open_files=open_files,
+                in_progress_task_name=in_progress_task_name,
+                access_key=secret.GenerateRandomString(),
+                namespace=settings.PLAYGROUND_NAMESPACE,
+                expiration_seconds=expiration_seconds)
   prj.put()
   # transactional get before update
   user = user.key.get()
@@ -504,8 +501,7 @@ def DeleteProject(project):
   def DelProject():
     # 2. get current entities
     prj = project.key.get()
-    user_key = ndb.Key(PlaygroundUser, prj.owner,
-                       namespace=settings.PLAYGROUND_NAMESPACE)
+    user_key = ndb.Key(User, prj.owner, namespace=settings.PLAYGROUND_NAMESPACE)
     usr = user_key.get()
     # 3. delete project
     prj.key.delete()
