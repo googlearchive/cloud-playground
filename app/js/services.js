@@ -21,6 +21,10 @@ angular.module('playgroundApp.services', [])
   var Alert = {
     alert_list: alert_list,
 
+    clear: function() {
+      alert_list = [];
+    },
+
     handle_exception: function(exception, cause) {
       var msg = '' + exception;
       if (cause) {

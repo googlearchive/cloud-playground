@@ -5,11 +5,6 @@
 // TODO: test
 function AlertController($scope, Alert) {
 
-  Alert.note('Note: This is a shared public playground.' +
-             ' Anyone can read, modify or delete your projects,' +
-             ' files and data at any time. Your private source' +
-             ' code and data are not safe here.');
-
   $scope.alerts = Alert.alerts;
 
   $scope.closeAlert = function(idx) {
@@ -19,6 +14,14 @@ function AlertController($scope, Alert) {
   $scope.cookie_problem = function() {
     return Alert.cookie_problem();
   }
+
+  $scope.$on('$routeChangeStart', function() {
+    Alert.clear();
+    Alert.note('Note: This is a shared public playground.' +
+               ' Anyone can read, modify or delete your projects,' +
+               ' files and data at any time. Your private source' +
+               ' code and data are not safe here.');
+  });
 }
 
 function HeaderController($scope, $location) {
