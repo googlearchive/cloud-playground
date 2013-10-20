@@ -187,7 +187,7 @@ def CreateRepoAsync(owner, repo_url, html_url, name, description, open_files):
   if repo.project:
     SetProjectOwningTask(repo.project, task.name)
   else:
-    project = CreateProject(user=owner,
+    project = CreateProject(owner=owner,
                             template_url=repo_url,
                             html_url=html_url,
                             project_name=name,
@@ -231,21 +231,30 @@ def _CreateProjectTree(project):
 
 
 @ndb.transactional(xg=True)
-def CopyProject(user, tp, expiration_seconds):
-  """Create new a project from a template."""
+def CopyProject(owner, template_project, expiration_seconds):
+  """Create new a project from a template.
+
+  Args:
+    owner: The user for which the project is to be created.
+    template_project: The template project to be copied.
+    expiration_seconds: Number of seconds before project is deleted.
+
+  Returns:
+    A new project.
+  """
   if (expiration_seconds and
       expiration_seconds < settings.MIN_EXPIRATION_SECONDS):
     expiration_seconds = settings.MIN_EXPIRATION_SECONDS
-  name = 'Copy of {}'.format(tp.project_name)
-  description = 'Copy of {}'.format(tp.project_description)
-  project = CreateProject(user=user,
-                          template_url=tp.template_url,
-                          html_url=tp.html_url,
+  name = 'Copy of {}'.format(template_project.project_name)
+  description = 'Copy of {}'.format(template_project.project_description)
+  project = CreateProject(owner=owner,
+                          template_url=template_project.template_url,
+                          html_url=template_project.html_url,
                           project_name=name,
                           project_description=description,
-                          open_files=tp.open_files,
+                          open_files=template_project.open_files,
                           expiration_seconds=expiration_seconds)
-  src_tree = _CreateProjectTree(tp)
+  src_tree = _CreateProjectTree(template_project)
   dst_tree = _CreateProjectTree(project)
   CopyTree(dst_tree, src_tree)
   return project
@@ -378,13 +387,13 @@ def NewProjectName():
 
 
 @ndb.transactional(xg=True)
-def CreateProject(user, template_url, html_url, project_name,
+def CreateProject(owner, template_url, html_url, project_name,
                   project_description, open_files,
                   in_progress_task_name=None, expiration_seconds=None):
   """Create a new user project.
 
   Args:
-    user: The user for which the project is to be created.
+    owner: The user for which the project is to be created.
     template_url: The template URL to populate the project files or None.
     html_url: The end user URL to populate the project files or None.
     project_name: The project name.
@@ -401,8 +410,8 @@ def CreateProject(user, template_url, html_url, project_name,
   """
   prj = Project(project_name=project_name,
                 project_description=project_description,
-                owner=user.key.id(),
-                writers=[user.key.id()],
+                owner=owner.key.id(),
+                writers=[owner.key.id()],
                 template_url=template_url,
                 html_url=html_url,
                 open_files=open_files,
@@ -412,9 +421,9 @@ def CreateProject(user, template_url, html_url, project_name,
                 expiration_seconds=expiration_seconds)
   prj.put()
   # transactional get before update
-  user = user.key.get()
-  user.projects.append(prj.key)
-  user.put()
+  owner = owner.key.get()
+  owner.projects.append(prj.key)
+  owner.put()
   # call taskqueue to schedule expiration
   if prj.expiration_seconds:
     ScheduleExpiration(prj)
