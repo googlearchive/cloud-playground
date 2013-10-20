@@ -30,9 +30,6 @@ class FilesystemRepoCollection(collection.RepoCollection):
     shared.EnsureRunningInTask()  # gives us automatic retries
     template_dir = self.repo_collection.key.id()  # repo_collection_url
     for dirname in os.listdir(template_dir):
-      # skip github submodule templates in production
-      if not common.IsDevMode() and '-' in dirname:
-        continue
       dirpath = os.path.join(template_dir, dirname)
       if not os.path.isdir(dirpath):
         continue
