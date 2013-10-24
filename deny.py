@@ -8,6 +8,6 @@ class DenyHandler(webapp2.RequestHandler):
   pass
 
 
-app = webapp2.WSGIApplication([
+deny_app = webapp2.WSGIApplication([
     ('/.*', DenyHandler),
 ], debug=True)

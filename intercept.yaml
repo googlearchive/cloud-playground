@@ -33,7 +33,7 @@ handlers:
 
 # block other mimic control requests
 - url: /_ah/mimic/.*
-  script: deny.control_app
+  script: deny.deny_app
   secure: always
 
 # script handler for everything else / user code
