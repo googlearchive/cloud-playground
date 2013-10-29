@@ -746,12 +746,8 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   // TODO: test
   $scope.run = function() {
     return DoSerial
-    .then(function() {
-      _save_dirty_files();
-    })
-    .then(function() {
-      $scope.clear_logs();
-    })
+    .then(_save_dirty_files)
+    .then($scope.clear_logs)
     .then(function() {
       // TODO: try to avoid DOM access
       if ($scope.output_window && $scope.output_window.closed) {
@@ -789,9 +785,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
       }
       DoSerial
       .then($scope._list_files)
-      .then(function() {
-        $scope._select_a_file();
-      });
+      .then($scope._select_a_file);
     });
   };
 
