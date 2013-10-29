@@ -4,9 +4,9 @@ from google.appengine.api import memcache
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 
-import model
-import settings
-import shared
+from .. import model
+from .. import settings
+from .. import shared
 
 from . import codesite
 from . import filesystem

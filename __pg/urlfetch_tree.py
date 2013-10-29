@@ -23,8 +23,8 @@ import urllib
 from mimic.__mimic import common
 
 from error import Abort
-import settings
-import shared
+from . import settings
+from . import shared
 
 from google.appengine.api import urlfetch
 

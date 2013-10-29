@@ -5,7 +5,7 @@ import logging
 import sys
 import traceback
 
-import settings
+from . import settings
 
 
 class PlaygroundError(Exception):

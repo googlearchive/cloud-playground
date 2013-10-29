@@ -6,9 +6,9 @@ import urllib
 
 from mimic.__mimic import common
 
-import model
-import settings
-import shared
+from .. import model
+from .. import settings
+from .. import shared
 
 from . import collection
 

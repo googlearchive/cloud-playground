@@ -72,7 +72,7 @@ function deploy() {
 }
 
 
-APP_IDS=$(APPLICATION_ID=$APP_ID python -c 'import appids; appids.PrintAppIds()')
+APP_IDS=$(APPLICATION_ID=$APP_ID python -c 'from __pg import appids; appids.PrintAppIds()')
 echo -e "Using app ids:\n$APP_IDS"
 for appid in $APP_IDS
 do

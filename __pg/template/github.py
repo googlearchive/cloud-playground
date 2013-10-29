@@ -6,9 +6,9 @@ import sys
 import traceback
 import yaml
 
-import fetcher
-import model
-import shared
+from .. import fetcher
+from .. import model
+from .. import shared
 
 from . import collection
 

@@ -3,7 +3,7 @@
 
 import os
 
-import urlfetch_tree
+from . import urlfetch_tree
 
 
 class CachingUrlFetchTree(urlfetch_tree.UrlFetchTree):

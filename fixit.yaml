@@ -1,5 +1,5 @@
 handlers:
 - url: /playground/fix/project
-  script: fixit.app
+  script: __pg.fixit.app
   secure: always
   login: admin

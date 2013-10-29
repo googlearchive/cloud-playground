@@ -3,8 +3,8 @@
 import httplib
 import json
 
-import model
-import shared
+from . import model
+from . import shared
 
 from google.appengine.api import urlfetch
 

@@ -6,9 +6,9 @@ import os
 
 from mimic.__mimic import common
 
-import appids
+from . import appids
 from error import Abort
-import settings
+from . import settings
 
 from google.appengine.api import app_identity
 from google.appengine.api import backends

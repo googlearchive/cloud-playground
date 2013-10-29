@@ -1,8 +1,8 @@
 handlers:
 - url: /_ah/warmup
-  script: internal.app
+  script: __pg.internal.app
   login: admin
 
 - url: /_ah/start
-  script: internal.app
+  script: __pg.internal.app
   login: admin

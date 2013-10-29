@@ -9,9 +9,9 @@ import sys
 from mimic.__mimic import common
 from mimic.__mimic import datastore_tree
 
-import appids
-import caching_urlfetch_tree
-import settings
+from __pg import appids
+from __pg import caching_urlfetch_tree
+from __pg import settings
 
 from google.appengine.api import app_identity
 

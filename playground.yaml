@@ -27,20 +27,20 @@ handlers:
   mime_type: text/html; charset=utf-8
 
 - url: /playground/p/.*/check_expiration
-  script: playground.internal_app
+  script: __pg.playground.internal_app
   secure: always
   login: admin
 
 - url: /playground/.*
-  script: playground.app
+  script: __pg.playground.app
   secure: always
 
 - url: /_ah/warmup
-  script: playground.app
+  script: __pg.playground.app
   secure: always
   login: admin
 
 - url: /_ah/start
-  script: playground.app
+  script: __pg.playground.app
   secure: always
   login: admin

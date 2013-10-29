@@ -1,7 +1,7 @@
 """Class representing a code repository."""
 
-import model
-import shared
+from .. import model
+from .. import shared
 
 from mimic.__mimic import common
 

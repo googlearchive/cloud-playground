@@ -11,17 +11,18 @@ import zipfile
 
 import webapp2
 
-import appids
-import error
+from . import appids
+from . import error
 from error import Abort
-import fixit
-import middleware
+from . import fixit
+from . import middleware
 from mimic.__mimic import common
 from mimic.__mimic import mimic
-import model
-import settings
-import shared
+from . import model
+from . import settings
+from . import shared
 from template import templates
+from . import wsgi_config
 
 from google.appengine.api import users
 
@@ -553,7 +554,7 @@ app = webapp2.WSGIApplication([
     ('/playground/datastore/(.*)', DatastoreRedirect),
     ('/playground/memcache/(.*)', MemcacheRedirect),
 ], debug=settings.DEBUG)
-app = middleware.Session(app, settings.WSGI_CONFIG)
+app = middleware.Session(app, wsgi_config.WSGI_CONFIG)
 app = middleware.ProjectFilter(app)
 app = middleware.ErrorHandler(app, debug=settings.DEBUG)
 

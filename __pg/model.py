@@ -6,9 +6,9 @@ import random
 from mimic.__mimic import common
 
 import datetime
-import secret
-import settings
-import shared
+from . import secret
+from . import settings
+from . import shared
 
 from google.appengine.api import memcache
 from google.appengine.api import taskqueue

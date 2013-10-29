@@ -9,14 +9,14 @@ from webapp2_extras import securecookie
 from webapp2_extras import security
 from webapp2_extras import sessions
 
-import appids
-import error
+from . import appids
+from . import error
 from error import Abort
 from mimic.__mimic import common
 from mimic.__mimic import mimic
-import model
-import settings
-import shared
+from . import model
+from . import settings
+from . import shared
 
 from google.appengine.api import users
 

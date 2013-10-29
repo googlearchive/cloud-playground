@@ -2,13 +2,14 @@
 
 from mimic import mimic_wsgi
 
-import middleware
-import settings
+from . import middleware
+from . import settings
+from . import wsgi_config
 
 
 control_app = mimic_wsgi.Mimic
 control_app = middleware.MimicControlAccessFilter(control_app)
-control_app = middleware.Session(control_app, settings.WSGI_CONFIG)
+control_app = middleware.Session(control_app, wsgi_config.WSGI_CONFIG)
 control_app = middleware.AccessKeyHttpHeaderFilter(control_app)
 control_app = middleware.Redirector(control_app)
 control_app = middleware.ProjectFilter(control_app)

@@ -5,8 +5,7 @@ import os
 from google.appengine.api import app_identity
 from google.appengine.api import backends
 
-import appids
-import secret
+from . import appids
 
 
 DEBUG = True
@@ -61,13 +60,6 @@ SESSION_COOKIE_ARGS = {
 XSRF_COOKIE_ARGS = {
     'httponly': False,
     'secure': not _DEV_MODE,
-}
-
-WSGI_CONFIG = {
-    'webapp2_extras.sessions': {
-        'secret_key': secret.GetSecret('webapp2_extras.sessions', entropy=128),
-        'cookie_args': SESSION_COOKIE_ARGS,
-    }
 }
 
 # One hour

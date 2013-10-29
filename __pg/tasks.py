@@ -2,8 +2,8 @@
 
 import webapp2
 
-import model
-import shared
+from . import model
+from . import shared
 
 from template import templates
 

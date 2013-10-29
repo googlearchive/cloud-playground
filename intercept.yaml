@@ -8,37 +8,37 @@ handlers:
 
 # allow file retrieval
 - url: /_ah/mimic/file
-  script: intercept.control_app
+  script: __pg.intercept.control_app
   secure: always
 
 # allow file deletion
 - url: /_ah/mimic/delete
-  script: intercept.control_app
+  script: __pg.intercept.control_app
   secure: always
 
 # allow directory listing
 - url: /_ah/mimic/dir
-  script: intercept.control_app
+  script: __pg.intercept.control_app
   secure: always
 
 # allow file rename
 - url: /_ah/mimic/move
-  script: intercept.control_app
+  script: __pg.intercept.control_app
   secure: always
 
 # allow log handler
 - url: /_ah/mimic/log
-  script: intercept.control_app
+  script: __pg.intercept.control_app
   secure: always
 
 # block other mimic control requests
 - url: /_ah/mimic/.*
-  script: deny.deny_app
+  script: __pg.deny.deny_app
   secure: always
 
 # script handler for everything else / user code
 - url: /.*
-  script: intercept.user_app
+  script: __pg.intercept.user_app
   # This script handler must either not require login, or require admin login
   # (via 'login: admin'). Do not specify 'login: required' since offline
   # requests (Cron, Task Queue, etc.) will fail with this error:

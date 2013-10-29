@@ -4,8 +4,8 @@ import webapp2
 
 from template import templates
 
-import middleware
-import settings
+from . import middleware
+from . import settings
 
 
 class Warmup(webapp2.RequestHandler):

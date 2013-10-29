@@ -2,7 +2,7 @@
 
 from webapp2_extras import security
 
-import settings
+from . import settings
 
 from google.appengine.ext import ndb
 

@@ -7,10 +7,10 @@ import traceback
 
 from mimic.__mimic import common
 
-import fetcher
-import model
-import settings
-import shared
+from .. import fetcher
+from .. import model
+from .. import settings
+from .. import shared
 
 from . import collection
 

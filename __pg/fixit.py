@@ -7,10 +7,10 @@ from mimic.__mimic import common
 from google.appengine.api import taskqueue
 from google.appengine.datastore.datastore_query import Cursor
 
-import model
-import secret
-import settings
-import shared
+from . import model
+from . import secret
+from . import settings
+from . import shared
 
 
 # number of entities to fix at a time
