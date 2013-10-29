@@ -159,7 +159,7 @@ angular.module('playgroundApp.services', [])
   return DoSerial;
 })
 
-.factory('playgroundHttpInterceptor', function($q, $log, $window, Alert) {
+.factory('pgHttpInterceptor', function($q, $log, $window, Alert) {
   return {
     'request': function(config) {
       return config || $q.when(config);

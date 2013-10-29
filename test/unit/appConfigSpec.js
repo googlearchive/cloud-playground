@@ -7,7 +7,7 @@ describe('app config', function() {
   beforeEach(module('playgroundApp'));
 
 
-  it('should install playgroundHttpInterceptor', function() {
+  it('should install pgHttpInterceptor', function() {
 
     var httpProvider;
 
@@ -17,7 +17,7 @@ describe('app config', function() {
 
     inject(function() {
       expect(httpProvider.responseInterceptors)
-        .toEqual(['playgroundHttpInterceptor']);
+      .toEqual(['pgHttpInterceptor']);
     });
 
   });

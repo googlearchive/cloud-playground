@@ -59,10 +59,10 @@ describe('service', function() {
 
   });
 
-  describe('playgroundHttpInterceptor', function() {
+  describe('pgHttpInterceptor', function() {
 
     it('should return HTTP normal responses unmodified',
-       inject(function(playgroundHttpInterceptor) {
+       inject(function(pgHttpInterceptor) {
          // TODO: use jasmine spy instead
          var called = false;
          var http_promise = {
@@ -73,7 +73,7 @@ describe('service', function() {
            }
          };
          expect(called).toBe(false);
-         var response = playgroundHttpInterceptor(http_promise);
+         var response = pgHttpInterceptor(http_promise);
          expect(response).toEqual('original http response');
          expect(called).toBe(true);
        }));
@@ -81,7 +81,7 @@ describe('service', function() {
 
     // TODO: renable this or comparable test
     xit('should recognize and log X-Cloud-Playground-Error error repsonses',
-       inject(function(playgroundHttpInterceptor, $log) {
+       inject(function(pgHttpInterceptor, $log) {
          var error_response = {
            config: {},
            data: 'error response body',
@@ -95,7 +95,7 @@ describe('service', function() {
              error_fn(error_response);
            }
          };
-         var response = playgroundHttpInterceptor(http_promise);
+         var response = pgHttpInterceptor(http_promise);
          expect(response).toBeUndefined();
          expect($log.error.logs.pop()).toEqual(['Error:\nerror response body']);
          $log.assertEmpty();
@@ -104,7 +104,7 @@ describe('service', function() {
 
     // TODO: renable this or comparable test
     xit('should log generic HTTP error repsonses',
-       inject(function(playgroundHttpInterceptor, $log) {
+       inject(function(pgHttpInterceptor, $log) {
          var error_response = {
            config: {},
            data: 'error response body',
@@ -116,7 +116,7 @@ describe('service', function() {
              error_fn(error_response);
            }
          };
-         var response = playgroundHttpInterceptor(http_promise);
+         var response = pgHttpInterceptor(http_promise);
          expect(response).toBeUndefined();
          expect($log.error.logs.pop()).toEqual(['HTTP ERROR', error_response]);
          $log.assertEmpty();
@@ -125,14 +125,14 @@ describe('service', function() {
 
     // TODO: renable this or comparable test
     xit('should log raised errors',
-       inject(function(playgroundHttpInterceptor, $log) {
+       inject(function(pgHttpInterceptor, $log) {
          var error_response = Error('raised error');
          var http_promise = {
            then: function(success_fn, error_fn) {
              error_fn(error_response);
            }
          };
-         var response = playgroundHttpInterceptor(http_promise);
+         var response = pgHttpInterceptor(http_promise);
          expect(response).toBeUndefined();
          expect($log.error.logs.pop()).toEqual([error_response]);
          $log.assertEmpty();
