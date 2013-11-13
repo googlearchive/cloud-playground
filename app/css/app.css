@@ -338,10 +338,6 @@ BUTTON.admin > I[class*=" icon-"] {
   color: #888;
 }
 
-.running {
-  color: #888;
-}
-
 .form-reduced-margin {
   margin-bottom: 2px;
 }

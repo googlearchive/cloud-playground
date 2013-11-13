@@ -49,9 +49,9 @@
       <input ng-model='iframe_run_url' type='url' class='span8 url-bar' ng-click='select_me($event)'>
       <button ng-click='popout(); run()' class='btn pull-right url-button' title='Open in a separate window'><i class="icon-share-alt"></i></button>
     </div>
-    <div id="output-iframe">
-      <div class="running" ng-show="!output_ready">
-        Running...
+    <div id="output-iframe" style="position: relative;">
+      <div ng-show="!output_ready" style="position: absolute; background-color: #eee;">
+        <div style="margin: 2em;">Deploying code to a Google data center...</div>
       </div>
       <iframe ng-hide="requested_popout" ng-src="{{iframe_run_url}}" pg-load="output_loaded()" pg-visible="output_ready">
       </iframe>
