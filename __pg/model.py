@@ -54,7 +54,7 @@ class Project(ndb.Model):
     if self.owner == settings.MANUAL_PROJECT_TEMPLATE_OWNER:
       return '4-{}-{}'.format(self.project_name, self.updated.isoformat())
     elif self.owner == settings.PUBLIC_PROJECT_TEMPLATE_OWNER:
-      return '1-{}-{}'.format(self.project_name, self.updated.isoformat())
+      return '1'
     else:
       return '2-{}-{}'.format(self.owner, self.updated.isoformat())
 
