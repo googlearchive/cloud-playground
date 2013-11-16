@@ -221,8 +221,7 @@ TABLE {
     padding: 0em 1em 4em;
   }
   .iframed #main {
-    /* no padding-bottom in iframed case */
-    padding: 0em 1em;
+    padding: 0px;
   }
 
   #footer {
@@ -294,13 +293,14 @@ BUTTON.admin > I[class*=" icon-"] {
 #output-iframe {
   width: 100%;
   height: 17em;
-  border: 1px solid #ccc;
 }
 
   #output-iframe > * {
     width: 100%;
     height: 100%;
-    border: none;
+    /* prevent horizontal scrolling due to 1px border */
+    margin: -2px;
+    border: 1px solid #ccc;
   }
 
 #drag-div {
