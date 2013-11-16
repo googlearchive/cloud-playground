@@ -149,6 +149,10 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
   };
 
   $scope.prompt_delete_project = function(project) {
+    if (project.owner.indexOf('@') >= 0 && $scope.config.is_admin) {
+      $scope.delete_project(project);
+      return;
+    }
     var title = 'Confirm project deletion';
     var msg = 'Are you sure you want to delete project "' + project.name +
               '"?';
