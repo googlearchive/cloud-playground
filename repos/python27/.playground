@@ -1,5 +1,5 @@
 {
-  "template_name" : "App Engine Python 2.7 Hello World",
-  "template_description" : "Trival Python 2.7 Hello World template",
+  "template_name" : "Hello World",
+  "template_description" : "Python 2.7 Hello World app",
   "open_files": ["main.py"]
 }

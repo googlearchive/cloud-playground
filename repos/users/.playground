@@ -1,5 +1,5 @@
 {
-  "template_name" : "App Engine Users API",
-  "template_description" : "Allow your users to authenticate using a Google Account",
+  "template_name" : "Users API",
+  "template_description" : "Google Account based authentication",
   "open_files": ["helloworld.py"]
 }

@@ -182,11 +182,12 @@ TABLE {
 
 .project_name {
   font-weight: bold;
-  width: 30em;
+  width: 20em;
 }
 
 .project_description {
   width: 30em;
+  white-space: pre-wrap;
 }
 
 .template {
