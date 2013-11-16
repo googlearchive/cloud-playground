@@ -24,13 +24,15 @@
     <tbody>
       <tr class="project_row" ng-repeat="project in projects | orderBy:'name':false | orderBy:'orderby':true" ng-class="{ghost: !project.key}">
         <td>
+          <span ng-show="!project.in_progress_task_name">
             <button ng-show="project.writable" class="btn btn-small btn-primary" style="width: 10em;" ng-disabled="!project.key" ng-click="select_project(project)">
               <i class="icon-share-alt icon-white"></i> open project
             </button>
-            <button ng-show="!project.writable && !project.in_progress_task_name" class="btn btn-small" style="width: 10em;" ng-disabled="!!project.in_progress_task_name" ng-click="new_project(project)">
+            <button ng-show="!project.writable" class="btn btn-small" style="width: 10em;" ng-click="new_project(project)">
               <i class="icon-plus"></i> make a copy
             </button>
-            <span ng-show="!!project.in_progress_task_name">(Fetching...)</span>
+          </span>
+          <span ng-show="!!project.in_progress_task_name">(Fetching...)</span>
         </td>
         <td class="project_id diag" ng-show="config.is_admin">{{project.key}}</td>
         <td class="project_name">{{project.name}}</td>

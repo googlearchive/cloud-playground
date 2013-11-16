@@ -222,7 +222,7 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
       var data = {
         'name': '(Creating template project...)',
         'description': '(Please wait...)',
-        'in_pogress_task_name': 'foo',
+        'in_progress_task_name': 'foo',
         'orderby': '3',
       };
       $scope.projects.push(data);
@@ -274,6 +274,7 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
     var data = {
       'name': '(Creating project...)',
       'description': '(Please wait and then refresh this page.)',
+      'in_progress_task_name': 'foo',
       'orderby': '3',
     };
     $scope.projects.push(data);
