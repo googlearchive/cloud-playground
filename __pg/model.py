@@ -210,7 +210,11 @@ def GetProjects(user):
     # users.projects references projects which do not exist
     missing_projects = [key for (key, prj) in zip(user.projects, projects)
                         if prj is None]
-    shared.e('Missing project(s): {0}'.format(missing_projects))
+    if common.IsDevMode():
+      shared.e('Missing project(s): {0}'.format(missing_projects))
+    else:
+      shared.w('Missing project(s): {0}'.format(missing_projects))
+      projects = [p for p in projects if p is not None]
   return projects
 
 
