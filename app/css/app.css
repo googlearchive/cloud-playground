@@ -260,6 +260,7 @@ BUTTON.admin > I[class*=" icon-"] {
   /* compact, for low-res laptop presentations */
   height: 165px;
 }
+
 .iframed #source-container {
   height: 200px;
 }
@@ -272,6 +273,7 @@ BUTTON.admin > I[class*=" icon-"] {
   #source-container IMG {
     background: url(/playground/img/checker.png) repeat;
     display: block;
+    border: 3px dotted #444;
   }
 
 .CodeMirror {
