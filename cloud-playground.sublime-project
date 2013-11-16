@@ -1,0 +1,9 @@
+{
+	"folders":
+	[
+		{
+			"path": "/fred/src/cloud-playground.bliss",
+			"folder_exclude_patterns": [".chrome-*", "test_out", "*.pyc", "api-python-client"]
+		}
+	]
+}
