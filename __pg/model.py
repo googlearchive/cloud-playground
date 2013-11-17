@@ -245,7 +245,7 @@ def CopyProject(owner, template_project, expiration_seconds):
   expiration_seconds = expiration_seconds or settings.DEFAULT_EXPIRATION_SECONDS
   expiration_seconds = min(settings.MIN_EXPIRATION_SECONDS, expiration_seconds)
   name = 'Copy of {}'.format(template_project.project_name)
-  description = 'Copy of {}'.format(template_project.project_description)
+  description = template_project.project_description
   project = CreateProject(owner=owner,
                           template_url=template_project.template_url,
                           html_url=template_project.html_url,
