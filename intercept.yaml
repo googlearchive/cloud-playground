@@ -6,6 +6,11 @@ handlers:
   script: mimic.control_app
   secure: always
 
+# allow zip download
+- url: /_ah/mimic/zip
+  script: __pg.intercept.control_app
+  secure: always
+
 # allow file retrieval
 - url: /_ah/mimic/file
   script: __pg.intercept.control_app

@@ -463,30 +463,6 @@ class ResetProject(PlaygroundHandler):
     self.response.write(tojson(r))
 
 
-class DownloadProject(PlaygroundHandler):
-  """Handler for downloading project source code."""
-
-  def PerformAccessCheck(self):
-    if not shared.HasProjectReadAccess(self.request.environ):
-      Abort(httplib.UNAUTHORIZED, 'no project read access')
-
-  def get(self):  # pylint:disable-msg=invalid-name
-    """Handles HTTP GET requests."""
-    project_data = model.GetProjectData(self.project_id, self.tree)
-    buf = StringIO.StringIO()
-    zf = zipfile.ZipFile(buf, mode='w', compression=zipfile.ZIP_DEFLATED)
-    for project_file in project_data['files']:
-      zf.writestr(project_file['path'], project_file['content'])
-    zf.close()
-
-    filename = '{}.zip'.format(project_data['project_name'])
-    content_disposition = 'attachment; filename="{}"'.format(filename)
-
-    self.response.headers['Content-Disposition'] = content_disposition
-    self.response.headers['Content-Type'] = 'application/zip'
-    self.response.write(buf.getvalue())
-
-
 class TouchProject(PlaygroundHandler):
   """Handler for updating the project last access timestamp."""
 
@@ -549,7 +525,6 @@ app = webapp2.WSGIApplication([
     ('/playground/p/.*/rename', RenameProject),
     ('/playground/p/.*/touch', TouchProject),
     ('/playground/p/.*/reset', ResetProject),
-    ('/playground/p/.*/download', DownloadProject),
 
     # admin tools
     ('/playground/nuke', Nuke),

@@ -808,9 +808,9 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     ConfirmDialog(title, msg, okButtonText, okButtonClass, callback);
   };
 
-  $scope.download_project = function() {
+  $scope.download_project = function(filename) {
     var project_id = $scope.namespace();
-    $window.location = '/playground/p/' + encodeURI(project_id) + '/download';
+    $window.location = $scope.url_of('zip', {filename: filename});
   }
 
   $scope.prompt_download_project = function() {
@@ -821,7 +821,8 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     var okButtonText = 'DOWNLOAD PROJECT';
     var okButtonClass = 'btn btn-primary';
     var callback = function() {
-      $scope.download_project();
+      var filename = $scope.project.name + ' - ' + $scope.project.key + '.zip';
+      $scope.download_project(filename);
     }
 
     ConfirmDialog(title, msg, okButtonText, okButtonClass, callback);
