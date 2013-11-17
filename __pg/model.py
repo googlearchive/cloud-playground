@@ -44,19 +44,10 @@ class Project(ndb.Model):
                                  indexed=False)
   updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
   open_files = ndb.StringProperty(required=False, repeated=True, indexed=False)
+  orderby = ndb.StringProperty(required=False, indexed=False)
   in_progress_task_name = ndb.StringProperty(indexed=False)
   access_key = ndb.StringProperty(required=True, indexed=False)
   expiration_seconds = ndb.IntegerProperty(required=True, indexed=False)
-
-  @property
-  def orderby(self):
-    """Return string for purposes of ordering in DESCENDING order."""
-    if self.owner == settings.MANUAL_PROJECT_TEMPLATE_OWNER:
-      return '4-{}-{}'.format(self.project_name, self.updated.isoformat())
-    elif self.owner == settings.PUBLIC_PROJECT_TEMPLATE_OWNER:
-      return '1'
-    else:
-      return '2-{}-{}'.format(self.owner, self.updated.isoformat())
 
 
 class User(ndb.Model):
@@ -107,6 +98,7 @@ class Repo(ndb.Model):
                                  indexed=False)
   updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
   open_files = ndb.StringProperty(required=False, repeated=True, indexed=False)
+  orderby = ndb.StringProperty(required=False, indexed=False)
   in_progress_task_name = ndb.StringProperty(indexed=False)
 
 
@@ -163,7 +155,8 @@ def GetRepo(repo_url):
 
 
 @ndb.transactional(xg=True)
-def CreateRepoAsync(owner, repo_url, html_url, name, description, open_files):
+def CreateRepoAsync(owner, repo_url, html_url, name, description, open_files,
+                    orderby=None):
   """Asynchronously create a repo."""
   repo = GetRepo(repo_url)
   if not repo:
@@ -173,6 +166,7 @@ def CreateRepoAsync(owner, repo_url, html_url, name, description, open_files):
                 name=name,
                 description=description,
                 open_files=open_files,
+                orderby=orderby,
                 namespace=settings.PLAYGROUND_NAMESPACE)
   elif repo.in_progress_task_name:
     shared.w('ignoring recreation of {} which is already executing in task {}'
@@ -194,6 +188,7 @@ def CreateRepoAsync(owner, repo_url, html_url, name, description, open_files):
                             project_description=description,
                             open_files=open_files,
                             expiration_seconds=0,
+                            orderby=orderby,
                             in_progress_task_name=task.name)
     repo.project = project.key
   repo.put()
@@ -257,7 +252,8 @@ def CopyProject(owner, template_project, expiration_seconds):
                           project_name=name,
                           project_description=description,
                           open_files=template_project.open_files,
-                          expiration_seconds=expiration_seconds)
+                          expiration_seconds=expiration_seconds,
+                          orderby=template_project.orderby)
   src_tree = _CreateProjectTree(template_project)
   dst_tree = _CreateProjectTree(project)
   CopyTree(dst_tree, src_tree)
@@ -393,7 +389,7 @@ def NewProjectName():
 @ndb.transactional(xg=True)
 def CreateProject(owner, template_url, html_url, project_name,
                   project_description, open_files, expiration_seconds,
-                  in_progress_task_name=None):
+                  orderby=None, in_progress_task_name=None):
   """Create a new user project.
 
   Args:
@@ -403,8 +399,9 @@ def CreateProject(owner, template_url, html_url, project_name,
     project_name: The project name.
     project_description: The project description.
     open_files: List of files to open.
+    expiration_seconds: Seconds till expiration, from last update.
+    orderby: String used for project descending sort order. Optional.
     in_progress_task_name: Owning task name. Optional.
-    expiration_seconds: Seconds till expiration, from last update. Optional.
 
   Returns:
     The new project entity.
@@ -419,6 +416,7 @@ def CreateProject(owner, template_url, html_url, project_name,
                 template_url=template_url,
                 html_url=html_url,
                 open_files=open_files,
+                orderby=orderby,
                 in_progress_task_name=in_progress_task_name,
                 access_key=secret.GenerateRandomString(),
                 namespace=settings.PLAYGROUND_NAMESPACE,

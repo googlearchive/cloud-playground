@@ -39,10 +39,12 @@ class FilesystemRepoCollection(collection.RepoCollection):
         name = data.get('template_name')
         description = data.get('template_description')
         open_files = data.get('open_files', [])
+        orderby = data.get('orderby')
       except IOError:
         name = dirpath
         description = dirname
         open_files = []
+        orderby = None
       url = os.path.join(template_dir, dirname)
       html_url = ('https://code.google.com/p/cloud-playground/source/browse/'
                   '?repo=bliss#git%2F{}'.format(urllib.quote(url)))
@@ -51,7 +53,8 @@ class FilesystemRepoCollection(collection.RepoCollection):
                             html_url=html_url,
                             name=name,
                             description=description,
-                            open_files=open_files)
+                            open_files=open_files,
+                            orderby=orderby)
 
   def CreateProjectTreeFromRepo(self, tree, repo):
     repo_url = repo.key.id()

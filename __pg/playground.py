@@ -81,6 +81,14 @@ class PlaygroundHandler(webapp2.RequestHandler):
     self.response.write('{}'.format(cgi.escape(body, quote=True)))
 
   def DictOfProject(self, project):
+    if project.owner == settings.MANUAL_PROJECT_TEMPLATE_OWNER:
+      orderby = '4-{}-{}'.format(project.project_name,
+                                    project.updated.isoformat())
+    elif project.owner == settings.PUBLIC_PROJECT_TEMPLATE_OWNER:
+      orderby = '1-{}'.format(project.orderby or '')
+    else:
+      orderby = '2-{}-{}'.format(project.owner, project.updated.isoformat())
+
     return {
         # cast to str since JavaScript doesn't support long
         'key': str(project.key.id()),
@@ -95,7 +103,7 @@ class PlaygroundHandler(webapp2.RequestHandler):
                                           {'mode': 'postMessage',
                                            'debug': 'false'}),
         'in_progress_task_name': project.in_progress_task_name,
-        'orderby': project.orderby,
+        'orderby': orderby,
         'writers': project.writers,
         'access_key': project.access_key,
         'expiration_seconds': project.expiration_seconds,
