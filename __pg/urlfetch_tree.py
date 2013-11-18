@@ -40,7 +40,7 @@ class UrlFetchTree(common.Tree):
       Abort(httplib.FORBIDDEN, 'Missing namespace')
     if not access_key:
       Abort(httplib.FORBIDDEN, 'Missing access key')
-    super(UrlFetchTree, self).__init__(namespace)
+    super(UrlFetchTree, self).__init__(namespace, access_key)
     self.namespace = namespace
     self.access_key = access_key
 
