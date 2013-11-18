@@ -10,8 +10,8 @@ from mimic.__mimic import common
 from mimic.__mimic import datastore_tree
 
 from __pg import appids
-from __pg import caching_urlfetch_tree
 from __pg import settings
+from __pg import zip_urlfetch_tree
 
 from google.appengine.api import app_identity
 
@@ -33,7 +33,7 @@ app_id = app_identity.get_application_id()
 if common.IsDevMode() or app_id == appids.PLAYGROUND_APP_ID:
   mimic_CREATE_TREE_FUNC = datastore_tree.DatastoreTree
 else:
-  mimic_CREATE_TREE_FUNC = caching_urlfetch_tree.CachingUrlFetchTree
+  mimic_CREATE_TREE_FUNC = zip_urlfetch_tree.ZipUrlFetchTree
 
 mimic_JSON_ENCODER = json.JSONEncoder()
 mimic_JSON_ENCODER.indent = 4
