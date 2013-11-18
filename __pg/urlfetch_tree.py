@@ -48,13 +48,6 @@ class UrlFetchTree(common.Tree):
     return ('<{0} namespace={1!r}>'
             .format(self.__class__.__name__, self.namespace))
 
-  @staticmethod
-  def _NormalizeDirectoryPath(path):
-    """Normalize non empty str to have a trailing '/'."""
-    if path and path[-1] != '/':
-      return path + '/'
-    return path
-
   def _ToFileURL(self, control_path, params):
     params = params.copy()
     params[common.config.PROJECT_ID_QUERY_PARAM] = self.namespace
