@@ -116,7 +116,7 @@ class UrlFetchTree(common.Tree):
     return date
 
   def HasFile(self, path):
-    # root always exists, even if there are no files in the datastore
+    # root always exists, even if there are no files in the tree
     if path == '':  # pylint: disable-msg=C6403
       return True
     resp = self.RemoteGetFile(path)

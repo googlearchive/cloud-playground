@@ -5,9 +5,7 @@ import httplib
 import json
 import os
 import re
-import StringIO
 import urllib
-import zipfile
 
 import webapp2
 
