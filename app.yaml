@@ -39,7 +39,8 @@ inbound_services:
 # Keep in sync with target_info.py library validation code.
 libraries:
 - name: django
-  version: latest
+  # TODO: restore to 'latest' once appengine-django-skeleton/tree/playground has been updated
+  version: 1.4
 - name: endpoints
   version: latest
 - name: jinja2
