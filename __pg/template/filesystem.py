@@ -72,10 +72,10 @@ class FilesystemRepoCollection(collection.RepoCollection):
         else:
           try:
             with open(fullpath, 'rb') as f:
-              shared.i('- {0}'.format(relpath))
+              shared.i('- {0}'.format(fullpath))
               tree.SetFile(relpath, f.read())
           except IOError:
             # file access may be disallowed due to app.yaml skip_files
-            shared.w('skipping {}'.format(relpath))
+            shared.w('skipping {}'.format(fullpath))
 
     AddFiles('')
