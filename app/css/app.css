@@ -13,6 +13,7 @@ A:hover {
 
 IFRAME {
   display: block;
+  border: none;
 }
 
 .context-menu {
@@ -298,12 +299,18 @@ BUTTON.admin > I[class*=" icon-"] {
   height: 17em;
 }
 
-  #output-iframe > * {
+  #output-iframe > DIV {
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    height: 100%;
+    border: 1px solid #ccc;
+  }
+
+  #output-iframe > DIV > IFRAME {
     width: 100%;
     height: 100%;
-    /* prevent horizontal scrolling due to 1px border */
-    margin: -2px;
-    border: 1px solid #ccc;
   }
 
 #drag-div {
@@ -378,7 +385,7 @@ BUTTON.admin > I[class*=" icon-"] {
 
 /* enable flexbox layout */
 .form-inline.url-container {
-  display: -moz-box;      /* OLD: Firefox (buggy) */ 
+  display: -moz-box;      /* OLD: Firefox (buggy) */
   display: box;           /* OLD */
   display: -ms-flexbox;   /* MID: IE 10 */
   display: -webkit-flex;  /* NEW, Chrome 21+ */

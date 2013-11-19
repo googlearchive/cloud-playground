@@ -53,8 +53,10 @@
       <div ng-show="!output_ready" style="position: absolute; background-color: #eee;">
         <div style="margin: 2em;">Deploying code to a Google data center...</div>
       </div>
-      <iframe ng-hide="requested_popout" ng-src="{{iframe_run_url}}" pg-load="output_loaded()" pg-visible="output_ready">
-      </iframe>
+      <div ng-hide="requested_popout" pg-visible="output_ready">
+        <iframe ng-src="{{iframe_run_url}}" pg-load="output_loaded()">
+        </iframe>
+      </div>
     </div>
 
     <hr ng-hide="iframed" pg-resizer="output-iframe">
