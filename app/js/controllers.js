@@ -390,9 +390,12 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     var url = $scope.url_of('file', {path: file.path});
     $http.get(url, {transformResponse: $scope.no_json_transform})
     .success(function(data, status, headers, config) {
-      file.contents = data;
-      file.dirty = false;
-      success_cb();
+      $timeout(function() {
+        // $timeout here ensures the codemirror finishes initialization.
+        file.contents = data;
+        file.dirty = false;
+        success_cb();
+      }, 0);
     });
   };
 
