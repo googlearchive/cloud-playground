@@ -5,7 +5,10 @@
 /.project
 /.pydevproject
 
-# Testacular
+# Sublime
+cloud-playground.sublime-workspace
+
+# Karma
 /test_out/
 /.chrome-test/
 /.chrome-e2e/
