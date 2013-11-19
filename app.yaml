@@ -77,25 +77,25 @@ libraries:
 skip_files:
 # built-in defaults
 # don't skip yaml files from template projects in 'repos/' dir
-##- ^(.*/)?app\.yaml
-##- ^(.*/)?app\.yml
-##- ^(.*/)?index\.yaml
-##- ^(.*/)?index\.yml
-- ^(.*/)?#.*#
-- ^(.*/)?.*~
-- ^(.*/)?.*\.py[co]
-- ^(.*/)?.*/RCS/.*
+##- ^(.*/)?app\.yaml$
+##- ^(.*/)?app\.yml$
+##- ^(.*/)?index\.yaml$
+##- ^(.*/)?index\.yml$
+- ^(.*/)?#.*#$
+- ^(.*/)?.*~$
+- ^(.*/)?.*\.py[co]$
+- ^(.*/)?.*/RCS/.*$
 # don't skip .playground files
 #- ^(.*/)?\..*
 - ^(.*/)?.*\.bak$
 # dot files we do want to skip
-- ^(.*/)?.bin
-- ^(.*/)?.chrome-*
-- ^(.*/)?.git.*
-- ^(.*/)?.idea
-- ^(.*/)?.jshintrc
-- ^(.*/)?.name
-- ^(.*/)?.travis.yml
+- ^(.*/)?.bin$
+- ^(.*/)?.chrome-.*$
+- ^(.*/)?.git.*$
+- ^(.*/)?.idea$
+- ^(.*/)?.jshintrc$
+- ^(.*/)?.name$
+- ^(.*/)?.travis.yml$
 
 pagespeed:
   enabled_rewriters:
