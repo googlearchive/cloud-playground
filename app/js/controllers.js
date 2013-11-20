@@ -47,10 +47,14 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
                         $dialog, $location, $log, WindowService,
                         IframedDetector, ConfirmDialog) {
 
+  $scope.track = function(category, action) {
+    ga('send', 'event', category, action || 'action');
+  }
+
   DoSerial
   .then(getconfig)
   .then(getprojects);
-  
+
   function getconfig() {
     $scope.status = 'Retrieving configuration';
     return $http.get('/playground/getconfig')
@@ -520,7 +524,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
       return;
     }
     // Calls touch project repeatedly to prevent expiration.
-    return $http.post('/playground/p/' + 
+    return $http.post('/playground/p/' +
       encodeURI(project_key) + '/touch')
     .success(function(data, status, headers, config) {
       for (var i in $scope.projects) {
@@ -554,6 +558,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   // TODO: test
   $scope.insert_path = function(path) {
+    $scope.track('insert_path');
     var file = $scope.files[path];
     if (!file) {
       // Create a file on the server side and use the result.
@@ -579,6 +584,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   // TODO: test
   $scope.prompt_new_file = function() {
+    $scope.track('prompt_new_file');
     $dialog.dialog({
         controller: 'NewFileController',
         templateUrl: '/playground/new_file_modal.html',
@@ -628,6 +634,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   // TODO: test
   // TODO: replace with $dialog
   $scope.project_context_menu = function(evt) {
+    $scope.track('project_context_menu');
     evt.stopPropagation();
     hide_context_menus();
     $scope.showprojectcontextmenu = true;
@@ -636,6 +643,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   // TODO: test
   function project_rename(project, name) {
+    $scope.track('project_rename');
     DoSerial
     .then(function() {
       return $http.post('rename', {newname: name})
@@ -652,6 +660,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   // TODO: test
   $scope.prompt_project_rename = function(project) {
+    $scope.track('prompt_project_rename');
     $dialog.dialog({
         controller: 'RenameProjectController',
         templateUrl: '/playground/rename_project_modal.html',
@@ -666,6 +675,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   // TODO: test
   $scope.file_context_menu = function(evt, file) {
+    $scope.track('file_context_menu');
     evt.stopPropagation();
     hide_context_menus();
     $scope.select_file(file);
@@ -675,6 +685,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   // TODO: test
   function delete_file(file) {
+    $scope.track('delete_file');
     DoSerial
     .then(function() {
       var url = $scope.url_of('delete', {path: file.path});
@@ -688,6 +699,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   // TODO: test
   $scope.prompt_delete_file = function(file) {
+    $scope.track('prompt_delete_file');
     var title = 'Confirm file deletion';
     var msg = 'Are you sure you want to delete file "' +
               $scope.current_file.path + '"?';
@@ -702,6 +714,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   // TODO: test
   function file_rename(file, path) {
+    $scope.track('file_rename');
     if (!path || path == file.path) {
       return;
     }
@@ -722,6 +735,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   // TODO: test
   $scope.prompt_file_rename = function(file) {
+    $scope.track('prompt_file_rename');
     $dialog.dialog({
         controller: 'RenameFileController',
         templateUrl: '/playground/rename_file_modal.html',
@@ -740,6 +754,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   // TODO: test
   $scope.popout = function() {
+    $scope.track('popout');
     $scope.requested_popout = true;
     $scope.output_window = undefined;
   };
@@ -753,6 +768,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   // TODO: test
   $scope.run = function() {
+    $scope.track('run');
     return DoSerial
     .then(_save_dirty_files)
     .then($scope.clear_logs)
@@ -782,6 +798,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   };
 
   $scope.reset_project = function() {
+    $scope.track('reset_project');
     var project_id = $scope.namespace();
     return $http.post('/playground/p/' + encodeURI(project_id) + '/reset')
     .success(function(data, status, headers, config) {
@@ -798,6 +815,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   };
 
   $scope.prompt_reset_project = function() {
+    $scope.track('prompt_reset_project');
     var title = 'Confirm project reset';
     var msg = 'Are you sure you want to reset project "' +
               $scope.project.name +
@@ -812,11 +830,13 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   };
 
   $scope.download_project = function(filename) {
+    $scope.track('download_project');
     var project_id = $scope.namespace();
     $window.location = $scope.url_of('zip', {filename: filename});
   }
 
   $scope.prompt_download_project = function() {
+    $scope.track('prompt_download_project');
     var title = 'Confirm project download';
     var msg = 'Are you sure you want to download project "' +
               $scope.project.name +
