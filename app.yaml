@@ -90,13 +90,15 @@ skip_files:
 #- ^(.*/)?\..*
 - ^(.*/)?.*\.bak$
 # dot files we do want to skip
-- ^(.*/)?.bin$
-- ^(.*/)?.chrome-.*$
-- ^(.*/)?.git.*$
-- ^(.*/)?.idea$
-- ^(.*/)?.jshintrc$
-- ^(.*/)?.name$
-- ^(.*/)?.travis.yml$
+- ^(.*/)?\.bin$
+- ^(.*/)?\.chrome-.*$
+- ^(.*/)?\.git.*$
+- ^(.*/)?\.idea$
+- ^(.*/)?\.jshintrc$
+- ^(.*/)?\.name$
+- ^(.*/)?\.travis.yml$
+# more patterns to skip
+- ^(.*/)?~.*$
 
 pagespeed:
   enabled_rewriters:
