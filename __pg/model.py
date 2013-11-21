@@ -195,6 +195,10 @@ def CreateRepoAsync(owner, repo_url, html_url, name, description, open_files,
   return repo
 
 
+def GetUser(user_id):
+  return User.get_by_id(user_id, namespace=settings.PLAYGROUND_NAMESPACE)
+
+
 def GetOrCreateUser(user_id):
   return User.get_or_insert(user_id, namespace=settings.PLAYGROUND_NAMESPACE)
 
@@ -315,30 +319,27 @@ def TouchProject(project_id):
   return project
 
 
-def _UpdateProjectUserKeys(dst_user, src_user):
+def AdoptProjects(dst_user_id, src_user_id):
   """Transfer project ownership to a new user."""
-  projects = GetProjects(src_user)
-  dst_user_key = dst_user.key.id()
-  src_user_key = src_user.key.id()
-  for p in projects:
-    if src_user_key not in p.writers:
-      continue
-    p.writers.remove(src_user_key)
-    if dst_user_key in p.writers:
-      continue
-    p.owner = dst_user_key
-    p.writers.append(dst_user_key)
-  ndb.put_multi(projects)
 
+  @ndb.transactional(xg=True)
+  def _AdoptProject(project_key, dst_user_key, src_user_key):
+    prj, dst_user, src_user = ndb.get_multi([project_key, dst_user_key,
+                                             src_user_key])
+    src_user.projects.remove(project_key)
+    dst_user.projects.append(project_key)
+    prj.owner = dst_user_key.id()
+    prj.writers.remove(src_user_key.id())
+    prj.writers.append(dst_user_key.id())
+    ndb.put_multi([prj, dst_user, src_user])
 
-def AdoptProjects(dst_user_key, src_user_key):
-  dst_user = GetOrCreateUser(dst_user_key)
-  src_user = GetOrCreateUser(src_user_key)
-  _UpdateProjectUserKeys(dst_user, src_user)
-  dst_user.projects.extend(src_user.projects)
-  dst_user.put()
-  src_user.key.delete()
-  memcache.flush_all()
+  src_user = GetUser(src_user_id)
+  if not src_user or not src_user.projects:
+    return
+  dst_user = GetOrCreateUser(dst_user_id)
+  for project_key in src_user.projects:
+    # slow, but transactionable
+    _AdoptProject(project_key, dst_user.key, src_user.key)
 
 
 def GetGlobalRootEntity():
