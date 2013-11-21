@@ -47,12 +47,12 @@
       </div>
 
       <div ng-controller="AlertController">
-        <div class="alert alert-error alert-reduced-margin" ng-show="cookie_problem() && iframed">
+        <alert class="alert alert-error alert-reduced-margin" ng-show="cookie_problem() && iframed">
            <b>As a first time user</b> you will need to briefly open the Cloud Playground in a
            <a href="." target="_blank">separate window</a>.<br>
            Once you've done that, please reload this page.
-        </div>
-        <div class="alert alert-error alert-reduced-margin" ng-show="cookie_problem()">
+        </alert>
+        <alert class="alert alert-error alert-reduced-margin" ng-show="cookie_problem()">
            Cloud Playground is having trouble with your browser cookies.<br>
            <br>
            Here are some other things you can try to resolve this:
@@ -61,8 +61,8 @@
              <li>Make sure your browser is configured to allow cookies.</li>
              <li>Clear your browser cookies.</li>
            </ol>
-        </div>
-        <div ng-repeat="alert in alerts()" close="closeAlert($index)" class="alert alert-{{alert.type}} alert-pre alert-reduced-margin"><i class="{{alert.icon}}"></i> {{alert.msg}}</div>
+        </alert>
+        <alert ng-repeat="alert in alerts()" close="closeAlert($index)" class="alert alert-{{alert.type}} alert-pre alert-reduced-margin"><i class="{{alert.icon}}"></i> {{alert.msg}}</alert>
       </div>
 
       <div id="main">
