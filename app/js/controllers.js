@@ -347,6 +347,9 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   // TODO: remove; don't maintain DOM references
   $scope.requested_popout = false;
 
+  // variable lifecycle: undefined -> false -> true -> false -> true -> ...
+  $scope.output_ready = undefined;
+
   // TODO: remove once file contents are returned in JSON response
   $scope.no_json_transform = function(data) { return data; };
 
@@ -790,6 +793,9 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   };
 
   $scope.output_loaded = function() {
+    if (typeof $scope.output_ready === 'undefined') {
+      return;
+    }
     $scope.output_ready = true;
   };
 
