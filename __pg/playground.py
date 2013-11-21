@@ -99,7 +99,7 @@ class PlaygroundHandler(webapp2.RequestHandler):
         'run_url': self._MakeMimicUrl(project, '/'),
         'control_url': self._MakeMimicUrl(project, '/_ah/mimic/log',
                                           {'mode': 'postMessage',
-                                           'debug': 'false'}),
+                                           'debug': 'true'}),
         'in_progress_task_name': project.in_progress_task_name,
         'orderby': orderby,
         'writers': project.writers,
