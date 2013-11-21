@@ -62,42 +62,11 @@ TABLE {
   position: relative;
 }
 
-.topbar {
-  position: absolute;
-  right: 0em;
-  top: 0em;
-}
-
-  .topbar DIV {
-    display: inline-block;
-  }
-
-  .topbar SPAN {
-    margin: 0.4em;
-  }
-
 .filestatus {
   color: #ccc;
   margin: 0em 2em;
   min-height: 2em;
 }
-
-.logo {
-  font-size: 2em;
-  font-weight: bold;
-  color: #000 !important;
-  text-decoration: none;
-}
-
-  .logo .app-back {
-    color: #ddd;
-    font-size: 0.9em;
-    vertical-align: top;
-  }
-
-  .logo:hover .app-back {
-    color: #555;
-  }
 
 .space-above {
   margin-top: 2em;
@@ -209,14 +178,59 @@ TABLE {
   min-height: 100%;
 }
 
-  #header {
-    border-bottom: 1px solid #ccc;
-    /* developers-logo.png is 200px x 48px */
-    background: 7px 7px no-repeat url(/playground/img/developers-logo.png);
-    padding-left: 215px;
-    line-height: 67px;
-    height: 67px;
+.notsafe {
+  color: gray;
+}
+
+#header {
+  margin: 5px;
+  border-bottom: 1px solid #ccc;
+}
+
+  .iframed #header {
+    border: none;
   }
+
+#header .header-logo {
+  float: left;
+  margin-right: 10px;
+}
+
+#header .header-logo-line {
+  line-height: 60px;
+  height: 48px;
+}
+
+#header .header-product-text {
+  font-size: 2em;
+  font-weight: bold;
+  color: #000 !important;
+  text-decoration: none;
+}
+
+  #header .header-product-text .app-back {
+    color: #ddd;
+    font-size: 0.9em;
+    vertical-align: top;
+  }
+
+  #header .header-product-text:hover .app-back {
+    color: #555;
+  }
+
+  #header .topbar {
+    position: absolute;
+    right: 0em;
+    top: 0em;
+  }
+
+    #header .topbar DIV {
+      display: inline-block;
+    }
+
+    #header .topbar SPAN {
+      margin: 0.4em;
+    }
 
   #main {
     /* bottom padding should be at least footer height */
