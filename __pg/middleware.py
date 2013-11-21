@@ -66,6 +66,7 @@ def GetOrMakeSession(request):
   if user:
     if _ANON_USER_KEY in session:
       AdoptAnonymousProjects(user.email(), session[_ANON_USER_KEY])
+      del session[_ANON_USER_KEY]
   else:
     if _ANON_USER_KEY not in session:
       session[_ANON_USER_KEY] = MakeAnonUserKey()
