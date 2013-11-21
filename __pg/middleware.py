@@ -190,16 +190,18 @@ class ProjectFilter(object):
   - environ['playground.project'] contains the current project
   """
 
-  def __init__(self, app):
-    self.app = app
+  def __init__(self, app, assert_project_existence=True):
+    self._app = app
+    self._assert_project_existence = assert_project_existence
 
   def __call__(self, environ, start_response):
     project_id = mimic.GetProjectId(environ, False)
     if project_id and shared.ThisIsPlaygroundApp():
       project = model.GetProject(project_id)
-      assert project, 'project_id {} not found in datastore'.format(project_id)
-      environ['playground.project'] = project
-    return self.app(environ, start_response)
+      if self._assert_project_existence:
+        assert project, 'project_id {} not found in datastore'.format(project_id)
+      environ['playground.project'] = project or settings.NO_SUCH_PROJECT
+    return self._app(environ, start_response)
 
 
 class AccessKeyCookieFilter(object):

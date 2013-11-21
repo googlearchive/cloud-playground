@@ -506,6 +506,9 @@ class CheckExpiration(webapp2.RequestHandler):
 
   def post(self):  # pylint:disable-msg=invalid-name
     project = self.request.environ.get('playground.project')
+    if project == settings.NO_SUCH_PROJECT:
+      # project already deleted
+      return
     model.CheckExpiration(project)
 
 app = webapp2.WSGIApplication([
@@ -542,4 +545,5 @@ app = middleware.ErrorHandler(app, debug=settings.DEBUG)
 internal_app = webapp2.WSGIApplication([
     ('/playground/p/.*/check_expiration', CheckExpiration)
 ], debug=settings.DEBUG)
-internal_app = middleware.ProjectFilter(internal_app)
+internal_app = middleware.ProjectFilter(internal_app,
+                                        assert_project_existence=False)

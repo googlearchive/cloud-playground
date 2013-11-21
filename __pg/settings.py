@@ -68,6 +68,9 @@ MIN_EXPIRATION_SECONDS = 3600
 # One week
 DEFAULT_EXPIRATION_SECONDS = 604800
 
+# sentinnel value indicating a missing project
+NO_SUCH_PROJECT = 'NO_SUCH_PROJECT'
+
 # Extensions to exclude when creating template projects
 SKIP_EXTENSIONS = ('swp', 'pyc', 'svn')
 
