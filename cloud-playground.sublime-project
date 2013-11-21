@@ -1,9 +1,33 @@
 {
 	"folders":
 	[
-		{
-			"path": "/fred/src/cloud-playground.bliss",
-			"folder_exclude_patterns": [".chrome-*", "test_out", "*.pyc", "api-python-client"]
-		}
-	]
-}
+  {
+    "path": "/fred/src/cloud-playground.bliss",
+    "name": "bliss",
+    "folder_exclude_patterns":
+    [
+    ".chrome-*",
+    "test_out",
+    "*.pyc",
+    "api-python-client",
+    "bootstrap",
+    "mimic",
+    "codemirror"
+    ],
+    "file_exclude_patterns": ["*.sublime-*"]
+
+    },
+    {
+      "path": "mimic",
+      "name": "mimic",
+      "folder_exclude_patterns": [
+      "*.pyc"
+      ]
+      },
+      {
+        "path": "bootstrap/docs/assets/css",
+        "name":"bootstrap-css",
+        "file_exclude_patterns": ["docs.css"]
+      }
+      ]
+    }
