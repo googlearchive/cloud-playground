@@ -13,7 +13,7 @@ function AlertController($scope, Alert) {
 
   $scope.cookie_problem = function() {
     return Alert.cookie_problem();
-  }
+  };
 
   $scope.$on('$routeChangeStart', function() {
     Alert.clear();
