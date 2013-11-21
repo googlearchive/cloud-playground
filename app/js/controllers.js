@@ -350,6 +350,9 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   // variable lifecycle: undefined -> false -> true -> false -> true -> ...
   $scope.output_ready = undefined;
 
+  // ensures exactly one automatic run after channel API socket opens
+  $scope.has_auto_run = false;
+
   // TODO: remove once file contents are returned in JSON response
   $scope.no_json_transform = function(data) { return data; };
 
@@ -617,9 +620,12 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     }
     var msg;
     if (msg = evt.data['socket.onopen']) {
-      // give Channel API opportunity to become fully setup
-      // https://code.google.com/p/googleappengine/issues/detail?id=7571
-      $timeout($scope.run, 1000);
+      if (!$scope.has_auto_run) {
+        $scope.has_auto_run = true;
+        // give Channel API opportunity to become fully setup
+        // https://code.google.com/p/googleappengine/issues/detail?id=7571
+        $timeout($scope.run, 1000);
+      }
     } else if (msg = evt.data['socket.onmessage']) {
       var log_entry = JSON.parse(msg.data);
       // $sce helps defend against hostile input
