@@ -257,7 +257,8 @@ def CopyProject(owner, template_project, expiration_seconds):
                           project_description=description,
                           open_files=template_project.open_files,
                           expiration_seconds=expiration_seconds,
-                          orderby=template_project.orderby)
+                          orderby=template_project.orderby,
+                          retries=3)
   src_tree = _CreateProjectTree(template_project)
   dst_tree = _CreateProjectTree(project)
   CopyTree(dst_tree, src_tree)
@@ -390,7 +391,7 @@ def NewProjectName():
 @ndb.transactional(xg=True)
 def CreateProject(owner, template_url, html_url, project_name,
                   project_description, open_files, expiration_seconds,
-                  orderby=None, in_progress_task_name=None):
+                  orderby=None, in_progress_task_name=None, retries=1):
   """Create a new user project.
 
   Args:
@@ -410,27 +411,33 @@ def CreateProject(owner, template_url, html_url, project_name,
   Raises:
     PlaygroundError: If the project name already exists.
   """
-  prj = Project(project_name=project_name,
-                project_description=project_description,
-                owner=owner.key.id(),
-                writers=[owner.key.id()],
-                template_url=template_url,
-                html_url=html_url,
-                open_files=open_files,
-                orderby=orderby,
-                in_progress_task_name=in_progress_task_name,
-                access_key=secret.GenerateRandomString(),
-                namespace=settings.PLAYGROUND_NAMESPACE,
-                expiration_seconds=expiration_seconds)
-  prj.put()
-  # transactional get before update
-  owner = owner.key.get()
-  owner.projects.append(prj.key)
-  owner.put()
-  # call taskqueue to schedule expiration
-  if prj.expiration_seconds:
-    ScheduleExpiration(prj)
-  return prj
+  for i in range(0, 3):
+    try:
+      prj = Project(project_name=project_name,
+                    project_description=project_description,
+                    owner=owner.key.id(),
+                    writers=[owner.key.id()],
+                    template_url=template_url,
+                    html_url=html_url,
+                    open_files=open_files,
+                    orderby=orderby,
+                    in_progress_task_name=in_progress_task_name,
+                    access_key=secret.GenerateRandomString(),
+                    namespace=settings.PLAYGROUND_NAMESPACE,
+                    expiration_seconds=expiration_seconds)
+      prj.put()
+      # transactional get before update
+      owner = owner.key.get()
+      owner.projects.append(prj.key)
+      owner.put()
+      # call taskqueue to schedule expiration
+      if prj.expiration_seconds:
+        ScheduleExpiration(prj)
+      return prj
+    except e:
+      if i == retries - 1:
+        raise
+      shared.w('Will retry CreateProject which encountered {}'.format(e))
 
 
 def GetProjectLastModified(project):
