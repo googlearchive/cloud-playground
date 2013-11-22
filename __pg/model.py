@@ -2,6 +2,7 @@
 
 import os
 import random
+import time
 
 from mimic.__mimic import common
 
@@ -258,7 +259,7 @@ def CopyProject(owner, template_project, expiration_seconds):
                           expiration_seconds=expiration_seconds,
                           orderby=template_project.orderby,
                           in_progress_task_name='copy_project',
-                          retries=3)
+                          retries=5)
   src_tree = _CreateProjectTree(template_project)
   dst_tree = _CreateProjectTree(project)
   CopyTree(dst_tree, src_tree)
@@ -409,7 +410,7 @@ def CreateProject(owner, template_url, html_url, project_name,
   Raises:
     PlaygroundError: If the project name already exists.
   """
-  for i in range(0, 3):
+  for i in range(0, retries):
     try:
       prj = Project(project_name=project_name,
                     project_description=project_description,
@@ -436,6 +437,7 @@ def CreateProject(owner, template_url, html_url, project_name,
       if i == retries - 1:
         raise
       shared.w('Will retry CreateProject which encountered {}'.format(e))
+      time.sleep(random.randint(1, 4))
 
 
 def GetProjectLastModified(project):
