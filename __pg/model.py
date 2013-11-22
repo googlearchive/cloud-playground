@@ -435,8 +435,10 @@ def CreateProject(owner, template_url, html_url, project_name,
   owner.projects.append(prj.key)
   owner.put()
   # call taskqueue to schedule expiration
-  if prj.expiration_seconds:
-    ScheduleExpiration(prj)
+  if expiration_seconds:
+    expiration_date = prj.updated + datetime.timedelta(0, expiration_seconds)
+    # explicit expiration_date avoids reading back all the files we just created
+    ScheduleExpiration(prj, expiration_date)
   return prj
 
 
@@ -460,11 +462,13 @@ def GetProjectLastModified(project):
   return last_modified
 
 
-def ScheduleExpiration(project):
+def ScheduleExpiration(project, expiration_date):
   base_url = '/playground/p/{0}/check_expiration'
   expiration_url = base_url.format(project.key.id())
-  expiration_date = (GetProjectLastModified(project) +
-                     datetime.timedelta(0, project.expiration_seconds))
+  if expiration_date is None:
+    # deteimne expiration date based on last file access
+    expiration_date = (GetProjectLastModified(project) +
+                       datetime.timedelta(0, project.expiration_seconds))
   taskqueue.add(queue_name='expiration',
                 url=expiration_url,
                 eta=expiration_date)
@@ -489,7 +493,7 @@ def CheckExpiration(project):
     DeleteProject(project)
   # Defer expiration
   else:
-    ScheduleExpiration(project)
+    ScheduleExpiration(project, None)
 
 
 @ndb.transactional()
