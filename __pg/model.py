@@ -386,10 +386,6 @@ def DeleteReposAndTemplateProjects():
   memcache.flush_all()
 
 
-def NewProjectName():
-  return 'foo{0}'.format(random.randint(100, 999))
-
-
 @ndb.transactional(xg=True)
 def CreateProject(owner, template_url, html_url, project_name,
                   project_description, open_files, expiration_seconds,
