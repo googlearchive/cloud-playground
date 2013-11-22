@@ -525,11 +525,12 @@ def DeleteProject(project):
     # 3. delete project
     prj.key.delete()
     # 4. delete project references
-    if prj.key not in usr.projects:
-      shared.e('project key {} not found in user projects {}'
+    if prj.key in usr.projects:
+      usr.projects.remove(prj.key)
+      usr.put()
+    else:
+      shared.i('ignoring project key {} not found in user projects {}'
                .format(prj.key, usr.projects))
-    usr.projects.remove(prj.key)
-    usr.put()
 
   @ndb.transactional(xg=True)
   def DelReposAndProject(keys):
