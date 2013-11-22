@@ -234,7 +234,6 @@ def _CreateProjectTree(project):
   return common.config.CREATE_TREE_FUNC(str(project.key.id()))
 
 
-@ndb.transactional(xg=True)
 def CopyProject(owner, template_project, expiration_seconds):
   """Create new a project from a template.
 
@@ -258,10 +257,13 @@ def CopyProject(owner, template_project, expiration_seconds):
                           open_files=template_project.open_files,
                           expiration_seconds=expiration_seconds,
                           orderby=template_project.orderby,
+                          in_progress_task_name='copy_project',
                           retries=3)
   src_tree = _CreateProjectTree(template_project)
   dst_tree = _CreateProjectTree(project)
   CopyTree(dst_tree, src_tree)
+  project.in_progress_task_name=None
+  project.put()
   return project
 
 
