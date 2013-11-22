@@ -50,11 +50,9 @@ class ZipUrlFetchTree(common.Tree):
                            settings.PLAYGROUND_HOSTS[0])
     url = 'https://{}{}?{}'.format(playground_hostname, path_info, query_params)
 
-    self._rpc = urlfetch.create_rpc()
-    headers = {settings.ACCESS_KEY_HTTP_HEADER: self.access_key}
-    urlfetch.make_fetch_call(self._rpc, url, headers=headers, method='GET',
-                             payload=None, follow_redirects=False)
-    self._zipfile = None
+    result = shared.Fetch(access_key, url, method='GET', deadline=30, retries=3)
+    buf = cStringIO.StringIO(result.content)
+    self._zipfile = zipfile.ZipFile(buf)
 
   def __repr__(self):
     return ('<{0} namespace={1!r}>'
@@ -63,41 +61,28 @@ class ZipUrlFetchTree(common.Tree):
   def IsMutable(self):
     return False
 
-  def FetchZip(self):
-    if self._zipfile:
-      return
-    self._rpc.check_success()
-    result = self._rpc.get_result()
-    buf = cStringIO.StringIO(result.content)
-    self._zipfile = zipfile.ZipFile(buf)
-
   def GetFileContents(self, path):
-    self.FetchZip()
     if path not in self._zipfile.namelist():
       return None
     with self._zipfile.open(path) as f:
       return f.read()
 
   def GetFileSize(self, path):
-    self.FetchZip()
     if path not in self._zipfile.namelist():
       return 0
     return self._zipfile.getinfo(path).file_size
 
   def GetFileLastModified(self, path):
-    self.FetchZip()
     dt = self._zipfile.getinfo(path).date_time
     return datetime.datetime(*dt)
 
   def HasFile(self, path):
-    self.FetchZip()
     # root always exists, even if there are no files in the tree
     if path == '':  # pylint: disable-msg=C6403
       return True
     return path in self._zipfile.namelist()
 
   def HasDirectory(self, path):
-    self.FetchZip()
     path = self._NormalizeDirectoryPath(path)
     for p in self._zipfile.namelist():
       if p.startswith(path):
@@ -105,7 +90,6 @@ class ZipUrlFetchTree(common.Tree):
     return False
 
   def ListDirectory(self, path):
-    self.FetchZip()
     path = self._NormalizeDirectoryPath(path)
     paths = [p for p in self._zipfile.namelist() if p.startswith(path)]
     return sorted(paths)

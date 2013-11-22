@@ -13,6 +13,11 @@ from . import settings
 from google.appengine.api import app_identity
 from google.appengine.api import backends
 from google.appengine.api import users
+from google.appengine.api import urlfetch
+
+
+# default URLFetch deadline
+_URL_FETCH_DEADLINE = 3
 
 
 # HTTP methods which do not affect state
@@ -38,6 +43,20 @@ def w(msg, *args, **kwargs):  # pylint:disable-msg=invalid-name
     if args or kwargs:
       msg = msg.format(*args, **kwargs)
   logging.warning('##### {0}'.format(repr(msg)))
+
+
+def Fetch(access_key, url, method, payload=None, deadline=_URL_FETCH_DEADLINE,
+          retries=1):
+  for i in range(0, retries):
+    try:
+      headers = {settings.ACCESS_KEY_HTTP_HEADER: access_key}
+      return urlfetch.fetch(url, headers=headers, method=method,
+                            payload=payload, follow_redirects=False,
+                            deadline=deadline)
+    except e:
+      if i == retries - 1:
+        raise
+      w('Will retry {} {} which encountered {}'.format(method, url, e))
 
 
 def GetCurrentTaskName():
