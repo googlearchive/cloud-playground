@@ -53,7 +53,7 @@ def Fetch(access_key, url, method, payload=None, deadline=_URL_FETCH_DEADLINE,
       return urlfetch.fetch(url, headers=headers, method=method,
                             payload=payload, follow_redirects=False,
                             deadline=deadline)
-    except e:
+    except Exception, e:
       if i == retries - 1:
         raise
       w('Will retry {} {} which encountered {}'.format(method, url, e))

@@ -434,7 +434,7 @@ def CreateProject(owner, template_url, html_url, project_name,
       if prj.expiration_seconds:
         ScheduleExpiration(prj)
       return prj
-    except e:
+    except Exception, e:
       if i == retries - 1:
         raise
       shared.w('Will retry CreateProject which encountered {}'.format(e))
