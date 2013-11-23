@@ -556,6 +556,9 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
       .then(setcurrentproject);
     }
   })
+  .then(function() {
+    $scope.control_url = $sce.trustAsResourceUrl($scope.project.control_url);
+  })
   .then($scope._list_files)
   .then($scope._select_a_file)
   .then($scope.set_loaded)
@@ -882,12 +885,6 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     }
     if ($scope.selected_path != newfile.path) {
       $scope.selected_path = newfile.path;
-    }
-  });
-
-  $scope.$watch('project.control_url', function(value) {
-    if (value) {
-      $scope.control_url = $sce.trustAsResourceUrl(value);
     }
   });
 
