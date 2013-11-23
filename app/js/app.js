@@ -21,11 +21,13 @@ angular.module('playgroundApp', [
   .when('/playground/', {
      templateUrl: '/playground/main.html',
      controller: MainController,
+     resolve: {'CookieFinder': 'CookieFinder'},
   })
   .when('/playground/p/:project_id/', {
      templateUrl: '/playground/project.html',
      controller: ProjectController,
      reloadOnSearch: false,
+     resolve: {'CookieFinder': 'CookieFinder'},
   });
 
   $httpProvider.interceptors.push('pgHttpInterceptor');

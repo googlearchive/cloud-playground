@@ -5,6 +5,17 @@
 angular.module('playgroundApp.services', [])
 
 // TODO: test
+.factory('CookieFinder', function($q, $log, $window) {
+  var deferred = $q.defer();
+  if ($window.document.cookie) {
+    deferred.resolve($window.document.cookie);
+  } else {
+    deferred.reject();
+  }
+  return deferred.promise;
+})
+
+// TODO: test
 .factory('$exceptionHandler', function($log, Alert) {
 
   // borrowed from app/lib/angular/angular.js
