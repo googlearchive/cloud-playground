@@ -31,7 +31,7 @@
     <div id="container" ng-class="{iframed: iframed}">
 
       <!-- cover up IFRAMEs during drag -->
-      <div id="drag-div" class="hidden">
+      <div id="drag-div" class="cover-everything hidden">
       </div>
 
       <div id="header" ng-controller="HeaderController">
@@ -59,23 +59,31 @@
 
       <div ng-controller="AlertController">
 
+        <!-- full screen lightbox for iframe cookie problems -->
+        <div class="cover-everything lightbox" ng-show="cookie_problem() && iframed">
+          <div class="lightbox-msg">
+            Try App Engine in the <button class="btn" ng-click="popout_ide()">
+            <i class="icon-fullscreen"></i></span> Cloud Playground</button>
+          </div>
+        </div>
+
         <!-- use DIV rather than ALERT so ng-show works -->
         <div class="alert alert-error alert-reduced-margin" ng-show="cookie_problem() && iframed">
-           <b>As a first time user</b> you will need to briefly open the Cloud Playground in a
-           <a href="." target="_blank">separate window</a>.<br>
-           Once you've done that, please reload this page.
+          <b>As a first time user</b> you will need to briefly open the Cloud Playground in a
+          <a href="." target="_blank">separate window</a>.<br>
+          Once you've done that, please reload this page.
         </div>
 
         <!-- use DIV rather than ALERT so ng-show works -->
         <div class="alert alert-error alert-reduced-margin" ng-show="cookie_problem()">
-           Cloud Playground is having trouble with your browser cookies.<br>
-           <br>
-           Here are some other things you can try to resolve this:
-           <ol>
-             <li><a ng-click="reload()">Reload</a> this page.</li>
-             <li>Make sure your browser is configured to allow cookies.</li>
-             <li>Clear your browser cookies.</li>
-           </ol>
+        Cloud Playground is having trouble with your browser cookies.<br>
+        <br>
+        Here are some other things you can try to resolve this:
+        <ol>
+          <li><a ng-click="reload()">Reload</a> this page.</li>
+          <li>Make sure your browser is configured to allow cookies.</li>
+          <li>Clear your browser cookies.</li>
+        </ol>
         </div>
 
         <!-- use ALERT here so CLOSE attribute triggers close widget -->

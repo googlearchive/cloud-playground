@@ -93,6 +93,11 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     WindowService.reload();
   };
 
+  $scope.popout_ide = function() {
+    $scope.track('popout_ide');
+    WindowService.open($location.absUrl(), '_blank');
+  }
+
   $scope.big_red_button = function() {
     DoSerial
     .then(function() {

@@ -16,6 +16,38 @@ IFRAME {
   border: none;
 }
 
+.cover-everything {
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  position: absolute;
+  z-index: 2147483647;
+}
+
+.lightbox {
+  background: #fff;
+  opacity: 0.95;
+  width: 100%;
+  height: 100%;
+}
+
+  .lightbox-msg {
+    position: relative;
+    font-size: 1.5em;
+    text-align: center;
+
+    /* center horizontally */
+    width: 600px;
+    margin-left: -300px;
+    left: 50%;
+
+    /* center vertically */
+    height: 100px;
+    margin-top: -50px;
+    top: 50%;
+  }
+
 .context-menu {
   position: absolute;
   margin-left: -2em;
@@ -326,15 +358,6 @@ BUTTON.admin > I[class*=" icon-"] {
     width: 100%;
     height: 100%;
   }
-
-#drag-div {
-  top: 0px;
-  left: 0px;
-  right: 0px;
-  bottom: 0px;
-  position: absolute;
-  z-index: 2147483647;
-}
 
 .hidden {
   display: none;
