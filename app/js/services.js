@@ -5,17 +5,6 @@
 angular.module('playgroundApp.services', [])
 
 // TODO: test
-.factory('CookieFinder', function($q, $log, $window) {
-  var deferred = $q.defer();
-  if ($window.document.cookie) {
-    deferred.resolve($window.document.cookie);
-  } else {
-    deferred.reject();
-  }
-  return deferred.promise;
-})
-
-// TODO: test
 .factory('$exceptionHandler', function($log, Alert) {
 
   // borrowed from app/lib/angular/angular.js
@@ -52,17 +41,35 @@ angular.module('playgroundApp.services', [])
 
 // TODO: test
 .factory('IframedDetector', function($location, $rootScope, $window) {
-  $rootScope.iframed = $location.search()['iframed'] ||
-                       $window.top != $window.self;
-  return {};
+  var iframed = $location.search()['iframed'] ||
+                $window.top != $window.self;
+  $rootScope.iframed = iframed;
+  return {
+    iframed: function() {
+      return iframed;
+    }
+  };
+})
+
+// TODO: test
+.factory('CookieFinder', function($q, $log, $window, IframedDetector) {
+  var deferred = $q.defer();
+  if ($window.document.cookie) {
+    deferred.resolve($window.document.cookie);
+  } else {
+    if (IframedDetector.iframed) {
+      deferred.reject('IFRAMED_NO_COOKIE');
+    } else {
+      deferred.reject('NO_BROWSER_COOKIE');
+    }
+  }
+  return deferred.promise;
 })
 
 // TODO: test
 .factory('Alert', function() {
 
   var alert_list = [];
-
-  var is_cookie_problem = false;
 
   var Alert = {
     alert_list: alert_list,
@@ -103,12 +110,6 @@ angular.module('playgroundApp.services', [])
       alert_list.splice(idx, 1);
     },
 
-    cookie_problem: function(problem) {
-      if (problem == undefined) {
-        return is_cookie_problem;
-      }
-      is_cookie_problem = problem;
-    },
   };
 
   return Alert;
@@ -187,7 +188,7 @@ angular.module('playgroundApp.services', [])
    'responseError': function(response) {
       if (response.headers('X-Cloud-Playground-Error')) {
         if (response.status == 401) {
-          Alert.cookie_problem(true);
+          // TODO: treat this case specially?
         }
       }
       return $q.reject(response);

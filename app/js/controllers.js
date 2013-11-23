@@ -11,10 +11,6 @@ function AlertController($scope, Alert) {
     Alert.remove_alert(idx);
   };
 
-  $scope.cookie_problem = function() {
-    return Alert.cookie_problem();
-  };
-
   $scope.$on('$routeChangeStart', function() {
     Alert.clear();
   });
@@ -40,16 +36,24 @@ function RenameProjectController($scope, $log, dialog, project_name) {
 }
 
 function PageController($scope, $http, DoSerial, $routeParams, $window,
-                        $dialog, $location, $log, WindowService,
-                        IframedDetector, ConfirmDialog) {
+                        $dialog, $location, $log, WindowService, $rootScope,
+                        IframedDetector, ConfirmDialog, $q) {
 
   $scope.track = function(category, action) {
     ga('send', 'event', category, action || 'action');
   }
 
-  DoSerial
-  .then(getconfig)
-  .then(getprojects);
+  // TODO: test
+  $scope.$on('$routeChangeError', function(evt, current, previous, rejection) {
+    $rootScope.set_load_state(rejection);
+  });
+
+  // TODO: test
+  $scope.$on('$routeChangeSuccess', function(evt, current, previous) {
+    DoSerial
+    .then(getconfig)
+    .then(getprojects);
+  });
 
   function getconfig() {
     $scope.status = 'Retrieving configuration';
@@ -64,7 +68,15 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
       var project_id = $scope.namespace();
       return $http.get('/playground/p/' + encodeURI(project_id) + '/retrieve')
       .success(function(data, status, headers, config) {
-          $scope.projects.push(data);
+        $scope.projects.push(data);
+      })
+      .error(function(data, status, headers, config) {
+        if (headers('X-Cloud-Playground-Error')) {
+          if (status == 401) {
+            return $q.reject('PROJECT_ACCESS_DENIED');
+          }
+        }
+        return $q.reject(data);
       });
   };
 
@@ -170,32 +182,31 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     ConfirmDialog(title, msg, okButtonText, okButtonClass, callback);
   };
 
-  $scope.set_loaded = function(err) {
-    if (err) {
-      $scope.loaded = err;
-    } else {
-      $scope.loaded = true;
-    }
+  $rootScope.set_load_state = function(state) {
+    $scope.load_state = state;
   }
 
+  $rootScope.set_load_state(false);
 }
 
 function MainController($scope, $http, $window, $location, $log, $routeParams,
-                        $q, Alert, DoSerial) {
+                        $q, Alert, DoSerial, $rootScope) {
 
   // TODO: test
-  DoSerial
-  .then(function() {
-    var template_url = $routeParams.template_url;
-    if (template_url) {
-      var expiration_seconds = parseInt($routeParams.expiration_seconds);
-      return $scope.new_project_from_template_url(template_url, expiration_seconds)
-      .catch(function(e) {
-        $scope.set_loaded(e);
-      });
-    } else {
-      $scope.set_loaded();
-    }
+  $scope.$on('$routeChangeSuccess', function(evt, current, previous) {
+    DoSerial
+    .then(function() {
+      var template_url = $routeParams.template_url;
+      if (template_url) {
+        var expiration_seconds = parseInt($routeParams.expiration_seconds);
+        return $scope.new_project_from_template_url(template_url, expiration_seconds)
+        .catch(function(e) {
+          $rootScope.set_load_state(e);
+        });
+      } else {
+        $rootScope.set_load_state(true);
+      }
+    });
   });
 
   // TODO: test
@@ -346,7 +357,7 @@ function OAuth2AdminController($scope, $log, dialog, key, url, client_id,
 function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
                            $dialog, $location, $log, DoSerial, DomElementById,
                            WrappedElementById, Backoff, ConfirmDialog,
-                           $timeout) {
+                           $timeout, $rootScope, $q) {
 
   // keep in sync with appengine_config.py
   var MIMIC_PROJECT_ID_QUERY_PARAM = '_mimic_project';
@@ -366,6 +377,39 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   $scope.no_json_transform = function(data) { return data; };
 
   $scope.logs = [];
+
+  // TODO: test
+  $scope.$on('$routeChangeSuccess', function(evt, current, previous) {
+    DoSerial
+    .then(function() {
+      var deferred = $q.defer();
+      deferred.resolve();
+      deferred.promise
+      .then(function() {
+        if (!setcurrentproject()) {
+          // project_id is not in $scope.projects
+          return $scope.retrieveproject()
+          .catch(function(e) {
+            $rootScope.set_load_state(e);
+            return $q.reject(e);
+          })
+          .then(setcurrentproject)
+        }
+      })
+      .then(function() {
+        $scope.control_url = $sce.trustAsResourceUrl($scope.project.control_url);
+      })
+      .then($scope._list_files)
+      .then($scope._select_a_file)
+      .then(function() {
+        $rootScope.set_load_state(true);
+      })
+      .then(function() {
+        $scope.touch_project($scope.project.key);
+      });
+      return deferred.promise;
+    })
+  });
 
   $scope.clear_logs = function() {
     $scope.logs = [];
@@ -551,24 +595,6 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
       }
     });
   };
-
-  DoSerial
-  .then(function() {
-    if (!setcurrentproject()) {
-      // project_id is not in $scope.projects
-      return $scope.retrieveproject()
-      .then(setcurrentproject);
-    }
-  })
-  .then(function() {
-    $scope.control_url = $sce.trustAsResourceUrl($scope.project.control_url);
-  })
-  .then($scope._list_files)
-  .then($scope._select_a_file)
-  .then($scope.set_loaded)
-  .then(function() {
-    $scope.touch_project($scope.project.key);
-  });
 
   // TODO: test
   $scope.insert_path = function(path) {

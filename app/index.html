@@ -25,9 +25,38 @@
     <script src="/codemirror/mode/yaml/yaml.js"></script>
 
     <script src="/codemirror/addon/edit/matchbrackets.js"></script>
-
   </head>
   <body ng-cloak ng-controller="PageController">
+
+    <!-- full screen lightbox for general initializaiton problems -->
+    <div class="cover-everything lightbox" ng-show="load_state && load_state != true" ng-switch="load_state">
+
+      <div class="lightbox-msg" ng-switch-when="IFRAMED_NO_COOKIE">
+        Try App Engine in the <button class="btn" ng-click="popout_ide()">
+        <i class="icon-fullscreen"></i> Cloud Playground</button>
+      </div>
+
+      <div class="lightbox-msg" ng-switch-when="NO_BROWSER_COOKIE">
+        <p><b>Cloud Playground is unable to use browser cookies.</b></p>
+        <div class="text-left">
+          <p>Here are some other things you can try to resolve this:
+            <ol>
+              <li><a ng-click="reload()">Reload</a> this page.</li>
+              <li>Make sure your browser is configured to allow cookies.</li>
+              <li>Clear your browser cookies.</li>
+            </ol>
+          </p>
+        </div>
+      </div>
+
+      <div class="lightbox-msg" ng-switch-default>
+        <p>Unexpected error. Please <a ng-click="reload()">reload</a> this page.</p>
+        <p><pre>{{load_state}}</pre></p>
+      </div>
+
+    </div>
+
+
     <div id="container" ng-class="{iframed: iframed}">
 
       <!-- cover up IFRAMEs during drag -->
@@ -50,7 +79,7 @@
           </div>
         </div>
 
-        <div class="text-center notsafe" ng-show="loaded == true">
+        <div class="text-center notsafe" ng-show="load_state == true">
           Note this playground is public and may be modified by anyone.
           Don't place sensitive source code or data here.
         </div>
@@ -58,43 +87,20 @@
 
 
       <div ng-controller="AlertController">
-
-        <!-- full screen lightbox for iframe cookie problems -->
-        <div class="cover-everything lightbox" ng-show="cookie_problem() && iframed">
-          <div class="lightbox-msg">
-            Try App Engine in the <button class="btn" ng-click="popout_ide()">
-            <i class="icon-fullscreen"></i></span> Cloud Playground</button>
-          </div>
-        </div>
-
-        <!-- use DIV rather than ALERT so ng-show works -->
-        <div class="alert alert-error alert-reduced-margin" ng-show="cookie_problem() && iframed">
-          <b>As a first time user</b> you will need to briefly open the Cloud Playground in a
-          <a href="." target="_blank">separate window</a>.<br>
-          Once you've done that, please try <a ng-click="reload()">reloading</a> this page.
-        </div>
-
-        <!-- use DIV rather than ALERT so ng-show works -->
-        <div class="alert alert-error alert-reduced-margin" ng-show="cookie_problem()">
-        Cloud Playground is having trouble setting browser cookies.<br>
-        <br>
-        Here are some other things you can try to resolve this:
-        <ol>
-          <li><a ng-click="reload()">Reload</a> this page.</li>
-          <li>Make sure your browser is configured to allow cookies.</li>
-          <li>Clear your browser cookies.</li>
-        </ol>
-        </div>
-
         <!-- use ALERT here so CLOSE attribute triggers close widget -->
         <alert ng-repeat="alert in alerts()" close="closeAlert($index)" class="alert-{{alert.type}} alert-pre alert-reduced-margin"><i class="{{alert.icon}}"></i> {{alert.msg}}</alert>
       </div>
 
-      <div id="main">
+      <div id="main" ng-show="load_state==true">
         <div ng-view></div>
       </div>
 
-      <div id="footer" ng-show="!iframed && loaded">
+      <div ng-show="load_state == false" style="padding: 2em;">
+        <div class="loading">Loading. Please wait...</div>
+        <div class="status">{{status}}</div>
+      </div>
+
+      <div id="footer" ng-show="!iframed && load_state == true">
         <div class="diag">
           <span>namespace: {{namespace()}}</span>
         </div>
