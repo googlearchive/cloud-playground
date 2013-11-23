@@ -3,7 +3,15 @@
   <div class="status">{{status}}</div>
 </div>
 
-<div ng-show="loaded">
+<div ng-show="loaded && loaded != true" style="padding: 1em 2em;">
+  <div class="loading">Unexpected Error Loading App</div>
+  <div class="status">{{loaded}}</div>
+  <div style="margin-top: 1em;">
+    <button ng-click="reload()" class="btn">Reload app</button>
+  </div>
+</div>
+
+<div ng-show="loaded == true">
 
   <h4 class="space-above"><a id="my_projects"></a>Projects</h4>
 

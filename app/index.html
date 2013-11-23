@@ -50,7 +50,7 @@
           </div>
         </div>
 
-        <div class="text-center notsafe">
+        <div class="text-center notsafe" ng-show="loaded == true">
           Note this playground is public and may be modified by anyone.
           Don't place sensitive source code or data here.
         </div>
@@ -71,12 +71,12 @@
         <div class="alert alert-error alert-reduced-margin" ng-show="cookie_problem() && iframed">
           <b>As a first time user</b> you will need to briefly open the Cloud Playground in a
           <a href="." target="_blank">separate window</a>.<br>
-          Once you've done that, please reload this page.
+          Once you've done that, please try <a ng-click="reload()">reloading</a> this page.
         </div>
 
         <!-- use DIV rather than ALERT so ng-show works -->
         <div class="alert alert-error alert-reduced-margin" ng-show="cookie_problem()">
-        Cloud Playground is having trouble with your browser cookies.<br>
+        Cloud Playground is having trouble setting browser cookies.<br>
         <br>
         Here are some other things you can try to resolve this:
         <ol>

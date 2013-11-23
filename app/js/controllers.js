@@ -170,8 +170,12 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     ConfirmDialog(title, msg, okButtonText, okButtonClass, callback);
   };
 
-  $scope.set_loaded = function() {
-    $scope.loaded = true;
+  $scope.set_loaded = function(err) {
+    if (err) {
+      $scope.loaded = err;
+    } else {
+      $scope.loaded = true;
+    }
   }
 
 }
@@ -186,8 +190,8 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
     if (template_url) {
       var expiration_seconds = parseInt($routeParams.expiration_seconds);
       return $scope.new_project_from_template_url(template_url, expiration_seconds)
-      .catch(function() {
-        $scope.set_loaded();
+      .catch(function(e) {
+        $scope.set_loaded(e);
       });
     } else {
       $scope.set_loaded();
