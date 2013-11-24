@@ -72,6 +72,16 @@ angular.module('playgroundApp.services', [])
 })
 
 // TODO: test
+.factory('ProjectListService', function(CookieFinder, $http, $log, $q) {
+  return $http.get('/playground/getprojects')
+  .then(function(data) {
+    return {
+      projects: data.data,
+    };
+  });
+})
+
+// TODO: test
 .factory('Alert', function() {
 
   var alert_list = [];

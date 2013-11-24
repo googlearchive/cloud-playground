@@ -24,23 +24,29 @@ angular.module('playgroundApp', [
   // TODO: see http://www.youtube.com/watch?v=P6KITGRQujQ
   $routeProvider
   .when('/playground/', {
-     templateUrl: '/playground/main.html',
-     controller: MainController,
-     resolve: {'CookieFinder': 'CookieFinder'},
+    templateUrl: '/playground/main.html',
+    controller: MainController,
+    resolve: {
+      'CookieFinder': 'CookieFinder',
+      'Projects': 'ProjectListService',
+    },
   })
   .when('/playground/p/:project_id/', {
-     templateUrl: '/playground/project.html',
-     controller: ProjectController,
-     reloadOnSearch: false,
-     resolve: {'CookieFinder': 'CookieFinder'},
+    templateUrl: '/playground/project.html',
+    controller: ProjectController,
+    reloadOnSearch: false,
+    resolve: {
+      'CookieFinder': 'CookieFinder',
+      'Projects': 'ProjectListService',
+    },
   });
 
   $httpProvider.interceptors.push('pgHttpInterceptor');
 
   // TODO: test these defaults?
   $dialogProvider.options({
-      backdropFade: true,
-      modalFade: true,
+    backdropFade: true,
+    modalFade: true,
   });
 
 })

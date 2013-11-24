@@ -41,15 +41,18 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
 
   // TODO: test
   $scope.$on('$routeChangeError', function(evt, current, previous, rejection) {
-    $log.log('PageController routeChangeError:', rejection)
-    $rootScope.set_load_state(rejection);
+    $log.log('PageController routeChangeError:', rejection);
+    if (rejection.status == 401) {
+      $rootScope.set_load_state('ACCESS_DENIED');
+    } else {
+      $rootScope.set_load_state(rejection);
+    }
   });
 
   // TODO: test
   $scope.$on('$routeChangeSuccess', function(evt, current, previous) {
     DoSerial
     .then(getconfig)
-    .then(getprojects);
   });
 
   function getconfig() {
@@ -61,28 +64,20 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
   };
 
   $scope.retrieveproject = function() {
-      $scope.status = 'Retrieving project ' + project_id;
-      var project_id = $scope.namespace();
-      return $http.get('/playground/p/' + encodeURI(project_id) + '/retrieve')
-      .success(function(data, status, headers, config) {
-        $scope.projects.push(data);
-      })
-      .catch(function(data) {
-        if (data.headers('X-Cloud-Playground-Error')) {
-          if (data.status == 401) {
-            return $q.reject('PROJECT_ACCESS_DENIED');
-          }
-        }
-      });
-  };
-
-  function getprojects() {
-    $scope.status = 'Retrieving projects';
-    return $http.get('/playground/getprojects')
+    $scope.status = 'Retrieving project ' + project_id;
+    var project_id = $scope.namespace();
+    return $http.get('/playground/p/' + encodeURI(project_id) + '/retrieve')
     .success(function(data, status, headers, config) {
-      $scope.projects = data;
+      Projects.projects.push(data);
+    })
+    .catch(function(data) {
+      if (data.headers('X-Cloud-Playground-Error')) {
+        if (data.status == 401) {
+          return $q.reject('PROJECT_ACCESS_DENIED');
+        }
+      }
     });
-  }
+  };
 
   $scope.namespace = function() {
     return $routeParams.project_id ||
@@ -152,9 +147,9 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
 
   $scope.delete_project = function(project) {
     $scope.project = undefined;
-    for (var i in $scope.projects) {
-      if ($scope.projects[i] == project) {
-        $scope.projects.splice(i, 1);
+    for (var i in Projects.projects) {
+      if (Projects.projects[i] == project) {
+        Projects.projects.splice(i, 1);
         break;
       }
     }
@@ -189,16 +184,17 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
 }
 
 function MainController($scope, $http, $window, $location, $log, $routeParams,
-                        $q, Alert, DoSerial, $rootScope) {
+                        $q, Alert, DoSerial, $rootScope, Projects) {
 
   // TODO: test
   $scope.$on('$routeChangeError', function(evt, current, previous, rejection) {
-    $log.log('MainController routeChangeError:', rejection)
+    $log.log('MainController routeChangeError:', rejection);
     $rootScope.set_load_state(rejection);
   });
 
   // TODO: test
   $scope.$on('$routeChangeSuccess', function(evt, current, previous) {
+    $scope.projects = Projects.projects;
     DoSerial
     .then(function() {
       var template_url = $routeParams.template_url;
@@ -224,7 +220,7 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
       })
       .success(function(data, status, headers, config) {
         var project = data;
-        $scope.projects.push(project);
+        Projects.projects.push(project);
         $scope.select_project(project);
         deferred.resolve();
       })
@@ -250,23 +246,23 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
         'in_progress_task_name': 'foo',
         'orderby': '3',
       };
-      $scope.projects.push(data);
+      Projects.projects.push(data);
       $http.post('/playground/create_template_project_by_url', {
           repo_url: repo_url
       })
       .success(function(data, status, headers, config) {
-        $scope.projects.pop();
-        for (var i in $scope.projects) {
-          if ($scope.projects[i].key == data.key) {
-            $scope.projects.splice(i, 1);
+        Projects.projects.pop();
+        for (var i in Projects.projects) {
+          if (Projects.projects[i].key == data.key) {
+            Projects.projects.splice(i, 1);
             break;
           }
         }
-        $scope.projects.push(data);
+        Projects.projects.push(data);
         deferred.resolve();
       })
       .error(function(data, status, headers, config) {
-        $scope.projects.pop();
+        Projects.projects.pop();
         if (status == 408) {
           Alert.error(data);
           deferred.resolve();
@@ -302,17 +298,17 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
       'in_progress_task_name': 'foo',
       'orderby': '3',
     };
-    $scope.projects.push(data);
+    Projects.projects.push(data);
     $http.post('/playground/p/' + encodeURI(template_project.key) + '/copy', {
       'expiration_seconds': expiration_seconds
     })
     .success(function(data, status, headers, config) {
-      $scope.projects.pop();
-      $scope.projects.push(data);
+      Projects.projects.pop();
+      Projects.projects.push(data);
       deferred.resolve();
     })
     .error(function(data, status, headers, config) {
-      $scope.projects.pop();
+      Projects.projects.pop();
       deferred.reject('Failed to copy project due to HTTP error ' +
                       status + ' ' + data);
     });
@@ -362,7 +358,7 @@ function OAuth2AdminController($scope, $log, dialog, key, url, client_id,
 function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
                            $dialog, $location, $log, DoSerial, DomElementById,
                            WrappedElementById, Backoff, ConfirmDialog,
-                           $timeout, $rootScope, $q) {
+                           $timeout, $rootScope, $q, Projects) {
 
   // keep in sync with appengine_config.py
   var MIMIC_PROJECT_ID_QUERY_PARAM = '_mimic_project';
@@ -386,7 +382,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   // TODO: test
   $scope.$on('$routeChangeError', function(evt, current, previous, rejection) {
     $rootScope.set_load_state(rejection);
-    $log.log('ProjectController routeChangeError:', rejection)
+    $log.log('ProjectController routeChangeError:', rejection);
   });
 
   // TODO: test
@@ -398,7 +394,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
       deferred.promise
       .then(function() {
         if (!setcurrentproject()) {
-          // project_id is not in $scope.projects
+          // project_id is not in Projects.projects
           return $scope.retrieveproject()
           .catch(function(e) {
             $rootScope.set_load_state(e);
@@ -575,9 +571,9 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   };
 
   function setcurrentproject() {
-      for (var i in $scope.projects) {
-          if ($scope.projects[i].key == $routeParams.project_id) {
-              $scope.project = $scope.projects[i];
+      for (var i in Projects.projects) {
+          if (Projects.projects[i].key == $routeParams.project_id) {
+              $scope.project = Projects.projects[i];
               return true;
           }
       }
@@ -593,9 +589,9 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     return $http.post('/playground/p/' +
       encodeURI(project_key) + '/touch')
     .success(function(data, status, headers, config) {
-      for (var i in $scope.projects) {
-        if ($scope.projects[i].key == project_key) {
-          $scope.project = $scope.projects[i] = data;
+      for (var i in Projects.projects) {
+        if (Projects.projects[i].key == project_key) {
+          $scope.project = Projects.projects[i] = data;
           break;
         }
       }
@@ -704,9 +700,9 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     .then(function() {
       return $http.post('rename', {newname: name})
       .success(function(data, status, headers, config) {
-        for (var i in $scope.projects) {
-          if ($scope.projects[i] == project) {
-            $scope.project = $scope.projects[i] = data;
+        for (var i in Projects.projects) {
+          if (Projects.projects[i] == project) {
+            $scope.project = Projects.projects[i] = data;
             break;
           }
         }
@@ -862,9 +858,9 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     var project_id = $scope.namespace();
     return $http.post('/playground/p/' + encodeURI(project_id) + '/reset')
     .success(function(data, status, headers, config) {
-      for (var i in $scope.projects) {
-        if ($scope.projects[i].key == data.key) {
-          $scope.projects[i] = data;
+      for (var i in Projects.projects) {
+        if (Projects.projects[i].key == data.key) {
+          Projects.projects[i] = data;
           break;
         }
       }
