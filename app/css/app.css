@@ -17,11 +17,11 @@ IFRAME {
 }
 
 .cover-everything {
+  position: absolute;
   left: 0px;
   top: 0px;
   right: 0px;
   bottom: 0px;
-  position: absolute;
   z-index: 2147483647;
 }
 
@@ -30,12 +30,12 @@ IFRAME {
   opacity: 0.95;
   width: 100%;
   height: 100%;
+  text-align: center;
 }
 
   .lightbox-msg {
     position: relative;
     font-size: 1.5em;
-    text-align: center;
 
     /* center horizontally */
     width: 600px;
