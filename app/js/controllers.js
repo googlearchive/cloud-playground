@@ -41,6 +41,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
 
   // TODO: test
   $scope.$on('$routeChangeError', function(evt, current, previous, rejection) {
+    $log.log('PageController routeChangeError:', rejection)
     $rootScope.set_load_state(rejection);
   });
 
@@ -192,6 +193,7 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
 
   // TODO: test
   $scope.$on('$routeChangeError', function(evt, current, previous, rejection) {
+    $log.log('MainController routeChangeError:', rejection)
     $rootScope.set_load_state(rejection);
   });
 
@@ -384,6 +386,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   // TODO: test
   $scope.$on('$routeChangeError', function(evt, current, previous, rejection) {
     $rootScope.set_load_state(rejection);
+    $log.log('ProjectController routeChangeError:', rejection)
   });
 
   // TODO: test
