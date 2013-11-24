@@ -42,10 +42,10 @@ IFRAME {
     margin-left: -300px;
     left: 50%;
 
-    /* center vertically */
+    /* place vertically */
     height: 100px;
     margin-top: -50px;
-    top: 50%;
+    top: 20%;
   }
 
 .context-menu {
