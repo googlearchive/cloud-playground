@@ -49,6 +49,11 @@
         </div>
       </div>
 
+      <div class="lightbox-msg" ng-switch-when="PROJECT_ACCESS_DENIED">
+        <p>Project no longer exists.</p>
+        <p>Go back to the <a href="/playground/">Cloud Playground</a>.</p>
+      </div>
+
       <div class="lightbox-msg" ng-switch-default>
         <p>Unexpected error. Please <a ng-click="reload()">reload</a> this page.</p>
         <p><pre>{{load_state}}</pre></p>
@@ -63,11 +68,11 @@
       <div id="drag-div" class="cover-everything hidden">
       </div>
 
-      <div id="header" ng-controller="HeaderController">
+      <div id="header" ng-controller="HeaderController" ng-show="load_state == true">
         <div ng-hide="iframed">
           <img src="/playground/img/developers-logo.png" class="header-logo"/>
           <div class="header-logo-line">
-            <a class="header-product-text" ng-href="/playground"><span class='app-back' pg-visible="!alreadyhome()">&#x2039;</span>Cloud Playground</a>
+            <a href="/playground/" class="header-product-text"><span class='app-back' pg-visible="!alreadyhome()">&#x2039;</span>Cloud Playground</a>
             <sup class="experimental">experimental</sup>
           </div>
           <div class="topbar" ng-show="config">

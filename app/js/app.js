@@ -1,5 +1,10 @@
 'use strict';
 
+window.track = function(category, action) {
+  console.log('TRACKING:', category, action)
+  ga('send', 'event', category, action || 'action');
+}
+
 angular.module('playgroundApp', [
     'playgroundApp.filters',
     'playgroundApp.services',

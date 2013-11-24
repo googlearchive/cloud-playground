@@ -63,7 +63,12 @@ angular.module('playgroundApp.services', [])
       deferred.reject('NO_BROWSER_COOKIE');
     }
   }
-  return deferred.promise;
+  return deferred.promise
+  .catch(function(rejection) {
+    // track and pass on rejection
+    track('cookie_problem', rejection);
+    return $q.reject(rejection);
+  });
 })
 
 // TODO: test
