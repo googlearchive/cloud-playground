@@ -262,17 +262,17 @@ def CopyProject(owner, template_project, expiration_seconds):
                               expiration_seconds=expiration_seconds,
                               orderby=template_project.orderby,
                               in_progress_task_name='copy_project')
+      src_tree = _CreateProjectTree(template_project)
+      dst_tree = _CreateProjectTree(project)
+      CopyTree(dst_tree, src_tree)
+      project.in_progress_task_name=None
+      project.put()
+      return project
     except Exception, e:
       if i == retries - 1:
         raise
       shared.w('Will retry CreateProject which encountered {}'.format(e))
       time.sleep(random.randint(1, 4))
-  src_tree = _CreateProjectTree(template_project)
-  dst_tree = _CreateProjectTree(project)
-  CopyTree(dst_tree, src_tree)
-  project.in_progress_task_name=None
-  project.put()
-  return project
 
 
 def CopyTree(dst_tree, src_tree):
