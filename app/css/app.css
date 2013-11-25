@@ -42,14 +42,12 @@ PRE {
     font-size: 1.5em;
 
     /* center horizontally */
-    width: 600px;
-    margin-left: -300px;
+    width: 90%;
+    margin-left: -45%;
     left: 50%;
 
     /* place vertically */
-    height: 100px;
-    margin-top: -50px;
-    top: 20%;
+    top: 10%;
   }
 
 .context-menu {
