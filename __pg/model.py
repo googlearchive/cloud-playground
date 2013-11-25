@@ -337,6 +337,9 @@ def AdoptProjects(dst_user_id, src_user_id):
   def _AdoptProject(project_key, dst_user_key, src_user_key):
     prj, dst_user, src_user = ndb.get_multi([project_key, dst_user_key,
                                              src_user_key])
+    if project_key not in src_user.projects:
+      # another concurrent request and transaction beat us to it
+      return
     src_user.projects.remove(project_key)
     dst_user.projects.append(project_key)
     prj.owner = dst_user_key.id()
