@@ -37,8 +37,7 @@ function RenameProjectController($scope, $log, dialog, project_name) {
 
 function PageController($scope, $http, DoSerial, $routeParams, $window,
                         $dialog, $location, $log, WindowService, $rootScope,
-                        IframedDetector, ConfirmDialog, $q, ConfigService,
-                        ProjectsFactory) {
+                        ConfirmDialog, $q, ConfigService, ProjectsFactory) {
 
   // TODO: test
   $scope.$on('$routeChangeError', function(evt, current, previous, rejection) {

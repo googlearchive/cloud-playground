@@ -40,24 +40,14 @@ angular.module('playgroundApp.services', [])
 })
 
 // TODO: test
-.factory('IframedDetector', function($location, $rootScope, $window) {
-  var iframed = $location.search()['iframed'] ||
-                $window.top != $window.self;
-  $rootScope.iframed = iframed;
-  return {
-    iframed: function() {
-      return iframed;
-    }
-  };
-})
-
-// TODO: test
-.factory('CookieFinder', function($q, $log, $window, IframedDetector) {
+.factory('CookieFinder', function($q, $log, $window, $location) {
   var deferred = $q.defer();
   if ($window.document.cookie) {
     deferred.resolve($window.document.cookie);
   } else {
-    if (IframedDetector.iframed) {
+    var iframed = $location.search()['iframed'] ||
+                  $window.top != $window.self;
+    if (iframed) {
       deferred.reject('IFRAMED_NO_COOKIE');
     } else {
       deferred.reject('NO_BROWSER_COOKIE');
