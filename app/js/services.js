@@ -42,8 +42,10 @@ angular.module('playgroundApp.services', [])
 // TODO: test
 .factory('CookieFinder', function($q, $log, $window, $location) {
   var deferred = $q.defer();
+  $window.document.cookie = "foo=bar; Path=/";
   if ($window.document.cookie) {
     deferred.resolve($window.document.cookie);
+    $window.document.cookie = "foo=bar; Path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
   } else {
     var iframed = $location.search()['iframed'] ||
                   $window.top != $window.self;
@@ -62,7 +64,7 @@ angular.module('playgroundApp.services', [])
 })
 
 // TODO: test
-.factory('ConfigService', function(CookieFinder, $http, $log, $q) {
+.factory('ConfigService', function($http, $log, $q) {
   return $http.get('/playground/getconfig')
   .then(function(resolved) {
     return {
@@ -72,7 +74,7 @@ angular.module('playgroundApp.services', [])
 })
 
 // TODO: test
-.factory('ProjectsFactory', function(CookieFinder, $http, $log, $q) {
+.factory('ProjectsFactory', function($http, $log, $q) {
   var projects = [];
   return $http.get('/playground/getprojects')
   .then(function(resolved) {

@@ -25,8 +25,6 @@ handlers:
   upload: app/index.html
   secure: always
   mime_type: text/html; charset=utf-8
-  http_headers:
-    Set-Cookie: a=42; Path=/
 
 - url: /playground/p/.*/check_expiration
   script: __pg.playground.internal_app
