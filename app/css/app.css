@@ -16,6 +16,10 @@ IFRAME {
   border: none;
 }
 
+PRE {
+  word-break: break-word;
+}
+
 .cover-everything {
   position: absolute;
   left: 0px;
