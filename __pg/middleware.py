@@ -199,7 +199,8 @@ class ProjectFilter(object):
     if project_id and shared.ThisIsPlaygroundApp():
       project = model.GetProject(project_id)
       if self._assert_project_existence:
-        assert project, 'project_id {} not found in datastore'.format(project_id)
+        if not project:
+          Abort(httplib.NOT_FOUND, 'project_id {} not found'.format(project_id))
       environ['playground.project'] = project or settings.NO_SUCH_PROJECT
     return self._app(environ, start_response)
 
