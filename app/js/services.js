@@ -47,9 +47,7 @@ angular.module('playgroundApp.services', [])
     deferred.resolve($window.document.cookie);
     $window.document.cookie = "foo=bar; Path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
   } else {
-    var iframed = $location.search()['iframed'] ||
-                  $window.top != $window.self;
-    if (iframed) {
+    if ($window.iframed) {
       deferred.reject('IFRAMED_NO_COOKIE');
     } else {
       deferred.reject('NO_BROWSER_COOKIE');

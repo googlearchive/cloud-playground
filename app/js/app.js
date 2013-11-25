@@ -5,6 +5,8 @@ window.track = function(category, action) {
   ga('send', 'event', category, action || 'action');
 }
 
+window.iframed = window.top != window.self;
+
 angular.module('playgroundApp', [
     'playgroundApp.filters',
     'playgroundApp.services',

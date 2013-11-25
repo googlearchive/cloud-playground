@@ -51,6 +51,8 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
 
   // TODO: test
   $scope.$on('$routeChangeSuccess', function(evt, current, previous) {
+    $scope.iframed = $window.iframed;
+
     ProjectsFactory
     .then(function(projects_service) {
       $scope.projects_service = projects_service;
