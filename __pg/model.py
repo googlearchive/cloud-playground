@@ -219,7 +219,11 @@ def GetProjects(user):
 
 
 def GetProject(project_id):
-  project = Project.get_by_id(long(project_id),
+  try:
+    project_id = long(project_id)
+  except ValueError:
+    return None
+  project = Project.get_by_id(project_id,
                               namespace=settings.PLAYGROUND_NAMESPACE)
   return project
 
