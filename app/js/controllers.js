@@ -37,7 +37,8 @@ function RenameProjectController($scope, $log, dialog, project_name) {
 
 function PageController($scope, $http, DoSerial, $routeParams, $window,
                         $dialog, $location, $log, WindowService, $rootScope,
-                        IframedDetector, ConfirmDialog, $q) {
+                        IframedDetector, ConfirmDialog, $q, ConfigService,
+                        ProjectsFactory) {
 
   // TODO: test
   $scope.$on('$routeChangeError', function(evt, current, previous, rejection) {
@@ -51,33 +52,16 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
 
   // TODO: test
   $scope.$on('$routeChangeSuccess', function(evt, current, previous) {
-    DoSerial
-    .then(getconfig)
-  });
-
-  function getconfig() {
-    $scope.status = 'Retrieving configuration';
-    return $http.get('/playground/getconfig')
-    .success(function(data, status, headers, config) {
-       $scope.config = data;
+    ProjectsFactory
+    .then(function(projects_service) {
+      $scope.projects_service = projects_service;
+      $scope.projects = projects_service.projects;
     });
-  };
-
-  $scope.retrieveproject = function() {
-    $scope.status = 'Retrieving project ' + project_id;
-    var project_id = $scope.namespace();
-    return $http.get('/playground/p/' + encodeURI(project_id) + '/retrieve')
-    .success(function(data, status, headers, config) {
-      Projects.projects.push(data);
+    ConfigService
+    .then(function(config_service) {
+      $scope.config = config_service.config;
     })
-    .catch(function(data) {
-      if (data.headers('X-Cloud-Playground-Error')) {
-        if (data.status == 401) {
-          return $q.reject('PROJECT_ACCESS_DENIED');
-        }
-      }
-    });
-  };
+  });
 
   $scope.namespace = function() {
     return $routeParams.project_id ||
@@ -140,23 +124,17 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
   };
 
   $scope.select_project = function(project) {
+    track('select_project');
     $location.path('/playground/p/' + encodeURI(project.key));
     // remove template_url and other query parameters
     $location.search({});
   };
 
   $scope.delete_project = function(project) {
+    track('delete_project');
+    $scope.projects_service.remove(project);
     $scope.project = undefined;
-    for (var i in Projects.projects) {
-      if (Projects.projects[i] == project) {
-        Projects.projects.splice(i, 1);
-        break;
-      }
-    }
-    $http.post('/playground/p/' + encodeURI(project.key) + '/delete')
-    .success(function(data, status, headers, config) {
-      $location.path('/playground/');
-    });
+    $location.path('/playground/');
   };
 
   $scope.prompt_delete_project = function(project) {
@@ -164,6 +142,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
       $scope.delete_project(project);
       return;
     }
+    track('prompt_delete_project');
     var title = 'Confirm project deletion';
     var msg = 'Are you sure you want to delete project "' + project.name +
               '"?';
@@ -184,7 +163,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
 }
 
 function MainController($scope, $http, $window, $location, $log, $routeParams,
-                        $q, Alert, DoSerial, $rootScope, Projects) {
+                        $q, Alert, DoSerial, $rootScope) {
 
   // TODO: test
   $scope.$on('$routeChangeError', function(evt, current, previous, rejection) {
@@ -194,13 +173,15 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
 
   // TODO: test
   $scope.$on('$routeChangeSuccess', function(evt, current, previous) {
-    $scope.projects = Projects.projects;
     DoSerial
     .then(function() {
       var template_url = $routeParams.template_url;
       if (template_url) {
         var expiration_seconds = parseInt($routeParams.expiration_seconds);
         return $scope.new_project_from_template_url(template_url, expiration_seconds)
+        .then(function(project) {
+          $scope.select_project(project);
+        })
         .catch(function(e) {
           $rootScope.set_load_state(e);
         });
@@ -212,27 +193,21 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
 
   // TODO: test
   $scope.new_project_from_template_url = function(repo_url, expiration_seconds) {
-    var deferred = $q.defer();
-    DoSerial
-    .then(function() {
-      $http.post('/playground/new_project_from_template_url', {
-          repo_url: repo_url
-      })
-      .success(function(data, status, headers, config) {
-        var project = data;
-        Projects.projects.push(project);
-        $scope.select_project(project);
-        deferred.resolve();
-      })
-      .error(function(data, status, headers, config) {
-        if (status == 408) {
-          Alert.error(data);
-        }
-        deferred.reject('Failed to create project due to HTTP error ' +
-                        status + ' ' + data);
-      });
+    track('new_project_from_template_url', repo_url);
+    return $http.post('/playground/new_project_from_template_url', {
+      repo_url: repo_url,
+    })
+    .then(function(resolved) {
+      var project = resolved.data;
+      $scope.projects.push(project);
+      return project;
+    })
+    .catch(function(rejection) {
+      if (rejection.status == 408) {
+        return $q.reject('TEMPLATE_NOT_YET_AVAILABLE');
+      }
+      return $q.reject(rejection);
     });
-    return deferred.promise;
   };
 
   // TODO: test
@@ -246,23 +221,23 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
         'in_progress_task_name': 'foo',
         'orderby': '3',
       };
-      Projects.projects.push(data);
+      $scope.projects.push(data);
       $http.post('/playground/create_template_project_by_url', {
           repo_url: repo_url
       })
       .success(function(data, status, headers, config) {
-        Projects.projects.pop();
-        for (var i in Projects.projects) {
-          if (Projects.projects[i].key == data.key) {
-            Projects.projects.splice(i, 1);
+        $scope.projects.pop();
+        for (var i in $scope.projects) {
+          if ($scope.projects[i].key == data.key) {
+            $scope.projects.splice(i, 1);
             break;
           }
         }
-        Projects.projects.push(data);
+        $scope.projects.push(data);
         deferred.resolve();
       })
       .error(function(data, status, headers, config) {
-        Projects.projects.pop();
+        $scope.projects.pop();
         if (status == 408) {
           Alert.error(data);
           deferred.resolve();
@@ -298,17 +273,17 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
       'in_progress_task_name': 'foo',
       'orderby': '3',
     };
-    Projects.projects.push(data);
+    $scope.projects.push(data);
     $http.post('/playground/p/' + encodeURI(template_project.key) + '/copy', {
       'expiration_seconds': expiration_seconds
     })
     .success(function(data, status, headers, config) {
-      Projects.projects.pop();
-      Projects.projects.push(data);
+      $scope.projects.pop();
+      $scope.projects.push(data);
       deferred.resolve();
     })
     .error(function(data, status, headers, config) {
-      Projects.projects.pop();
+      $scope.projects.pop();
       deferred.reject('Failed to copy project due to HTTP error ' +
                       status + ' ' + data);
     });
@@ -358,7 +333,7 @@ function OAuth2AdminController($scope, $log, dialog, key, url, client_id,
 function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
                            $dialog, $location, $log, DoSerial, DomElementById,
                            WrappedElementById, Backoff, ConfirmDialog,
-                           $timeout, $rootScope, $q, Projects) {
+                           $timeout, $rootScope, $q) {
 
   // keep in sync with appengine_config.py
   var MIMIC_PROJECT_ID_QUERY_PARAM = '_mimic_project';
@@ -394,7 +369,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
       deferred.promise
       .then(function() {
         if (!setcurrentproject()) {
-          // project_id is not in Projects.projects
+          // project_id is not in $scope.projects
           return $scope.retrieveproject()
           .catch(function(e) {
             $rootScope.set_load_state(e);
@@ -417,6 +392,25 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
       return deferred.promise;
     })
   });
+
+  $scope.retrieveproject = function() {
+    $scope.status = 'Retrieving project ' + project_id;
+    var project_id = $scope.namespace();
+    return $http.get('/playground/p/' + encodeURI(project_id) + '/retrieve')
+    .success(function(data, status, headers, config) {
+      $scope.projects.push(data);
+    })
+    .catch(function(rejection) {
+      if (rejection.headers('X-Cloud-Playground-Error')) {
+        if (rejection.status == 401) {
+          return $q.reject('PROJECT_ACCESS_DENIED');
+        } else if (rejection.status == 404) {
+          return $q.reject('PROJECT_NOT_FOUND');
+        }
+      }
+      return $q.reject(rejection);
+    });
+  };
 
   $scope.clear_logs = function() {
     $scope.logs = [];
@@ -533,7 +527,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   };
 
   $scope.select_file = function(file) {
-    $location.hash(file.path);
+    track('select_file', file.path);
     if ($scope.is_image_mime_type(file.mime_type)) {
       $scope.current_file = file;
       return;
@@ -571,13 +565,13 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   };
 
   function setcurrentproject() {
-      for (var i in Projects.projects) {
-          if (Projects.projects[i].key == $routeParams.project_id) {
-              $scope.project = Projects.projects[i];
-              return true;
-          }
-      }
-      return false;
+    for (var i in $scope.projects) {
+        if ($scope.projects[i].key == $routeParams.project_id) {
+            $scope.project = $scope.projects[i];
+            return true;
+        }
+    }
+    return false;
   }
 
   $scope.touch_project = function(project_key) {
@@ -589,9 +583,9 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     return $http.post('/playground/p/' +
       encodeURI(project_key) + '/touch')
     .success(function(data, status, headers, config) {
-      for (var i in Projects.projects) {
-        if (Projects.projects[i].key == project_key) {
-          $scope.project = Projects.projects[i] = data;
+      for (var i in $scope.projects) {
+        if ($scope.projects[i].key == project_key) {
+          $scope.project = $scope.projects[i] = data;
           break;
         }
       }
@@ -670,7 +664,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
       $timeout(function() {
         // socket.onopen may be called more than once and user can manually run
         if ($scope.app_run_count == 0) {
-          $scope.run();
+          $scope.run('delayed-onload');
         }
       }, 2000);
     } else if (msg = evt.data['socket.onmessage']) {
@@ -700,9 +694,9 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     .then(function() {
       return $http.post('rename', {newname: name})
       .success(function(data, status, headers, config) {
-        for (var i in Projects.projects) {
-          if (Projects.projects[i] == project) {
-            $scope.project = Projects.projects[i] = data;
+        for (var i in $scope.projects) {
+          if ($scope.projects[i] == project) {
+            $scope.project = $scope.projects[i] = data;
             break;
           }
         }
@@ -819,8 +813,8 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   };
 
   // TODO: test
-  $scope.run = function() {
-    track('run');
+  $scope.run = function(action) {
+    track('run', action);
     $scope.app_run_count++;
     return DoSerial
     .then(_save_dirty_files)
@@ -858,9 +852,9 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     var project_id = $scope.namespace();
     return $http.post('/playground/p/' + encodeURI(project_id) + '/reset')
     .success(function(data, status, headers, config) {
-      for (var i in Projects.projects) {
-        if (Projects.projects[i].key == data.key) {
-          Projects.projects[i] = data;
+      for (var i in $scope.projects) {
+        if ($scope.projects[i].key == data.key) {
+          $scope.projects[i] = data;
           break;
         }
       }
@@ -911,9 +905,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     if (!newpath) {
       return;
     }
-    if ($scope.current_file != $scope.files[newpath]) {
-      $scope.select_file($scope.files[newpath]);
-    }
+    $location.hash(newpath);
   });
 
   $scope.$watch('current_file', function(newfile, oldfile) {

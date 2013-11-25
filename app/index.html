@@ -49,14 +49,30 @@
         </div>
       </div>
 
-      <div class="lightbox-msg" ng-switch-when="PROJECT_ACCESS_DENIED">
+      <div class="lightbox-msg" ng-switch-when="TEMPLATE_NOT_YET_AVAILABLE">
+        <p>Loading the requested template...</p>
+        <p>Please wait 10 seconds and then <a ng-click="reload()">reload</a>.</p>
+      </div>
+
+      <div class="lightbox-msg" ng-switch-when="PROJECT_NOT_FOUND">
         <p>Project no longer exists.</p>
-        <p>Go back to the <a href="/playground/">Cloud Playground</a>.</p>
+        <p>Return to the <a href="/playground/">Cloud Playground</a>.</p>
+      </div>
+
+      <div class="lightbox-msg" ng-switch-when="PROJECT_ACCESS_DENIED">
+        <p>Project access denied.</p>
+        <p>Return to the <a href="/playground/">Cloud Playground</a>.</p>
       </div>
 
       <div class="lightbox-msg" ng-switch-default>
         <p>Unexpected error. Try <a ng-click="reload()">reloading</a> this page.</p>
-        <p><pre>{{load_state}}</pre></p>
+        <div ng-show="load_state.status && load_state.data && load_state.config.method && load_state.config.url" class="text-left">
+          <p><pre>{{load_state.status}} &lt;- {{load_state.config.method}} {{load_state.config.url}}</pre></p>
+          <p><pre>{{load_state.data}}</pre></p>
+        </div>
+        <div>
+          <p><pre>{{load_state}}</pre></p>
+        </div>
       </div>
 
     </div>

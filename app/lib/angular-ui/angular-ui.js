@@ -106,11 +106,11 @@ angular.module('ui.directives')
 
         codeMirror.setOption('extraKeys', {
           'Cmd-Enter': function(cm) {
-            scope.run();
+            scope.run('Cmd-Enter');
             scope.$apply();
           },
           'Ctrl-Enter': function(cm) {
-            scope.run();
+            scope.run('Ctrl-Enter');
             scope.$apply();
           },
         });

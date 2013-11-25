@@ -28,7 +28,9 @@ angular.module('playgroundApp', [
     controller: MainController,
     resolve: {
       'CookieFinder': 'CookieFinder',
-      'Projects': 'ProjectListService',
+      'NeededByPageControllerConfigService': 'ConfigService',
+      'NeededByPageControllerProjectsFactory': 'ProjectsFactory',
+      'Projects': 'ProjectsFactory',
     },
   })
   .when('/playground/p/:project_id/', {
@@ -37,7 +39,9 @@ angular.module('playgroundApp', [
     reloadOnSearch: false,
     resolve: {
       'CookieFinder': 'CookieFinder',
-      'Projects': 'ProjectListService',
+      'NeededByPageControllerConfigService': 'ConfigService',
+      'NeededByPageControllerProjectsFactory': 'ProjectsFactory',
+      'Projects': 'ProjectsFactory',
     },
   });
 

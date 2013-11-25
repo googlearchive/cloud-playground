@@ -72,11 +72,40 @@ angular.module('playgroundApp.services', [])
 })
 
 // TODO: test
-.factory('ProjectListService', function(CookieFinder, $http, $log, $q) {
-  return $http.get('/playground/getprojects')
-  .then(function(data) {
+.factory('ConfigService', function(CookieFinder, $http, $log, $q) {
+  return $http.get('/playground/getconfig')
+  .then(function(resolved) {
     return {
-      projects: data.data,
+      config: resolved.data,
+    };
+  });
+})
+
+// TODO: test
+.factory('ProjectsFactory', function(CookieFinder, $http, $log, $q) {
+  var projects = [];
+  return $http.get('/playground/getprojects')
+  .then(function(resolved) {
+    angular.forEach(resolved.data, function(project) {
+      projects.push(project);
+    });
+    return {
+      projects: projects,
+
+      remove: function(project) {
+        for (var i in projects) {
+          if (projects[i] == project) {
+            projects.splice(i, 1);
+            break;
+          }
+        }
+        $http.post('/playground/p/' + encodeURI(project.key) + '/delete')
+        .catch(function(rejection) {
+          // TODO: handle failure
+          $log.log('error deleting project:', rejection);
+        });
+
+      },
     };
   });
 })
