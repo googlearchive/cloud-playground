@@ -67,6 +67,10 @@ mimic_CORS_ALLOWED_HEADERS = ','.join([
     'X-XSRF-Token',
 ])
 
+# # see the SDK's sample_appengine_config.py
+# appstats_DATASTORE_DETAILS = True
+# appstats_CALC_RPC_COSTS = True
+#
 # def webapp_add_wsgi_middleware(app):
 #   from google.appengine.ext.appstats import recording
 #   app = recording.appstats_wsgi_middleware(app)
