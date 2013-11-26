@@ -280,12 +280,8 @@ def CopyProject(owner, template_project, expiration_seconds):
 
 
 def CopyTree(dst_tree, src_tree):
-  paths = src_tree.ListDirectory(None)
-  for path in paths:
-    if path.endswith('/'):
-      continue
-    content = src_tree.GetFileContents(path)
-    dst_tree.SetFile(path, content)
+  files = src_tree.GetFiles(None)
+  dst_tree.PutFiles(files)
 
 
 def ResetProject(project_id, project_tree):
