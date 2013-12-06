@@ -56,7 +56,7 @@ angular.module('playgroundApp.services', [])
   return deferred.promise
   .catch(function(rejection) {
     // track and pass on rejection
-    track('cookie_problem', rejection);
+    track('cookie-problem', rejection);
     return $q.reject(rejection);
   });
 })
@@ -117,6 +117,7 @@ angular.module('playgroundApp.services', [])
       if (cause) {
         msg += ' caused by ' + cause;
       }
+      track('alert', 'handle-exception', msg);
       alert_list.push({type: 'error', icon: 'icon-exclamation-sign', msg: msg});
     },
 
@@ -133,6 +134,7 @@ angular.module('playgroundApp.services', [])
     },
 
     error: function(msg) {
+      track('alert', 'error', msg);
       alert_list.push({type: 'error', icon: 'icon-exclamation-sign', msg: msg});
     },
 
@@ -280,6 +282,10 @@ angular.module('playgroundApp.services', [])
 
 .factory('WindowService', function($window) {
   var WindowService = {
+    'go': function(url) {
+      // avoid $window.location which assumes paths are routes
+      window.location = url;
+    },
     'reload': function() {
       // TODO: don't access 'document' directly
       document.body.scrollTop = 0;

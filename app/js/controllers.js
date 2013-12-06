@@ -70,13 +70,23 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
            ($scope.config && $scope.config.playground_namespace);
   };
 
+  $scope.signin = function(label) {
+    track('sign-in', label);
+    WindowService.go('/playground/login');
+  }
+
+  $scope.signout = function(label) {
+    track('sign-out', label);
+    WindowService.go('/playground/logout');
+  }
+
   $scope.datastore_admin = function(label) {
-    track('datastore_admin', label);
+    track('datastore-admin', label);
     WindowService.open('/playground/datastore/' + $scope.namespace(), '_blank');
   };
 
   $scope.memcache_admin = function(label) {
-    track('memcache_admin', label);
+    track('memcache-admin', label);
     WindowService.open('/playground/memcache/' + $scope.namespace(), '_blank');
   };
 
@@ -86,7 +96,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
   };
 
   $scope.popout_ide = function() {
-    track('popout_ide');
+    track('popout-ide');
     WindowService.open($location.absUrl(), '_blank');
   }
 
@@ -126,14 +136,14 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
   };
 
   $scope.select_project = function(project, label) {
-    track('select_project', label);
+    track('select-project', label, project.template_url);
     $location.path('/playground/p/' + encodeURI(project.key));
     // remove template_url and other query parameters
     $location.search({});
   };
 
   $scope.delete_project = function(project, label) {
-    track('delete_project', label);
+    track('delete-project', label, project.template_url);
     $scope.projects_service.remove(project);
     $scope.project = undefined;
     $location.path('/playground/');
@@ -144,7 +154,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
       $scope.delete_project(project, label);
       return;
     }
-    track('prompt_delete_project', label);
+    track('prompt-delete-project', label);
     var title = 'Confirm project deletion';
     var msg = 'Are you sure you want to delete project "' + project.name +
               '"?';
@@ -181,9 +191,9 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
       var template_url = $routeParams.template_url;
       if (template_url) {
         var expiration_seconds = parseInt($routeParams.expiration_seconds);
-        return $scope.new_project_from_template_url(template_url, expiration_seconds, 'MainController')
+        return $scope.new_project_from_template_url(template_url, expiration_seconds, 'auto-from-template-url')
         .then(function(project) {
-          $scope.select_project(project, 'auto_from_template_url');
+          $scope.select_project(project, 'auto-from-template-url');
         })
         .catch(function(e) {
           $rootScope.set_load_state(e);
@@ -196,7 +206,7 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
 
   // TODO: test
   $scope.new_project_from_template_url = function(repo_url, expiration_seconds, label) {
-    track('new_project_from_template_url', label, repo_url);
+    track('new-project-from-template-url', label, repo_url);
     return $http.post('/playground/new_project_from_template_url', {
       repo_url: repo_url,
     })
@@ -215,7 +225,7 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
 
   // TODO: test
   $scope.create_template_project_by_url = function(repo_url, label) {
-    track('create_template_project_by_url', label, repo_url);
+    track('create-template-project-by-url', label, repo_url);
     var deferred = $q.defer();
     DoSerial
     .then(function() {
@@ -270,7 +280,7 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
   };
 
   $scope.new_project = function(template_project, expiration_seconds, label) {
-    track('new_project', label, template_project.template_url);
+    track('new-project', label, template_project.template_url);
     var deferred = $q.defer();
     var data = {
       'name': '(Creating project...)',
@@ -483,7 +493,8 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   };
 
   // TODO: test
-  function _save(path) {
+  function _save(path, label) {
+    track('save', label, path)
     var file = $scope.files[path];
     if (!file.dirty) {
       return;
@@ -515,7 +526,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
         var dirtypath = path;
         DoSerial
         .then(function() {
-          return _save(dirtypath);
+          return _save(dirtypath, 'save-dirty-files');
         });
         break;
       }
@@ -535,7 +546,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   };
 
   $scope.select_file = function(file, label) {
-    track('select_file', label, file.path);
+    track('select-file', label, file.path);
     if ($scope.is_image_mime_type(file.mime_type)) {
       $scope.current_file = file;
       return;
@@ -548,9 +559,9 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   $scope.set_path = function(path) {
     var file = $scope.files[path];
     if (file) {
-      $scope.select_file(file, 'set_path');
+      $scope.select_file(file, 'set-path');
     } else {
-      $scope._select_a_file('set_path');
+      $scope._select_a_file('set-path');
     }
   };
 
@@ -575,7 +586,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     }
     // select first file
     for (var path in $scope.files) {
-      $scope.select_file($scope.files[path], 'auto_first_file');
+      $scope.select_file($scope.files[path], 'auto-first-file');
       break;
     }
   };
@@ -615,7 +626,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   // TODO: test
   $scope.new_file = function(path, label) {
-    track('new_file', label, path);
+    track('new-file', label, path);
     var file = $scope.files[path];
     if (!file) {
       // Create a file on the server side and use the result.
@@ -624,7 +635,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
       })
       .success(function(data, status, header, config) {
         $scope.files[path] = data;
-        $scope.select_file(data, 'new_file');
+        $scope.select_file(data, 'new-file');
       })
       .error(function(data, status, header, config) {
         // Note: If the mimic encounters an unhandled exception like
@@ -635,13 +646,13 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
                     status + '.');
       });
     } else {
-      $scope.select_file(file, 'new_file_existing');
+      $scope.select_file(file, 'new-file-existing');
     }
   };
 
   // TODO: test
   $scope.prompt_new_file = function(label) {
-    track('prompt_new_file', label);
+    track('prompt-new-file', label);
     $dialog.dialog({
         controller: 'NewFileController',
         templateUrl: '/playground/new_file_modal.html',
@@ -680,7 +691,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
       $timeout(function() {
         // socket.onopen may be called more than once and user can manually run
         if ($scope.app_run_count == 0) {
-          $scope.run('delayed-onload');
+          $scope.run('auto-delayed-onload');
         }
       }, 2000);
     } else if (msg = evt.data['socket.onmessage']) {
@@ -696,7 +707,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   // TODO: test
   // TODO: replace with $dialog
   $scope.project_context_menu = function(evt, label) {
-    track('project_context_menu', label);
+    track('project-context-menu', label);
     evt.stopPropagation();
     hide_context_menus();
     $scope.showprojectcontextmenu = true;
@@ -705,7 +716,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   // TODO: test
   function project_rename(project, name, label) {
-    track('project_rename', label);
+    track('project-rename', label, project.template_url);
     DoSerial
     .then(function() {
       return $http.post('rename', {newname: name})
@@ -722,7 +733,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   // TODO: test
   $scope.prompt_project_rename = function(project, label) {
-    track('prompt_project_rename', label);
+    track('prompt-project-rename', label);
     $dialog.dialog({
         controller: 'RenameProjectController',
         templateUrl: '/playground/rename_project_modal.html',
@@ -737,7 +748,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   // TODO: test
   $scope.file_context_menu = function(evt, file, label) {
-    track('file_context_menu', label, file.path);
+    track('file-context-menu', label, file.path);
     evt.stopPropagation();
     hide_context_menus();
     $scope.select_file(file, 'file_context_menu');
@@ -747,7 +758,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   // TODO: test
   function delete_file(file, label) {
-    track('delete_file', label, file.path);
+    track('delete-file', label, file.path);
     DoSerial
     .then(function() {
       var url = $scope.url_of('delete', {path: file.path});
@@ -761,7 +772,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   // TODO: test
   $scope.prompt_delete_file = function(file, label) {
-    track('prompt_delete_file', label, file.path);
+    track('prompt-delete-file', label, file.path);
     var title = 'Confirm file deletion';
     var msg = 'Are you sure you want to delete file "' +
               $scope.current_file.path + '"?';
@@ -776,7 +787,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   // TODO: test
   function file_rename(file, path, label) {
-    track('file_rename', label, path);
+    track('file-rename', label, path);
     if (!path || path == file.path) {
       return;
     }
@@ -797,7 +808,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   // TODO: test
   $scope.prompt_file_rename = function(file, label) {
-    track('prompt_file_rename', label, file.path);
+    track('prompt-file-rename', label, file.path);
     $dialog.dialog({
         controller: 'RenameFileController',
         templateUrl: '/playground/rename_file_modal.html',
@@ -833,6 +844,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     track('run', label);
     $scope.app_run_count++;
     return DoSerial
+    // TODO: _save_dirty_files must succeed before running
     .then(_save_dirty_files)
     .then($scope.clear_logs)
     .then(function() {
@@ -864,7 +876,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   };
 
   $scope.reset_project = function(label) {
-    track('reset_project', label);
+    track('reset-project', label);
     var project_id = $scope.namespace();
     return $http.post('/playground/p/' + encodeURI(project_id) + '/reset')
     .success(function(data, status, headers, config) {
@@ -877,13 +889,13 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
       DoSerial
       .then($scope._list_files)
       .then(function() {
-        $scope._select_a_file('reset_project');
+        $scope._select_a_file('reset-project');
       });
     });
   };
 
   $scope.prompt_reset_project = function(label) {
-    track('prompt_reset_project', label);
+    track('prompt-reset-project', label);
     var title = 'Confirm project reset';
     var msg = 'Are you sure you want to reset project "' +
               $scope.project.name +
@@ -891,20 +903,20 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     var okButtonText = 'RESET PROJECT';
     var okButtonClass = 'btn btn-danger';
     var callback = function() {
-      $scope.reset_project();
+      $scope.reset_project(label);
     }
 
     ConfirmDialog(title, msg, okButtonText, okButtonClass, callback);
   };
 
   $scope.download_project = function(filename, label) {
-    track('download_project', label);
+    track('download-project', label);
     var project_id = $scope.namespace();
     $window.location = $scope.url_of('zip', {filename: filename});
   }
 
   $scope.prompt_download_project = function(label) {
-    track('prompt_download_project', label);
+    track('prompt-download-project', label);
     var title = 'Confirm project download';
     var msg = 'Are you sure you want to download project "' +
               $scope.project.name +

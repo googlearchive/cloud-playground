@@ -28,10 +28,10 @@
       <tr class="project_row" ng-repeat="project in projects | orderBy:'name':false | orderBy:'orderby':true" ng-class="{ghost: !project.key}">
         <td>
           <span ng-show="!project.in_progress_task_name">
-            <button ng-show="project.writable" class="btn btn-small btn-primary" style="width: 10em;" ng-disabled="!project.key" ng-click="select_project(project, 'click_open_project_button')">
+            <button ng-show="project.writable" class="btn btn-small btn-primary" style="width: 10em;" ng-disabled="!project.key" ng-click="select_project(project, 'click-open-project-button')">
               <i class="icon-share-alt icon-white"></i> open project
             </button>
-            <button ng-show="!project.writable" class="btn btn-small" style="width: 10em;" ng-click="new_project(project, undefined, 'copy_project')">
+            <button ng-show="!project.writable" class="btn btn-small" style="width: 10em;" ng-click="new_project(project, undefined, 'copy-project')">
               <i class="icon-plus"></i> make a copy
             </button>
           </span>
@@ -63,7 +63,7 @@
             <input class='span6' type='url' id='import_url'
                    ng-model='import_url' required
                    placeholder="https://github.com/github_user_id/repo_name">
-            <button class="btn" type="submit" ng-click="create_template_project_by_url(import_url, 'import_button')">Import</button>
+            <button class="btn" type="submit" ng-click="create_template_project_by_url(import_url, 'import-button')">Import</button>
           </div>
         </div>
       </div>
