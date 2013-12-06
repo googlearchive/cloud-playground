@@ -28,10 +28,10 @@
       <tr class="project_row" ng-repeat="project in projects | orderBy:'name':false | orderBy:'orderby':true" ng-class="{ghost: !project.key}">
         <td>
           <span ng-show="!project.in_progress_task_name">
-            <button ng-show="project.writable" class="btn btn-small btn-primary" style="width: 10em;" ng-disabled="!project.key" ng-click="select_project(project)">
+            <button ng-show="project.writable" class="btn btn-small btn-primary" style="width: 10em;" ng-disabled="!project.key" ng-click="select_project(project, 'click_open_project_button')">
               <i class="icon-share-alt icon-white"></i> open project
             </button>
-            <button ng-show="!project.writable" class="btn btn-small" style="width: 10em;" ng-click="new_project(project)">
+            <button ng-show="!project.writable" class="btn btn-small" style="width: 10em;" ng-click="new_project(project, undefined, 'copy_project')">
               <i class="icon-plus"></i> make a copy
             </button>
           </span>
@@ -45,7 +45,7 @@
           <a ng-show="config.is_admin && !project.writable" ng-class="{disabled: !project.key}" ng-click="recreate_template_project(project)" title="refresh project"><i class="icon-refresh"></i></a>
         </td>
         <td>
-          <a ng-show="config.is_admin || project.writable" ng-click="prompt_delete_project(project)" title="delete project"><i class="icon-trash"></i></a>
+          <a ng-show="config.is_admin || project.writable" ng-click="prompt_delete_project(project, 'trashcan_icon')" title="delete project"><i class="icon-trash"></i></a>
         </td>
       </tr>
 
@@ -63,7 +63,7 @@
             <input class='span6' type='url' id='import_url'
                    ng-model='import_url' required
                    placeholder="https://github.com/github_user_id/repo_name">
-            <button class="btn" type="submit" ng-click="create_template_project_by_url(import_url)">Import</button>
+            <button class="btn" type="submit" ng-click="create_template_project_by_url(import_url, 'import_button')">Import</button>
           </div>
         </div>
       </div>

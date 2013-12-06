@@ -3,7 +3,7 @@
     <div id="nav" ng-hide="iframed">
       <div id="navheader">
         <div class="project_name" title="{{project.description}}">{{project.name}}</div>
-        <div class="dropdown"><a ng-click="project_context_menu($event)">…</a></div>
+        <div class="dropdown"><a ng-click="project_context_menu($event, 'elipsis')">…</a></div>
       </div>
       <div id="filelist">
         <div id="file-{{$index}}" class="fileentry"
@@ -12,15 +12,15 @@
           <a ng-click="set_path(file.path)" class="filename">
             {{file.path}} <i class="icon-asterisk dirtymarker" ng-show="file.dirty"></i>
           </a>
-          <a class="dropdown" ng-click="file_context_menu($event, file)">…</a>
+          <a class="dropdown" ng-click="file_context_menu($event, file, 'elipsis')">…</a>
         </div>
-        <div><a class='link newthing' ng-click='prompt_new_file()'>+ new file</a></div>
+        <div><a class='link newthing' ng-click='prompt_new_file("new_file_link")'>+ new file</a></div>
       </div>
     </div>
 
     <form class="form-inline form-reduced-margin btn-height">
-      <button ng-click='prompt_reset_project()' title='Reset {{project.name}}' class='btn pull-right'>Reset Project</button>
-      <button ng-click='prompt_download_project()' title='Download {{project.name}}' class='btn  pull-right'><i class="icon-download"></i> ZIP</button>
+      <button ng-click='prompt_reset_project("project_reset_button")' title='Reset {{project.name}}' class='btn pull-right'>Reset Project</button>
+      <button ng-click='prompt_download_project("project_download_button")' title='Download {{project.name}}' class='btn pull-right'><i class="icon-download"></i> ZIP</button>
       <span ng-hide="iframed" class="current-file-path"> {{current_file.path}}</span>
       <select ng-show="iframed" ng-model="selected_path">
         <option ng-repeat="file in files">{{file.path}}</option>
@@ -42,12 +42,12 @@
     </iframe>
     <div class="">
        If your app fails to load in the IFRAME below, try running your app in a
-       <a ng-click='popout(); run("retry_popout");'>separate window</a>.
+       <a ng-click='popout("separate_window_link"); run("separate_window_link");'>separate window</a>.
     </div>
     <div class='form-inline url-container'>
-      <button ng-click='run("click")' class='btn btn-primary url-button pull-left' title='Run'><i class="icon-play icon-white"></i></button>
+      <button ng-click='run("blue_button")' class='btn btn-primary url-button pull-left' title='Run'><i class="icon-play icon-white"></i></button>
       <input ng-model='iframe_run_url' type='url' class='span8 url-bar' ng-click='select_me($event)'>
-      <button ng-click='popout(); run("popout_button")' class='btn pull-right url-button' title='Open in a separate window'><i class="icon-share-alt"></i></button>
+      <button ng-click='popout("popout_button"); run("popout_button")' class='btn pull-right url-button' title='Open in a separate window'><i class="icon-share-alt"></i></button>
     </div>
     <div id="output-iframe" style="position: relative;">
       <div ng-show="!output_ready" style="position: absolute; background-color: #eee;">
@@ -79,11 +79,11 @@
 
   <!-- hidden bits -->
   <div id="file-context-menu" class="context-menu" ng-show="showfilecontextmenu" pg-movable="file_context_menu_pos">
-    <div ng-click="prompt_file_rename(current_file)"><b>Rename</b> <code>{{current_file.path}}</code></div>
-    <div ng-click="prompt_delete_file(current_file)"><b>Delete</b> <code>{{current_file.path}}</code></div>
+    <div ng-click="prompt_file_rename(current_file, 'file_context_menu')"><b>Rename</b> <code>{{current_file.path}}</code></div>
+    <div ng-click="prompt_delete_file(current_file, 'file_context_menu')"><b>Delete</b> <code>{{current_file.path}}</code></div>
   </div>
   <div id="project-context-menu" class="context-menu" ng-show="showprojectcontextmenu" pg-movable="project_context_menu_pos">
-    <div ng-click="prompt_project_rename(project)"><b>Rename</b> {{project.name}}</div>
-    <div ng-click="prompt_delete_project(project)"><b>Delete</b> {{project.name}}</div>
+    <div ng-click="prompt_project_rename(project, 'project_context_menu')"><b>Rename</b> {{project.name}}</div>
+    <div ng-click="prompt_delete_project(project, 'project_context_menu')"><b>Delete</b> {{project.name}}</div>
   </div>
 </div>
