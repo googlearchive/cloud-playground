@@ -53,7 +53,7 @@
         <div class="text-left">
           <p>Here are some other things you can try to resolve this:
             <ol>
-              <li><a ng-click="reload()">Reload</a> this page.</li>
+              <li><a ng-click="reload('{load_state}')">Reload</a> this page.</li>
               <li>Make sure your browser is configured to allow cookies.</li>
               <li>Clear your browser cookies.</li>
             </ol>
@@ -63,7 +63,7 @@
 
       <div class="lightbox-msg" ng-switch-when="TEMPLATE_NOT_YET_AVAILABLE">
         <p>Loading the requested template...</p>
-        <p>Please wait 10 seconds and then <a ng-click="reload()">reload</a>.</p>
+        <p>Please wait 10 seconds and then <a ng-click="reload('{load_state}')">reload</a>.</p>
       </div>
 
       <div class="lightbox-msg" ng-switch-when="PROJECT_NOT_FOUND">
@@ -77,7 +77,7 @@
       </div>
 
       <div class="lightbox-msg" ng-switch-default>
-        <p>Unexpected error. Try <a ng-click="reload()">reloading</a> this page.</p>
+        <p>Unexpected error. Try <a ng-click="reload('{load_state}')">reloading</a> this page.</p>
         <div ng-show="load_state.status && load_state.data && load_state.config.method && load_state.config.url" class="text-left">
           <p><pre>{{load_state.status}} &lt;- {{load_state.config.method}} {{load_state.config.url}}</pre></p>
           <p><pre>{{load_state.data}}</pre></p>
@@ -145,8 +145,8 @@
           <span ng-show="config.is_admin">oauth2(<a class="link" ng-click="oauth2_admin('github', 'https://github.com/settings/applications/38287')">github</a>)</span>
 
           <span ng-show="config.is_admin || config.is_devappserver">
-            admin(<a class="link" ng-click="datastore_admin()" target="_blank">datastore</a>,
-                  <a class="link" ng-click="memcache_admin()" target="_blank">memcache</a>)
+            admin(<a class="link" ng-click="datastore_admin('footer_link')" target="_blank">datastore</a>,
+                  <a class="link" ng-click="memcache_admin('footer_link')" target="_blank">memcache</a>)
           </span>
 
         </div>
