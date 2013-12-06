@@ -82,14 +82,14 @@ describe('cloud playground app', function() {
         function() {
       login(false);
       expect(element('[ng-click="big_red_button()"]').height()).toEqual(0);
-      expect(element('[ng-click="datastore_admin()"]').height()).toEqual(0);
-      expect(element('[ng-click="memcache_admin()"]').height()).toEqual(0);
+      expect(element('[ng-click="open_datastore_admin()"]').height()).toEqual(0);
+      expect(element('[ng-click="open_memcache_admin()"]').height()).toEqual(0);
       login(true);
       expect(element('[ng-click="big_red_button()"]').height())
         .toBeGreaterThan(0);
-      expect(element('[ng-click="datastore_admin()"]').height())
+      expect(element('[ng-click="open_datastore_admin()"]').height())
         .toBeGreaterThan(0);
-      expect(element('[ng-click="memcache_admin()"]').height())
+      expect(element('[ng-click="open_memcache_admin()"]').height())
         .toBeGreaterThan(0);
     });
 

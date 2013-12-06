@@ -16,11 +16,26 @@ function AlertController($scope, Alert) {
   });
 }
 
-function HeaderController($scope, $location) {
+function HeaderController($scope, $location, $routeParams) {
 
   $scope.alreadyhome = function() {
     return $location.path() == '/playground/';
   };
+
+  // TODO: test
+  $scope.$on('$routeChangeSuccess', function(evt, current, previous) {
+    if (!previous) {
+      if ($routeParams.template_url) {
+        track('first-page-load', 'from-template', $routeParams.template_url);
+      } else if ($scope.alreadyhome()) {
+        track('first-page-load', 'main-page');
+      } else if ($location.path().match(/^\/playground\/p\//)) {
+        track('first-page-load', 'project-page');
+      } else {
+        track('first-page-load', $location.path());
+      }
+     }
+   });
 
 }
 
@@ -41,7 +56,6 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
 
   // TODO: test
   $scope.$on('$routeChangeError', function(evt, current, previous, rejection) {
-    track('$routeChangeError', 'PageController', rejection)
     $log.log('PageController routeChangeError:', rejection);
     if (rejection.status == 401) {
       $rootScope.set_load_state('ACCESS_DENIED');
@@ -70,6 +84,11 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
            ($scope.config && $scope.config.playground_namespace);
   };
 
+  $scope.to_main_page = function(label) {
+    track('to-main-page', label);
+    $location.path('/playground/').hash('');
+  }
+
   $scope.signin = function(label) {
     track('sign-in', label);
     WindowService.go('/playground/login');
@@ -80,14 +99,19 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     WindowService.go('/playground/logout');
   }
 
-  $scope.datastore_admin = function(label) {
-    track('datastore-admin', label);
+  $scope.open_datastore_admin = function(label) {
+    track('open-datastore-admin', label);
     WindowService.open('/playground/datastore/' + $scope.namespace(), '_blank');
   };
 
-  $scope.memcache_admin = function(label) {
-    track('memcache-admin', label);
+  $scope.open_memcache_admin = function(label) {
+    track('open-memcache-admin', label);
     WindowService.open('/playground/memcache/' + $scope.namespace(), '_blank');
+  };
+
+  $scope.open_git_project = function(label) {
+    track('open-git-project', label);
+    WindowService.open($scope.config.git_playground_url, '_blank');
   };
 
   $scope.reload = function(label) {
@@ -95,12 +119,13 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     WindowService.reload();
   };
 
-  $scope.popout_ide = function() {
-    track('popout-ide');
+  $scope.popout_ide = function(label) {
+    track('popout-ide', label);
     WindowService.open($location.absUrl(), '_blank');
   }
 
-  $scope.big_red_button = function() {
+  $scope.big_red_button = function(label) {
+    track('big-red-button', label);
     DoSerial
     .then(function() {
       return $http.post('/playground/nuke')
@@ -111,29 +136,43 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
   };
 
   // TODO: test
-  function prompt_oauth2_admin(credential) {
-    $dialog.dialog({
-        controller: 'OAuth2AdminController',
-        templateUrl: '/playground/oauth2_admin.html',
-        resolve: {
-            key: credential.key,
-            url: credential.url,
-            client_id: credential.client_id,
-            client_secret: credential.client_secret,
-        },
-    })
-    .open().then(function(credential) {
-      $http.post('/playground/oauth2_admin', credential);
-    });
-  }
+  $scope.set_oauth2_admin = function(credential, label) {
+    track('set-oauth2-admin', label, credential.key);
+    $http.post('/playground/oauth2_admin', credential);
+  };
 
   // TODO: test
-  $scope.oauth2_admin = function(key, url) {
+  $scope.prompt_oauth2_admin = function(key, url, label) {
+    track('prompt-oauth2-admin', label, key);
     $http.post('/playground/oauth2_admin', {key: key, url: url})
     .success(function(data, status, headers, config) {
-      prompt_oauth2_admin(data);
+      $dialog.dialog({
+          controller: 'OAuth2AdminController',
+          templateUrl: '/playground/oauth2_admin.html',
+          resolve: {
+              key: data.key,
+              url: data.url,
+              client_id: data.client_id,
+              client_secret: data.client_secret,
+          },
+      })
+      .open().then(function(credential) {
+        if (!credential) {
+          return;
+        }
+        $scope.set_oauth2_admin(credential, label);
+      });
     });
   };
+
+  // // TODO: test
+  // $scope.oauth2_admin = function(key, url, label) {
+  //   track('oauth2-admin', label, key);
+  //   $http.post('/playground/oauth2_admin', {key: key, url: url})
+  //   .success(function(data, status, headers, config) {
+  //     prompt_oauth2_admin(data);
+  //   });
+  // };
 
   $scope.select_project = function(project, label) {
     track('select-project', label, project.template_url);
@@ -167,8 +206,11 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     ConfirmDialog(title, msg, okButtonText, okButtonClass, callback);
   };
 
-  $rootScope.set_load_state = function(state) {
-    $scope.load_state = state;
+  $rootScope.set_load_state = function(load_state) {
+    if (typeof load_state != 'boolean') {
+      track('set-load-state', load_state);
+    }
+    $scope.load_state = load_state;
   }
 
   $rootScope.set_load_state(false);
@@ -179,7 +221,6 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
 
   // TODO: test
   $scope.$on('$routeChangeError', function(evt, current, previous, rejection) {
-    track('$routeChangeError', 'MainController', rejection)
     $log.log('MainController routeChangeError:', rejection);
     $rootScope.set_load_state(rejection);
   });
@@ -195,8 +236,8 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
         .then(function(project) {
           $scope.select_project(project, 'auto-from-template-url');
         })
-        .catch(function(e) {
-          $rootScope.set_load_state(e);
+        .catch(function(rejection) {
+          $rootScope.set_load_state(rejection);
         });
       } else {
         $rootScope.set_load_state(true);
@@ -262,10 +303,6 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
       });
       return deferred.promise;
     });
-  };
-
-  $scope.login = function() {
-    $window.location.replace('/playground/login');
   };
 
   // TODO: test
@@ -371,7 +408,6 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   // TODO: test
   $scope.$on('$routeChangeError', function(evt, current, previous, rejection) {
-    track('$routeChangeError', 'ProjectController', rejection)
     $rootScope.set_load_state(rejection);
     $log.log('ProjectController routeChangeError:', rejection);
   });
@@ -399,7 +435,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
       })
       .then($scope._list_files)
       .then(function() {
-        $scope._select_a_file('$routeChangeSuccess');
+        $scope._select_a_file('auto-route-change-success');
       })
       .then(function() {
         $rootScope.set_load_state(true);
@@ -546,13 +582,22 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   };
 
   $scope.select_file = function(file, label) {
+    if (file == $scope.current_file) {
+      if ($location.hash() != file.path) {
+        // user was on a valid file, then changed hash to invalid path
+        $location.hash(file.path);
+      }
+      return;
+    }
     track('select-file', label, file.path);
     if ($scope.is_image_mime_type(file.mime_type)) {
       $scope.current_file = file;
+      $location.hash(file.path);
       return;
     }
     $scope._get(file, function() {
       $scope.current_file = file;
+      $location.hash(file.path);
     });
   };
 
@@ -751,7 +796,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     track('file-context-menu', label, file.path);
     evt.stopPropagation();
     hide_context_menus();
-    $scope.select_file(file, 'file_context_menu');
+    $scope.select_file(file, 'file-context-menu');
     $scope.showfilecontextmenu = true;
     $scope.file_context_menu_pos = [evt.pageX, evt.pageY];
   };
@@ -765,7 +810,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
       return $http.post(url)
       .success(function(data, status, headers, config) {
         delete $scope.files[file.path];
-        $scope._select_a_file('delete_file');
+        $scope._select_a_file('delete-file');
       });
     });
   };
@@ -932,10 +977,10 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   };
 
   $scope.$watch('selected_path', function(newpath, oldpath) {
-    if (!newpath) {
+    if (!newpath || newpath == oldpath) {
       return;
     }
-    $location.hash(newpath);
+    $scope.set_path(newpath);
   });
 
   $scope.$watch('current_file', function(newfile, oldfile) {

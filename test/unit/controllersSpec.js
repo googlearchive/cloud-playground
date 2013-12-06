@@ -601,12 +601,12 @@ describe('PageController', function() {
       }));
 
 
-      describe('datastore_admin function', function() {
+      describe('open_datastore_admin function', function() {
 
         it('should open new window to /playground/datastore/some_namespace',
            function() {
              expect(WindowService.open).not.toHaveBeenCalled();
-             scope.datastore_admin();
+             scope.open_datastore_admin();
              expect(WindowService.open).toHaveBeenCalledWith(
                '/playground/datastore/some_namespace', '_blank');
            });
@@ -614,12 +614,12 @@ describe('PageController', function() {
       });
 
 
-      describe('memcache_admin function', function() {
+      describe('open_memcache_admin function', function() {
 
         it('should open new window to /playground/memcache/some_namespace',
            function() {
              expect(WindowService.open).not.toHaveBeenCalled();
-             scope.memcache_admin();
+             scope.open_memcache_admin();
              expect(WindowService.open).toHaveBeenCalledWith(
                '/playground/memcache/some_namespace', '_blank');
            });

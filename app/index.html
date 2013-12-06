@@ -44,7 +44,7 @@
     <div class="cover-everything lightbox" ng-show="load_state && load_state != true" ng-switch="load_state">
 
       <div class="lightbox-msg" ng-switch-when="IFRAMED_NO_COOKIE">
-        Try App Engine in the <button class="btn" ng-click="popout_ide()">
+        Try App Engine in the <button class="btn" ng-click="popout_ide('{{load_state}}')">
         <i class="icon-fullscreen"></i> Cloud Playground</button>
       </div>
 
@@ -53,7 +53,7 @@
         <div class="text-left">
           <p>Here are some other things you can try to resolve this:
             <ol>
-              <li><a ng-click="reload('{load_state}')">Reload</a> this page.</li>
+              <li><a ng-click="reload('{{load_state}}')">Reload</a> this page.</li>
               <li>Make sure your browser is configured to allow cookies.</li>
               <li>Clear your browser cookies.</li>
             </ol>
@@ -63,21 +63,21 @@
 
       <div class="lightbox-msg" ng-switch-when="TEMPLATE_NOT_YET_AVAILABLE">
         <p>Loading the requested template...</p>
-        <p>Please wait 10 seconds and then <a ng-click="reload('{load_state}')">reload</a>.</p>
+        <p>Please wait 10 seconds and then <a ng-click="reload('{{load_state}}')">reload</a>.</p>
       </div>
 
       <div class="lightbox-msg" ng-switch-when="PROJECT_NOT_FOUND">
         <p>Project no longer exists.</p>
-        <p>Return to the <a href="/playground/">Cloud Playground</a>.</p>
+        <p>Return to the <a ng-click="to_main_page('{{load_state}}')">Cloud Playground</a>.</p>
       </div>
 
       <div class="lightbox-msg" ng-switch-when="PROJECT_ACCESS_DENIED">
         <p>Project access denied.</p>
-        <p>Return to the <a href="/playground/">Cloud Playground</a>.</p>
+        <p>Return to the <a ng-click="to_main_page('{{load_state}}')">Cloud Playground</a>.</p>
       </div>
 
       <div class="lightbox-msg" ng-switch-default>
-        <p>Unexpected error. Try <a ng-click="reload('{load_state}')">reloading</a> this page.</p>
+        <p>Unexpected error. Try <a ng-click="reload('{{load_state}}')">reloading</a> this page.</p>
         <div ng-show="load_state.status && load_state.data && load_state.config.method && load_state.config.url" class="text-left">
           <p><pre>{{load_state.status}} &lt;- {{load_state.config.method}} {{load_state.config.url}}</pre></p>
           <p><pre>{{load_state.data}}</pre></p>
@@ -100,7 +100,7 @@
         <div ng-hide="iframed">
           <img src="/playground/img/developers-logo.png" class="header-logo"/>
           <div class="header-logo-line">
-            <a href="/playground/" class="header-product-text"><span class='app-back' pg-visible="!alreadyhome()">&#x2039;</span>Cloud Playground</a>
+            <a ng-click="to_main_page('header-logo')" class="header-product-text"><span class='app-back' pg-visible="!alreadyhome()">&#x2039;</span>Cloud Playground</a>
             <sup class="experimental">experimental</sup>
           </div>
           <div class="topbar" ng-show="config">
@@ -138,15 +138,15 @@
           <span>namespace: {{namespace()}}</span>
         </div>
         <div class="adminlinks">
-          <span>git(<a class="link" ng-href="{{config.git_playground_url}}" target="_blank">cloud-playground</a>)</span>
+          <span>git(<a class="link" ng-click="open_git_project('page-footer')">cloud-playground</a>)</span>
 
-          <span ng-show="config.is_admin">danger(<a class="link" ng-click="big_red_button()">big-red-button</a>)</span>
+          <span ng-show="config.is_admin">danger(<a class="link" ng-click="big_red_button('page-footer')">big-red-button</a>)</span>
 
-          <span ng-show="config.is_admin">oauth2(<a class="link" ng-click="oauth2_admin('github', 'https://github.com/settings/applications/38287')">github</a>)</span>
+          <span ng-show="config.is_admin">oauth2(<a class="link" ng-click="prompt_oauth2_admin('github', 'https://github.com/settings/applications/38287', 'page-footer')">github</a>)</span>
 
           <span ng-show="config.is_admin || config.is_devappserver">
-            admin(<a class="link" ng-click="datastore_admin('footer_link')" target="_blank">datastore</a>,
-                  <a class="link" ng-click="memcache_admin('footer_link')" target="_blank">memcache</a>)
+            admin(<a class="link" ng-click="open_datastore_admin('page-footer')" target="_blank">datastore</a>,
+                  <a class="link" ng-click="open_memcache_admin('page-footer')" target="_blank">memcache</a>)
           </span>
 
         </div>
