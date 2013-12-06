@@ -176,7 +176,6 @@ function MainController($scope, $http, $window, $location, $log, $routeParams,
 
   // TODO: test
   $scope.$on('$routeChangeSuccess', function(evt, current, previous) {
-    track('$routeChangeSuccess', 'MainController');
     DoSerial
     .then(function() {
       var template_url = $routeParams.template_url;
@@ -369,7 +368,6 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   // TODO: test
   $scope.$on('$routeChangeSuccess', function(evt, current, previous) {
-    track('$routeChangeSuccess', 'ProjectController');
     DoSerial
     .then(function() {
       var deferred = $q.defer();
@@ -548,11 +546,19 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   };
 
   $scope.set_path = function(path) {
-    $location.hash(path);
+    var file = $scope.files[path];
+    if (file) {
+      $scope.select_file(file, 'set_path');
+    } else {
+      $scope._select_a_file('set_path');
+    }
   };
 
   $scope.$on('$routeUpdate', function(evt) {
     var file = $scope.files[$location.hash()];
+    if (file == $scope.current_file) {
+      return;
+    }
     if (file) {
       $scope.select_file(file, '$routeUpdate');
     } else {
