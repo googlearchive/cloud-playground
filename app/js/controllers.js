@@ -26,7 +26,7 @@ function HeaderController($scope, $location, $routeParams) {
   $scope.$on('$routeChangeSuccess', function(evt, current, previous) {
     if (!previous) {
       if ($routeParams.template_url) {
-        track('first-page-load', 'from-template', $routeParams.template_url);
+        track('first-page-load', $routeParams.template_url);
       } else if ($scope.alreadyhome()) {
         track('first-page-load', 'main-page');
       } else if ($location.path().match(/^\/playground\/p\//)) {
@@ -137,13 +137,13 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
 
   // TODO: test
   $scope.set_oauth2_admin = function(credential, label) {
-    track('set-oauth2-admin', label, credential.key);
+    track('set-oauth2-admin', credential.key, label);
     $http.post('/playground/oauth2_admin', credential);
   };
 
   // TODO: test
   $scope.prompt_oauth2_admin = function(key, url, label) {
-    track('prompt-oauth2-admin', label, key);
+    track('prompt-oauth2-admin', key, label);
     $http.post('/playground/oauth2_admin', {key: key, url: url})
     .success(function(data, status, headers, config) {
       $dialog.dialog({
@@ -164,15 +164,6 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
       });
     });
   };
-
-  // // TODO: test
-  // $scope.oauth2_admin = function(key, url, label) {
-  //   track('oauth2-admin', label, key);
-  //   $http.post('/playground/oauth2_admin', {key: key, url: url})
-  //   .success(function(data, status, headers, config) {
-  //     prompt_oauth2_admin(data);
-  //   });
-  // };
 
   $scope.select_project = function(project, label) {
     track('select-project', label, project.template_url);

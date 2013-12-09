@@ -1,9 +1,12 @@
 'use strict';
 
-window.track = function(action, label, value) {
+window.track = function(action, label, label_detail) {
   var category = 'cloud-playground';
-  // console.log(action, label, value);
-  ga('send', 'event', category, action, label, value);
+  if (label_detail !== undefined) {
+    label = label + ':' + label_detail;
+  }
+  // console.log(action, label);
+  ga('send', 'event', category, action, label);
 }
 
 window.iframed = window.top != window.self;
