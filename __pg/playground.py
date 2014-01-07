@@ -31,6 +31,8 @@ _JSON_ENCODER = json.JSONEncoder()
 _JSON_ENCODER.indent = 4
 _JSON_ENCODER.sort_keys = True
 
+_JSON_DECODER = json.JSONDecoder()
+
 _DEV_APPSERVER = os.environ['SERVER_SOFTWARE'].startswith('Development/')
 
 _DASH_DOT_DASH = '-dot-'
@@ -40,8 +42,15 @@ _VALID_PROJECT_RE = re.compile('^[a-z0-9-]{0,50}$')
 
 
 def tojson(r):  # pylint:disable-msg=invalid-name
-  """Converts a python object to JSON."""
+  """Converts a Python object to JSON."""
   return _JSON_ENCODER.encode(r)
+
+
+def fromjson(json):  # pylint:disable-msg=invalid-name
+  """Converts a JSON object into a Python object."""
+  if json == '':
+    return None
+  return _JSON_DECODER.decode(json)
 
 
 class PlaygroundHandler(webapp2.RequestHandler):
@@ -469,7 +478,8 @@ class UpdateProject(PlaygroundHandler):
       Abort(httplib.UNAUTHORIZED, 'no project write access')
 
   def post(self):  # pylint:disable-msg=invalid-name
-    project = model.UpdateProject(self.project_id)
+    data = fromjson(str(self.request.body))
+    project = model.UpdateProject(self.project_id, data)
     r = self.DictOfProject(project)
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))

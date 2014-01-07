@@ -513,8 +513,8 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     $scope.files = {};
     return $http.get(url)
     .success(function(data, status, headers, config) {
-      angular.forEach(data, function(props, i) {
-        $scope.files[props.path] = props;
+      angular.forEach(data, function(file, i) {
+        $scope.files[file.path] = file;
       });
     });
   };
@@ -637,14 +637,14 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     return false;
   }
 
-  $scope.update_project = function(project_key) {
-    // Stops calling update_project if on different page.
+  $scope.update_project = function(project_key, data) {
+    // Stop calling update_project if on different page.
     if ($routeParams.project_id != project_key) {
       return;
     }
     // Calls update_project repeatedly to prevent expiration.
     return $http.post('/playground/p/' +
-      encodeURI(project_key) + '/update')
+      encodeURI(project_key) + '/update', data)
     .success(function(data, status, headers, config) {
       for (var i in $scope.projects) {
         if ($scope.projects[i].key == project_key) {
@@ -660,10 +660,22 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     });
   };
 
+  $scope.mark_as_open_file = function(path) {
+    angular.forEach($scope.project.open_files, function(open_file) {
+      if (path == open_file) {
+        return;
+      }
+    });
+    $scope.project.open_files.push(path);
+    $scope.update_project($scope.project.key,
+                          {open_files: $scope.project.open_files})
+  }
+
   // TODO: test
   $scope.new_file = function(path, label) {
     track('new-file', label, path);
     var file = $scope.files[path];
+    $scope.mark_as_open_file(path);
     if (!file) {
       // Create a file on the server side and use the result.
       $http.put($scope.url_of('file', {path: path}), '', {
@@ -827,6 +839,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     if (!path || path == file.path) {
       return;
     }
+    $scope.mark_as_open_file(path);
     DoSerial
     .then(function() {
       var oldpath = file.path;

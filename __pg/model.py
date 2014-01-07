@@ -324,8 +324,13 @@ def RenameProject(project_id, project_name):
   return project
 
 
-def UpdateProject(project_id):
+@ndb.transactional
+def UpdateProject(project_id, data):
   project = GetProject(project_id)
+  if data:
+    open_files = data.get('open_files')
+    assert isinstance(open_files, list)
+    project.open_files = open_files
   project.put()
   return project
 
