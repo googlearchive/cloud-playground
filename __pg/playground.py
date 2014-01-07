@@ -102,7 +102,7 @@ class PlaygroundHandler(webapp2.RequestHandler):
         'owner': project.owner,
         'name': project.project_name,
         'description': project.project_description,
-        'open_files': project.open_files,
+        'show_files': project.show_files,
         'template_url': project.template_url,
         'html_url': project.html_url,
         'run_url': self._MakeMimicUrl(project, '/'),
@@ -363,7 +363,7 @@ class RecreateTemplateProject(PlaygroundHandler):
                           html_url=repo.html_url,
                           name=repo.name,
                           description=repo.description,
-                          open_files=repo.open_files)
+                          show_files=repo.show_files)
 
 
 class NewProjectFromTemplateUrl(PlaygroundHandler):
@@ -385,7 +385,7 @@ class NewProjectFromTemplateUrl(PlaygroundHandler):
                                    html_url=html_url,
                                    name=name,
                                    description=description,
-                                   open_files=[])
+                                   show_files=[])
     template_project = repo.project.get()
     if not template_project or template_project.in_progress_task_name:
       Abort(httplib.REQUEST_TIMEOUT,
@@ -417,7 +417,7 @@ class CreateTemplateProjectByUrl(PlaygroundHandler):
                                    html_url=html_url,
                                    name=name,
                                    description=description,
-                                   open_files=[])
+                                   show_files=[])
     project = repo.project.get()
     if not project or project.in_progress_task_name:
       Abort(httplib.REQUEST_TIMEOUT,

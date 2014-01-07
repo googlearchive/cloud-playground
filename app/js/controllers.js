@@ -614,7 +614,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   });
 
   $scope._select_a_file = function(label) {
-    var path = $location.hash() || $scope.project.open_files[0];
+    var path = $location.hash() || $scope.project.show_files[0];
     var file = $scope.files[path];
     if (file) {
       $scope.select_file(file, label);
@@ -661,14 +661,14 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   };
 
   $scope.mark_as_open_file = function(path) {
-    angular.forEach($scope.project.open_files, function(open_file) {
+    angular.forEach($scope.project.show_files, function(open_file) {
       if (path == open_file) {
         return;
       }
     });
-    $scope.project.open_files.push(path);
+    $scope.project.show_files.push(path);
     $scope.update_project($scope.project.key,
-                          {open_files: $scope.project.open_files})
+                          {show_files: $scope.project.show_files})
   }
 
   // TODO: test

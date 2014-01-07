@@ -75,7 +75,7 @@ class CodesiteRepoCollection(collection.RepoCollection):
                               html_url=project_url,
                               name=name,
                               description=description,
-                              open_files=[])
+                              show_files=[])
       except urlfetch_errors.Error:
         exc_info = sys.exc_info()
         formatted_exception = traceback.format_exception(exc_info[0],

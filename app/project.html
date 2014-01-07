@@ -8,7 +8,7 @@
       <div id="filelist">
         <div id="file-{{$index}}" class="fileentry"
              ng-class="{selected: file == current_file}"
-             ng-repeat="file in files | file_filter:project.open_files">
+             ng-repeat="file in files | file_filter:project.show_files">
           <a ng-click="set_path(file.path)" class="filename">
             {{file.path}} <i class="icon-asterisk dirtymarker" ng-show="file.dirty"></i>
           </a>
@@ -23,11 +23,11 @@
       <button ng-click='prompt_download_project("project-download-button")' title='Download {{project.name}}' class='btn pull-right'><i class="icon-download"></i> ZIP</button>
       <span ng-hide="iframed" class="current-file-path"> {{current_file.path}}</span>
       <select ng-show="iframed" ng-model="selected_path">
-        <option ng-repeat="file in files | file_filter:project.open_files">{{file.path}}</option>
+        <option ng-repeat="file in files | file_filter:project.show_files">{{file.path}}</option>
       </select>
       <span class="filestatus" ng-bind="filestatus"></span>
     </form>
-    <span ng-show="file == current_file" ng-repeat="file in files | file_filter:project.open_files">
+    <span ng-show="file == current_file" ng-repeat="file in files | file_filter:project.show_files">
       <div ng-hide="is_image_mime_type(file.mime_type)" class="source-code" ui-codeMirror="{onChange: create_on_change_closure(file), file: file}" ng-model="file.contents"></div>
       <img ng-show="is_image_mime_type(file.mime_type)" ng-src="{{image_url_of(file)}}">
     </span>

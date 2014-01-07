@@ -284,7 +284,7 @@ class GithubRepoCollection(collection.RepoCollection):
                             html_url=repo['html_url'],
                             name=name,
                             description=description,
-                            open_files=[])
+                            show_files=[])
 
   def CreateProjectTreeFromRepo(self, tree, repo):
     # e.g. https://github.com/GoogleCloudPlatform/appengine-guestbook-python

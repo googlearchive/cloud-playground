@@ -38,12 +38,12 @@ class FilesystemRepoCollection(collection.RepoCollection):
           data = json.loads(f.read())
         name = data.get('template_name')
         description = data.get('template_description')
-        open_files = data.get('open_files', [])
+        show_files = data.get('show_files', [])
         orderby = data.get('orderby')
       except IOError:
         name = dirpath
         description = dirname
-        open_files = []
+        show_files = []
         orderby = None
       url = os.path.join(template_dir, dirname)
       html_url = ('https://code.google.com/p/cloud-playground/source/browse/'
@@ -53,7 +53,7 @@ class FilesystemRepoCollection(collection.RepoCollection):
                             html_url=html_url,
                             name=name,
                             description=description,
-                            open_files=open_files,
+                            show_files=show_files,
                             orderby=orderby)
 
   def CreateProjectTreeFromRepo(self, tree, repo):
