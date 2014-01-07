@@ -432,7 +432,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
         $rootScope.set_load_state(true);
       })
       .then(function() {
-        $scope.touch_project($scope.project.key);
+        $scope.update_project($scope.project.key);
       });
       return deferred.promise;
     })
@@ -637,14 +637,14 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     return false;
   }
 
-  $scope.touch_project = function(project_key) {
-    // Stops calling touch_project if on different page.
+  $scope.update_project = function(project_key) {
+    // Stops calling update_project if on different page.
     if ($routeParams.project_id != project_key) {
       return;
     }
-    // Calls touch project repeatedly to prevent expiration.
+    // Calls update_project repeatedly to prevent expiration.
     return $http.post('/playground/p/' +
-      encodeURI(project_key) + '/touch')
+      encodeURI(project_key) + '/update')
     .success(function(data, status, headers, config) {
       for (var i in $scope.projects) {
         if ($scope.projects[i].key == project_key) {
@@ -654,7 +654,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
       }
       if ($scope.project.expiration_seconds) {
         $timeout(function() {
-          $scope.touch_project($scope.project.key);
+          $scope.update_project($scope.project.key);
         }, $scope.project.expiration_seconds*1000/2);
       }
     });

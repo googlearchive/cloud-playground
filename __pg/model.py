@@ -324,7 +324,7 @@ def RenameProject(project_id, project_name):
   return project
 
 
-def TouchProject(project_id):
+def UpdateProject(project_id):
   project = GetProject(project_id)
   project.put()
   return project

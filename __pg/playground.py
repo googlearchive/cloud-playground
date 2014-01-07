@@ -461,15 +461,15 @@ class ResetProject(PlaygroundHandler):
     self.response.write(tojson(r))
 
 
-class TouchProject(PlaygroundHandler):
-  """Handler for updating the project last access timestamp."""
+class UpdateProject(PlaygroundHandler):
+  """Handler for updating project metadata."""
 
   def PerformAccessCheck(self):
     if not shared.HasProjectWriteAccess(self.request.environ):
       Abort(httplib.UNAUTHORIZED, 'no project write access')
 
   def post(self):  # pylint:disable-msg=invalid-name
-    project = model.TouchProject(self.project_id)
+    project = model.UpdateProject(self.project_id)
     r = self.DictOfProject(project)
     self.response.headers['Content-Type'] = _JSON_MIME_TYPE
     self.response.write(tojson(r))
@@ -524,7 +524,7 @@ app = webapp2.WSGIApplication([
     ('/playground/p/.*/retrieve', RetrieveProject),
     ('/playground/p/.*/delete', DeleteProject),
     ('/playground/p/.*/rename', RenameProject),
-    ('/playground/p/.*/touch', TouchProject),
+    ('/playground/p/.*/update', UpdateProject),
     ('/playground/p/.*/reset', ResetProject),
 
     # admin tools
