@@ -13,9 +13,6 @@ from .. import shared
 from . import collection
 
 
-_PLAYGROUND_SETTINGS_FILENAME = '.playground'
-
-
 def IsValidUrl(url):
   return url.startswith(settings.TEMPLATE_PROJECT_DIR)
 
@@ -33,36 +30,22 @@ class FilesystemRepoCollection(collection.RepoCollection):
       dirpath = os.path.join(template_dir, dirname)
       if not os.path.isdir(dirpath):
         continue
-      try:
-        with open(os.path.join(dirpath, _PLAYGROUND_SETTINGS_FILENAME)) as f:
-          data = json.loads(f.read())
-        name = data.get('template_name')
-        description = data.get('template_description')
-        show_files = data.get('show_files', [])
-        orderby = data.get('orderby')
-      except IOError:
-        name = dirpath
-        description = dirname
-        show_files = []
-        orderby = None
       url = os.path.join(template_dir, dirname)
       html_url = ('https://code.google.com/p/cloud-playground/source/browse/'
                   '?repo=bliss#git%2F{}'.format(urllib.quote(url)))
       model.CreateRepoAsync(owner=model.GetPublicTemplateOwner(),
                             repo_url=url,
                             html_url=html_url,
-                            name=name,
-                            description=description,
-                            show_files=show_files,
-                            orderby=orderby)
+                            name=dirpath,
+                            description=dirname,
+                            show_files=[],
+                            orderby=None)
 
   def CreateProjectTreeFromRepo(self, tree, repo):
     repo_url = repo.key.id()
 
     def AddFiles(dirname):
       for path in os.listdir(os.path.join(repo_url, dirname)):
-        if path == _PLAYGROUND_SETTINGS_FILENAME:
-          continue
         if common.GetExtension(path) in settings.SKIP_EXTENSIONS:
           continue
         relpath = os.path.join(dirname, path)

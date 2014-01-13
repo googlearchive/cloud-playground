@@ -1,6 +1,6 @@
 {
-  "template_name" : "Hello World",
-  "template_description" : "Python 2.7 Hello World app",
+  "project_name" : "Hello World",
+  "project_description" : "Python 2.7 Hello World app",
   "orderby": "999",
   "open_files": ["main.py"]
 }

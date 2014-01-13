@@ -102,8 +102,8 @@ class Info(object):
             .format(**self.__dict__))
 
 
-def GetInfo(html_url):
-  """Get Info object based on the provided HTML URL.
+def GetInfo(human_url):
+  """Get Info object based on the provided github URL.
 
   For example:
   - https://api.github.com/users/GoogleCloudPlatform/repos
@@ -114,11 +114,11 @@ def GetInfo(html_url):
   - https://api.github.com/repos/GoogleCloudPlatform/appengine-guestbook-python/branches/part6-staticfiles
 
   Args:
-    html_url: The url for the human readable HTML page.
+    human_url: The human readable github.
   Returns:
     The info object.
   """
-  matcher = _GITHUB_URL_RE.match(html_url)
+  matcher = _GITHUB_URL_RE.match(human_url)
   if not matcher:
     return None
   components = matcher.group(1).split('/')

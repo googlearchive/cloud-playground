@@ -1,9 +1,15 @@
 """Class representing a code repository."""
 
+
+import json
+
 from .. import model
 from .. import shared
 
 from mimic.__mimic import common
+
+
+_PLAYGROUND_SETTINGS_FILENAME = '.playground'
 
 
 class RepoCollection(object):
@@ -24,9 +30,24 @@ class RepoCollection(object):
     tree = common.config.CREATE_TREE_FUNC(str(template_project.key.id()))
     tree.Clear()
     self.CreateProjectTreeFromRepo(tree, repo)
+    self.ParseAndApplyProjectSettings(tree, template_project)
     template_project = model.SetProjectOwningTask(repo.project, None)
     repo.in_progress_task_name = None
     repo.put()
+
+  def ParseAndApplyProjectSettings(self, tree, project):
+    try:
+      json_text = tree.GetFileContents(_PLAYGROUND_SETTINGS_FILENAME)
+    except IOError:
+      shared.i('No {} file found for project {} based on {}'
+               .format(_PLAYGROUND_SETTINGS_FILENAME, project.key.id(),
+                       project.template_url))
+      return
+    if not json_text:
+      return
+    data = json.loads(json_text)
+    model.UpdateProject(project.key.id(), data)
+
 
   def PopulateRepos(self):
     """Populate repos for this collection."""

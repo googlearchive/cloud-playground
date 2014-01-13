@@ -328,9 +328,11 @@ def RenameProject(project_id, project_name):
 def UpdateProject(project_id, data):
   project = GetProject(project_id)
   if data:
-    show_files = data.get('show_files')
-    assert isinstance(show_files, list)
-    project.show_files = show_files
+    project.project_name = data.get('project_name', project.project_name)
+    project.project_description = data.get('project_description',
+                                           project.project_description)
+    project.show_files = data.get('show_files', project.show_files)
+    project.orderby = data.get('orderby', project.orderby)
   project.put()
   return project
 
