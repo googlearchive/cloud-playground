@@ -45,7 +45,13 @@ class RepoCollection(object):
       return
     if not json_text:
       return
-    data = json.loads(json_text)
+    try:
+      data = json.loads(json_text)
+    except Exception, e:
+      shared.w('Failed to parse JSON in {} for project {} based on {} due to {}'
+               .format(_PLAYGROUND_SETTINGS_FILENAME, project.key.id(),
+                       project.template_url, e))
+      return
     model.UpdateProject(project.key.id(), data)
 
 
