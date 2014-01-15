@@ -50,8 +50,11 @@
       <button ng-click='popout("popout-button"); run("popout-button")' class='btn pull-right url-button' title='Open in a separate window'><i class="icon-share-alt"></i></button>
     </div>
     <div id="output-iframe" style="position: relative;">
-      <div ng-show="!output_ready" style="position: absolute; background-color: #eee;">
-        <div style="text-align: center; margin-top: 4em;">
+      <div ng-show= "!output_ready" style="position: absolute; background-color: #eee;">
+        <div style="margin: 2em;" ng-show="app_run_count !=0">
+          Deploying code to a Google data center...
+        </div>
+        <div style="text-align: center; margin-top: 4em;" ng-show="app_run_count == 0">
           [ Click the blue <a ng-click="run('output-iframe-inline-run-link')">run</a> button to see your output here. ]
         </div>
       </div>
