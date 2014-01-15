@@ -51,7 +51,9 @@
     </div>
     <div id="output-iframe" style="position: relative;">
       <div ng-show="!output_ready" style="position: absolute; background-color: #eee;">
-        <div style="margin: 2em;">Deploying code to a Google data center...</div>
+        <div style="text-align: center; margin-top: 4em;">
+          [ Click the blue <a ng-click="run('output-iframe-inline-run-link')">run</a> button to see your output here. ]
+        </div>
       </div>
       <div ng-hide="requested_popout" pg-visible="output_ready">
         <iframe ng-src="{{iframe_run_url}}" pg-load="output_loaded()">

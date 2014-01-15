@@ -739,7 +739,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
       $timeout(function() {
         // socket.onopen may be called more than once and user can manually run
         if ($scope.app_run_count == 0) {
-          $scope.run('auto-delayed-onload');
+          //$scope.run('auto-delayed-onload');
         }
       }, 2000);
     } else if (msg = evt.data['socket.onmessage']) {
