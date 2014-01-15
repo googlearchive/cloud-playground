@@ -168,7 +168,15 @@
   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
   ga('create', 'UA-34864136-2', 'cloud-playground.appspot.com');
-  ga('send', 'pageview');
+  ga('create', 'UA-36037335-1', 'cloud-playground.appspot.com',
+     {'name': 'console'});
+
+  ga(function() {
+    var trackers = ga.getAll();
+    for (var index = 0; index < trackers.length; index++) {
+      trackers[index].send('pageview');
+    }
+  });
 </script>
   </body>
 </html>
