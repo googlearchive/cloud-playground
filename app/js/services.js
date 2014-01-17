@@ -288,7 +288,7 @@ angular.module('playgroundApp.services', [])
     },
     'reload': function() {
       // TODO: don't access 'document' directly
-      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
       $window.location.reload();
     },
     'open': function(url, name, specs, replace) {
