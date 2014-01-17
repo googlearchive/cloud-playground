@@ -661,11 +661,19 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   };
 
   $scope.mark_as_open_file = function(path) {
-    angular.forEach($scope.project.show_files, function(open_file) {
-      if (path == open_file) {
-        return;
+    if ($scope.project.show_files.length == 0) {
+      // project doesn't use a show_files list
+      return;
+    }
+    var existing_show_file = false;
+    angular.forEach($scope.project.show_files, function(show_file) {
+      if (path == show_file) {
+        existing_show_file = true;
       }
     });
+    if (existing_show_file) {
+      return;
+    }
     $scope.project.show_files.push(path);
     $scope.update_project($scope.project.key,
                           {show_files: $scope.project.show_files})
@@ -988,7 +996,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   });
 
   $scope.$watch('current_file', function(newfile, oldfile) {
-    if (!newfile) {
+    if (!newfile || newfile == oldfile) {
       return;
     }
     if ($scope.selected_path != newfile.path) {
