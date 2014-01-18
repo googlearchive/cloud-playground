@@ -22,9 +22,15 @@
       <button ng-click='prompt_reset_project("project-reset-button")' title='Reset {{project.name}}' class='btn pull-right'>Reset Project</button>
       <button ng-click='prompt_download_project("project-download-button")' title='Download {{project.name}}' class='btn pull-right'><i class="icon-download"></i> ZIP</button>
       <span ng-hide="iframed" class="current-file-path"> {{current_file.path}}</span>
-      <select ng-show="iframed" ng-model="selected_path">
+      <select ng-show="iframed && visible_files_count > 5" ng-model="selected_path">
         <option ng-repeat="file in visible_files">{{file.path}}</option>
       </select>
+      <div ng-show="iframed && visible_files_count <= 5">
+        <ul class="nav nav-tabs">
+          <li ng-repeat="file in visible_files" ng-class="{active: file == current_file}"><a ng-click="set_path(file.path)" title={{file.path}}>{{file.path | pathonly }}</a></li>
+          <li><a class="link newthing" ng-click="prompt_new_file('new-file-tab')">+ new file</a></li>
+        </ul>
+      </div>
       <span class="filestatus" ng-bind="filestatus"></span>
     </form>
     <span ng-show="file == current_file" ng-repeat="file in visible_files">
