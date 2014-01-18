@@ -1004,4 +1004,37 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     }
   });
 
+  $scope.$watch('files', function(newfiles, oldfiles) {
+    if (newfiles == oldfiles) {
+      return;
+    }
+
+    var show_files = $scope.project.show_files;
+    if (show_files.length == 0) {
+      // empty filter list implies no filtering
+      $scope.visible_files = newfiles;
+      return;
+    }
+    var show_files_map = {};
+    angular.forEach(show_files, function(show_file) {
+      show_files_map[show_file] = true;
+    });
+    $scope.visible_files = {};
+    angular.forEach(newfiles, function(file) {
+      if (show_files_map[file.path]) {
+        $scope.visible_files[file.path] = file;
+      }
+    });
+  }, true);
+
+  $scope.$watch('visible_files', function(newfiles, oldfiles) {
+    if (newfiles == oldfiles) {
+      return;
+    }
+    $scope.visible_files_count = 0
+    angular.forEach(newfiles, function(file) {
+      $scope.visible_files_count++;
+    });
+  }, true);
+
 }
