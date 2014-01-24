@@ -6,8 +6,13 @@ window.track = function(action, label, label_detail) {
     label = label + ':' + label_detail;
   }
   // console.log(action, label);
-  ga('send', 'event', category, action, label);
-}
+  ga(function() {
+    var trackers = ga.getAll();
+    for (var index = 0; index < trackers.length; index++) {
+      trackers[index].send('event', category, action, label);
+    }
+  });
+};
 
 window.iframed = window.top != window.self;
 
