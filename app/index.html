@@ -167,9 +167,10 @@
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-  ga('create', 'UA-34864136-2', 'cloud-playground.appspot.com');
+  ga('create', 'UA-34864136-2', 'cloud-playground.appspot.com',
+     {'allowLinker': true});
   ga('create', 'UA-36037335-1', 'cloud-playground.appspot.com',
-     {'name': 'console'});
+     {'name': 'console', 'allowLinker': true});
 
   ga(function() {
     var trackers = ga.getAll();
