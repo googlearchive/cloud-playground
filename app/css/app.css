@@ -331,6 +331,10 @@ BUTTON.admin > I[class*=" icon-"] {
     border: 3px dotted #444;
   }
 
+#source-container SELECT {
+  width: 400px;
+}
+
 .CodeMirror {
   border: 1px solid #ccc;
   height: 100%;
@@ -496,3 +500,7 @@ BUTTON.admin > I[class*=" icon-"] {
     border-top: 1px solid #eee;
     border-bottom: 1px solid #eee;
   }
+
+.read-only .CodeMirror {
+  background: #f7f7f7;
+}

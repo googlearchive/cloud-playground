@@ -17,6 +17,7 @@ function AlertController($scope, Alert) {
 }
 
 function HeaderController($scope, $location, $routeParams) {
+  $scope.read_only = !!($location.search()['read_only']);
 
   $scope.alreadyhome = function() {
     return $location.path() == '/playground/';
@@ -36,7 +37,6 @@ function HeaderController($scope, $location, $routeParams) {
       }
      }
    });
-
 }
 
 // TODO: test
@@ -53,6 +53,8 @@ function RenameProjectController($scope, $log, dialog, project_name) {
 function PageController($scope, $http, DoSerial, $routeParams, $window,
                         $dialog, $location, $log, WindowService, $rootScope,
                         ConfirmDialog, $q, ConfigService, ProjectsFactory) {
+
+  $scope.read_only = !!($location.search()['read_only']);
 
   // TODO: test
   $scope.$on('$routeChangeError', function(evt, current, previous, rejection) {
@@ -168,8 +170,9 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
   $scope.select_project = function(project, label) {
     track('select-project', label, project.template_url);
     $location.path('/playground/p/' + encodeURI(project.key));
-    // remove template_url and other query parameters
-    $location.search({});
+    // Remove all params except read_only.
+    var read_only = $location.search()['read_only'];
+    $location.search(read_only ? {'read_only': read_only} : {});
   };
 
   $scope.delete_project = function(project, label) {
@@ -1037,4 +1040,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     });
   }, true);
 
+  if ($scope.read_only) {
+    $scope.run("read-only");
+  }
 }

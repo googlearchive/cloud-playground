@@ -19,7 +19,7 @@
     </div>
 
     <form class="form-inline form-reduced-margin btn-height">
-      <button ng-click='prompt_reset_project("project-reset-button")' title='Reset {{project.name}}' class='btn pull-right'>Reset Project</button>
+      <button ng-hide='read_only' ng-click='prompt_reset_project("project-reset-button")' title='Reset {{project.name}}' class='btn pull-right'>Reset Project</button>
       <button ng-click='prompt_download_project("project-download-button")' title='Download {{project.name}}' class='btn pull-right'><i class="icon-download"></i> ZIP</button>
       <span ng-hide="iframed" class="current-file-path"> {{current_file.path}}</span>
       <select ng-show="iframed && visible_files_count > 5" ng-model="selected_path">
@@ -34,7 +34,7 @@
       <span class="filestatus" ng-bind="filestatus"></span>
     </form>
     <span ng-show="file == current_file" ng-repeat="file in visible_files">
-      <div ng-hide="is_image_mime_type(file.mime_type)" class="source-code" ui-codeMirror="{onChange: create_on_change_closure(file), file: file}" ng-model="file.contents"></div>
+      <div ng-hide="is_image_mime_type(file.mime_type)" class="source-code" ng-class="{'read-only': read_only}" ui-codeMirror="{onChange: create_on_change_closure(file), file: file, readOnly: read_only ? 'nocursor' : false}" ng-model="file.contents"></div>
       <img ng-show="is_image_mime_type(file.mime_type)" ng-src="{{image_url_of(file)}}">
     </span>
   </div>
@@ -46,7 +46,7 @@
   <div>
     <iframe class="control-iframe" ng-attr-src="{{control_url}}">
     </iframe>
-    <div class="">
+    <div ng-hide='read_only' class="">
        If your app fails to load in the IFRAME below, try running your app in a
        <a ng-click='popout("separate-window-link"); run("separate-window-link");'>separate window</a>.
     </div>

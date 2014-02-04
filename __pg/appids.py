@@ -15,6 +15,7 @@ _APP_ID_TUPLES = [
     ('try-appengine', 'shared-playground', 'cloud-playground'),
     # development environment
     ('fredsa-bliss', 'fredsa-hr', None),
+    ('dansanderson-bliss', 'dansanderson-mimic', None),
 ]
 
 
