@@ -6,6 +6,7 @@ import sys
 import traceback
 
 from . import settings
+from . import jsonutil
 
 
 class PlaygroundError(Exception):

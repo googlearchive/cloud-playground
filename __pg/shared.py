@@ -8,6 +8,7 @@ from mimic.__mimic import common
 
 from . import appids
 from error import Abort
+from . import jsonutil
 from . import settings
 
 from google.appengine.api import app_identity

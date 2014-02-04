@@ -2,7 +2,6 @@
 
 import cgi
 import httplib
-import json
 import os
 import re
 import urllib
@@ -13,6 +12,7 @@ from . import appids
 from . import error
 from error import Abort
 from . import fixit
+from . import jsonutil
 from . import middleware
 from mimic.__mimic import common
 from mimic.__mimic import mimic
@@ -25,14 +25,6 @@ from . import wsgi_config
 from google.appengine.api import users
 
 
-_JSON_MIME_TYPE = 'application/json'
-
-_JSON_ENCODER = json.JSONEncoder()
-_JSON_ENCODER.indent = 4
-_JSON_ENCODER.sort_keys = True
-
-_JSON_DECODER = json.JSONDecoder()
-
 _DEV_APPSERVER = os.environ['SERVER_SOFTWARE'].startswith('Development/')
 
 _DASH_DOT_DASH = '-dot-'
@@ -41,29 +33,17 @@ _DASH_DOT_DASH = '-dot-'
 _VALID_PROJECT_RE = re.compile('^[a-z0-9-]{0,50}$')
 
 
-def tojson(r):  # pylint:disable-msg=invalid-name
-  """Converts a Python object to JSON."""
-  return _JSON_ENCODER.encode(r)
-
-
-def fromjson(json):  # pylint:disable-msg=invalid-name
-  """Converts a JSON object into a Python object."""
-  if json == '':
-    return None
-  return _JSON_DECODER.decode(json)
-
-
 class JsonHandler(webapp2.RequestHandler):
   """Convenience request handler for handler JSON requests and responses."""
 
   def dispatch(self):
-    self.request.data = fromjson(self.request.body)
+    self.request.data = jsonutil.fromjson(self.request.body)
     r = super(JsonHandler, self).dispatch()
     if isinstance(r, dict) or isinstance(r, list):
-      self.response.headers['Content-Type'] = _JSON_MIME_TYPE
+      self.response.headers['Content-Type'] = jsonutil.JSON_MIME_TYPE
       # JSON Vulnerability Protection, see http://docs.angularjs.org/api/ng.$http
       self.response.write(")]}',\n")
-      self.response.write(tojson(r))
+      self.response.write(jsonutil.tojson(r))
 
 
 class PlaygroundHandler(JsonHandler):
@@ -182,7 +162,7 @@ class PlaygroundHandler(JsonHandler):
 
     content_type = self.request.headers.get('Content-Type')
     if content_type and content_type.split(';')[0] == 'application/json':
-      self.request.data = json.loads(self.request.body)
+      self.request.data = jsonutil.fromjson(self.request.body)
     # Exceptions in super.dispatch are automatically routed to handle_exception
     super(PlaygroundHandler, self).dispatch()
 
