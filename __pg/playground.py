@@ -53,7 +53,20 @@ def fromjson(json):  # pylint:disable-msg=invalid-name
   return _JSON_DECODER.decode(json)
 
 
-class PlaygroundHandler(webapp2.RequestHandler):
+class JsonHandler(webapp2.RequestHandler):
+  """Convenience request handler for handler JSON requests and responses."""
+
+  def dispatch(self):
+    self.request.data = fromjson(self.request.body)
+    r = super(JsonHandler, self).dispatch()
+    if isinstance(r, dict) or isinstance(r, list):
+      self.response.headers['Content-Type'] = _JSON_MIME_TYPE
+      # JSON Vulnerability Protection, see http://docs.angularjs.org/api/ng.$http
+      self.response.write(")]}',\n")
+      self.response.write(tojson(r))
+
+
+class PlaygroundHandler(JsonHandler):
   """Convenience request handler with playground specific functionality."""
 
   @webapp2.cached_property
@@ -233,8 +246,7 @@ class GetConfig(PlaygroundHandler):
         'is_admin': bool(users.is_current_user_admin()),
         'is_devappserver': bool(_DEV_APPSERVER),
     }
-    self.response.headers['Content-Type'] = _JSON_MIME_TYPE
-    self.response.write(tojson(r))
+    return r
 
 
 class OAuth2Admin(PlaygroundHandler):
@@ -248,11 +260,10 @@ class OAuth2Admin(PlaygroundHandler):
     if not users.is_current_user_admin():
       self.response.set_status(httplib.UNAUTHORIZED)
       return
-    data = json.loads(self.request.body)
-    key = data['key']
-    url = data['url']
-    client_id = data.get('client_id')
-    client_secret = data.get('client_secret')
+    key = self.request.data['key']
+    url = self.request.data['url']
+    client_id = self.request.data.get('client_id')
+    client_secret = self.request.data.get('client_secret')
     if client_id and client_secret:
       credential = model.SetOAuth2Credential(key, client_id, client_secret)
     else:
@@ -263,8 +274,7 @@ class OAuth2Admin(PlaygroundHandler):
         'client_id': credential.client_id,
         'client_secret': credential.client_secret,
     }
-    self.response.headers['Content-Type'] = _JSON_MIME_TYPE
-    self.response.write(tojson(r))
+    return r
 
 
 class RetrieveProject(PlaygroundHandler):
@@ -275,9 +285,7 @@ class RetrieveProject(PlaygroundHandler):
       Abort(httplib.UNAUTHORIZED, 'no project read access')
 
   def get(self):  # pylint:disable-msg=invalid-name
-    r = self.DictOfProject(self.project)
-    self.response.headers['Content-Type'] = _JSON_MIME_TYPE
-    self.response.write(tojson(r))
+    return self.DictOfProject(self.project)
 
 
 class GetProjects(PlaygroundHandler):
@@ -291,8 +299,7 @@ class GetProjects(PlaygroundHandler):
     template_projects = model.GetPublicTemplateProjects()
     projects = user_projects + template_projects
     r = [self.DictOfProject(p) for p in projects]
-    self.response.headers['Content-Type'] = _JSON_MIME_TYPE
-    self.response.write(tojson(r))
+    return r
 
 
 class Login(PlaygroundHandler):
@@ -333,9 +340,7 @@ class CopyProject(PlaygroundHandler):
             'Please try again in 30 seconds.')
     expiration_seconds = self.request.data.get('expiration_seconds')
     project = model.CopyProject(self.user, tp, expiration_seconds)
-    r = self.DictOfProject(project)
-    self.response.headers['Content-Type'] = _JSON_MIME_TYPE
-    self.response.write(tojson(r))
+    return self.DictOfProject(project)
 
 
 class RecreateTemplateProject(PlaygroundHandler):
@@ -393,9 +398,7 @@ class NewProjectFromTemplateUrl(PlaygroundHandler):
             'Please try again in 30 seconds.')
     expiration_seconds = self.request.data.get('expiration_seconds')
     project = model.CopyProject(self.user, template_project, expiration_seconds)
-    r = self.DictOfProject(project)
-    self.response.headers['Content-Type'] = _JSON_MIME_TYPE
-    self.response.write(tojson(r))
+    return self.DictOfProject(project)
 
 
 class CreateTemplateProjectByUrl(PlaygroundHandler):
@@ -423,9 +426,7 @@ class CreateTemplateProjectByUrl(PlaygroundHandler):
       Abort(httplib.REQUEST_TIMEOUT,
             'Sorry. Requested template is not yet available. '
             'Please try again in 30 seconds.')
-    r = self.DictOfProject(project)
-    self.response.headers['Content-Type'] = _JSON_MIME_TYPE
-    self.response.write(tojson(r))
+    return self.DictOfProject(project)
 
 
 class DeleteProject(PlaygroundHandler):
@@ -447,13 +448,10 @@ class RenameProject(PlaygroundHandler):
       Abort(httplib.UNAUTHORIZED, 'no project write access')
 
   def post(self):  # pylint:disable-msg=invalid-name
-    data = json.loads(self.request.body)
-    newname = data.get('newname')
+    newname = self.request.data.get('newname')
     assert newname
     project = model.RenameProject(self.project_id, newname)
-    r = self.DictOfProject(project)
-    self.response.headers['Content-Type'] = _JSON_MIME_TYPE
-    self.response.write(tojson(r))
+    return self.DictOfProject(project)
 
 
 class ResetProject(PlaygroundHandler):
@@ -465,9 +463,7 @@ class ResetProject(PlaygroundHandler):
 
   def post(self):  # pylint:disable-msg=invalid-name
     project = model.ResetProject(self.project_id, self.tree)
-    r = self.DictOfProject(project)
-    self.response.headers['Content-Type'] = _JSON_MIME_TYPE
-    self.response.write(tojson(r))
+    return self.DictOfProject(project)
 
 
 class UpdateProject(PlaygroundHandler):
@@ -478,11 +474,8 @@ class UpdateProject(PlaygroundHandler):
       Abort(httplib.UNAUTHORIZED, 'no project write access')
 
   def post(self):  # pylint:disable-msg=invalid-name
-    data = fromjson(str(self.request.body))
-    project = model.UpdateProject(self.project_id, data)
-    r = self.DictOfProject(project)
-    self.response.headers['Content-Type'] = _JSON_MIME_TYPE
-    self.response.write(tojson(r))
+    project = model.UpdateProject(self.project_id, self.request.data)
+    return self.DictOfProject(project)
 
 
 class Fixit(PlaygroundHandler):
