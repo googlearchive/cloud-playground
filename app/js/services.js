@@ -224,7 +224,8 @@ angular.module('playgroundApp.services', [])
    'responseError': function(response) {
       if (response.headers('X-Cloud-Playground-Error')) {
         if (response.status == 401) {
-          // TODO: treat this case specially?
+          // can occur if XRF cookie is deleted, but session cookie is still present
+          Alert.error('UNAUTHORIZED. Please clear your browser cookies and try again.');
         }
       }
       return $q.reject(response);
