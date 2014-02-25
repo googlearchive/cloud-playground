@@ -45,6 +45,8 @@ class Project(ndb.Model):
                                  indexed=False)
   updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
   show_files = ndb.StringProperty(required=False, repeated=True, indexed=False)
+  read_only_files = ndb.StringProperty(required=False, repeated=True,
+                                       indexed=False)
   orderby = ndb.StringProperty(required=False, indexed=False)
   in_progress_task_name = ndb.StringProperty(indexed=False)
   access_key = ndb.StringProperty(required=True, indexed=False)
@@ -99,6 +101,8 @@ class Repo(ndb.Model):
                                  indexed=False)
   updated = ndb.DateTimeProperty(required=True, auto_now=True, indexed=False)
   show_files = ndb.StringProperty(required=False, repeated=True, indexed=False)
+  read_only_files = ndb.StringProperty(required=False, repeated=True,
+                                       indexed=False)
   orderby = ndb.StringProperty(required=False, indexed=False)
   in_progress_task_name = ndb.StringProperty(indexed=False)
 
@@ -157,7 +161,7 @@ def GetRepo(repo_url):
 
 @ndb.transactional(xg=True)
 def CreateRepoAsync(owner, repo_url, html_url, name, description, show_files,
-                    orderby=None):
+                    read_only_files, orderby=None):
   """Asynchronously create a repo."""
   repo = GetRepo(repo_url)
   if not repo:
@@ -167,6 +171,7 @@ def CreateRepoAsync(owner, repo_url, html_url, name, description, show_files,
                 name=name,
                 description=description,
                 show_files=show_files,
+                read_only_files=read_only_files,
                 orderby=orderby,
                 namespace=settings.PLAYGROUND_NAMESPACE)
   elif repo.in_progress_task_name:
@@ -188,6 +193,7 @@ def CreateRepoAsync(owner, repo_url, html_url, name, description, show_files,
                             project_name=name,
                             project_description=description,
                             show_files=show_files,
+                            read_only_files=read_only_files,
                             expiration_seconds=0,
                             orderby=orderby,
                             in_progress_task_name=task.name)
@@ -263,6 +269,7 @@ def CopyProject(owner, template_project, expiration_seconds):
                               project_name=name,
                               project_description=description,
                               show_files=template_project.show_files,
+                              read_only_files=template_project.read_only_files,
                               expiration_seconds=expiration_seconds,
                               orderby=template_project.orderby,
                               in_progress_task_name='copy_project')
@@ -332,6 +339,8 @@ def UpdateProject(project_id, data):
     project.project_description = data.get('project_description',
                                            project.project_description)
     project.show_files = data.get('show_files', project.show_files)
+    project.read_only_files = data.get('read_only_files',
+                                       project.read_only_files)
     project.orderby = data.get('orderby', project.orderby)
   project.put()
   return project
@@ -406,8 +415,8 @@ def DeleteReposAndTemplateProjects():
 
 @ndb.transactional(xg=True)
 def CreateProject(owner, template_url, html_url, project_name,
-                  project_description, show_files, expiration_seconds,
-                  orderby=None, in_progress_task_name=None):
+                  project_description, show_files, read_only_files,
+                  expiration_seconds, orderby=None, in_progress_task_name=None):
   """Create a new user project.
 
   Args:
@@ -417,6 +426,7 @@ def CreateProject(owner, template_url, html_url, project_name,
     project_name: The project name.
     project_description: The project description.
     show_files: List of files to open.
+    read_only_files: List of files that should be shown in read-only mode.
     expiration_seconds: Seconds till expiration, from last update.
     orderby: String used for project descending sort order. Optional.
     in_progress_task_name: Owning task name. Optional.
@@ -434,6 +444,7 @@ def CreateProject(owner, template_url, html_url, project_name,
                 template_url=template_url,
                 html_url=html_url,
                 show_files=show_files,
+                read_only_files=read_only_files,
                 orderby=orderby,
                 in_progress_task_name=in_progress_task_name,
                 access_key=secret.GenerateRandomString(),

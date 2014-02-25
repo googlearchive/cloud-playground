@@ -96,6 +96,7 @@ class PlaygroundHandler(JsonHandler):
         'name': project.project_name,
         'description': project.project_description,
         'show_files': project.show_files,
+        'read_only_files': project.read_only_files,
         'template_url': project.template_url,
         'html_url': project.html_url,
         'run_url': self._MakeMimicUrl(project, '/'),
@@ -348,7 +349,8 @@ class RecreateTemplateProject(PlaygroundHandler):
                           html_url=repo.html_url,
                           name=repo.name,
                           description=repo.description,
-                          show_files=repo.show_files)
+                          show_files=repo.show_files,
+                          read_only_files=repo.read_only_files)
 
 
 class NewProjectFromTemplateUrl(PlaygroundHandler):
@@ -370,7 +372,8 @@ class NewProjectFromTemplateUrl(PlaygroundHandler):
                                    html_url=html_url,
                                    name=name,
                                    description=description,
-                                   show_files=[])
+                                   show_files=[],
+                                   read_only_files=[])
     template_project = repo.project.get()
     if not template_project or template_project.in_progress_task_name:
       Abort(httplib.REQUEST_TIMEOUT,
@@ -400,7 +403,8 @@ class CreateTemplateProjectByUrl(PlaygroundHandler):
                                    html_url=html_url,
                                    name=name,
                                    description=description,
-                                   show_files=[])
+                                   show_files=[],
+                                   read_only_files=[])
     project = repo.project.get()
     if not project or project.in_progress_task_name:
       Abort(httplib.REQUEST_TIMEOUT,

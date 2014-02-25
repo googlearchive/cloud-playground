@@ -1022,9 +1022,20 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     angular.forEach(show_files, function(show_file) {
       show_files_map[show_file] = true;
     });
+
+    var read_only_files = $scope.project.read_only_files;
+    var read_only_files_map = {};
+    angular.forEach(read_only_files, function(read_only_file) {
+      read_only_files_map[read_only_file] = true;
+    });
+
     $scope.visible_files = {};
     angular.forEach(newfiles, function(file) {
       if (show_files_map[file.path]) {
+        if (read_only_files_map[file.path]) {
+          file.read_only = true;
+        }
+
         $scope.visible_files[file.path] = file;
       }
     });
