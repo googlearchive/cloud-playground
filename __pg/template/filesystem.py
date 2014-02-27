@@ -40,6 +40,7 @@ class FilesystemRepoCollection(collection.RepoCollection):
                             description=dirname,
                             show_files=[],
                             read_only_files=[],
+                            read_only_demo_url=None,
                             orderby=None)
 
   def CreateProjectTreeFromRepo(self, tree, repo):

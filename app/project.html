@@ -44,7 +44,7 @@
   <hr ng-hide="iframed" pg-resizer="source-container">
 
   <div>
-    <iframe class="control-iframe" ng-attr-src="{{control_url}}">
+    <iframe class="control-iframe" ng-show="control_url" ng-attr-src="{{control_url}}">
     </iframe>
     <div ng-hide='read_only' class="">
        If your app fails to load in the IFRAME below, try running your app in a

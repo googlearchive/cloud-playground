@@ -47,6 +47,7 @@ class Project(ndb.Model):
   show_files = ndb.StringProperty(required=False, repeated=True, indexed=False)
   read_only_files = ndb.StringProperty(required=False, repeated=True,
                                        indexed=False)
+  read_only_demo_url = ndb.StringProperty(required=False, indexed=False)
   orderby = ndb.StringProperty(required=False, indexed=False)
   in_progress_task_name = ndb.StringProperty(indexed=False)
   access_key = ndb.StringProperty(required=True, indexed=False)
@@ -103,6 +104,7 @@ class Repo(ndb.Model):
   show_files = ndb.StringProperty(required=False, repeated=True, indexed=False)
   read_only_files = ndb.StringProperty(required=False, repeated=True,
                                        indexed=False)
+  read_only_demo_url = ndb.StringProperty(required=False, indexed=False)
   orderby = ndb.StringProperty(required=False, indexed=False)
   in_progress_task_name = ndb.StringProperty(indexed=False)
 
@@ -161,7 +163,7 @@ def GetRepo(repo_url):
 
 @ndb.transactional(xg=True)
 def CreateRepoAsync(owner, repo_url, html_url, name, description, show_files,
-                    read_only_files, orderby=None):
+                    read_only_files, read_only_demo_url, orderby=None):
   """Asynchronously create a repo."""
   repo = GetRepo(repo_url)
   if not repo:
@@ -172,6 +174,7 @@ def CreateRepoAsync(owner, repo_url, html_url, name, description, show_files,
                 description=description,
                 show_files=show_files,
                 read_only_files=read_only_files,
+                read_only_demo_url=read_only_demo_url,
                 orderby=orderby,
                 namespace=settings.PLAYGROUND_NAMESPACE)
   elif repo.in_progress_task_name:
@@ -194,6 +197,7 @@ def CreateRepoAsync(owner, repo_url, html_url, name, description, show_files,
                             project_description=description,
                             show_files=show_files,
                             read_only_files=read_only_files,
+                            read_only_demo_url=read_only_demo_url,
                             expiration_seconds=0,
                             orderby=orderby,
                             in_progress_task_name=task.name)
@@ -263,16 +267,18 @@ def CopyProject(owner, template_project, expiration_seconds):
   retries = 5
   for i in range(0, retries):
     try:
-      project = CreateProject(owner=owner,
-                              template_url=template_project.template_url,
-                              html_url=template_project.html_url,
-                              project_name=name,
-                              project_description=description,
-                              show_files=template_project.show_files,
-                              read_only_files=template_project.read_only_files,
-                              expiration_seconds=expiration_seconds,
-                              orderby=template_project.orderby,
-                              in_progress_task_name='copy_project')
+      project = CreateProject(
+        owner=owner,
+        template_url=template_project.template_url,
+        html_url=template_project.html_url,
+        project_name=name,
+        project_description=description,
+        show_files=template_project.show_files,
+        read_only_files=template_project.read_only_files,
+        read_only_demo_url=template_project.read_only_demo_url,
+        expiration_seconds=expiration_seconds,
+        orderby=template_project.orderby,
+        in_progress_task_name='copy_project')
       src_tree = _CreateProjectTree(template_project)
       dst_tree = _CreateProjectTree(project)
       CopyTree(dst_tree, src_tree)
@@ -341,6 +347,8 @@ def UpdateProject(project_id, data):
     project.show_files = data.get('show_files', project.show_files)
     project.read_only_files = data.get('read_only_files',
                                        project.read_only_files)
+    project.read_only_demo_url = data.get('read_only_demo_url',
+                                          project.read_only_demo_url)
     project.orderby = data.get('orderby', project.orderby)
   project.put()
   return project
@@ -416,7 +424,8 @@ def DeleteReposAndTemplateProjects():
 @ndb.transactional(xg=True)
 def CreateProject(owner, template_url, html_url, project_name,
                   project_description, show_files, read_only_files,
-                  expiration_seconds, orderby=None, in_progress_task_name=None):
+                  read_only_demo_url, expiration_seconds, orderby=None,
+                  in_progress_task_name=None):
   """Create a new user project.
 
   Args:
@@ -427,6 +436,8 @@ def CreateProject(owner, template_url, html_url, project_name,
     project_description: The project description.
     show_files: List of files to open.
     read_only_files: List of files that should be shown in read-only mode.
+    read_only_demo_url: URL to use for the "run" frame if the sample is
+        read-only, or None to run the sample code with mimic in the usual way.
     expiration_seconds: Seconds till expiration, from last update.
     orderby: String used for project descending sort order. Optional.
     in_progress_task_name: Owning task name. Optional.
@@ -445,6 +456,7 @@ def CreateProject(owner, template_url, html_url, project_name,
                 html_url=html_url,
                 show_files=show_files,
                 read_only_files=read_only_files,
+                read_only_demo_url=read_only_demo_url,
                 orderby=orderby,
                 in_progress_task_name=in_progress_task_name,
                 access_key=secret.GenerateRandomString(),
