@@ -429,6 +429,8 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
       })
       .then($scope._list_files)
       .then(function() {
+        $scope.visible_files = $scope.calculate_visible_files(
+          $scope.project, $scope.files);
         $scope._select_a_file('auto-route-change-success');
       })
       .then(function() {
@@ -618,14 +620,15 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
 
   $scope._select_a_file = function(label) {
     var path = $location.hash() || $scope.project.show_files[0];
-    var file = $scope.files[path];
+    var file = $scope.visible_files[path];
     if (file) {
       $scope.select_file(file, label);
       return;
     }
-    // select first file
-    for (var path in $scope.files) {
-      $scope.select_file($scope.files[path], 'auto-first-file');
+
+    // select first visible file
+    for (var path in $scope.visible_files) {
+      $scope.select_file($scope.visible_files[path], 'auto-first-file');
       break;
     }
   };
@@ -991,6 +994,53 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     ConfirmDialog(title, msg, okButtonText, okButtonClass, callback);
   };
 
+  /**
+   * Calculates visible files based on a project.
+   *
+   * @param {object} project The project whose visibility settings to use.
+   * @param {object} files A mapping of filenames to file objects.
+   * @return {object} A mapping of filenames to file objects for just those
+   *     files considered visible for the project.
+   */
+  $scope.calculate_visible_files = function(project, files) {
+    var show_files = project.show_files;
+    if (show_files.length == 0) {
+      // empty filter list implies no filtering
+      for (var filename in files) {
+        if (files.hasOwnProperty(filename)) {
+          show_files.push(filename);
+        }
+      }
+    }
+
+    var show_files_map = {};
+    angular.forEach(show_files, function(show_file) {
+      show_files_map[show_file] = true;
+    });
+
+    // Always hide .playground, if present.
+    delete show_files_map['.playground'];
+
+    var read_only_files = project.read_only_files;
+    var read_only_files_map = {};
+    angular.forEach(read_only_files, function(read_only_file) {
+      read_only_files_map[read_only_file] = true;
+    });
+
+    var visible_files = {};
+    angular.forEach(files, function(file) {
+      if (show_files_map[file.path]) {
+        if (read_only_files_map[file.path]) {
+          file.read_only = true;
+        }
+
+        visible_files[file.path] = file;
+      }
+    });
+
+    return visible_files;
+  };
+
   $scope.$watch('selected_path', function(newpath, oldpath) {
     if (!newpath || newpath == oldpath) {
       return;
@@ -1012,33 +1062,8 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
       return;
     }
 
-    var show_files = $scope.project.show_files;
-    if (show_files.length == 0) {
-      // empty filter list implies no filtering
-      $scope.visible_files = newfiles;
-      return;
-    }
-    var show_files_map = {};
-    angular.forEach(show_files, function(show_file) {
-      show_files_map[show_file] = true;
-    });
-
-    var read_only_files = $scope.project.read_only_files;
-    var read_only_files_map = {};
-    angular.forEach(read_only_files, function(read_only_file) {
-      read_only_files_map[read_only_file] = true;
-    });
-
-    $scope.visible_files = {};
-    angular.forEach(newfiles, function(file) {
-      if (show_files_map[file.path]) {
-        if (read_only_files_map[file.path]) {
-          file.read_only = true;
-        }
-
-        $scope.visible_files[file.path] = file;
-      }
-    });
+    $scope.visible_files = $scope.calculate_visible_files(
+        $scope.project, newfiles);
   }, true);
 
   $scope.$watch('visible_files', function(newfiles, oldfiles) {
