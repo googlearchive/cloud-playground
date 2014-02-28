@@ -266,7 +266,7 @@ def CopyProject(owner, template_project, expiration_seconds,
   expiration_seconds = expiration_seconds or settings.DEFAULT_EXPIRATION_SECONDS
   expiration_seconds = max(settings.MIN_EXPIRATION_SECONDS, expiration_seconds)
   if not new_project_name:
-    name = 'Copy of {}'.format(template_project.project_name)
+    new_project_name = 'Copy of {}'.format(template_project.project_name)
   description = template_project.project_description
   retries = 5
   for i in range(0, retries):
