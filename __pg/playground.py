@@ -385,7 +385,8 @@ class NewProjectFromTemplateUrl(PlaygroundHandler):
             'Sorry. Requested template is not yet available. '
             'Please try again in 30 seconds.')
     expiration_seconds = self.request.data.get('expiration_seconds')
-    project = model.CopyProject(self.user, template_project, expiration_seconds)
+    project = model.CopyProject(self.user, template_project, expiration_seconds,
+                                new_project_name=template_project.project_name)
     return self.DictOfProject(project)
 
 

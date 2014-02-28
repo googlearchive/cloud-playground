@@ -249,20 +249,24 @@ def _CreateProjectTree(project):
   return common.config.CREATE_TREE_FUNC(str(project.key.id()))
 
 
-def CopyProject(owner, template_project, expiration_seconds):
+def CopyProject(owner, template_project, expiration_seconds,
+                new_project_name=None):
   """Create new a project from a template.
 
   Args:
     owner: The user for which the project is to be created.
     template_project: The template project to be copied.
     expiration_seconds: Number of seconds before project is deleted.
+    new_project_name: The new project's name, or None to use "Copy of ..." based
+        on the template.
 
   Returns:
     A new project.
   """
   expiration_seconds = expiration_seconds or settings.DEFAULT_EXPIRATION_SECONDS
   expiration_seconds = max(settings.MIN_EXPIRATION_SECONDS, expiration_seconds)
-  name = 'Copy of {}'.format(template_project.project_name)
+  if not new_project_name:
+    name = 'Copy of {}'.format(template_project.project_name)
   description = template_project.project_description
   retries = 5
   for i in range(0, retries):
@@ -271,7 +275,7 @@ def CopyProject(owner, template_project, expiration_seconds):
         owner=owner,
         template_url=template_project.template_url,
         html_url=template_project.html_url,
-        project_name=name,
+        project_name=new_project_name,
         project_description=description,
         show_files=template_project.show_files,
         read_only_files=template_project.read_only_files,
