@@ -55,6 +55,10 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
                         ConfirmDialog, $q, ConfigService, ProjectsFactory) {
 
   $scope.read_only = !!($location.search()['read_only']);
+  $scope.show_sidebar = (!!($location.search()['show_sidebar']) &&
+                         $window.iframed);
+  $scope.show_project_title = (!!($location.search()['show_project_title']) &&
+                               $window.iframed);
 
   // TODO: test
   $scope.$on('$routeChangeError', function(evt, current, previous, rejection) {
@@ -170,9 +174,17 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
   $scope.select_project = function(project, label) {
     track('select-project', label, project.template_url);
     $location.path('/playground/p/' + encodeURI(project.key));
-    // Remove all params except read_only.
-    var read_only = $location.search()['read_only'];
-    $location.search(read_only ? {'read_only': read_only} : {});
+
+    // Remove all params except the display flags.
+    var params_to_preserve = ['read_only', 'show_sidebar', 'show_project_title'];
+    var new_params = {};
+    for (var pname in params_to_preserve) {
+      var pval = $location.search()[pname];
+      if (pval) {
+        new_params[pname] = pval;
+      }
+    }
+    $location.search(new_params);
   };
 
   $scope.delete_project = function(project, label) {

@@ -1,8 +1,47 @@
+@import url(https://fonts.googleapis.com/css?family=Droid+Sans+Mono|Open+Sans:300,600);
+
+body {
+  font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+}
+body.iframed {
+  background-color: #f6f6f6;
+}
+html, body {
+  margin: 0;
+  padding: 0;
+}
+.CodeMirror {
+  font-family: 'Droid Sans Mono', monospace;
+}
+.CodeMirror-gutters {
+  background-color: #eeeeee;
+  border-right: 0;
+}
+.CodeMirror-linenumber {
+  color: #c1c1c1;
+}
+.project-editor {
+  background-color: #f6f6f6;
+  padding-right: 52px;
+}
+.project-title {
+  color: #313131;
+  text-transform: uppercase;
+  font-weight: bold;
+  height: 40px;
+  line-height: 48px;
+  margin-left: 20px;
+}
+
+.source-main-container.with-sidebar {
+  margin-left: 156px;
+}
+
+
 HTML, BODY {
 }
 
 BODY {
-  font-family: Arial, Helvetica, sans-serif;
 }
 
 A:hover {
@@ -123,31 +162,38 @@ TABLE {
 }
 
 #nav {
-  width: 200px;
-  height: 100%;
-  float: left;
+  position: absolute;
+  width: 156px;
+  top: 0;
+  bottom: 0;
 }
 
   #nav #filelist {
-    border-top: 1px solid #aaa;
     width: 100%;
     height: 100%;
     overflow-x: hidden;
     overflow-y: show;
+
+    padding-top: 4px;
+    font-size: 12px;
+    line-height: 22px;
   }
 
+    #nav #filelist A {
+      color: #717171;
+    }
+
     #nav #filelist .fileentry {
-      margin: 2px 0px 0px;
       cursor: pointer;
       overflow: hidden;
     }
 
-    #nav #filelist .fileentry.selected {
-      background-color: #ddf;
+    #nav #filelist .fileentry.selected a {
+      color: #4285f4;
     }
 
-    #nav #filelist .fileentry:hover {
-      background-color: #ccf;
+    #nav #filelist .fileentry a:hover {
+      color: #5c96f5;
     }
 
       #nav #filelist .fileentry .filename , #nav #navheader .project_name {
@@ -155,12 +201,20 @@ TABLE {
         width: 160px;
         overflow: hidden;
         white-space: nowrap;
-        line-height: normal;
+
+        margin-left: 20px;
+      }
+      #nav #filelist .newthing {
+        margin-left: 20px;
       }
 
       #nav #filelist .fileentry.selected .filename {
         font-weight: bold;
       }
+
+    #nav #filelist .newthing {
+      color: #1155cc;
+    }
 
   #nav .dropdown {
     text-align: right;
@@ -182,7 +236,7 @@ TABLE {
 }
 
 .newthing {
-  color: #bbb;
+  color: #1155cc;
 }
 
 .project_row {
@@ -336,7 +390,6 @@ BUTTON.admin > I[class*=" icon-"] {
 }
 
 .CodeMirror {
-  border: 1px solid #ccc;
   height: 100%;
   line-height: 1.25em;
 }
@@ -362,12 +415,12 @@ BUTTON.admin > I[class*=" icon-"] {
     top: 0px;
     bottom: 0px;
     height: 100%;
-    border: 1px solid #ccc;
   }
 
   #output-iframe > DIV > IFRAME {
     width: 100%;
     height: 100%;
+    background-color: white;
   }
 
 .hidden {
@@ -433,6 +486,10 @@ BUTTON.admin > I[class*=" icon-"] {
   display: flex;          /* NEW: Opera 12.1, Firefox 22+ */
 }
 
+.form-inline.just-url-button {
+  height: 52px;
+}
+
 .url-bar {
  -webkit-flex: 1 1 auto;
  -ms-flex: 1 1 auto;
@@ -443,6 +500,11 @@ BUTTON.admin > I[class*=" icon-"] {
 
 .url-button {
   height: 30px;  /* same as URL input bar */
+}
+.just-url-button .url-button {
+  height: 28px;
+  width: 84px;
+  margin-top: 12px;
 }
 
 .login-button {
@@ -503,4 +565,12 @@ BUTTON.admin > I[class*=" icon-"] {
 
 .read-only .CodeMirror {
   background: #f7f7f7;
+}
+
+.iframed .modal-backdrop {
+  background-color: #ffffff;
+}
+
+.download-btn {
+  height: 29px;
 }

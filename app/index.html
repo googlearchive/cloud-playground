@@ -29,7 +29,7 @@
     <script src="/codemirror/addon/edit/matchbrackets.js"></script>
 <!--<![endif]-->
   </head>
-  <body ng-cloak ng-controller="PageController">
+  <body ng-cloak ng-controller="PageController" ng-class="{iframed: iframed}">
 
 <!--[if IE]>
     <div class="cover-everything lightbox">
@@ -113,10 +113,11 @@
           </div>
         </div>
 
-        <div class="text-center notsafe" ng-show="load_state == true && !read_only">
+        <div class="text-center notsafe" ng-show="!iframed && load_state == true && !read_only">
           Note this playground is public and may be modified by anyone.
           Don't place sensitive source code or data here.
         </div>
+
       </div>
 
 

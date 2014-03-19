@@ -1,31 +1,35 @@
-<div>
-  <div id="source-container">
-    <div id="nav" ng-hide="iframed">
-      <div id="navheader">
-        <div class="project_name" title="{{project.description}}">{{project.name}}</div>
-        <div class="dropdown"><a ng-click="project_context_menu($event, 'elipsis')">…</a></div>
-      </div>
-      <div id="filelist">
-        <div id="file-{{$index}}" class="fileentry"
-             ng-class="{selected: file == current_file}"
-             ng-repeat="file in visible_files">
-          <a ng-click="set_path(file.path)" class="filename">
-            {{file.path}} <i class="icon-asterisk dirtymarker" ng-show="file.dirty"></i>
-          </a>
-          <a class="dropdown" ng-click="file_context_menu($event, file, 'elipsis')">…</a>
-        </div>
-        <div><a class="link newthing" ng-click="prompt_new_file('new-file-link')">+ new file</a></div>
-      </div>
+<div class="project-title" ng-show="show_project_title && iframed && project.name">{{ project.name }}</div>
+<div class="project-editor" style="position: relative">
+  <div id="nav" ng-show="!iframed || show_sidebar">
+    <div ng-show="!iframed" id="navheader">
+      <div class="project_name" title="{{project.description}}">{{project.name}}</div>
+      <!-- div class="dropdown"><a ng-click="project_context_menu($event, 'elipsis')">…</a></div -->
     </div>
+    <div id="filelist">
+      <div id="file-{{$index}}" class="fileentry"
+           ng-class="{selected: file == current_file}"
+           ng-repeat="file in visible_files">
+        <a ng-click="set_path(file.path)" class="filename">
+          {{file.path}} <i class="icon-asterisk dirtymarker" ng-show="file.dirty"></i>
+        </a>
+        <!-- a ng-show="!iframed || !show_sidebar" class="dropdown" ng-click="file_context_menu($event, file, 'elipsis')">…</a -->
+      </div>
+      <div><a class="link newthing" ng-click="prompt_new_file('new-file-link')">+ new file</a></div>
+    </div>
+  </div>
 
-    <form class="form-inline form-reduced-margin btn-height">
-      <button ng-hide='read_only' ng-click='prompt_reset_project("project-reset-button")' title='Reset {{project.name}}' class='btn pull-right'>Reset Project</button>
-      <button ng-click='prompt_download_project("project-download-button")' title='Download {{project.name}}' class='btn pull-right'><i class="icon-download"></i> ZIP</button>
-      <span ng-hide="iframed" class="current-file-path"> {{current_file.path}}</span>
-      <select ng-show="iframed && visible_files_count > 5" ng-model="selected_path">
+  <div class="source-main-container" ng-class="{'with-sidebar': !iframed || show_sidebar}">
+
+  <div id="source-container">
+
+    <form ng-show="!iframed || !show_sidebar" class="form-inline form-reduced-margin btn-height">
+      <button ng-show="!read_only" ng-click="prompt_reset_project('project-reset-button')" title="Reset {{project.name}}" class="btn pull-right">Reset Project</button>
+      <button ng-click="prompt_download_project('project-download-button')" title="Download {{project.name}}" class="btn pull-right"><i class="icon-download"></i> ZIP</button>
+      <span ng-show="!iframed" class="current-file-path"> {{current_file.path}}</span>
+      <select ng-show="iframed && !show_sidebar && visible_files_count > 5" ng-model="selected_path">
         <option ng-repeat="file in visible_files">{{file.path}}</option>
       </select>
-      <div ng-show="iframed && visible_files_count <= 5">
+      <div ng-show="iframed && !show_sidebar && visible_files_count <= 5">
         <ul class="nav nav-tabs">
           <li ng-repeat="file in visible_files" ng-class="{active: file == current_file}"><a ng-click="set_path(file.path)" title={{file.path}}>{{file.path | pathonly }}</a></li>
           <li><a class="link newthing" ng-click="prompt_new_file('new-file-tab')">+ new file</a></li>
@@ -33,47 +37,49 @@
       </div>
       <span class="filestatus" ng-bind="filestatus"></span>
     </form>
+
     <span ng-show="file == current_file" ng-repeat="file in visible_files">
-      <div ng-hide="is_image_mime_type(file.mime_type)" class="source-code" ng-class="{'read-only': read_only || file.read_only}" ui-codeMirror="{onChange: create_on_change_closure(file), file: file, readOnly: read_only || file.read_only ? 'nocursor' : false}" ng-model="file.contents"></div>
+      <div ng-show="!is_image_mime_type(file.mime_type)" class="source-code" ng-class="{'read-only': read_only || file.read_only}" ui-codeMirror="{onChange: create_on_change_closure(file), file: file, readOnly: read_only || file.read_only ? 'nocursor' : false}" ng-model="file.contents"></div>
       <img ng-show="is_image_mime_type(file.mime_type)" ng-src="{{image_url_of(file)}}">
     </span>
   </div>
 
-<br>
-<br>
-  <hr ng-hide="iframed" pg-resizer="source-container">
+  <br ng-show="!show_sidebar">
+  <br ng-show="!show_sidebar">
+  <hr ng-show="!iframed" pg-resizer="source-container">
 
   <div>
-    <iframe class="control-iframe" ng-show="control_url" ng-attr-src="{{control_url}}">
-    </iframe>
-    <div ng-hide='read_only' class="">
-       If your app fails to load in the IFRAME below, try running your app in a
-       <a ng-click='popout("separate-window-link"); run("separate-window-link");'>separate window</a>.
-    </div>
-    <div class='form-inline url-container'>
-      <button ng-click='run("blue-button")' class='btn btn-primary url-button pull-left' title='Run'><i class="icon-play icon-white"></i></button>
-      <input ng-model='iframe_run_url' type='url' class='span8 url-bar' ng-click='select_me($event)'>
-      <button ng-click='popout("popout-button"); run("popout-button")' class='btn pull-right url-button' title='Open in a separate window'><i class="icon-share-alt"></i></button>
+    <div ng-class="{'form-inline': true, 'url-container': !show_sidebar, 'just-url-button': show_sidebar}">
+      <button ng-click="run('blue-button')" class="btn btn-primary url-button pull-left" title="Run"><i class="icon-play icon-white"></i></button>
+      <input ng-show="!show_sidebar" ng-model="iframe_run_url" type="url" class="span8 url-bar" ng-click="select_me($event)">
+      <button ng-show="!show_sidebar" ng-click="popout('popout-button'); run('popout-button')" class="btn pull-right url-button" title="Open in a separate window"><i class="icon-share-alt"></i></button>
     </div>
     <div id="output-iframe" style="position: relative;">
       <div ng-show= "!output_ready" style="position: absolute; background-color: #eee;">
         <div style="margin: 2em;" ng-show="app_run_count !=0">
-          Deploying code to a Google data center...
+          Deploying your code...
         </div>
-        <div style="text-align: center; margin-top: 4em;" ng-show="app_run_count == 0">
-          [ Click the blue <a ng-click="run('output-iframe-inline-run-link')">run</a> button to see your output here. ]
+        <div style="text-align: center; margin-top: 100px;" ng-show="app_run_count == 0">
+          Click the blue <a ng-click="run('output-iframe-inline-run-link')">run</a> button to run this code.
         </div>
       </div>
-      <div ng-hide="requested_popout" pg-visible="output_ready">
+      <div ng-show="!requested_popout" pg-visible="output_ready">
         <iframe ng-src="{{iframe_run_url}}" pg-load="output_loaded()">
         </iframe>
       </div>
     </div>
 
-    <hr ng-hide="iframed" pg-resizer="output-iframe">
+    <hr ng-show="!iframed" pg-resizer="output-iframe">
+
+    <iframe class="control-iframe" ng-show="control_url" ng-attr-src="{{control_url}}">
+    </iframe>
+
+    <button ng-show="iframed && show_sidebar" ng-click="download_project(project.name + ' - ' + project.key + '.zip', 'project-download-button')" title="Download your code" class="btn btn-primary download-btn">Download your code</button>
   </div>
 
-  <div ng-hide="iframed">
+  </div>
+
+  <div ng-show="!iframed">
     <div ng-show="logs.length">
       <a ng-click="clear_logs()" ng-show="logs.length" class="btn pull-right">clear logs</a>
       <h4>Log output</h4>
