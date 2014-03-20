@@ -11,6 +11,11 @@ handlers:
   script: __pg.intercept.control_app
   secure: always
 
+# allow zip download
+- url: /_ah/mimic/ziprepo
+  script: __pg.intercept.control_app
+  secure: always
+
 # allow file retrieval
 - url: /_ah/mimic/file
   script: __pg.intercept.control_app
