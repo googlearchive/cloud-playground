@@ -13,7 +13,7 @@ handlers:
 
 # allow zip download
 - url: /_ah/mimic/ziprepo
-  script: __pg.intercept.control_app
+  script: __pg.intercept.ziprepo_app
   secure: always
 
 # allow file retrieval

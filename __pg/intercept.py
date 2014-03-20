@@ -22,3 +22,6 @@ user_app = middleware.AccessKeyHttpHeaderFilter(user_app)
 user_app = middleware.Redirector(user_app)
 user_app = middleware.ProjectFilter(user_app)
 user_app = middleware.ErrorHandler(user_app, debug=settings.DEBUG)
+
+ziprepo_app = mimic_wsgi.Mimic
+ziprepo_app = middleware.ErrorHandler(ziprepo_app, debug=settings.DEBUG)
