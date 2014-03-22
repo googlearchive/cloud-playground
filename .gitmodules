@@ -19,3 +19,21 @@
 [submodule "repos/appengine-angular-hello-world-python"]
 	path = repos/appengine-angular-hello-world-python
 	url = https://github.com/GoogleCloudPlatform/appengine-angular-hello-world-python
+[submodule "repos/appengine-try-go"]
+	path = repos/appengine-try-go
+	url = https://github.com/GoogleCloudPlatform/appengine-try-go/
+[submodule "repos/appengine-try-php"]
+	path = repos/appengine-try-php
+	url = https://github.com/GoogleCloudPlatform/appengine-try-php/
+[submodule "repos/appengine-try-java"]
+	path = repos/appengine-try-java
+	url = https://github.com/GoogleCloudPlatform/appengine-try-java/
+[submodule "repos/appengine-try-python-flask"]
+	path = repos/appengine-try-python-flask
+	url = https://github.com/GoogleCloudPlatform/appengine-try-python-flask/
+[submodule "repos/appengine-try-python-bottle"]
+	path = repos/appengine-try-python-bottle
+	url = https://github.com/GoogleCloudPlatform/appengine-try-python-bottle/
+[submodule "repos/appengine-try-python-django"]
+	path = repos/appengine-try-python-django
+	url = https://github.com/GoogleCloudPlatform/appengine-try-python-django/

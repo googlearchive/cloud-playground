@@ -44,8 +44,8 @@ class ZipUrlFetchTree(common.Tree):
     self.access_key = access_key
 
     path_info = '{}/zip'.format(common.CONTROL_PREFIX)
-    query_params = '{}={}'.format(common.config.PROJECT_ID_QUERY_PARAM,
-                                  namespace)
+    query_params = '{}={}&use_basepath=false'.format(
+      common.config.PROJECT_ID_QUERY_PARAM, namespace)
     playground_hostname = (settings.PLAYGROUND_USER_CONTENT_HOST or
                            settings.PLAYGROUND_HOSTS[0])
     url = 'https://{}{}?{}'.format(playground_hostname, path_info, query_params)
