@@ -39,7 +39,7 @@ inbound_services:
 # Keep in sync with target_info.py library validation code.
 libraries:
 - name: django
-  version: latest
+  version: 1.5
 - name: endpoints
   version: latest
 - name: jinja2
