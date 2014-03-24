@@ -1,0 +1,11 @@
+application: fredsa-bliss
+module: try-go-demo
+version: 1
+runtime: go
+api_version: go1
+instance_class: F1
+
+# Handlers must mimic repos/appengine-try-go/app.yaml.
+handlers:
+- url: /.*
+  script: _go_app
