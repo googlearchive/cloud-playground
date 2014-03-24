@@ -27,6 +27,10 @@ other than Apache 2.0.
 * Some subdirectories of the CodeMirror distribution include their own LICENSE
   files, and are released under different licences.
 
-* Twitter Bootstrap (https://github.com/twitter/bootstrap.git) See
+* Twitter Bootstrap (https://github.com/twitter/bootstrap.git). See
   https://github.com/twitter/bootstrap/blob/master/LICENSE
 
+* Werkzeug (http://werkzeug.pocoo.org/). See
+  https://github.com/mitsuhiko/werkzeug/blob/master/LICENSE
+
+* Flask (http://flask.pocoo.org/). See http://flask.pocoo.org/docs/license/

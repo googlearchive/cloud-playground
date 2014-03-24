@@ -61,6 +61,12 @@ echo
 echo "Using app id: $APP_ID"
 
 function deploy() {
+  # TODO: If $* has .yamls in it, separate them and use them instead of "." with each appcfg.py command.
+  #for arg in $*
+  #do
+  #  
+  #done
+
   echo -e "\n*** Rolling back any pending updates (just in case) ***\n"
   appcfg.py --oauth2 $* rollback .
 
@@ -73,6 +79,8 @@ function deploy() {
 
 
 APP_IDS=$(APPLICATION_ID=$APP_ID python -c 'from __pg import appids; appids.PrintAppIds()')
+
+# TODO: If $* has .yamls in it, only use the first app ID, not all of them.
 echo -e "Using app ids:\n$APP_IDS"
 for appid in $APP_IDS
 do

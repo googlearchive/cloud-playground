@@ -17,11 +17,12 @@ from google.appengine.api import app_identity
 
 
 def _FixupSysPath():
-  """Add api-python-client directory to sys.path."""
+  """Add additional directories to sys.path."""
   app_root_dir = os.path.dirname(__file__)
-  api_python_client_dir = os.path.join(app_root_dir, 'api-python-client')
-  if api_python_client_dir not in sys.path:
-    sys.path.append(api_python_client_dir)
+  for dir_name in ('lib', 'api-python-client'):
+    dir_path = os.path.join(app_root_dir, 'api-python-client')
+    if dir_path not in sys.path:
+      sys.path.append(dir_path)
 
 
 _FixupSysPath()

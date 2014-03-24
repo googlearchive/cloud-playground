@@ -1018,8 +1018,9 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     var show_files = project.show_files;
     if (show_files.length == 0) {
       // empty filter list implies no filtering
+      // other than .playground file, if present
       for (var filename in files) {
-        if (files.hasOwnProperty(filename)) {
+        if (filename != '.playground' && files.hasOwnProperty(filename)) {
           show_files.push(filename);
         }
       }
@@ -1029,9 +1030,6 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     angular.forEach(show_files, function(show_file) {
       show_files_map[show_file] = true;
     });
-
-    // Always hide .playground, if present.
-    delete show_files_map['.playground'];
 
     var read_only_files = project.read_only_files;
     var read_only_files_map = {};
