@@ -92,6 +92,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
 
   $scope.to_main_page = function(label) {
     track('to-main-page', label);
+    $location.replace();
     $location.path('/playground/').hash('');
   }
 
@@ -172,6 +173,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
   };
 
   $scope.select_project = function(project, label) {
+    $location.replace();
     track('select-project', label, project.template_url);
     $location.path('/playground/p/' + encodeURI(project.key));
 
@@ -188,6 +190,7 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
   };
 
   $scope.delete_project = function(project, label) {
+    $location.replace();
     track('delete-project', label, project.template_url);
     $scope.projects_service.remove(project);
     $scope.project = undefined;
@@ -590,6 +593,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   };
 
   $scope.select_file = function(file, label) {
+    $location.replace();
     if (file == $scope.current_file) {
       if ($location.hash() != file.path) {
         // user was on a valid file, then changed hash to invalid path
