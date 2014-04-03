@@ -593,7 +593,6 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
   };
 
   $scope.select_file = function(file, label) {
-    $location.replace();
     if (file == $scope.current_file) {
       if ($location.hash() != file.path) {
         // user was on a valid file, then changed hash to invalid path
