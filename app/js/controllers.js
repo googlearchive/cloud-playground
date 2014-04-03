@@ -597,6 +597,7 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     if (file == $scope.current_file) {
       if ($location.hash() != file.path) {
         // user was on a valid file, then changed hash to invalid path
+        $location.replace();
         $location.hash(file.path);
       }
       return;
@@ -604,10 +605,12 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     track('select-file', label, file.path);
     if ($scope.is_image_mime_type(file.mime_type)) {
       $scope.current_file = file;
+      $location.replace();
       $location.hash(file.path);
       return;
     }
     $scope._get(file, function() {
+      $location.replace();
       $scope.current_file = file;
       $location.hash(file.path);
     });
