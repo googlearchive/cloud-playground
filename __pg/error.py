@@ -1,5 +1,6 @@
 """Exceptions raised in playground app."""
 
+import cgi
 import httplib
 import logging
 import sys
@@ -23,7 +24,7 @@ class PlaygroundError(Exception):
 
 def Abort(status_code, message):
   logging.debug('Abort {} {}'.format(status_code, message))
-  raise PlaygroundError(status_code, message)
+  raise PlaygroundError(int(status_code), cgi.escape(message))
 
 
 def MakeErrorResponse(exception, debug_mode):
