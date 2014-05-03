@@ -43,39 +43,39 @@ inbound_services:
 # Keep in sync with target_info.py library validation code.
 libraries:
 - name: django
-  version: 1.5
+  version: "1.5"
 - name: endpoints
-  version: latest
+  version: "1.0"
 - name: jinja2
-  version: latest
+  version: "2.6"
 - name: lxml
-  version: latest
+  version: "2.3"
 - name: markupsafe
-  version: latest
+  version: "0.15"
 - name: matplotlib
-  version: latest
+  version: "1.2.0"
 - name: MySQLdb
-  version: latest
+  version: "1.2.4b4"
 - name: numpy
-  version: latest
+  version: "1.6.1"
 - name: PIL
-  version: latest
+  version: "1.1.7"
 - name: protorpc
-  version: latest
+  version: "1.0"
 - name: PyAMF
-  version: latest
+  version: "0.6.1"
 - name: pycrypto
-  version: latest
+  version: "2.6"
 - name: setuptools
-  version: latest
+  version: "0.6c11"
 - name: ssl
-  version: latest
+  version: "2.7"
 - name: webapp2
-  version: latest
+  version: "2.5.2"
 - name: webob
-  version: latest
+  version: "1.2.3"
 - name: yaml
-  version: latest
+  version: "3.10"
 
 # https://developers.google.com/appengine/docs/python/config/appconfig#Skipping_Files
 skip_files:
