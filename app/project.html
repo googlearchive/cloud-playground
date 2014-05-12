@@ -14,7 +14,7 @@
         </a>
         <!-- a ng-show="!iframed || !show_sidebar" class="dropdown" ng-click="file_context_menu($event, file, 'elipsis')">…</a -->
       </div>
-      <div><a class="link newthing" ng-click="prompt_new_file('new-file-link')">+ new file</a></div>
+      <div><a ng-hide="read_only" class="link newthing" ng-click="prompt_new_file('new-file-link')">+ new file</a></div>
     </div>
   </div>
 
@@ -32,7 +32,7 @@
       <div ng-show="iframed && !show_sidebar && visible_files_count <= 5">
         <ul class="nav nav-tabs">
           <li ng-repeat="file in visible_files" ng-class="{active: file == current_file}"><a ng-click="set_path(file.path)" title={{file.path}}>{{file.path | pathonly }}</a></li>
-          <li><a class="link newthing" ng-click="prompt_new_file('new-file-tab')">+ new file</a></li>
+          <li ng-hide="read_only"><a class="link newthing" ng-click="prompt_new_file('new-file-tab')">+ new file</a></li>
         </ul>
       </div>
       <span class="filestatus" ng-bind="filestatus"></span>
