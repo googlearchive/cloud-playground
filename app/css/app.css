@@ -574,3 +574,5 @@ BUTTON.admin > I[class*=" icon-"] {
 .download-btn {
   height: 29px;
 }
+
+.read-only .CodeMirror div.CodeMirror-cursor { visibility: hidden; }

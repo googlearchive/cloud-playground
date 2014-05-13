@@ -39,7 +39,7 @@
     </form>
 
     <span ng-show="file == current_file" ng-repeat="file in visible_files">
-      <div ng-show="!is_image_mime_type(file.mime_type)" class="source-code" ng-class="{'read-only': read_only || file.read_only}" ui-codeMirror="{onChange: create_on_change_closure(file), file: file, readOnly: read_only || file.read_only ? 'nocursor' : false}" ng-model="file.contents"></div>
+      <div ng-show="!is_image_mime_type(file.mime_type)" class="source-code" ng-class="{'read-only': read_only || file.read_only}" ui-codeMirror="{onChange: create_on_change_closure(file), file: file, readOnly: read_only || file.read_only}" ng-model="file.contents"></div>
       <img ng-show="is_image_mime_type(file.mime_type)" ng-src="{{image_url_of(file)}}">
     </span>
   </div>
