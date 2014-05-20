@@ -96,7 +96,10 @@ angular.module('ui.directives')
           // file list, with empty contents. So we need to clear the history
           // here, in order to prevent the editor from undo to an empty state.
           codeMirror.getDoc().clearHistory();
-          codeMirror.focus();
+
+          // Disabling this to prevent CodeMirror from stealing auto-focus on
+          // first load.
+          // codeMirror.focus();
 
           // Defer the setOption call, since otherwise an empty editor shown
           $timeout(function() {
