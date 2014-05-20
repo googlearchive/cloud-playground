@@ -117,7 +117,10 @@ angular.module('ui.directives')
 
         scope.$watch('file.path', function() {
           // The file renamed, need to focus.
-          codeMirror.focus();
+
+          // Disabling this to prevent CodeMirror from stealing auto-focus on
+          // first load.
+          // codeMirror.focus();
         });
 
         scope.$watch('file.mime_type', function() {
