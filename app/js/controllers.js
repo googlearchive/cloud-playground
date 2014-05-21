@@ -994,7 +994,17 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
     track('download-project', label);
     var project_id = $scope.namespace();
     $window.location = $scope.url_of('zip', {filename: filename});
-  }
+  };
+
+  $scope.handle_download_button = function(project) {
+    var filename = project.download_filename;
+    if (!filename) {
+      filename = project.name;
+      filename = filename.replace(/[^a-zA-Z0-9-]/g, '_');
+      filename = filename + '.zip';
+    }
+    $scope.download_project(filename, 'project-download-button');
+  };
 
   $scope.prompt_download_project = function(label) {
     track('prompt-download-project', label);

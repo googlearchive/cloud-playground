@@ -48,6 +48,8 @@ class Project(ndb.Model):
   read_only_files = ndb.StringProperty(required=False, repeated=True,
                                        indexed=False)
   read_only_demo_url = ndb.StringProperty(required=False, indexed=False)
+  is_read_only = ndb.BooleanProperty(required=False)
+  download_filename = ndb.StringProperty(required=False)
   orderby = ndb.StringProperty(required=False, indexed=False)
   in_progress_task_name = ndb.StringProperty(indexed=False)
   access_key = ndb.StringProperty(required=True, indexed=False)
@@ -107,6 +109,9 @@ class Repo(ndb.Model):
   read_only_demo_url = ndb.StringProperty(required=False, indexed=False)
   orderby = ndb.StringProperty(required=False, indexed=False)
   in_progress_task_name = ndb.StringProperty(indexed=False)
+  is_read_only = ndb.BooleanProperty(required=False)
+  hide_template = ndb.BooleanProperty(required=False)
+  download_filename = ndb.StringProperty(required=False)
 
 
 def GetResource(url):
@@ -163,7 +168,9 @@ def GetRepo(repo_url):
 
 @ndb.transactional(xg=True)
 def CreateRepoAsync(owner, repo_url, html_url, name, description, show_files,
-                    read_only_files, read_only_demo_url, orderby=None):
+                    read_only_files, read_only_demo_url, orderby=None,
+                    download_filename=None, hide_template=False,
+                    is_read_only=False):
   """Asynchronously create a repo."""
   repo = GetRepo(repo_url)
   if not repo:
@@ -176,7 +183,10 @@ def CreateRepoAsync(owner, repo_url, html_url, name, description, show_files,
                 read_only_files=read_only_files,
                 read_only_demo_url=read_only_demo_url,
                 orderby=orderby,
-                namespace=settings.PLAYGROUND_NAMESPACE)
+                namespace=settings.PLAYGROUND_NAMESPACE,
+                download_filename=download_filename,
+                hide_template=hide_template,
+                is_read_only=is_read_only)
   elif repo.in_progress_task_name:
     shared.w('ignoring recreation of {} which is already executing in task {}'
              .format(repo_url, repo.in_progress_task_name))
@@ -200,7 +210,9 @@ def CreateRepoAsync(owner, repo_url, html_url, name, description, show_files,
                             read_only_demo_url=read_only_demo_url,
                             expiration_seconds=0,
                             orderby=orderby,
-                            in_progress_task_name=task.name)
+                            in_progress_task_name=task.name,
+                            download_filename=download_filename,
+                            is_read_only=is_read_only)
     repo.project = project.key
   repo.put()
   return repo
@@ -282,7 +294,9 @@ def CopyProject(owner, template_project, expiration_seconds,
         read_only_demo_url=template_project.read_only_demo_url,
         expiration_seconds=expiration_seconds,
         orderby=template_project.orderby,
-        in_progress_task_name='copy_project')
+        in_progress_task_name='copy_project',
+        download_filename=template_project.download_filename,
+        is_read_only=template_project.is_read_only)
       src_tree = _CreateProjectTree(template_project)
       dst_tree = _CreateProjectTree(project)
       CopyTree(dst_tree, src_tree)
@@ -354,6 +368,9 @@ def UpdateProject(project_id, data):
     project.read_only_demo_url = data.get('read_only_demo_url',
                                           project.read_only_demo_url)
     project.orderby = data.get('orderby', project.orderby)
+    project.download_filename = data.get('download_filename',
+                                         project.download_filename)
+    project.is_read_only = data.get('is_read_only', project.is_read_only)
   project.put()
   return project
 
@@ -429,7 +446,9 @@ def DeleteReposAndTemplateProjects():
 def CreateProject(owner, template_url, html_url, project_name,
                   project_description, show_files, read_only_files,
                   read_only_demo_url, expiration_seconds, orderby=None,
-                  in_progress_task_name=None):
+                  in_progress_task_name=None,
+                  download_filename=None,
+                  is_read_only=False):
   """Create a new user project.
 
   Args:
@@ -445,6 +464,9 @@ def CreateProject(owner, template_url, html_url, project_name,
     expiration_seconds: Seconds till expiration, from last update.
     orderby: String used for project descending sort order. Optional.
     in_progress_task_name: Owning task name. Optional.
+    download_filename: The filename used when the user clicks the
+        "Download your code"/"Zip" button.
+    is_read_only: True if the project cannot be edited in the UI.
 
   Returns:
     The new project entity.
@@ -465,7 +487,9 @@ def CreateProject(owner, template_url, html_url, project_name,
                 in_progress_task_name=in_progress_task_name,
                 access_key=secret.GenerateRandomString(),
                 namespace=settings.PLAYGROUND_NAMESPACE,
-                expiration_seconds=expiration_seconds)
+                expiration_seconds=expiration_seconds,
+                download_filename=download_filename,
+                is_read_only=is_read_only)
   prj.put()
   # transactional get before update
   owner = owner.key.get()

@@ -110,6 +110,8 @@ class PlaygroundHandler(JsonHandler):
         'orderby': orderby,
         'writers': project.writers,
         'access_key': project.access_key,
+        'download_filename': project.download_filename,
+        'is_read_only': project.is_read_only,
         'expiration_seconds': project.expiration_seconds,
         'writable': self.user.key.id() in project.writers,
     }
