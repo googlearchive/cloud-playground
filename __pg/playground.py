@@ -114,6 +114,7 @@ class PlaygroundHandler(JsonHandler):
         'is_read_only': project.is_read_only,
         'expiration_seconds': project.expiration_seconds,
         'writable': self.user.key.id() in project.writers,
+        'hide_template': project.hide_template
     }
 
   def _MakeMimicUrl(self, project, path, params=None):

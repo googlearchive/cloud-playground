@@ -85,6 +85,10 @@ function PageController($scope, $http, DoSerial, $routeParams, $window,
     })
   });
 
+  $scope.show_project_in_list = function(project) {
+    return $scope.config.is_admin || !project.hide_template;
+  };
+
   $scope.namespace = function() {
     return $routeParams.project_id ||
            ($scope.config && $scope.config.playground_namespace);

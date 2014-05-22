@@ -54,6 +54,7 @@ class Project(ndb.Model):
   in_progress_task_name = ndb.StringProperty(indexed=False)
   access_key = ndb.StringProperty(required=True, indexed=False)
   expiration_seconds = ndb.IntegerProperty(required=True, indexed=False)
+  hide_template = ndb.BooleanProperty(required=False)
 
 
 class User(ndb.Model):
@@ -212,7 +213,8 @@ def CreateRepoAsync(owner, repo_url, html_url, name, description, show_files,
                             orderby=orderby,
                             in_progress_task_name=task.name,
                             download_filename=download_filename,
-                            is_read_only=is_read_only)
+                            is_read_only=is_read_only,
+                            hide_template=hide_template)
     repo.project = project.key
   repo.put()
   return repo
@@ -296,7 +298,8 @@ def CopyProject(owner, template_project, expiration_seconds,
         orderby=template_project.orderby,
         in_progress_task_name='copy_project',
         download_filename=template_project.download_filename,
-        is_read_only=template_project.is_read_only)
+        is_read_only=template_project.is_read_only,
+        hide_template=template_project.hide_template)
       src_tree = _CreateProjectTree(template_project)
       dst_tree = _CreateProjectTree(project)
       CopyTree(dst_tree, src_tree)
@@ -371,6 +374,7 @@ def UpdateProject(project_id, data):
     project.download_filename = data.get('download_filename',
                                          project.download_filename)
     project.is_read_only = data.get('is_read_only', project.is_read_only)
+    project.hide_template = data.get('hide_template', project.hide_template)
   project.put()
   return project
 
@@ -448,7 +452,7 @@ def CreateProject(owner, template_url, html_url, project_name,
                   read_only_demo_url, expiration_seconds, orderby=None,
                   in_progress_task_name=None,
                   download_filename=None,
-                  is_read_only=False):
+                  is_read_only=False, hide_template=False):
   """Create a new user project.
 
   Args:
@@ -467,6 +471,8 @@ def CreateProject(owner, template_url, html_url, project_name,
     download_filename: The filename used when the user clicks the
         "Download your code"/"Zip" button.
     is_read_only: True if the project cannot be edited in the UI.
+    hide_template: True if the project/template should not appear on the main
+        page, such as for samples that don't actually run on CP.
 
   Returns:
     The new project entity.
@@ -489,7 +495,8 @@ def CreateProject(owner, template_url, html_url, project_name,
                 namespace=settings.PLAYGROUND_NAMESPACE,
                 expiration_seconds=expiration_seconds,
                 download_filename=download_filename,
-                is_read_only=is_read_only)
+                is_read_only=is_read_only,
+                hide_template=hide_template)
   prj.put()
   # transactional get before update
   owner = owner.key.get()
