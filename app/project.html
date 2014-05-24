@@ -74,7 +74,7 @@
     <iframe class="control-iframe" ng-show="control_url" ng-attr-src="{{control_url}}">
     </iframe>
 
-    <button ng-show="iframed && show_sidebar" ng-click="handle_download_button(project)" title="Download your code" class="btn btn-primary download-btn">Download your code</button>
+    <button ng-show="iframed && show_sidebar" ng-click="handle_download_button(project)" ng-title="Download {{read_only ? 'this' : 'your'}} code" class="btn btn-primary download-btn">Download {{read_only ? 'this' : 'your'}} code</button>
   </div>
 
   </div>
