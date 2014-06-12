@@ -97,7 +97,7 @@ class Info(object):
     if self.branch is None:
       fetched = FetchAsyncWithAuth(self.RepositoryUrl())
       data = fetched.json_content
-      self.branch = data['master_branch']
+      self.branch = data['default_branch']
     return ('https://api.github.com/repos/{owner}/{repo}/branches/{branch}'
             .format(**self.__dict__))
 
