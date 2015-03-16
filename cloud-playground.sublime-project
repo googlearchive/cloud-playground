@@ -2,7 +2,7 @@
 	"folders":
 	[
   {
-    "path": "/fred/src/cloud-playground.bliss",
+    "path": ".",
     "name": "bliss",
     "folder_exclude_patterns":
     [
