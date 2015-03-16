@@ -6,7 +6,7 @@
 	url = https://github.com/twbs/bootstrap
 [submodule "mimic"]
 	path = mimic
-	url = https://code.google.com/p/cloud-playground.mimic
+	url = https://github.com/fredsa/mimic
 [submodule "repos/appengine-guestbook-python"]
 	path = repos/appengine-guestbook-python
 	url = https://github.com/GoogleCloudPlatform/appengine-guestbook-python
