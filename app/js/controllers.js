@@ -665,8 +665,8 @@ function ProjectController($scope, $browser, $http, $routeParams, $window, $sce,
                 'zipUrl' : $scope.url_of('zip', {filename: filename}),
                 'accessKey' : $scope.project.access_key
               };
-              // When the cloud playground is iFramed, the project access key is given 
-	     // unconditionally to the parent frame.
+              // When the cloud playground is iFramed, the project access key is given
+	            // unconditionally to the parent frame.
               parent.postMessage(postedData, '*');
             }
             return true;
