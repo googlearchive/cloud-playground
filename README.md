@@ -18,9 +18,9 @@ https://cloud-playground.appspot.com/
 # Using the source #
 There are two important projects which together create the Cloud Playground:
 
-  1. [mimic](https://github.com/fredsa/mimic) is a regular (or "special", depending on how you look at things) Python App Engine app, which serves as a development server (similar to the App Engine SDK "dev\_appserver"), but which runs in the production App Engine environment, providing you access to the production APIs and environment while still offering a quick and easy way to test out bits of code.
+  1. [mimic](https://github.com/GoogleCloudPlatform/mimic) is a regular (or "special", depending on how you look at things) Python App Engine app, which serves as a development server (similar to the App Engine SDK "dev\_appserver"), but which runs in the production App Engine environment, providing you access to the production APIs and environment while still offering a quick and easy way to test out bits of code.
 
-  1. [bliss](https://github.com/fredsa/cloud-playground) (this project) is an experimental, trivial browser based code editor which lets edit code in the mimic virtual file system (backed by the App Engine datastore), providing you with a user interface so you can see what the mimic app can do for you.
+  1. [bliss](https://github.com/GoogleCloudPlatform/cloud-playground) (this project) is an experimental, trivial browser based code editor which lets edit code in the mimic virtual file system (backed by the App Engine datastore), providing you with a user interface so you can see what the mimic app can do for you.
 
 
 # Creating a private cloud playground #
@@ -30,7 +30,7 @@ There are two important projects which together create the Cloud Playground:
   1. Create a git clone of bliss and its submodules:
 
     ```bash
-    git clone --recursive https://github.com/fredsa/cloud-playground
+    git clone --recursive https://github.com/GoogleCloudPlatform/cloud-playground
     cd cloud-playground
     ```
 
@@ -66,7 +66,7 @@ There are two important projects which together create the Cloud Playground:
 
 _Note, the Cloud Playground includes libraries that are licensed under terms other than Apache 2.0._
 
-* Bliss (i.e the source code in this repo) — [LICENSE](https://github.com/fredsa/cloud-playground/blob/master/LICENSE) file
+* Bliss (i.e the source code in this repo) — [LICENSE](https://github.com/GoogleCloudPlatform/cloud-playground/blob/master/LICENSE) file
 
 * [AngularJS](code.angularjs.org) — https://github.com/angular/angular.js/blob/master/LICENSE
 
