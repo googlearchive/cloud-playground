@@ -1,3 +1,9 @@
+# Project status #
+![status: inactive](https://img.shields.io/badge/status-inactive-red.svg)
+
+This project is no longer actively maintained, and remains here as an archive of this work.
+
+
 # Introduction #
 Cloud Playground is a place for developers to experiment and play with some of the services offered by the Google Cloud Platform (http://cloud.google.com/), such as [Google App Engine](https://developers.google.com/appengine/), [Google Cloud Storage](https://developers.google.com/storage/) and [Google Cloud SQL](https://developers.google.com/cloud-sql/). Think of the playground as an easy way to get to know these services, or just quickly try out a new API, without having to download the SDK or having to run `appcfg.py update` every time you want to test your changes.
 
